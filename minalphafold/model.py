@@ -3,7 +3,7 @@ import torch.utils.checkpoint as torch_checkpoint
 import math
 from typing import cast
 
-from .evoformer import Evoformer
+from .evoformer import Evoformer, SimplicialEvoformer
 from .structure_module import StructureModule
 from .initialization import init_gate_linear, init_linear, zero_linear
 from .embedders import InputEmbedder, TemplatePair, TemplatePointwiseAttention, ExtraMsaStack
@@ -50,7 +50,17 @@ class AlphaFold2(torch.nn.Module):
 
     def __init__(self, config):
         super().__init__()
-        self.evoformer_blocks = torch.nn.ModuleList([Evoformer(config) for _ in range(config.num_evoformer)])
+        self.use_simplicial_evoformer = bool(getattr(config, "use_simplicial_evoformer", False))
+        simplex_every_n = max(int(getattr(config, "simplex_every_n_blocks", 1)), 1)
+        if self.use_simplicial_evoformer:
+            self.evoformer_blocks = torch.nn.ModuleList(
+                [
+                    SimplicialEvoformer(config, enable_simplex=((idx + 1) % simplex_every_n == 0))
+                    for idx in range(config.num_evoformer)
+                ]
+            )
+        else:
+            self.evoformer_blocks = torch.nn.ModuleList([Evoformer(config) for _ in range(config.num_evoformer)])
         self.structure_model = StructureModule(config)
 
         self.input_embedder = InputEmbedder(config)
@@ -226,6 +236,8 @@ class AlphaFold2(torch.nn.Module):
         single_rep_prev = torch.zeros(batch_size, N_res, c_m, device=msa_feat.device)
         z_prev = torch.zeros(batch_size, N_res, N_res, c_z, device=msa_feat.device)
         x_prev = torch.zeros(batch_size, N_res, 3, device=msa_feat.device)
+        ca_prev: torch.Tensor | None = None
+        rotations_prev: torch.Tensor | None = None
 
         # Algorithm 2 line 2: recycling loop.
         for i in range(n_cycles):
@@ -242,8 +254,10 @@ class AlphaFold2(torch.nn.Module):
                 # matters at inference — supplement 1.11.2 uses N_ensemble = 1
                 # at training, and the masked MSA head is training-only.
                 single_rep_accum = torch.zeros(batch_size, N_res, c_m, device=msa_feat.device)
+                structure_single_accum = torch.zeros(batch_size, N_res, self.config.c_s, device=msa_feat.device)
                 pair_repr_accum = torch.zeros(batch_size, N_res, N_res, c_z, device=msa_feat.device)
                 msa_repr_last: torch.Tensor | None = None
+                simplex_aux_last: dict[str, torch.Tensor] | None = None
 
                 # Algorithm 2 line 4: ensemble loop.
                 for ensemble_index in range(n_ensemble):
@@ -339,8 +353,25 @@ class AlphaFold2(torch.nn.Module):
                                 )
 
                     # Algorithm 2 line 17 (= Algorithm 6 / EvoformerStack).
+                    single_repr = self.single_rep_proj(msa_repr[:, 0, :, :])
                     for block in self.evoformer_blocks:
-                        if self.training:
+                        if isinstance(block, SimplicialEvoformer):
+                            # The simplex adapter uses discrete top-k topology
+                            # plus auxiliary-index tensors; keep this path
+                            # explicit instead of checkpointing nested dicts.
+                            msa_repr, pair_repr, single_repr, simplex_aux = block(
+                                msa_repr,
+                                pair_repr,
+                                single_repr,
+                                msa_mask=evo_msa_mask,
+                                pair_mask=pair_mask,
+                                seq_mask=seq_mask,
+                                recycled_ca_coords=ca_prev,
+                                recycled_frames=rotations_prev,
+                            )
+                            if simplex_aux:
+                                simplex_aux_last = simplex_aux
+                        elif self.training:
                             msa_repr, pair_repr = cast(
                                 tuple[torch.Tensor, torch.Tensor],
                                 torch_checkpoint.checkpoint(
@@ -355,12 +386,14 @@ class AlphaFold2(torch.nn.Module):
                                 msa_repr, pair_repr,
                                 msa_mask=evo_msa_mask, pair_mask=pair_mask,
                             )
+                            single_repr = self.single_rep_proj(msa_repr[:, 0, :, :])
 
                     # Algorithm 2 line 18: accumulate m_1i and z_ij only.
                     # Keep the last sample's full MSA rep (real-MSA rows only,
                     # dropping the appended template-angle rows) for the
                     # masked MSA head — see the comment above the accumulators.
                     single_rep_accum = single_rep_accum + msa_repr[:, 0, :, :]
+                    structure_single_accum = structure_single_accum + single_repr
                     pair_repr_accum = pair_repr_accum + pair_repr
                     msa_repr_last = msa_repr[:, :msa_feat_current.shape[1], :, :]
 
@@ -372,7 +405,10 @@ class AlphaFold2(torch.nn.Module):
 
                 # Algorithm 6 line 12: s_i = Linear(m_1i). By linearity this is
                 # equivalent to averaging s_i itself across ensemble members.
-                single_rep = self.single_rep_proj(msa_first_row)
+                if self.use_simplicial_evoformer:
+                    single_rep = structure_single_accum / n_ensemble
+                else:
+                    single_rep = self.single_rep_proj(msa_first_row)
 
                 # Algorithm 2 line 21: StructureModule consumes (ŝ_i, ẑ_ij).
                 structure_predictions = self.structure_model(
@@ -396,7 +432,7 @@ class AlphaFold2(torch.nn.Module):
                     plddt_logits = self.plddt_head(structure_predictions["single"])
                     tm_logits = self.tm_score_head(pair_repr)
 
-                    return {
+                    output = {
                         **structure_predictions,
                         "distogram_logits": distogram_logits,
                         "masked_msa_logits": masked_msa_logits,
@@ -409,6 +445,9 @@ class AlphaFold2(torch.nn.Module):
                         "sampled_n_cycles": n_cycles,
                         "sampled_n_ensemble": n_ensemble,
                     }
+                    if simplex_aux_last is not None:
+                        output.update(simplex_aux_last)
+                    return output
 
                 # Algorithm 2 line 22: store averaged m̂_1i, ẑ_ij (pre-projection,
                 # in c_m not c_s) and pseudo-β positions for the next cycle.
@@ -425,6 +464,8 @@ class AlphaFold2(torch.nn.Module):
                 is_gly = (aatype == 7)
                 cb_idx = torch.where(is_gly, 1, 4)
                 atom_coords = structure_predictions["atom14_coords"]
+                ca_prev = atom_coords[:, :, 1, :].detach()
+                rotations_prev = structure_predictions["final_rotations"].detach()
                 x_prev = torch.gather(
                     atom_coords, 2,
                     cb_idx[:, :, None, None].expand(-1, -1, 1, 3),

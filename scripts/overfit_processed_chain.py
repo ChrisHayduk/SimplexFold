@@ -470,6 +470,13 @@ _LOSS_BREAKDOWN_LAYOUT: tuple[tuple[str, str], ...] = (
     ("distogram_loss", "dist"),
     ("msa_loss", "msa"),
     ("plddt_loss", "plddt"),
+    ("simplex_contact_loss", "simp_c"),
+    ("simplex_face_area_loss", "simp_f"),
+    ("simplex_face_distance_loss", "simp_fd"),
+    ("simplex_tetra_geometry_loss", "simp_t"),
+    ("simplex_tetra_distance_loss", "simp_td"),
+    ("simplex_pair_face_consistency_loss", "simp_pf"),
+    ("simplex_face_tetra_consistency_loss", "simp_ft"),
 )
 _VIOLATION_KEYS: tuple[tuple[str, str], ...] = (
     ("structural_violation_loss", "viol"),

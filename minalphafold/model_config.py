@@ -82,6 +82,31 @@ class ModelConfig:
     evoformer_msa_dropout: float
     evoformer_pair_dropout: float
 
+    # SimplexFold sparse higher-order adapter.
+    use_simplicial_evoformer: bool
+    simplex_every_n_blocks: int
+    simplex_neighbor_k: int
+    simplex_c_face: int
+    simplex_c_tetra: int
+    simplex_hidden_dim: int
+    simplex_use_faces: bool
+    simplex_use_tetra: bool
+    simplex_use_msa_to_face: bool
+    simplex_msa_to_face_rank: int
+    simplex_use_recycled_geometry: bool
+    simplex_local_radius: int
+    simplex_local_bias: float
+    simplex_long_min_sep: int
+    simplex_long_bias: float
+    simplex_geometry_distance_weight: float
+    simplex_rbf_bins: int
+    simplex_sequence_max: float
+    simplex_distance_max: float
+    simplex_area_max: float
+    simplex_volume_scale: float
+    simplex_dropout: float
+    simplex_single_transition_n: int
+
     # Structure Module (supplement 1.8, Algorithm 20).
     structure_module_c: int
     structure_module_layers: int

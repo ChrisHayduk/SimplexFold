@@ -279,7 +279,7 @@ def test_shipped_profiles_have_expected_scales():
     assert medium.c_m > tiny.c_m
     assert medium.c_z > tiny.c_z
     assert medium.num_evoformer > tiny.num_evoformer
-    # alphafold2 profile locked to the paper (supplement 1.5 / 1.6 / Algorithm 22).
+    # alphafold2 profile keeps the AF2-sized base trunk (supplement 1.5 / 1.6 / Algorithm 22).
     assert alphafold2.c_m == 256
     assert alphafold2.c_s == 384
     assert alphafold2.c_z == 128
@@ -307,6 +307,7 @@ def test_zero_dropout_model_config_preserves_dimensions_and_clears_dropout():
     assert overfit_config.extra_pair_dropout == 0.0
     assert overfit_config.evoformer_msa_dropout == 0.0
     assert overfit_config.evoformer_pair_dropout == 0.0
+    assert overfit_config.simplex_dropout == 0.0
     assert overfit_config.structure_module_dropout_ipa == 0.0
     assert overfit_config.structure_module_dropout_transition == 0.0
 

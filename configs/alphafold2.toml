@@ -1,6 +1,6 @@
-# Full AlphaFold2 monomer profile — matches supplement Section 1.5 / 1.6 /
-# 1.7 / 1.8 and Algorithms 3-24 exactly. Every value here is paper-spec;
-# the supplement reference is in the inline comment.
+# Full-size SimplexFold profile. The base MSA/pair/structure dimensions match
+# AlphaFold2 monomer supplement Section 1.5 / 1.6 / 1.7 / 1.8, then the sparse
+# SimplexFold adapter adds explicit face/tetra states.
 
 model_profile = "alphafold2"
 
@@ -54,6 +54,32 @@ num_extra_msa = 4                     # Algorithm 18: N_block=4
 num_evoformer = 48
 evoformer_msa_dropout = 0.15          # Algorithm 6 line 2 / supplement 1.11.6
 evoformer_pair_dropout = 0.25         # Algorithm 6 lines 6-9 / supplement 1.11.6
+
+# Sparse SimplexFold adapter. Channel dims stay under the NanoFold-style
+# budget while adding explicit anchored 2-/3-simplex states.
+use_simplicial_evoformer = true
+simplex_every_n_blocks = 1
+simplex_neighbor_k = 12
+simplex_c_face = 32
+simplex_c_tetra = 16
+simplex_hidden_dim = 128
+simplex_use_faces = true
+simplex_use_tetra = true
+simplex_use_msa_to_face = false
+simplex_msa_to_face_rank = 16
+simplex_use_recycled_geometry = true
+simplex_local_radius = 4
+simplex_local_bias = 5.0
+simplex_long_min_sep = 24
+simplex_long_bias = 0.0
+simplex_geometry_distance_weight = 0.1
+simplex_rbf_bins = 8
+simplex_sequence_max = 64.0
+simplex_distance_max = 32.0
+simplex_area_max = 300.0
+simplex_volume_scale = 1000.0
+simplex_dropout = 0.1
+simplex_single_transition_n = 2
 
 # Structure Module (supplement 1.8, Algorithm 20: N_layer=8, c=128).
 structure_module_c = 128

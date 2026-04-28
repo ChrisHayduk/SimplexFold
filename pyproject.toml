@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "minalphafold"
 version = "0.1.0"
-description = "A minimal, pedagogical PyTorch reimplementation of AlphaFold2."
+description = "A sparse 2-/3-simplex Evoformer research fork of a minimal AlphaFold2 implementation."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }

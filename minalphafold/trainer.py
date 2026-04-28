@@ -68,10 +68,9 @@ def load_model_config(name_or_path: str | Path) -> ModelConfig:
     or the schema surfaces immediately as a ``TypeError`` instead of
     later as an ``AttributeError`` during a forward pass.
 
-    Tiny is a shrunk-to-CPU version of the AlphaFold2 monomer config
-    (supplement 1.6 / Table 4); medium is a mid-sized profile for local
-    experiments; alphafold2 matches the paper exactly (see
-    ``configs/alphafold2.toml``).
+    Tiny is a shrunk-to-CPU SimplexFold config, medium is a mid-sized profile
+    for local experiments, and alphafold2 keeps AF2-sized base channels while
+    enabling the sparse simplex adapter.
     """
     path = Path(name_or_path)
     if not path.exists():
@@ -350,6 +349,7 @@ def zero_dropout_model_config(model_config: ModelConfig) -> ModelConfig:
         extra_pair_dropout=0.0,
         evoformer_msa_dropout=0.0,
         evoformer_pair_dropout=0.0,
+        simplex_dropout=0.0,
         structure_module_dropout_ipa=0.0,
         structure_module_dropout_transition=0.0,
         model_profile=f"{model_config.model_profile}_no_dropout",

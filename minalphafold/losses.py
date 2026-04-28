@@ -38,6 +38,7 @@ import torch
 from typing import Optional
 
 from .utils import distance_bin
+from .simplex import SimplexGeometryLoss
 from .residue_constants import (
     between_res_bond_length_c_n, between_res_bond_length_stddev_c_n,
     between_res_cos_angles_c_n_ca, between_res_cos_angles_ca_c_n,
@@ -183,6 +184,7 @@ class AlphaFoldLoss(torch.nn.Module):
             min_resolution=0.1,
             max_resolution=3.0,
         )
+        self.simplex_geometry_loss = SimplexGeometryLoss()
         self.backbone_loss = BackboneTrajectoryLoss()
         self.sidechain_fape_loss = AllAtomFAPE()
 
@@ -443,6 +445,18 @@ class AlphaFoldLoss(torch.nn.Module):
             "weighted_msa_loss": weighted_msa_loss,
             "weighted_plddt_loss": weighted_plddt_loss,
         }
+
+        if "simplex_contact_logits" in structure_model_prediction:
+            true_ca = true_atom_positions[:, :, 1, :]
+            true_ca_mask = true_atom_mask[:, :, 1]
+            simplex_terms = self.simplex_geometry_loss(
+                structure_model_prediction,
+                true_ca,
+                true_ca_mask,
+                seq_mask=seq_mask,
+            )
+            loss = loss + simplex_terms["simplex_aux_loss"]
+            loss_terms.update(simplex_terms)
 
         if self.finetune:
             structural_violation_loss = self.structural_violation_loss(

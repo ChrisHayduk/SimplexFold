@@ -24,6 +24,7 @@ from .embedders import (
     TriangleMultiplicationOutgoing,
     PairTransition,
 )
+from .simplex import SimplicialAdapter, SimplexSingleTransition
 
 class Evoformer(torch.nn.Module):
     """Evoformer block (Algorithm 6).
@@ -192,3 +193,109 @@ class MSARowAttentionWithPairBias(torch.nn.Module):
             output = output * msa_mask[..., None]
 
         return output
+
+
+class SimplicialEvoformer(torch.nn.Module):
+    """Evoformer block with sparse face/tetra message passing.
+
+    The MSA and triangle updates are the same as :class:`Evoformer`.  After
+    the pair triangle stack, the block builds an anchored sparse simplicial
+    complex from pair-derived topology logits plus optional recycled geometry,
+    runs gated 2-/3-simplex message passing, scatters updates back to pair and
+    single streams, and then applies ordinary pair/single transitions.
+    """
+
+    def __init__(self, config, *, enable_simplex: bool = True):
+        super().__init__()
+        self.msa_row_att = MSARowAttentionWithPairBias(config)
+        self.msa_col_att = MSAColumnAttention(config)
+        self.msa_transition = MSATransition(config)
+        self.outer_mean = OuterProductMean(config)
+
+        self.triangle_mult_out = TriangleMultiplicationOutgoing(config)
+        self.triangle_mult_in = TriangleMultiplicationIncoming(config)
+        self.triangle_att_start = TriangleAttentionStartingNode(config)
+        self.triangle_att_end = TriangleAttentionEndingNode(config)
+
+        self.simplex_adapter = SimplicialAdapter(config)
+        self.pair_transition = PairTransition(config)
+        self.single_transition = SimplexSingleTransition(config)
+
+        self.msa_dropout = config.evoformer_msa_dropout
+        self.pair_dropout = config.evoformer_pair_dropout
+        self.single_dropout = float(getattr(config, "simplex_dropout", 0.0))
+        self.enable_simplex = enable_simplex
+
+    def forward(
+        self,
+        msa_representation: torch.Tensor,
+        pair_representation: torch.Tensor,
+        single_representation: torch.Tensor,
+        msa_mask: Optional[torch.Tensor] = None,
+        pair_mask: Optional[torch.Tensor] = None,
+        seq_mask: Optional[torch.Tensor] = None,
+        recycled_ca_coords: Optional[torch.Tensor] = None,
+        recycled_frames: Optional[torch.Tensor] = None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
+        assert msa_representation.ndim == 4, \
+            f"msa_representation must be (batch, N_seq, N_res, c_m), got {msa_representation.shape}"
+        assert pair_representation.ndim == 4, \
+            f"pair_representation must be (batch, N_res, N_res, c_z), got {pair_representation.shape}"
+        assert single_representation.ndim == 3, \
+            f"single_representation must be (batch, N_res, c_s), got {single_representation.shape}"
+
+        z = self.msa_row_att(msa_representation, pair_representation, msa_mask=msa_mask)
+        msa_representation = msa_representation + dropout_rowwise(z, p=self.msa_dropout, training=self.training)
+        msa_representation = msa_representation + self.msa_col_att(msa_representation, msa_mask=msa_mask)
+        msa_representation = msa_representation + self.msa_transition(msa_representation)
+
+        pair_representation = pair_representation + self.outer_mean(msa_representation, msa_mask=msa_mask)
+        pair_representation = pair_representation + dropout_rowwise(
+            self.triangle_mult_out(pair_representation, pair_mask=pair_mask),
+            p=self.pair_dropout,
+            training=self.training,
+        )
+        pair_representation = pair_representation + dropout_rowwise(
+            self.triangle_mult_in(pair_representation, pair_mask=pair_mask),
+            p=self.pair_dropout,
+            training=self.training,
+        )
+        pair_representation = pair_representation + dropout_rowwise(
+            self.triangle_att_start(pair_representation, pair_mask=pair_mask),
+            p=self.pair_dropout,
+            training=self.training,
+        )
+        pair_representation = pair_representation + dropout_columnwise(
+            self.triangle_att_end(pair_representation, pair_mask=pair_mask),
+            p=self.pair_dropout,
+            training=self.training,
+        )
+
+        simplex_aux: dict[str, torch.Tensor] = {}
+        if self.enable_simplex:
+            pair_representation, single_representation, simplex_aux = self.simplex_adapter(
+                pair_representation,
+                single_representation,
+                msa_representation=msa_representation,
+                msa_mask=msa_mask,
+                seq_mask=seq_mask,
+                pair_mask=pair_mask,
+                recycled_ca_coords=recycled_ca_coords,
+                recycled_frames=recycled_frames,
+            )
+
+        pair_representation = pair_representation + self.pair_transition(pair_representation)
+        single_update = self.single_transition(single_representation, seq_mask=seq_mask)
+        single_representation = single_representation + torch.nn.functional.dropout(
+            single_update,
+            p=self.single_dropout,
+            training=self.training,
+        )
+        if seq_mask is not None:
+            single_representation = single_representation * seq_mask[..., None]
+
+        return msa_representation, pair_representation, single_representation, simplex_aux
+
+
+# Backwards-compatible typo from the initial README wording.
+SimplicalEvoformer = SimplicialEvoformer
