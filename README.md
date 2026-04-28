@@ -1,5 +1,7 @@
 # SimplexFold
 
+![Simplex visualizations: 1-, 2-, and 3-simplex protein structures](assets/simplex_visualizations/simplex_1_2_3_comparison.png)
+
 SimplexFold is a research fork of a minimal AlphaFold2-style model that asks a
 specific question:
 
