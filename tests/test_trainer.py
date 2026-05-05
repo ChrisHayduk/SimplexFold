@@ -1,4 +1,5 @@
 import os
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -268,7 +269,13 @@ def test_load_model_config_raises_for_missing_profile():
 
 def test_list_available_profiles_includes_shipped_json_configs():
     profiles = list_available_profiles()
-    assert {"tiny", "medium", "alphafold2", "simplexfold_param_matched"}.issubset(set(profiles))
+    assert {
+        "tiny",
+        "medium",
+        "alphafold2",
+        "simplexfold_param_matched",
+        "simplexfold_medium_param_matched",
+    }.issubset(set(profiles))
 
 
 def test_shipped_profiles_have_expected_scales():
@@ -302,6 +309,30 @@ def test_shipped_profiles_have_expected_scales():
     assert param_matched.c_z < alphafold2.c_z
     assert param_matched.simplex_c_face < alphafold2.simplex_c_face
     assert param_matched.simplex_c_tetra < alphafold2.simplex_c_tetra
+
+    medium_param_matched = load_model_config("simplexfold_medium_param_matched")
+    assert medium_param_matched.use_simplicial_evoformer
+    assert medium_param_matched.num_evoformer == medium.num_evoformer
+    assert medium_param_matched.structure_module_layers == medium.structure_module_layers
+    assert medium_param_matched.template_pair_num_blocks == medium.template_pair_num_blocks
+    assert medium_param_matched.num_extra_msa == medium.num_extra_msa
+    assert medium_param_matched.recommended_n_cycles == 4
+    assert medium_param_matched.c_m < medium.c_m
+    assert medium_param_matched.c_s < medium.c_s
+    assert medium_param_matched.c_z < medium.c_z
+
+
+def test_simplexfold_medium_param_matched_matches_af2_medium_budget():
+    medium = load_model_config("medium")
+    af2_medium = replace(medium, use_simplicial_evoformer=False)
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+
+    af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+
+    assert af2_params == 3_106_642
+    assert simplex_params == 3_106_690
+    assert abs(simplex_params - af2_params) <= 64
 
 
 def test_zero_dropout_model_config_preserves_dimensions_and_clears_dropout():

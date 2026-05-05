@@ -129,3 +129,8 @@ class ModelConfig:
     n_plddt_bins: int      # pLDDT output bins (supplement 1.9.6)
     n_msa_classes: int     # masked MSA head (supplement 1.9.9)
     n_pae_bins: int        # PAE / pTM head (supplement 1.9.7)
+
+    # Run metadata. Recycling is controlled by TrainingConfig / forward()
+    # rather than model construction, but profiles can carry a recommended
+    # default for runners that choose to honor it.
+    recommended_n_cycles: int = 1

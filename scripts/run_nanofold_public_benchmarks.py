@@ -1040,7 +1040,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--n-cycles", type=int, default=1)
+    parser.add_argument(
+        "--n-cycles",
+        type=int,
+        default=None,
+        help="Recycling cycles. Defaults to the model profile's recommended_n_cycles.",
+    )
     parser.add_argument("--n-ensemble", type=int, default=1)
     parser.add_argument("--mixed-precision", choices=["off", "bf16", "fp16"], default="off")
     return parser.parse_args(argv)
@@ -1080,6 +1085,9 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
     base_config = load_model_config(args.model_config)
     if args.zero_dropout:
         base_config = zero_dropout_model_config(base_config)
+    n_cycles = args.n_cycles
+    if n_cycles is None:
+        n_cycles = int(getattr(base_config, "recommended_n_cycles", 1))
     foldscore_components_fn = _load_foldscore_components(nanofold_root)
     data_config = DataConfig(
         processed_features_dir=features_dir,
@@ -1128,7 +1136,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         device=args.device,
         seed=args.seed,
         num_workers=args.num_workers,
-        n_cycles=args.n_cycles,
+        n_cycles=n_cycles,
         n_ensemble=args.n_ensemble,
     )
     max_val_batches = args.max_val_batches if args.max_val_batches > 0 else None
@@ -1192,7 +1200,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "violation_ramp_steps": args.violation_ramp_steps,
         "device": args.device,
         "seed": args.seed,
-        "n_cycles": args.n_cycles,
+        "n_cycles": n_cycles,
         "n_ensemble": args.n_ensemble,
         "mixed_precision": args.mixed_precision,
         "log_every": args.log_every,
