@@ -88,13 +88,17 @@ def data_config_for_stage(
     *,
     processed_features_dir: Path,
     processed_labels_dir: Path,
-    val_fraction: float,
+    train_manifest: Path | None = None,
+    val_manifest: Path | None = None,
+    val_fraction: float = 0.0,
     chains_manifest: Path | None = None,
 ) -> DataConfig:
     """Build a :class:`DataConfig` with this stage's crop + MSA sizing."""
     return DataConfig(
         processed_features_dir=processed_features_dir,
         processed_labels_dir=processed_labels_dir,
+        train_manifest=train_manifest,
+        val_manifest=val_manifest,
         val_fraction=val_fraction,
         crop_size=stage.crop_size,
         msa_depth=stage.msa_depth,
@@ -181,6 +185,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
     parser.add_argument("--processed-features-dir", type=Path, default=Path("data/processed_features"))
     parser.add_argument("--processed-labels-dir", type=Path, default=Path("data/processed_labels"))
+    parser.add_argument(
+        "--train-manifest",
+        type=Path,
+        default=None,
+        help="Optional plain-text train manifest. Use NanoFold data/manifests/train.txt for official public split.",
+    )
+    parser.add_argument(
+        "--val-manifest",
+        type=Path,
+        default=None,
+        help="Optional plain-text validation manifest. Use NanoFold data/manifests/val.txt for official public split.",
+    )
     parser.add_argument("--val-fraction", type=float, default=0.0)
     parser.add_argument(
         "--chains-manifest", type=Path, default=None,
@@ -231,7 +247,11 @@ def main(argv: list[str] | None = None) -> None:
 
     args.checkpoint_dir.mkdir(parents=True, exist_ok=True)
     latest_path = args.checkpoint_dir / f"{args.stage}_latest.pt"
-    best_path = args.checkpoint_dir / f"{args.stage}_best.pt" if args.val_fraction > 0 else None
+    best_path = (
+        args.checkpoint_dir / f"{args.stage}_best.pt"
+        if args.val_fraction > 0 or args.val_manifest is not None
+        else None
+    )
 
     # --- Fine-tune init vs resume resolution --------------------------
     # Fine-tune from scratch requires --init-from (cross-stage weight
@@ -266,6 +286,8 @@ def main(argv: list[str] | None = None) -> None:
         stage,
         processed_features_dir=args.processed_features_dir,
         processed_labels_dir=args.processed_labels_dir,
+        train_manifest=args.train_manifest,
+        val_manifest=args.val_manifest,
         val_fraction=args.val_fraction,
         chains_manifest=args.chains_manifest,
     )

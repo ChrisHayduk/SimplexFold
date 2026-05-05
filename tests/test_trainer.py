@@ -32,6 +32,7 @@ from minalphafold.trainer import (
     build_optimizer,
     DataConfig,
     TrainingConfig,
+    apply_loss_weight_schedule,
     build_dataloader,
     evaluate,
     fit,
@@ -251,6 +252,7 @@ def test_load_model_config_selects_requested_profile():
     assert load_model_config("tiny").model_profile == "tiny"
     assert load_model_config("medium").model_profile == "medium"
     assert load_model_config("alphafold2").model_profile == "alphafold2"
+    assert load_model_config("simplexfold_param_matched").model_profile == "simplexfold_param_matched"
 
 
 def test_load_model_config_accepts_an_explicit_toml_path():
@@ -266,7 +268,7 @@ def test_load_model_config_raises_for_missing_profile():
 
 def test_list_available_profiles_includes_shipped_json_configs():
     profiles = list_available_profiles()
-    assert {"tiny", "medium", "alphafold2"}.issubset(set(profiles))
+    assert {"tiny", "medium", "alphafold2", "simplexfold_param_matched"}.issubset(set(profiles))
 
 
 def test_shipped_profiles_have_expected_scales():
@@ -291,6 +293,15 @@ def test_shipped_profiles_have_expected_scales():
     assert alphafold2.template_triangle_mult_c == 64
     assert alphafold2.template_triangle_attn_c == 64
     assert alphafold2.template_pair_transition_n == 2
+
+    param_matched = load_model_config("simplexfold_param_matched")
+    assert param_matched.use_simplicial_evoformer
+    assert param_matched.num_evoformer == alphafold2.num_evoformer
+    assert param_matched.c_m < alphafold2.c_m
+    assert param_matched.c_s < alphafold2.c_s
+    assert param_matched.c_z < alphafold2.c_z
+    assert param_matched.simplex_c_face < alphafold2.simplex_c_face
+    assert param_matched.simplex_c_tetra < alphafold2.simplex_c_tetra
 
 
 def test_zero_dropout_model_config_preserves_dimensions_and_clears_dropout():
@@ -387,6 +398,42 @@ def test_use_finetune_loss_supports_two_phase_schedule():
     assert use_finetune_loss(always_finetune, global_step=0) is True
     assert use_finetune_loss(scheduled, global_step=4) is False
     assert use_finetune_loss(scheduled, global_step=5) is True
+
+
+def test_apply_loss_weight_schedule_ramps_research_weights():
+    cfg = TrainingConfig(
+        msa_loss_weight=2.0,
+        distogram_loss_weight=0.3,
+        simplex_aux_weight=1.0,
+        backbone_loss_weight=1.0,
+        sidechain_fape_loss_weight=1.0,
+        torsion_loss_weight=1.0,
+        loss_weight_ramp_start_step=10,
+        loss_weight_ramp_steps=10,
+        msa_loss_weight_final=0.5,
+        distogram_loss_weight_final=0.1,
+        simplex_aux_weight_final=0.0,
+        backbone_loss_weight_final=6.0,
+        sidechain_fape_loss_weight_final=2.0,
+        torsion_loss_weight_final=0.25,
+    )
+    loss_fn = AlphaFoldLoss()
+
+    apply_loss_weight_schedule(loss_fn, cfg, step=5)
+    assert loss_fn.msa_weight == pytest.approx(2.0)
+    assert loss_fn.backbone_loss_weight == pytest.approx(1.0)
+
+    apply_loss_weight_schedule(loss_fn, cfg, step=15)
+    assert loss_fn.msa_weight == pytest.approx(1.25)
+    assert loss_fn.distogram_weight == pytest.approx(0.2)
+    assert loss_fn.simplex_aux_weight == pytest.approx(0.5)
+    assert loss_fn.backbone_loss_weight == pytest.approx(3.5)
+    assert loss_fn.sidechain_fape_loss_weight == pytest.approx(1.5)
+    assert loss_fn.torsion_loss_weight == pytest.approx(0.625)
+
+    apply_loss_weight_schedule(loss_fn, cfg, step=20)
+    assert loss_fn.msa_weight == pytest.approx(0.5)
+    assert loss_fn.backbone_loss_weight == pytest.approx(6.0)
 
 
 def test_build_dataloader_can_fix_training_features(tmp_path):

@@ -1062,6 +1062,8 @@ class SimplexGeometryLoss(torch.nn.Module):
             "simplex_tetra_geometry_logits" in prediction
             and "simplex_tetra_indices" in prediction
             and prediction["simplex_tetra_indices"].shape[2] > 0
+            and prediction["simplex_tetra_geometry_logits"].shape[2]
+            == prediction["simplex_tetra_indices"].shape[2]
         ):
             tetra_indices = prediction["simplex_tetra_indices"]
             tetra_mask = prediction["simplex_tetra_mask"].to(dtype)

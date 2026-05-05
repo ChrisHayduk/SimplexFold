@@ -268,6 +268,24 @@ def test_simplex_geometry_loss_adds_distance_and_consistency_terms():
     assert torch.isfinite(terms["simplex_aux_loss"]).all()
 
 
+def test_simplex_geometry_loss_skips_disabled_tetra_heads():
+    true_ca = torch.randn(1, 5, 3)
+    ca_mask = torch.ones(1, 5)
+    prediction = {
+        "simplex_contact_logits": torch.zeros(1, 5, 5),
+        "simplex_tetra_indices": torch.tensor([[[[0, 1, 2, 3]], [[1, 2, 3, 4]], [[2, 3, 4, 0]], [[3, 4, 0, 1]], [[4, 0, 1, 2]]]]),
+        "simplex_tetra_mask": torch.ones(1, 5, 1),
+        "simplex_tetra_geometry_logits": torch.zeros(1, 5, 0, 3),
+        "simplex_tetra_distance_logits": torch.zeros(1, 5, 0, 6, 64),
+    }
+
+    terms = SimplexGeometryLoss()(prediction, true_ca, ca_mask)
+
+    assert "simplex_tetra_geometry_loss" not in terms
+    assert "simplex_tetra_distance_loss" not in terms
+    assert torch.isfinite(terms["simplex_aux_loss"]).all()
+
+
 def test_tiny_alphafold2_profile_emits_simplex_training_tensors():
     from minalphafold.model import AlphaFold2
     from minalphafold.trainer import load_model_config

@@ -1,0 +1,103 @@
+# Full-depth SimplexFold profile with approximately vanilla-AF2 parameter
+# budget.  The goal is to keep 48 SimplicialEvoformer layers while shrinking
+# widths so the added face/tetra machinery does not double the total model.
+#
+# Parameter audit against ``configs/alphafold2.toml`` with simplex disabled:
+#   vanilla AF2 total params:              94,159,450
+#   this SimplexFold total params:         93,818,274  (-0.36%)
+#   vanilla AF2 Evoformer block params:     1,829,952
+#   this SimplicialEvoformer block params:  1,885,819  (+3.05%)
+
+model_profile = "simplexfold_param_matched"
+
+# Channel dimensions.  These are ~0.69x AF2 width for the MSA/pair trunk,
+# leaving budget for explicit 2-/3-simplex states at every Evoformer layer.
+c_m = 176
+c_s = 256
+c_z = 88
+c_t = 64
+c_e = 64
+
+# Main MSA row / column attention.
+dim = 24
+num_heads = 8
+
+msa_transition_n = 4
+outer_product_dim = 24
+
+# Pair stack.
+triangle_mult_c = 88
+triangle_dim = 24
+triangle_num_heads = 4
+pair_transition_n = 4
+
+# Template pair stack.  Templates remain disabled for NanoFold official runs,
+# but the modules stay present so the architecture is complete.
+template_pair_num_blocks = 2
+template_pair_dropout = 0.25
+template_pointwise_attention_dim = 64
+template_pointwise_num_heads = 4
+template_triangle_mult_c = 64
+template_triangle_attn_c = 64
+template_triangle_attn_num_heads = 4
+template_pair_transition_n = 2
+
+# Extra MSA stack.
+extra_msa_dim = 8
+extra_msa_dropout = 0.15
+extra_pair_dropout = 0.25
+msa_column_global_attention_dim = 8
+num_extra_msa = 4
+
+# Main Evoformer depth is unchanged.
+num_evoformer = 48
+evoformer_msa_dropout = 0.15
+evoformer_pair_dropout = 0.25
+
+# Sparse SimplexFold adapter.
+use_simplicial_evoformer = true
+simplex_every_n_blocks = 1
+simplex_neighbor_k = 12
+simplex_c_face = 24
+simplex_c_tetra = 12
+simplex_hidden_dim = 96
+simplex_use_faces = true
+simplex_use_tetra = true
+simplex_use_msa_to_face = false
+simplex_msa_to_face_rank = 12
+simplex_use_recycled_geometry = true
+simplex_local_radius = 4
+simplex_local_bias = 5.0
+simplex_long_min_sep = 24
+simplex_long_bias = 0.0
+simplex_geometry_distance_weight = 0.1
+simplex_rbf_bins = 8
+simplex_sequence_max = 64.0
+simplex_distance_max = 32.0
+simplex_area_max = 300.0
+simplex_volume_scale = 1000.0
+simplex_dropout = 0.1
+simplex_single_transition_n = 2
+
+# Structure Module.
+structure_module_c = 128
+structure_module_layers = 8
+structure_module_dropout_ipa = 0.1
+structure_module_dropout_transition = 0.1
+sidechain_num_channel = 128
+sidechain_num_residual_block = 2
+position_scale = 10.0
+zero_init = true
+
+# Invariant Point Attention.
+ipa_num_heads = 8
+ipa_c = 16
+ipa_n_query_points = 4
+ipa_n_value_points = 8
+
+# Auxiliary heads.
+n_dist_bins = 64
+plddt_hidden_dim = 128
+n_plddt_bins = 50
+n_msa_classes = 23
+n_pae_bins = 64

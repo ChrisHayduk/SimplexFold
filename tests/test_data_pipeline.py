@@ -20,9 +20,11 @@ from minalphafold.data import (
     build_supervision,
     build_template_angle_feat,
     build_template_pair_feat,
+    chain_id_to_stem,
     collate_batch,
     discover_chain_ids,
     masked_msa_inputs,
+    read_chain_id_manifest,
     split_chain_ids,
 )
 from minalphafold.losses import AlphaFoldLoss, select_best_atom14_ground_truth
@@ -452,6 +454,69 @@ def test_dataset_loads_legacy_cache_defaults(tmp_path):
     assert torch.equal(example["residue_index"], torch.arange(5, dtype=torch.long))
     assert example["resolution"].shape == ()
     assert example["resolution"].item() == 0.0
+
+
+def test_dataset_reads_nanofold_manifest_and_template_ca_schema(tmp_path):
+    feature_dir = tmp_path / "processed_features"
+    label_dir = tmp_path / "processed_labels"
+    manifest = tmp_path / "train.txt"
+    feature_dir.mkdir()
+    label_dir.mkdir()
+
+    chain_id = "4b4s_A"
+    sequence = "AGAGA"
+    features, labels = make_feature_and_label_example(sequence, include_templates=False)
+    features.pop("template_atom14_positions")
+    features.pop("template_atom14_mask")
+    features["template_ca_coords"] = np.zeros((0, len(sequence), 3), dtype=np.float32)
+    features["template_ca_mask"] = np.zeros((0, len(sequence)), dtype=bool)
+    labels["ca_coords"] = labels["atom14_positions"][:, 1]
+    labels["ca_mask"] = labels["atom14_mask"][:, 1].astype(bool)
+
+    stem = chain_id_to_stem(chain_id)
+    np.savez_compressed(feature_dir / f"{stem}.npz", **features)
+    np.savez_compressed(label_dir / f"{stem}.npz", **labels)
+    manifest.write_text(f"# official split\n{chain_id}\n\n")
+
+    assert read_chain_id_manifest(manifest) == [chain_id]
+    assert discover_chain_ids(feature_dir, label_dir) == [chain_id]
+
+    dataset = ProcessedOpenProteinSetDataset(feature_dir, label_dir, split="train", manifest_path=manifest)
+    example = dataset[0]
+
+    assert dataset.chain_ids == [chain_id]
+    assert example["chain_id"] == chain_id
+    assert example["template_atom14_positions"].shape == (0, len(sequence), 14, 3)
+    assert example["template_atom14_mask"].shape == (0, len(sequence), 14)
+    assert example["atom14_positions"].shape == (len(sequence), 14, 3)
+
+
+def test_dataset_converts_nonempty_template_ca_placeholders(tmp_path):
+    feature_dir = tmp_path / "processed_features"
+    label_dir = tmp_path / "processed_labels"
+    feature_dir.mkdir()
+    label_dir.mkdir()
+
+    chain_id = "5abc_B"
+    sequence = "AG"
+    features, labels = make_feature_and_label_example(sequence, include_templates=False)
+    features.pop("template_atom14_positions")
+    features.pop("template_atom14_mask")
+    ca_coords = np.asarray([[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]], dtype=np.float32)
+    features["template_aatype"] = features["aatype"][None]
+    features["template_ca_coords"] = ca_coords
+    features["template_ca_mask"] = np.asarray([[True, False]])
+
+    stem = chain_id_to_stem(chain_id)
+    np.savez_compressed(feature_dir / f"{stem}.npz", **features)
+    np.savez_compressed(label_dir / f"{stem}.npz", **labels)
+
+    dataset = ProcessedOpenProteinSetDataset(feature_dir, label_dir, split="all")
+    example = dataset[0]
+
+    assert example["template_atom14_positions"].shape == (1, 2, 14, 3)
+    assert torch.allclose(example["template_atom14_positions"][0, :, 1], torch.from_numpy(ca_coords[0]))
+    assert torch.equal(example["template_atom14_mask"][0, :, 1], torch.tensor([1.0, 0.0]))
 
 
 def test_crop_example_crops_all_residue_axes_together():

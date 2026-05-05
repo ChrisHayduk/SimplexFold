@@ -356,19 +356,37 @@ class AlphaFold2(torch.nn.Module):
                     single_repr = self.single_rep_proj(msa_repr[:, 0, :, :])
                     for block in self.evoformer_blocks:
                         if isinstance(block, SimplicialEvoformer):
-                            # The simplex adapter uses discrete top-k topology
-                            # plus auxiliary-index tensors; keep this path
-                            # explicit instead of checkpointing nested dicts.
-                            msa_repr, pair_repr, single_repr, simplex_aux = block(
-                                msa_repr,
-                                pair_repr,
-                                single_repr,
-                                msa_mask=evo_msa_mask,
-                                pair_mask=pair_mask,
-                                seq_mask=seq_mask,
-                                recycled_ca_coords=ca_prev,
-                                recycled_frames=rotations_prev,
-                            )
+                            if self.training:
+                                # Non-reentrant checkpointing supports kwargs
+                                # and nested outputs, so the simplex auxiliary
+                                # dictionary can be recomputed just like the
+                                # tensor activations inside the block.
+                                msa_repr, pair_repr, single_repr, simplex_aux = cast(
+                                    tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, torch.Tensor]],
+                                    torch_checkpoint.checkpoint(
+                                        block,
+                                        msa_repr,
+                                        pair_repr,
+                                        single_repr,
+                                        msa_mask=evo_msa_mask,
+                                        pair_mask=pair_mask,
+                                        seq_mask=seq_mask,
+                                        recycled_ca_coords=ca_prev,
+                                        recycled_frames=rotations_prev,
+                                        use_reentrant=False,
+                                    ),
+                                )
+                            else:
+                                msa_repr, pair_repr, single_repr, simplex_aux = block(
+                                    msa_repr,
+                                    pair_repr,
+                                    single_repr,
+                                    msa_mask=evo_msa_mask,
+                                    pair_mask=pair_mask,
+                                    seq_mask=seq_mask,
+                                    recycled_ca_coords=ca_prev,
+                                    recycled_frames=rotations_prev,
+                                )
                             if simplex_aux:
                                 simplex_aux_last = simplex_aux
                         elif self.training:

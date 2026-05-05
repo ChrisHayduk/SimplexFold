@@ -105,6 +105,8 @@ class DataConfig:
 
     processed_features_dir: str | Path = "data/processed_features"
     processed_labels_dir: str | Path = "data/processed_labels"
+    train_manifest: str | Path | None = None
+    val_manifest: str | Path | None = None
     val_fraction: float = 0.1
     crop_size: int = 256          # N_res — Table 4 initial training
     msa_depth: int = 128          # N_seq — Table 4 initial training
@@ -180,6 +182,23 @@ class TrainingConfig:
     lr_decay_factor: float = 1.0              # §1.11.3 multiplicative factor (paper: 0.95)
     grad_clip_norm: float | None = 0.1        # supplement 1.11.3
     ema_decay: float | None = None            # §1.11.7 parameter EMA (paper: 0.999)
+    use_clamped_fape: float | None = 0.9      # §1.11.5: 90% clamped / 10% unclamped backbone FAPE
+    msa_loss_weight: float = 2.0
+    distogram_loss_weight: float = 0.3
+    confidence_loss_weight: float = 0.01
+    simplex_aux_weight: float = 1.0
+    backbone_loss_weight: float = 1.0
+    sidechain_fape_loss_weight: float = 1.0
+    torsion_loss_weight: float = 1.0
+    loss_weight_ramp_start_step: int | None = None
+    loss_weight_ramp_steps: int = 1
+    msa_loss_weight_final: float | None = None
+    distogram_loss_weight_final: float | None = None
+    confidence_loss_weight_final: float | None = None
+    simplex_aux_weight_final: float | None = None
+    backbone_loss_weight_final: float | None = None
+    sidechain_fape_loss_weight_final: float | None = None
+    torsion_loss_weight_final: float | None = None
     device: str = default_device()
     seed: int = 0
     num_workers: int = 0
@@ -188,6 +207,7 @@ class TrainingConfig:
     finetune: bool = False                    # supplement 1.11.1 stage toggle
     finetune_start_step: int | None = None
     finetune_lr_scale: float = 0.5            # supplement 1.11.3 ("half the base LR")
+    violation_ramp_steps: int = 0
     detach_rotations: bool = True
     latest_checkpoint_path: str | Path | None = None
     best_checkpoint_path: str | Path | None = None
@@ -383,6 +403,11 @@ def build_dataloader(
     n_cycles: int = 1,
     n_ensemble: int = 1,
 ) -> DataLoader:
+    manifest_path = None
+    if split == "train":
+        manifest_path = data_config.train_manifest
+    elif split == "val":
+        manifest_path = data_config.val_manifest
     dataset = ProcessedOpenProteinSetDataset(
         data_config.processed_features_dir,
         data_config.processed_labels_dir,
@@ -390,6 +415,7 @@ def build_dataloader(
         val_fraction=data_config.val_fraction,
         seed=seed,
         chains_manifest=data_config.chains_manifest,
+        manifest_path=manifest_path,
     )
     collate_fn = partial(
         collate_batch,
@@ -625,6 +651,82 @@ def learning_rate_at_step(
             training_config.lr_decay_factor,
         )
     return learning_rate_for_step(training_config, step, total_steps)
+
+
+def _ramped_value(
+    initial: float,
+    final: float | None,
+    *,
+    step: int,
+    start_step: int | None,
+    ramp_steps: int,
+) -> float:
+    if final is None or start_step is None or step < start_step:
+        return initial
+    if ramp_steps <= 0:
+        return final
+    progress = min(max((step - start_step) / float(ramp_steps), 0.0), 1.0)
+    return initial + (final - initial) * progress
+
+
+def apply_loss_weight_schedule(loss_fn: AlphaFoldLoss, training_config: TrainingConfig, step: int) -> None:
+    """Update loss weights for a fixed-step phase/ramp schedule.
+
+    This is intentionally separate from the AF2 fine-tuning violation-loss
+    toggle: it is a research/debug hook for testing staged optimisation such
+    as "let MSA/distogram/torsion settle, then raise FAPE".
+    """
+    start_step = training_config.loss_weight_ramp_start_step
+    ramp_steps = training_config.loss_weight_ramp_steps
+    loss_fn.msa_weight = _ramped_value(
+        training_config.msa_loss_weight,
+        training_config.msa_loss_weight_final,
+        step=step,
+        start_step=start_step,
+        ramp_steps=ramp_steps,
+    )
+    loss_fn.distogram_weight = _ramped_value(
+        training_config.distogram_loss_weight,
+        training_config.distogram_loss_weight_final,
+        step=step,
+        start_step=start_step,
+        ramp_steps=ramp_steps,
+    )
+    loss_fn.confidence_weight = _ramped_value(
+        training_config.confidence_loss_weight,
+        training_config.confidence_loss_weight_final,
+        step=step,
+        start_step=start_step,
+        ramp_steps=ramp_steps,
+    )
+    loss_fn.simplex_aux_weight = _ramped_value(
+        training_config.simplex_aux_weight,
+        training_config.simplex_aux_weight_final,
+        step=step,
+        start_step=start_step,
+        ramp_steps=ramp_steps,
+    )
+    loss_fn.backbone_loss_weight = _ramped_value(
+        training_config.backbone_loss_weight,
+        training_config.backbone_loss_weight_final,
+        step=step,
+        start_step=start_step,
+        ramp_steps=ramp_steps,
+    )
+    loss_fn.sidechain_fape_loss_weight = _ramped_value(
+        training_config.sidechain_fape_loss_weight,
+        training_config.sidechain_fape_loss_weight_final,
+        step=step,
+        start_step=start_step,
+        ramp_steps=ramp_steps,
+    )
+    loss_fn.torsion_loss_weight = _ramped_value(
+        training_config.torsion_loss_weight,
+        training_config.torsion_loss_weight_final,
+        step=step,
+        start_step=start_step,
+        ramp_steps=ramp_steps,
+    )
 
 
 def model_inputs_from_batch(batch: dict[str, Any], training_config: TrainingConfig) -> dict[str, torch.Tensor | int]:
@@ -906,11 +1008,32 @@ def fit(
         n_cycles=training_config.n_cycles,
         n_ensemble=training_config.n_ensemble,
     )
-    has_validation = data_config.val_fraction > 0.0 and len(cast(Sized, val_loader.dataset)) > 0
+    has_validation = (
+        (data_config.val_manifest is not None or data_config.val_fraction > 0.0)
+        and len(cast(Sized, val_loader.dataset)) > 0
+    )
 
     model = AlphaFold2(model_config).to(device)
-    pretrain_loss_fn = AlphaFoldLoss(finetune=False).to(device)
-    finetune_loss_fn = AlphaFoldLoss(finetune=True).to(device)
+    pretrain_loss_fn = AlphaFoldLoss(
+        finetune=False,
+        use_clamped_fape=training_config.use_clamped_fape,
+        simplex_aux_weight=training_config.simplex_aux_weight,
+        backbone_loss_weight=training_config.backbone_loss_weight,
+        sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
+        torsion_loss_weight=training_config.torsion_loss_weight,
+    ).to(device)
+    finetune_loss_fn = AlphaFoldLoss(
+        finetune=True,
+        use_clamped_fape=training_config.use_clamped_fape,
+        simplex_aux_weight=training_config.simplex_aux_weight,
+        backbone_loss_weight=training_config.backbone_loss_weight,
+        sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
+        torsion_loss_weight=training_config.torsion_loss_weight,
+    ).to(device)
+    for loss_fn in (pretrain_loss_fn, finetune_loss_fn):
+        loss_fn.msa_weight = training_config.msa_loss_weight
+        loss_fn.distogram_weight = training_config.distogram_loss_weight
+        loss_fn.confidence_weight = training_config.confidence_loss_weight
     optimizer = build_optimizer(model, training_config)
 
     # --- Cross-stage weight init (supplement 1.11.1) --------------------
@@ -994,6 +1117,7 @@ def fit(
         for batch in train_loader:
             is_finetune = use_finetune_loss(training_config, global_step)
             loss_fn = finetune_loss_fn if is_finetune else pretrain_loss_fn
+            apply_loss_weight_schedule(loss_fn, training_config, global_step)
 
             model.train()
             batch = move_to_device(batch, device)
@@ -1073,6 +1197,7 @@ def fit(
                 if use_finetune_loss(training_config, global_step)
                 else pretrain_loss_fn
             )
+            apply_loss_weight_schedule(val_loss_fn, training_config, global_step)
             val_metrics = evaluate(eval_model, val_loss_fn, val_loader, training_config)
             epoch_metrics["val_loss"] = val_metrics["loss"]
 
@@ -1144,6 +1269,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--processed-features-dir", type=str, default="data/processed_features")
     parser.add_argument("--processed-labels-dir", type=str, default="data/processed_labels")
+    parser.add_argument(
+        "--train-manifest",
+        type=str,
+        default=None,
+        help="Optional plain-text train manifest, e.g. NanoFold data/manifests/train.txt.",
+    )
+    parser.add_argument(
+        "--val-manifest",
+        type=str,
+        default=None,
+        help="Optional plain-text validation manifest, e.g. NanoFold data/manifests/val.txt.",
+    )
     parser.add_argument("--val-fraction", type=float, default=0.1)
     parser.add_argument("--crop-size", type=int, default=256)
     parser.add_argument("--msa-depth", type=int, default=128)
@@ -1182,6 +1319,33 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--ema-decay", type=float, default=None,
         help="Enable parameter EMA with this decay (paper: 0.999, §1.11.7).",
     )
+    parser.add_argument(
+        "--use-clamped-fape",
+        type=float,
+        default=0.9,
+        help=(
+            "Backbone FAPE clamped-loss mixture weight. 0.9 matches the "
+            "expected AF2 90%% clamped / 10%% unclamped training batches; "
+            "use 1.0 for fully clamped, 0.0 for fully unclamped, or -1 for "
+            "the legacy fully clamped default."
+        ),
+    )
+    parser.add_argument("--msa-loss-weight", type=float, default=2.0)
+    parser.add_argument("--distogram-loss-weight", type=float, default=0.3)
+    parser.add_argument("--confidence-loss-weight", type=float, default=0.01)
+    parser.add_argument("--simplex-aux-weight", type=float, default=1.0)
+    parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
+    parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
+    parser.add_argument("--torsion-loss-weight", type=float, default=1.0)
+    parser.add_argument("--loss-weight-ramp-start-step", type=int, default=None)
+    parser.add_argument("--loss-weight-ramp-steps", type=int, default=1)
+    parser.add_argument("--msa-loss-weight-final", type=float, default=None)
+    parser.add_argument("--distogram-loss-weight-final", type=float, default=None)
+    parser.add_argument("--confidence-loss-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-aux-weight-final", type=float, default=None)
+    parser.add_argument("--backbone-loss-weight-final", type=float, default=None)
+    parser.add_argument("--sidechain-fape-loss-weight-final", type=float, default=None)
+    parser.add_argument("--torsion-loss-weight-final", type=float, default=None)
     parser.add_argument("--device", type=str, default=default_device())
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--num-workers", type=int, default=0)
@@ -1190,6 +1354,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--finetune", action="store_true")
     parser.add_argument("--finetune-start-step", type=int, default=None)
     parser.add_argument("--finetune-lr-scale", type=float, default=0.5)
+    parser.add_argument("--violation-ramp-steps", type=int, default=0)
     parser.add_argument("--latest-checkpoint-path", type=str, default=None)
     parser.add_argument("--best-checkpoint-path", type=str, default=None)
     parser.add_argument(
@@ -1205,6 +1370,8 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
     data_config = DataConfig(
         processed_features_dir=args.processed_features_dir,
         processed_labels_dir=args.processed_labels_dir,
+        train_manifest=args.train_manifest,
+        val_manifest=args.val_manifest,
         val_fraction=args.val_fraction,
         crop_size=args.crop_size,
         msa_depth=args.msa_depth,
@@ -1235,6 +1402,23 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         lr_decay_factor=args.lr_decay_factor,
         grad_clip_norm=grad_clip_norm,
         ema_decay=args.ema_decay,
+        use_clamped_fape=None if args.use_clamped_fape < 0 else args.use_clamped_fape,
+        msa_loss_weight=args.msa_loss_weight,
+        distogram_loss_weight=args.distogram_loss_weight,
+        confidence_loss_weight=args.confidence_loss_weight,
+        simplex_aux_weight=args.simplex_aux_weight,
+        backbone_loss_weight=args.backbone_loss_weight,
+        sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
+        torsion_loss_weight=args.torsion_loss_weight,
+        loss_weight_ramp_start_step=args.loss_weight_ramp_start_step,
+        loss_weight_ramp_steps=args.loss_weight_ramp_steps,
+        msa_loss_weight_final=args.msa_loss_weight_final,
+        distogram_loss_weight_final=args.distogram_loss_weight_final,
+        confidence_loss_weight_final=args.confidence_loss_weight_final,
+        simplex_aux_weight_final=args.simplex_aux_weight_final,
+        backbone_loss_weight_final=args.backbone_loss_weight_final,
+        sidechain_fape_loss_weight_final=args.sidechain_fape_loss_weight_final,
+        torsion_loss_weight_final=args.torsion_loss_weight_final,
         device=args.device,
         seed=args.seed,
         num_workers=args.num_workers,
@@ -1243,6 +1427,7 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         finetune=args.finetune,
         finetune_start_step=args.finetune_start_step,
         finetune_lr_scale=args.finetune_lr_scale,
+        violation_ramp_steps=args.violation_ramp_steps,
         latest_checkpoint_path=args.latest_checkpoint_path,
         best_checkpoint_path=args.best_checkpoint_path,
         resume_from_checkpoint=args.resume_from_checkpoint,

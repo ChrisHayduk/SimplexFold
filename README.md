@@ -281,6 +281,8 @@ So SimplexFold focuses on faces and tetrahedra first.
   tetra-geometry, and boundary-consistency losses.
 - Tiny/medium/full configs with simplex defaults.
 - Benchmark harness: `scripts/benchmark_simplexfold.py`.
+- NanoFold public train/validation benchmark runner:
+  `scripts/run_nanofold_public_benchmarks.py`.
 - Publication benchmark protocol: `BENCHMARK_PLAN.md`.
 
 ## Research Context
@@ -332,3 +334,48 @@ python scripts/benchmark_simplexfold.py \
   --extra-msa-depth 0 \
   --n-cycles 2
 ```
+
+## NanoFold Public Benchmark
+
+```bash
+python scripts/run_nanofold_public_benchmarks.py \
+  --nanofold-root /Users/christopherhayduk/Projects/nanoFold-Competition \
+  --model-config tiny \
+  --variants no_simplex faces full msa_to_face \
+  --train-limit 256 \
+  --val-limit 64 \
+  --steps 1000 \
+  --crop-size 128 \
+  --msa-depth 32 \
+  --extra-msa-depth 0 \
+  --max-templates 0
+```
+
+The runner uses NanoFold's official public manifests, keeps templates disabled,
+and writes figure-ready JSON/CSV artifacts under
+`artifacts/nanofold_public_benchmarks/`. When the NanoFold repo is available,
+the CSV also includes official FoldScore component metrics on the evaluated
+crops.
+
+For the full model on Modal:
+
+```bash
+modal run --detach --timestamps scripts/modal_nanofold_public_benchmark.py \
+  --model-config simplexfold_param_matched \
+  --variant full \
+  --steps 10000 \
+  --train-limit 0 \
+  --val-limit 0 \
+  --crop-size 256 \
+  --msa-depth 128 \
+  --extra-msa-depth 256 \
+  --max-templates 0 \
+  --n-cycles 4 \
+  --mixed-precision bf16 \
+  --log-every 100
+```
+
+Use `configs/simplexfold_param_matched.toml` for the fair parameter-budget
+comparison: it keeps 48 SimplicialEvoformer layers but shrinks trunk/simplex
+widths so total parameters are roughly the same as a vanilla AF2-width
+pair-only model.

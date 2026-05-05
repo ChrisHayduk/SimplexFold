@@ -85,6 +85,7 @@ MASKED_MSA_UNIFORM_PROB = 0.1
 # feature set to zero.)" for the template unit vector. Kept on here for
 # completeness; set to False to zero it and replicate the release models.
 USE_TEMPLATE_UNIT_VECTOR = True
+CHAIN_FILE_PREFIX = "chain_"
 
 
 # Keys in this set are stochastic MSA features. When recycling / ensembling
@@ -145,15 +146,86 @@ def hhblits_profile(msa: torch.Tensor) -> torch.Tensor:
     return msa_one_hot.float().mean(dim=0)
 
 
+def chain_id_to_stem(chain_id: str) -> str:
+    """Return the NanoFold-safe filename stem for a human chain id.
+
+    NanoFold manifests contain ids such as ``4B4S_A`` while the public
+    processed cache stores files as ``chain_<utf8-hex>.npz``.  Keeping this
+    helper local avoids making SimplexFold import the competition package at
+    runtime, which matters for Modal and standalone reproductions.
+    """
+    normalized = str(chain_id)
+    if not normalized:
+        raise ValueError("Chain ID must be non-empty.")
+    return f"{CHAIN_FILE_PREFIX}{normalized.encode('utf-8').hex()}"
+
+
+def chain_id_from_stem(stem: str) -> str:
+    """Decode a NanoFold ``chain_<hex>`` stem, or raise for other stems."""
+    if not stem.startswith(CHAIN_FILE_PREFIX):
+        raise ValueError(f"Not a NanoFold chain file stem: {stem}")
+    payload = stem[len(CHAIN_FILE_PREFIX):]
+    try:
+        return bytes.fromhex(payload).decode("utf-8")
+    except ValueError as exc:
+        raise ValueError(f"Invalid NanoFold chain file stem: {stem}") from exc
+
+
+def chain_npz_path(base_dir: str | Path, chain_id: str) -> Path:
+    """Return the encoded NanoFold path for ``chain_id`` under ``base_dir``."""
+    return Path(base_dir) / f"{chain_id_to_stem(chain_id)}.npz"
+
+
+def read_chain_id_manifest(manifest_path: str | Path) -> List[str]:
+    """Read a plain text manifest, ignoring blanks and comment lines."""
+    path = Path(manifest_path)
+    chain_ids = [
+        line.strip()
+        for line in path.read_text().splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    if not chain_ids:
+        raise ValueError(f"Empty chain manifest: {path}")
+    return chain_ids
+
+
+def _chain_id_from_npz_path(path: Path) -> str:
+    """Map a processed NPZ path to the chain id the dataset should expose."""
+    if path.stem.startswith(CHAIN_FILE_PREFIX):
+        try:
+            return chain_id_from_stem(path.stem)
+        except ValueError:
+            pass
+    return path.stem
+
+
+def _npz_path_for_chain_id(base_dir: str | Path, chain_id: str) -> Path:
+    """Resolve either legacy ``<id>.npz`` or NanoFold ``chain_<hex>.npz``."""
+    base = Path(base_dir)
+    direct = base / f"{chain_id}.npz"
+    if direct.exists():
+        return direct
+    encoded = chain_npz_path(base, chain_id)
+    if encoded.exists():
+        return encoded
+    # Return the direct path so any FileNotFoundError remains intuitive for
+    # legacy SimplexFold caches; callers add the encoded candidate when useful.
+    return direct
+
+
 def discover_chain_ids(processed_features_dir: str | Path, processed_labels_dir: str | Path | None = None) -> List[str]:
     feature_dir = Path(processed_features_dir)
     label_dir = Path(processed_labels_dir) if processed_labels_dir is not None else None
 
-    chain_ids = sorted(path.stem for path in feature_dir.glob("*.npz"))
+    chain_ids = sorted(_chain_id_from_npz_path(path) for path in feature_dir.glob("*.npz"))
     if label_dir is None:
         return chain_ids
 
-    return [chain_id for chain_id in chain_ids if (label_dir / f"{chain_id}.npz").exists()]
+    return [
+        chain_id
+        for chain_id in chain_ids
+        if _npz_path_for_chain_id(label_dir, chain_id).exists()
+    ]
 
 
 def load_accepted_chains_from_manifest(manifest_path: str | Path) -> List[str]:
@@ -210,6 +282,7 @@ def _load_processed_features(path: Path) -> Dict[str, torch.Tensor]:
     """
     with np.load(path) as feature_data:
         aatype = torch.from_numpy(feature_data["aatype"]).long()
+        length = int(aatype.shape[0])
         if "between_segment_residues" in feature_data.files:
             between_segment_residues = torch.from_numpy(feature_data["between_segment_residues"]).long()
         else:
@@ -219,15 +292,40 @@ def _load_processed_features(path: Path) -> Dict[str, torch.Tensor]:
         else:
             residue_index = torch.arange(aatype.shape[0], dtype=torch.long)
 
+        if "template_aatype" in feature_data.files:
+            template_aatype = torch.from_numpy(feature_data["template_aatype"]).long()
+        else:
+            template_aatype = torch.zeros((0, length), dtype=torch.long)
+
+        if "template_atom14_positions" in feature_data.files and "template_atom14_mask" in feature_data.files:
+            template_atom14_positions = torch.from_numpy(feature_data["template_atom14_positions"]).float()
+            template_atom14_mask = torch.from_numpy(feature_data["template_atom14_mask"]).float()
+        elif "template_ca_coords" in feature_data.files and "template_ca_mask" in feature_data.files:
+            # NanoFold's official no-template public data keeps schema-level
+            # template placeholders as C-alpha tensors with T=0. Convert that
+            # representation to the atom14 template layout consumed by the
+            # AF2-style feature builders. If a custom cache ever carries C-alpha
+            # templates, only the atom14 CA slot is marked present.
+            ca_coords = torch.from_numpy(feature_data["template_ca_coords"]).float()
+            ca_mask = torch.from_numpy(feature_data["template_ca_mask"]).float()
+            template_atom14_positions = ca_coords.new_zeros((*ca_coords.shape[:2], 14, 3))
+            template_atom14_mask = ca_mask.new_zeros((*ca_mask.shape[:2], 14))
+            if ca_coords.numel() > 0:
+                template_atom14_positions[..., 1, :] = ca_coords
+                template_atom14_mask[..., 1] = ca_mask
+        else:
+            template_atom14_positions = torch.zeros((0, length, 14, 3), dtype=torch.float32)
+            template_atom14_mask = torch.zeros((0, length, 14), dtype=torch.float32)
+
         return {
             "aatype": aatype,
             "msa": torch.from_numpy(feature_data["msa"]).long(),
             "deletions": torch.from_numpy(feature_data["deletions"]).long(),
             "between_segment_residues": between_segment_residues,
             "residue_index": residue_index,
-            "template_aatype": torch.from_numpy(feature_data["template_aatype"]).long(),
-            "template_atom14_positions": torch.from_numpy(feature_data["template_atom14_positions"]).float(),
-            "template_atom14_mask": torch.from_numpy(feature_data["template_atom14_mask"]).float(),
+            "template_aatype": template_aatype,
+            "template_atom14_positions": template_atom14_positions,
+            "template_atom14_mask": template_atom14_mask,
         }
 
 
@@ -238,11 +336,14 @@ def _load_processed_labels(path: Path) -> Dict[str, torch.Tensor]:
             resolution = torch.as_tensor(label_data["resolution"]).float()
         else:
             resolution = torch.tensor(0.0, dtype=torch.float32)
-        return {
+        labels = {
             "atom14_positions": torch.from_numpy(label_data["atom14_positions"]).float(),
             "atom14_mask": torch.from_numpy(label_data["atom14_mask"]).float(),
             "resolution": resolution,
         }
+        if "residue_index" in label_data.files:
+            labels["label_residue_index"] = torch.from_numpy(label_data["residue_index"]).long()
+        return labels
 
 
 class ProcessedOpenProteinSetDataset(Dataset):
@@ -269,17 +370,39 @@ class ProcessedOpenProteinSetDataset(Dataset):
         val_fraction: float = 0.1,
         seed: int = 0,
         chains_manifest: str | Path | None = None,
+        manifest_path: str | Path | None = None,
     ):
         self.processed_features_dir = Path(processed_features_dir)
         self.processed_labels_dir = Path(processed_labels_dir)
-        chain_ids = discover_chain_ids(self.processed_features_dir, self.processed_labels_dir)
+        if manifest_path is None:
+            chain_ids = discover_chain_ids(self.processed_features_dir, self.processed_labels_dir)
+        else:
+            chain_ids = read_chain_id_manifest(manifest_path)
+            missing = [
+                chain_id
+                for chain_id in chain_ids
+                if not _npz_path_for_chain_id(self.processed_features_dir, chain_id).exists()
+                or not _npz_path_for_chain_id(self.processed_labels_dir, chain_id).exists()
+            ]
+            if missing:
+                sample = ", ".join(missing[:8])
+                raise FileNotFoundError(
+                    "Manifest references chains without processed feature/label NPZs "
+                    f"in {self.processed_features_dir} and {self.processed_labels_dir}. "
+                    f"Examples: {sample}"
+                )
         if chains_manifest is not None:
             # Restrict to the accepted set from the §1.2.5 filter manifest
             # before the train/val split runs, so the split is computed on
             # the post-filter population rather than the raw NPZ listing.
             allowed = set(load_accepted_chains_from_manifest(chains_manifest))
             chain_ids = [chain_id for chain_id in chain_ids if chain_id in allowed]
-        self.chain_ids = split_chain_ids(chain_ids, split=split, val_fraction=val_fraction, seed=seed)
+        if manifest_path is None:
+            self.chain_ids = split_chain_ids(chain_ids, split=split, val_fraction=val_fraction, seed=seed)
+        else:
+            if split not in {"train", "val", "all"}:
+                raise ValueError(f"Unsupported split {split!r}. Expected 'train', 'val', or 'all'.")
+            self.chain_ids = list(chain_ids)
         self.split = split
 
     def __len__(self) -> int:
@@ -288,8 +411,8 @@ class ProcessedOpenProteinSetDataset(Dataset):
     def __getitem__(self, index: int) -> Dict[str, Any]:
         chain_id = self.chain_ids[index]
         example: Dict[str, Any] = {"chain_id": chain_id}
-        example.update(_load_processed_features(self.processed_features_dir / f"{chain_id}.npz"))
-        example.update(_load_processed_labels(self.processed_labels_dir / f"{chain_id}.npz"))
+        example.update(_load_processed_features(_npz_path_for_chain_id(self.processed_features_dir, chain_id)))
+        example.update(_load_processed_labels(_npz_path_for_chain_id(self.processed_labels_dir, chain_id)))
         return example
 
 

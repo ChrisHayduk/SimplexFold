@@ -163,7 +163,15 @@ class AlphaFoldLoss(torch.nn.Module):
     chain FAPE is always clamped regardless, so this knob never reaches it.
     """
 
-    def __init__(self, finetune: bool = False, use_clamped_fape: Optional[float] = None):
+    def __init__(
+        self,
+        finetune: bool = False,
+        use_clamped_fape: Optional[float] = None,
+        simplex_aux_weight: float = 1.0,
+        backbone_loss_weight: float = 1.0,
+        sidechain_fape_loss_weight: float = 1.0,
+        torsion_loss_weight: float = 1.0,
+    ):
         super().__init__()
         self.torsion_angle_loss = TorsionAngleLoss()
         self.plddt_loss = PLDDTLoss(
@@ -196,6 +204,10 @@ class AlphaFoldLoss(torch.nn.Module):
         self.experimentally_resolved_weight = 0.01
         self.structural_violation_weight = 1.0
         self.tm_score_weight = 0.1  # supplement 1.9.7 (paragraph after eq 38)
+        self.simplex_aux_weight = simplex_aux_weight
+        self.backbone_loss_weight = backbone_loss_weight
+        self.sidechain_fape_loss_weight = sidechain_fape_loss_weight
+        self.torsion_loss_weight = torsion_loss_weight
 
         self.finetune = finetune
         self.use_clamped_fape = use_clamped_fape
@@ -418,9 +430,9 @@ class AlphaFoldLoss(torch.nn.Module):
         # `sidechain_loss` is L_FAPE (all-atom, final layer); `torsion_loss` already
         # bundles 0.5 * L_aux^{torsion} + 0.01 * L_aux^{anglenorm} per Algorithm 27
         # and the L_aux factor from equation 7.
-        weighted_backbone_loss = (1.0 - self.sidechain_weight_frac) * backbone_loss
-        weighted_sidechain_fape_loss = self.sidechain_weight_frac * sidechain_loss
-        weighted_torsion_loss = torsion_loss
+        weighted_backbone_loss = self.backbone_loss_weight * (1.0 - self.sidechain_weight_frac) * backbone_loss
+        weighted_sidechain_fape_loss = self.sidechain_fape_loss_weight * self.sidechain_weight_frac * sidechain_loss
+        weighted_torsion_loss = self.torsion_loss_weight * torsion_loss
         fape_loss = weighted_backbone_loss + weighted_sidechain_fape_loss
         structure_loss = fape_loss + weighted_torsion_loss
         weighted_distogram_loss = self.distogram_weight * dist_loss
@@ -455,8 +467,10 @@ class AlphaFoldLoss(torch.nn.Module):
                 true_ca_mask,
                 seq_mask=seq_mask,
             )
-            loss = loss + simplex_terms["simplex_aux_loss"]
+            weighted_simplex_aux_loss = self.simplex_aux_weight * simplex_terms["simplex_aux_loss"]
+            loss = loss + weighted_simplex_aux_loss
             loss_terms.update(simplex_terms)
+            loss_terms["weighted_simplex_aux_loss"] = weighted_simplex_aux_loss
 
         if self.finetune:
             structural_violation_loss = self.structural_violation_loss(

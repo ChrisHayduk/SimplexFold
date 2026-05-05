@@ -57,6 +57,7 @@ from minalphafold.data import (
     crop_example,
     hhblits_profile,
     masked_msa_inputs,
+    _npz_path_for_chain_id,
     sample_cluster_and_extra,
 )
 from minalphafold.losses import AlphaFoldLoss, select_best_atom14_ground_truth
@@ -607,8 +608,8 @@ def main(argv: list[str] | None = None) -> dict:
     # ------------------------------------------------------------
     features_dir = Path(args.processed_features_dir)
     labels_dir = Path(args.processed_labels_dir)
-    feature_cache = features_dir / f"{args.chain_id}.npz"
-    label_cache = labels_dir / f"{args.chain_id}.npz"
+    feature_cache = _npz_path_for_chain_id(features_dir, args.chain_id)
+    label_cache = _npz_path_for_chain_id(labels_dir, args.chain_id)
     if not feature_cache.exists() or not label_cache.exists():
         raise FileNotFoundError(
             f"Processed cache not found. Expected:\n"

@@ -120,6 +120,8 @@ def main(
     checkpoint_dir: str = "/root/checkpoints",
     processed_features_dir: str = "/root/data/processed_features",
     processed_labels_dir: str = "/root/data/processed_labels",
+    train_manifest: str | None = None,
+    val_manifest: str | None = None,
     val_fraction: float = 0.0,
     batch_size: int = 1,
     grad_accum_steps: int | None = None,
@@ -162,6 +164,10 @@ def main(
     ]
     if grad_accum_steps is not None:
         argv += ["--grad-accum-steps", str(grad_accum_steps)]
+    if train_manifest is not None:
+        argv += ["--train-manifest", train_manifest]
+    if val_manifest is not None:
+        argv += ["--val-manifest", val_manifest]
     if epochs is not None:
         argv += ["--epochs", str(epochs)]
     if resume_path is not None:
