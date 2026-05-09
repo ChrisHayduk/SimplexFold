@@ -173,6 +173,8 @@ def test_simplicial_adapter_shapes_masks_and_gradients():
     assert aux["simplex_tetra_indices"].shape[-1] == 4
     assert aux["simplex_face_distance_logits"].shape[-2:] == (3, cfg.n_dist_bins)
     assert aux["simplex_tetra_distance_logits"].shape[-2:] == (6, cfg.n_dist_bins)
+    assert not torch.allclose(out_pair[0], pair.detach()[0])
+    assert not torch.allclose(out_single[0], single.detach()[0])
     assert torch.all(out_single[1, 4:] == 0)
     assert torch.all(out_pair[1, 4:, :, :] == 0)
     assert torch.all(out_pair[1, :, 4:, :] == 0)

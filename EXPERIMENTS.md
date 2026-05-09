@@ -114,3 +114,21 @@ Validation:
 
 - `pytest tests/test_simplex.py::test_simplex_topology_neighborhood_loss_targets_anchor_neighbors`
 - E01 targeted tests and budget tests.
+
+### E03: Warm-Started Simplex Boundary Messages
+
+Status: implemented locally; queued for Runpod.
+
+Hypothesis: the current simplex adapter starts as an identity because the
+face/tetra residual projections into pair and single states are zero
+initialized. That is conservative, but it delays the effect of explicit
+higher-order cells on the structure trunk. Warm-starting the simplex boundary
+message projections should let faces and tetras influence pair/single
+representations immediately while keeping the parameter count unchanged.
+
+Mechanism: initialize the face-to-edge, face-to-single, face-to-tetra,
+tetra-to-face, tetra-to-edge, and tetra-to-single MLP output projections with
+the standard LeCun initializer instead of the zero "final" initializer.
+
+Decision rule: keep only if the Runpod pilot improves final `val_lddt_ca`
+without losing the best-interim gains seen in E02.

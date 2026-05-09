@@ -63,3 +63,10 @@
 - E02 local targeted tests passed:
   `tests/test_simplex.py::test_simplex_topology_neighborhood_loss_targets_anchor_neighbors`,
   E01 simplex loss/runner tests, and the medium budget/profile tests.
+- E02 Runpod pilot completed on pod `sytp4e4kjs7e61`, treatment commit
+  `e09b88f`, same 1000-step full-variant protocol. Final `val_lddt_ca`
+  was `0.0281`; best interim was `0.1127` at step 800. This is the best
+  interim score so far but does not solve final collapse.
+- E03 implemented warm-started simplex boundary message projections so
+  face/tetra states influence pair and single streams immediately rather than
+  starting as identity residuals. No parameter-count change.

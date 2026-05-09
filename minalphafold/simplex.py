@@ -555,10 +555,10 @@ class SimplexAuxiliaryHeads(torch.nn.Module):
 class SimplicialAdapter(torch.nn.Module):
     """Sparse 2-/3-simplex message passing adapter.
 
-    The adapter starts as an identity on the pair/single streams because all
-    residual projection heads are zero-initialised.  Auxiliary heads still
-    receive non-zero face/tetra states, so their losses can immediately train
-    the simplex representations and the topology contact scorer.
+    The adapter builds non-zero face/tetra states from pair, single, and
+    recycled geometry inputs, then passes their boundary messages back into
+    pair and single streams.  Auxiliary heads supervise the same explicit
+    simplex states that produce those boundary messages.
     """
 
     def __init__(self, config):
@@ -592,11 +592,11 @@ class SimplicialAdapter(torch.nn.Module):
 
         face_geom = face_geometry_dim(self.rbf_bins)
         self.face_init = SimplexMLP(3 * config.c_z + 3 * config.c_s + face_geom, self.hidden_dim, self.c_face)
-        self.edge_to_face = SimplexMLP(self.c_face + 3 * config.c_z, self.hidden_dim, self.c_face, final_init="final")
+        self.edge_to_face = SimplexMLP(self.c_face + 3 * config.c_z, self.hidden_dim, self.c_face)
         self.face_gate = torch.nn.Linear(self.c_face, self.c_face)
         init_gate_linear(self.face_gate)
-        self.face_to_edge = SimplexMLP(self.c_face, self.hidden_dim, 3 * config.c_z, final_init="final")
-        self.face_to_single = SimplexMLP(self.c_face, self.hidden_dim, 3 * config.c_s, final_init="final")
+        self.face_to_edge = SimplexMLP(self.c_face, self.hidden_dim, 3 * config.c_z)
+        self.face_to_single = SimplexMLP(self.c_face, self.hidden_dim, 3 * config.c_s)
         self.msa_to_face_a = torch.nn.Linear(config.c_m, self.msa_to_face_rank, bias=False)
         self.msa_to_face_b = torch.nn.Linear(config.c_m, self.msa_to_face_rank, bias=False)
         self.msa_to_face_c = torch.nn.Linear(config.c_m, self.msa_to_face_rank, bias=False)
@@ -608,12 +608,12 @@ class SimplicialAdapter(torch.nn.Module):
         tetra_geom = tetra_geometry_dim(self.rbf_bins)
         tetra_input_dim = 6 * config.c_z + 3 * self.c_face + 4 * config.c_s + tetra_geom
         self.tetra_init = SimplexMLP(tetra_input_dim, self.hidden_dim, self.c_tetra)
-        self.face_to_tetra = SimplexMLP(self.c_tetra + 3 * self.c_face, self.hidden_dim, self.c_tetra, final_init="final")
+        self.face_to_tetra = SimplexMLP(self.c_tetra + 3 * self.c_face, self.hidden_dim, self.c_tetra)
         self.tetra_gate = torch.nn.Linear(self.c_tetra, self.c_tetra)
         init_gate_linear(self.tetra_gate)
-        self.tetra_to_face = SimplexMLP(self.c_tetra, self.hidden_dim, 3 * self.c_face, final_init="final")
-        self.tetra_to_edge = SimplexMLP(self.c_tetra, self.hidden_dim, 6 * config.c_z, final_init="final")
-        self.tetra_to_single = SimplexMLP(self.c_tetra, self.hidden_dim, 4 * config.c_s, final_init="final")
+        self.tetra_to_face = SimplexMLP(self.c_tetra, self.hidden_dim, 3 * self.c_face)
+        self.tetra_to_edge = SimplexMLP(self.c_tetra, self.hidden_dim, 6 * config.c_z)
+        self.tetra_to_single = SimplexMLP(self.c_tetra, self.hidden_dim, 4 * config.c_s)
 
         self.single_gate = torch.nn.Linear(config.c_s, config.c_s)
         init_gate_linear(self.single_gate)
