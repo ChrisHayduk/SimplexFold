@@ -280,6 +280,55 @@ def test_simplex_contact_loss_balances_contacts_and_non_contacts():
     assert torch.allclose(terms["weighted_simplex_contact_loss"], expected.reshape(1))
 
 
+def test_simplex_topology_neighborhood_loss_targets_anchor_neighbors():
+    true_ca = torch.tensor(
+        [
+            [
+                [0.0, 0.0, 0.0],
+                [4.0, 0.0, 0.0],
+                [20.0, 0.0, 0.0],
+                [40.0, 0.0, 0.0],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    ca_mask = torch.ones(1, 4)
+    contact_logits = torch.tensor(
+        [
+            [
+                [0.0, -2.0, 3.0, 1.0],
+                [-2.0, 0.0, 3.0, 1.0],
+                [1.0, 2.0, 0.0, 3.0],
+                [1.0, 2.0, 3.0, 0.0],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    prediction = {"simplex_contact_logits": contact_logits}
+
+    terms = SimplexGeometryLoss(contact_weight=0.0, topology_neighborhood_weight=1.0)(
+        prediction,
+        true_ca,
+        ca_mask,
+    )
+
+    distances = torch.cdist(true_ca, true_ca)
+    contact_true = (distances < 8.0).float()
+    valid = 1.0 - torch.eye(4).reshape(1, 4, 4)
+    positive = valid * contact_true
+    positive_count_by_row = positive.sum(dim=-1)
+    masked_logits = contact_logits.masked_fill(valid <= 0, torch.finfo(contact_logits.dtype).min / 4)
+    log_probs = torch.nn.functional.log_softmax(masked_logits, dim=-1)
+    target_distribution = positive / positive_count_by_row[..., None].clamp_min(1.0)
+    row_loss = -(target_distribution * log_probs).sum(dim=-1)
+    has_positive = (positive_count_by_row > 0).float()
+    expected = (row_loss * has_positive).sum(dim=1) / has_positive.sum(dim=1).clamp_min(1.0)
+
+    assert torch.allclose(terms["simplex_topology_neighborhood_loss"], expected)
+    assert torch.allclose(terms["weighted_simplex_topology_neighborhood_loss"], expected)
+    assert torch.allclose(terms["simplex_aux_loss"], expected)
+
+
 def test_simplex_geometry_loss_adds_distance_and_consistency_terms():
     cfg = SimplexConfig()
     true_ca = torch.randn(1, 5, 3)

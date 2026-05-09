@@ -92,3 +92,25 @@ Validation:
 Reason: an all-pairs C-alpha distance preservation loss is metric-aligned but
 not specifically simplicial. It could help a pair-only AF2 trunk in the same
 way and would blur the intended claim.
+
+### E02: Row-Wise Topology Neighborhood Loss
+
+Status: implemented locally; queued for Runpod.
+
+Hypothesis: the sparse complex depends on each anchor's selected neighbor star
+`N(i)`. A row-wise contact-neighborhood objective should better train the
+topology logits for the actual top-k selector than independent pairwise BCE.
+
+Mechanism: for each residue with at least one true contact, treat true contact
+neighbors as the target distribution over that residue's valid neighbors and
+apply cross entropy to `simplex_contact_logits[i, :]`. This is a direct
+supervision signal for the simplicial complex construction step, not an
+all-pairs metric-fitting loss.
+
+Decision rule: keep only if Runpod `full` improves over E01/control on best
+interim and final `val_lddt_ca` without changing parameter count.
+
+Validation:
+
+- `pytest tests/test_simplex.py::test_simplex_topology_neighborhood_loss_targets_anchor_neighbors`
+- E01 targeted tests and budget tests.

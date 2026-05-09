@@ -934,6 +934,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         *,
         contact_distance_threshold: float = 8.0,
         contact_weight: float = 0.05,
+        topology_neighborhood_weight: float = 0.05,
         face_area_weight: float = 0.05,
         face_distance_weight: float = 0.05,
         tetra_geometry_weight: float = 0.02,
@@ -946,6 +947,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         super().__init__()
         self.contact_distance_threshold = contact_distance_threshold
         self.contact_weight = contact_weight
+        self.topology_neighborhood_weight = topology_neighborhood_weight
         self.face_area_weight = face_area_weight
         self.face_distance_weight = face_distance_weight
         self.tetra_geometry_weight = tetra_geometry_weight
@@ -988,7 +990,8 @@ class SimplexGeometryLoss(torch.nn.Module):
             )
             positive_mask = pair_valid * contact_true
             negative_mask = pair_valid * (1.0 - contact_true)
-            positive_count = positive_mask.sum(dim=(1, 2))
+            positive_count_by_row = positive_mask.sum(dim=-1)
+            positive_count = positive_count_by_row.sum(dim=1)
             negative_count = negative_mask.sum(dim=(1, 2))
             positive_loss = (bce * positive_mask).sum(dim=(1, 2)) / positive_count.clamp_min(1.0)
             negative_loss = (bce * negative_mask).sum(dim=(1, 2)) / negative_count.clamp_min(1.0)
@@ -1000,6 +1003,20 @@ class SimplexGeometryLoss(torch.nn.Module):
             loss_terms["simplex_contact_loss"] = contact_loss
             weighted = self.contact_weight * contact_loss
             loss_terms["weighted_simplex_contact_loss"] = weighted
+            total = total + weighted
+
+            very_negative = torch.finfo(contact_logits.dtype).min / 4
+            masked_logits = contact_logits.masked_fill(pair_valid <= 0, very_negative)
+            log_probs = torch.nn.functional.log_softmax(masked_logits, dim=-1)
+            positive_distribution = positive_mask / positive_count_by_row[..., None].clamp_min(1.0)
+            row_loss = -(positive_distribution * log_probs).sum(dim=-1)
+            row_has_positive = (positive_count_by_row > 0).to(dtype)
+            topology_neighborhood_loss = (row_loss * row_has_positive).sum(dim=1) / row_has_positive.sum(
+                dim=1
+            ).clamp_min(1.0)
+            loss_terms["simplex_topology_neighborhood_loss"] = topology_neighborhood_loss
+            weighted = self.topology_neighborhood_weight * topology_neighborhood_loss
+            loss_terms["weighted_simplex_topology_neighborhood_loss"] = weighted
             total = total + weighted
 
         if (

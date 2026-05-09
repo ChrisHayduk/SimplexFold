@@ -45,3 +45,21 @@
 - Runpod fp32 smoke passed for main/full and E01/full with
   `train-limit=8`, `val-limit=4`, `steps=2`, `crop=128`, `msa-depth=32`.
   These numbers are smoke-only and not evidence for the study.
+- E01 Runpod pilot completed on pod `sytp4e4kjs7e61`:
+  main/full control commit `a299438` vs E01/full commit `6c20faa`,
+  `train-limit=256`, `val-limit=64`, `steps=1000`, `crop=128`,
+  `msa-depth=32`, `mixed-precision=off`.
+- E01 final `val_lddt_ca` did not beat control:
+  control `0.0401`, E01 `0.0316`.
+- E01 best interim `val_lddt_ca` was slightly higher:
+  control best `0.0992` at step 400, E01 best `0.1096` at step 400.
+  Interpretation: balanced contact supervision can improve some early topology
+  selection points but is not sufficient as a standalone change.
+- Next candidate: a row-wise topology neighborhood loss that directly trains
+  each anchor residue's contact logits as a distribution over `N(i)`, the
+  sparse neighbor star used to instantiate faces and tetras.
+- E02 implemented the row-wise topology neighborhood loss inside
+  `SimplexGeometryLoss` with no parameter-count change.
+- E02 local targeted tests passed:
+  `tests/test_simplex.py::test_simplex_topology_neighborhood_loss_targets_anchor_neighbors`,
+  E01 simplex loss/runner tests, and the medium budget/profile tests.
