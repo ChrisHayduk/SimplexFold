@@ -254,6 +254,7 @@ def test_load_model_config_selects_requested_profile():
     assert load_model_config("medium").model_profile == "medium"
     assert load_model_config("alphafold2").model_profile == "alphafold2"
     assert load_model_config("simplexfold_param_matched").model_profile == "simplexfold_param_matched"
+    assert load_model_config("simplexfold_medium_width_matched").model_profile == "simplexfold_medium_width_matched"
 
 
 def test_load_model_config_accepts_an_explicit_toml_path():
@@ -275,6 +276,7 @@ def test_list_available_profiles_includes_shipped_json_configs():
         "alphafold2",
         "simplexfold_param_matched",
         "simplexfold_medium_param_matched",
+        "simplexfold_medium_width_matched",
     }.issubset(set(profiles))
 
 
@@ -321,6 +323,17 @@ def test_shipped_profiles_have_expected_scales():
     assert medium_param_matched.c_s < medium.c_s
     assert medium_param_matched.c_z < medium.c_z
 
+    medium_width_matched = load_model_config("simplexfold_medium_width_matched")
+    assert medium_width_matched.use_simplicial_evoformer
+    assert medium_width_matched.c_m == medium.c_m
+    assert medium_width_matched.c_s == medium.c_s
+    assert medium_width_matched.c_z == medium.c_z
+    assert medium_width_matched.structure_module_layers == medium.structure_module_layers
+    assert medium_width_matched.template_pair_num_blocks == 0
+    assert medium_width_matched.num_extra_msa == 0
+    assert medium_width_matched.num_evoformer == 2
+    assert medium_width_matched.recommended_n_cycles == 4
+
 
 def test_simplexfold_medium_param_matched_matches_af2_medium_budget():
     medium = load_model_config("medium")
@@ -333,6 +346,22 @@ def test_simplexfold_medium_param_matched_matches_af2_medium_budget():
     assert af2_params == 3_106_642
     assert simplex_params == 3_106_690
     assert abs(simplex_params - af2_params) <= 64
+
+
+def test_simplexfold_medium_width_matched_preserves_widths_near_af2_medium_budget():
+    medium = load_model_config("medium")
+    af2_medium = replace(medium, use_simplicial_evoformer=False)
+    simplex_medium = load_model_config("simplexfold_medium_width_matched")
+
+    af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+
+    assert af2_params == 3_106_642
+    assert simplex_params == 3_348_544
+    assert simplex_medium.c_m == medium.c_m
+    assert simplex_medium.c_s == medium.c_s
+    assert simplex_medium.c_z == medium.c_z
+    assert (simplex_params - af2_params) / af2_params < 0.08
 
 
 def test_zero_dropout_model_config_preserves_dimensions_and_clears_dropout():
