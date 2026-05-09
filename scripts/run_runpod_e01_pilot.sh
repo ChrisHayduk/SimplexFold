@@ -4,6 +4,9 @@ set -euo pipefail
 REPO_URL="${REPO_URL:-https://github.com/ChrisHayduk/SimplexFold.git}"
 MAIN_COMMIT="${MAIN_COMMIT:-a2994386581a05f1569b785c473347cc4f4a9558}"
 E01_COMMIT="${E01_COMMIT:-6c20faa94f5581c9f40b6919dddacd9c08b56813}"
+TREATMENT_COMMIT="${TREATMENT_COMMIT:-${E01_COMMIT}}"
+CONTROL_RUN_NAME="${CONTROL_RUN_NAME:-e00_main_full_runpod_pilot}"
+TREATMENT_RUN_NAME="${TREATMENT_RUN_NAME:-e01_balanced_contact_full_runpod_pilot}"
 WORKDIR="${RUNPOD_WORKDIR:-/workspace/codex-simplexfold-e01-runpod-20260509}"
 NANOFOLD_ROOT="${NANOFOLD_ROOT:-/workspace/nanoFold-Competition}"
 PYTHON_BIN="${PYTHON_BIN:-python}"
@@ -84,8 +87,17 @@ from pathlib import Path
 
 workdir = Path(os.environ.get("RUNPOD_WORKDIR", "/workspace/codex-simplexfold-e01-runpod-20260509"))
 runs = [
-    ("e00_main_full_runpod_pilot", os.environ.get("MAIN_COMMIT", "a2994386581a05f1569b785c473347cc4f4a9558")),
-    ("e01_balanced_contact_full_runpod_pilot", os.environ.get("E01_COMMIT", "6c20faa94f5581c9f40b6919dddacd9c08b56813")),
+    (
+        os.environ.get("CONTROL_RUN_NAME", "e00_main_full_runpod_pilot"),
+        os.environ.get("MAIN_COMMIT", "a2994386581a05f1569b785c473347cc4f4a9558"),
+    ),
+    (
+        os.environ.get("TREATMENT_RUN_NAME", "e01_balanced_contact_full_runpod_pilot"),
+        os.environ.get(
+            "TREATMENT_COMMIT",
+            os.environ.get("E01_COMMIT", "6c20faa94f5581c9f40b6919dddacd9c08b56813"),
+        ),
+    ),
 ]
 rows = []
 for run_name, commit in runs:
@@ -133,8 +145,8 @@ require_path "${NANOFOLD_ROOT}/data/processed_features"
 require_path "${NANOFOLD_ROOT}/data/processed_labels"
 
 checkout_repo "${WORKDIR}/repos/SimplexFold-main" "${MAIN_COMMIT}"
-checkout_repo "${WORKDIR}/repos/SimplexFold-e01" "${E01_COMMIT}"
+checkout_repo "${WORKDIR}/repos/SimplexFold-treatment" "${TREATMENT_COMMIT}"
 
-run_benchmark "${WORKDIR}/repos/SimplexFold-main" "e00_main_full_runpod_pilot"
-run_benchmark "${WORKDIR}/repos/SimplexFold-e01" "e01_balanced_contact_full_runpod_pilot"
+run_benchmark "${WORKDIR}/repos/SimplexFold-main" "${CONTROL_RUN_NAME}"
+run_benchmark "${WORKDIR}/repos/SimplexFold-treatment" "${TREATMENT_RUN_NAME}"
 summarize_results
