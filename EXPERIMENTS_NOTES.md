@@ -100,3 +100,8 @@
   under-expansion: predicted C-alpha radius of gyration remains much smaller
   than the true structures in these pilots.
 - Stopped dedicated Runpod pod `sytp4e4kjs7e61` after runs completed.
+- E04 implemented selected-simplex coordinate realization losses: predicted
+  C-alpha face areas and tetra signed/absolute volume plus radius of gyration
+  are compared only on the model's selected sparse face/tetra cells. This is
+  intended to address collapse while staying mediated by the explicit
+  simplicial complex.

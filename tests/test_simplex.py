@@ -358,6 +358,58 @@ def test_simplex_geometry_loss_adds_distance_and_consistency_terms():
     assert torch.isfinite(terms["simplex_aux_loss"]).all()
 
 
+def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
+    true_ca = torch.tensor(
+        [
+            [
+                [0.0, 0.0, 0.0],
+                [4.0, 0.0, 0.0],
+                [0.0, 5.0, 0.0],
+                [0.0, 0.0, 6.0],
+                [8.0, 8.0, 8.0],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    ca_mask = torch.ones(1, 5)
+    matching_atom14 = torch.zeros(1, 5, 14, 3)
+    matching_atom14[:, :, 1, :] = true_ca
+    collapsed_atom14 = matching_atom14.clone()
+    collapsed_atom14[:, :, 1, :] = 0.0
+    base_prediction = {
+        "simplex_contact_logits": torch.zeros(1, 5, 5),
+        "simplex_face_indices": torch.tensor([[[[0, 1, 2]], [[1, 2, 3]], [[2, 3, 4]], [[3, 4, 0]], [[4, 0, 1]]]]),
+        "simplex_face_mask": torch.ones(1, 5, 1),
+        "simplex_face_area_logits": torch.zeros(1, 5, 1),
+        "simplex_tetra_indices": torch.tensor([[[[0, 1, 2, 3]], [[1, 2, 3, 4]], [[2, 3, 4, 0]], [[3, 4, 0, 1]], [[4, 0, 1, 2]]]]),
+        "simplex_tetra_mask": torch.ones(1, 5, 1),
+        "simplex_tetra_geometry_logits": torch.zeros(1, 5, 1, 3),
+    }
+    loss_fn = SimplexGeometryLoss(
+        contact_weight=0.0,
+        topology_neighborhood_weight=0.0,
+        face_area_weight=0.0,
+        face_coordinate_weight=1.0,
+        face_distance_weight=0.0,
+        tetra_geometry_weight=0.0,
+        tetra_coordinate_weight=1.0,
+        tetra_distance_weight=0.0,
+        pair_face_consistency_weight=0.0,
+        face_tetra_consistency_weight=0.0,
+    )
+
+    matching_terms = loss_fn({**base_prediction, "atom14_coords": matching_atom14}, true_ca, ca_mask)
+    collapsed_terms = loss_fn({**base_prediction, "atom14_coords": collapsed_atom14}, true_ca, ca_mask)
+
+    assert matching_terms["simplex_face_coordinate_area_loss"].item() < 1e-6
+    assert matching_terms["simplex_tetra_coordinate_geometry_loss"].item() < 1e-6
+    assert collapsed_terms["simplex_aux_loss"] > matching_terms["simplex_aux_loss"]
+    assert collapsed_terms["simplex_face_coordinate_area_loss"] > matching_terms["simplex_face_coordinate_area_loss"]
+    assert collapsed_terms["simplex_tetra_coordinate_geometry_loss"] > matching_terms[
+        "simplex_tetra_coordinate_geometry_loss"
+    ]
+
+
 def test_simplex_geometry_loss_skips_disabled_tetra_heads():
     true_ca = torch.randn(1, 5, 3)
     ca_mask = torch.ones(1, 5)

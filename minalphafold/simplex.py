@@ -936,8 +936,10 @@ class SimplexGeometryLoss(torch.nn.Module):
         contact_weight: float = 0.05,
         topology_neighborhood_weight: float = 0.05,
         face_area_weight: float = 0.05,
+        face_coordinate_weight: float = 0.1,
         face_distance_weight: float = 0.05,
         tetra_geometry_weight: float = 0.02,
+        tetra_coordinate_weight: float = 0.1,
         tetra_distance_weight: float = 0.05,
         pair_face_consistency_weight: float = 0.02,
         face_tetra_consistency_weight: float = 0.02,
@@ -949,8 +951,10 @@ class SimplexGeometryLoss(torch.nn.Module):
         self.contact_weight = contact_weight
         self.topology_neighborhood_weight = topology_neighborhood_weight
         self.face_area_weight = face_area_weight
+        self.face_coordinate_weight = face_coordinate_weight
         self.face_distance_weight = face_distance_weight
         self.tetra_geometry_weight = tetra_geometry_weight
+        self.tetra_coordinate_weight = tetra_coordinate_weight
         self.tetra_distance_weight = tetra_distance_weight
         self.pair_face_consistency_weight = pair_face_consistency_weight
         self.face_tetra_consistency_weight = face_tetra_consistency_weight
@@ -1030,9 +1034,9 @@ class SimplexGeometryLoss(torch.nn.Module):
             x_i = gather_single(true_ca, i)
             x_j = gather_single(true_ca, j)
             x_k = gather_single(true_ca, k)
-            target_area = _triangle_area(x_i, x_j, x_k)
+            true_area = _triangle_area(x_i, x_j, x_k)
             denom = torch.log1p(torch.as_tensor(self.area_scale, device=device, dtype=dtype)).clamp_min(1.0)
-            target_area = torch.log1p(target_area) / denom
+            target_area = torch.log1p(true_area) / denom
             pred_area = prediction["simplex_face_area_logits"].to(dtype)
             valid = face_mask * gather_single(valid_res, i) * gather_single(valid_res, j) * gather_single(valid_res, k)
             face_loss = (torch.nn.functional.smooth_l1_loss(pred_area, target_area, reduction="none") * valid).sum(
@@ -1042,6 +1046,20 @@ class SimplexGeometryLoss(torch.nn.Module):
             weighted = self.face_area_weight * face_loss
             loss_terms["weighted_simplex_face_area_loss"] = weighted
             total = total + weighted
+
+            if "atom14_coords" in prediction:
+                pred_ca = prediction["atom14_coords"][:, :, 1, :].to(dtype)
+                pred_i = gather_single(pred_ca, i)
+                pred_j = gather_single(pred_ca, j)
+                pred_k = gather_single(pred_ca, k)
+                pred_area_from_coords = torch.log1p(_triangle_area(pred_i, pred_j, pred_k)) / denom
+                face_coordinate_loss = (
+                    torch.nn.functional.smooth_l1_loss(pred_area_from_coords, target_area, reduction="none") * valid
+                ).sum(dim=(1, 2)) / valid.sum(dim=(1, 2)).clamp_min(1.0)
+                loss_terms["simplex_face_coordinate_area_loss"] = face_coordinate_loss
+                weighted = self.face_coordinate_weight * face_coordinate_loss
+                loss_terms["weighted_simplex_face_coordinate_area_loss"] = weighted
+                total = total + weighted
 
             if "simplex_face_distance_logits" in prediction:
                 face_distance_logits = prediction["simplex_face_distance_logits"]
@@ -1126,6 +1144,45 @@ class SimplexGeometryLoss(torch.nn.Module):
             weighted = self.tetra_geometry_weight * tetra_loss
             loss_terms["weighted_simplex_tetra_geometry_loss"] = weighted
             total = total + weighted
+
+            if "atom14_coords" in prediction:
+                pred_ca = prediction["atom14_coords"][:, :, 1, :].to(dtype)
+                pred_i = gather_single(pred_ca, i)
+                pred_j = gather_single(pred_ca, j)
+                pred_k = gather_single(pred_ca, k)
+                pred_l = gather_single(pred_ca, l_idx)
+                pred_signed_volume = (
+                    torch.sum(torch.cross(pred_j - pred_i, pred_k - pred_i, dim=-1) * (pred_l - pred_i), dim=-1)
+                    / 6.0
+                )
+                pred_points = torch.stack([pred_i, pred_j, pred_k, pred_l], dim=-2)
+                pred_center = pred_points.mean(dim=-2, keepdim=True)
+                pred_rg = torch.sqrt(
+                    torch.mean(torch.sum((pred_points - pred_center) ** 2, dim=-1), dim=-1).clamp_min(1e-8)
+                )
+                pred_geometry = torch.stack(
+                    [
+                        torch.sign(pred_signed_volume)
+                        * torch.log1p(torch.abs(pred_signed_volume))
+                        / volume_denom,
+                        torch.log1p(torch.abs(pred_signed_volume)) / volume_denom,
+                        torch.log1p(pred_rg)
+                        / torch.log1p(torch.as_tensor(32.0, device=device, dtype=dtype)).clamp_min(1.0),
+                    ],
+                    dim=-1,
+                )
+                tetra_coordinate_per = torch.nn.functional.smooth_l1_loss(
+                    pred_geometry,
+                    target,
+                    reduction="none",
+                ).mean(dim=-1)
+                tetra_coordinate_loss = (tetra_coordinate_per * valid).sum(dim=(1, 2)) / valid.sum(
+                    dim=(1, 2)
+                ).clamp_min(1.0)
+                loss_terms["simplex_tetra_coordinate_geometry_loss"] = tetra_coordinate_loss
+                weighted = self.tetra_coordinate_weight * tetra_coordinate_loss
+                loss_terms["weighted_simplex_tetra_coordinate_geometry_loss"] = weighted
+                total = total + weighted
 
             if "simplex_tetra_distance_logits" in prediction:
                 tetra_distance_logits = prediction["simplex_tetra_distance_logits"]

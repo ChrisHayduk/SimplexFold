@@ -137,3 +137,22 @@ E02.
 Scaled follow-up: a 3000-step Runpod pilot at crop 256 / MSA depth 64 reached
 best `val_lddt_ca=0.1219` and final `val_lddt_ca=0.1009`. This confirms the
 direction is useful but not sufficient for the 0.7 target.
+
+### E04: Selected-Simplex Coordinate Realization Loss
+
+Status: implemented locally; queued for Runpod.
+
+Hypothesis: the pilots show persistent under-expansion of predicted C-alpha
+geometry. The model may learn useful face/tetra latent geometry while the
+structure module still collapses the realized coordinates. Supervising the
+predicted structure only on selected sparse cells should push the realized
+geometry to match the topological complex without becoming a generic all-pairs
+distance loss.
+
+Mechanism: use `simplex_face_indices` and `simplex_tetra_indices` to compare
+predicted C-alpha face areas and tetra signed/absolute volume plus radius of
+gyration against the true coordinates for the same selected cells. These terms
+are attached to `SimplexGeometryLoss` and add no parameters.
+
+Decision rule: keep if a Runpod pilot improves final `val_lddt_ca` over E03
+and reduces the predicted/true radius-of-gyration gap.
