@@ -76,6 +76,9 @@ bash scripts/run_runpod_e01_pilot.sh
 This compares `full` on main commit `a299438` against E01 commit `6c20faa`
 with identical Runpod CUDA settings.
 
+Note: the pilot currently defaults to fp32 because a Runpod BF16 smoke exposed
+an activation-checkpoint recomputation metadata mismatch in the simplex trunk.
+
 Validation:
 
 - `pytest tests/test_simplex.py::test_simplex_contact_loss_balances_contacts_and_non_contacts`

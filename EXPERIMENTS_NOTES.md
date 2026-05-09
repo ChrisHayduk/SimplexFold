@@ -35,3 +35,13 @@
   `tests/test_simplex.py::test_tiny_alphafold2_profile_emits_simplex_training_tensors`,
   `tests/test_trainer.py::test_simplexfold_medium_param_matched_matches_af2_medium_budget`,
   and `tests/test_trainer.py::test_load_model_config_selects_requested_profile`.
+- Launched dedicated Runpod pod `sytp4e4kjs7e61`
+  (`codex-simplexfold-e01-runpod-20260509`) for SimplexFold experiments.
+  Do not manage or modify pre-existing Runpod instances for this study.
+- Runpod BF16 smoke failed on main/full before training completed due a
+  PyTorch activation-checkpoint recomputation metadata mismatch. Conservative
+  pilot runs should use `--mixed-precision off` until checkpointing and BF16
+  are made compatible.
+- Runpod fp32 smoke passed for main/full and E01/full with
+  `train-limit=8`, `val-limit=4`, `steps=2`, `crop=128`, `msa-depth=32`.
+  These numbers are smoke-only and not evidence for the study.
