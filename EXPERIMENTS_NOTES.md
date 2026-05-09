@@ -84,3 +84,19 @@
 | E01 balanced contact | 400 | 0.1096 | 0.0316 | 0.1996 |
 | E02 topology neighborhood | 800 | 0.1127 | 0.0281 | 0.1944 |
 | E03 warm boundary | 800 | 0.1311 | 0.0742 | 0.2132 |
+
+## Scaled E03 Pilot
+
+- Ran E03 on the same dedicated Runpod pod with `train-limit=1024`,
+  `val-limit=128`, `steps=3000`, `crop=256`, `msa-depth=64`,
+  `mixed-precision=off`.
+- Result path on the Runpod network volume:
+  `/workspace/codex-simplexfold-e03-scaled-20260509/results/e03_warm_boundary_scaled_c256_m64_s3000`.
+- Best scaled `val_lddt_ca`: `0.1219` at step 1000.
+- Final scaled `val_lddt_ca`: `0.1009` at step 3000.
+- Final scaled FoldScore: `0.2346`.
+- Interpretation: E03 improves over the initial control but remains far from
+  the `0.7` target. The persistent issue is structural collapse or
+  under-expansion: predicted C-alpha radius of gyration remains much smaller
+  than the true structures in these pilots.
+- Stopped dedicated Runpod pod `sytp4e4kjs7e61` after runs completed.

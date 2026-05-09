@@ -133,3 +133,7 @@ the standard LeCun initializer instead of the zero "final" initializer.
 Decision: keep as the leading candidate. The Runpod pilot improved both final
 and best-interim `val_lddt_ca` relative to the main/full control, E01, and
 E02.
+
+Scaled follow-up: a 3000-step Runpod pilot at crop 256 / MSA depth 64 reached
+best `val_lddt_ca=0.1219` and final `val_lddt_ca=0.1009`. This confirms the
+direction is useful but not sufficient for the 0.7 target.
