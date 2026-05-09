@@ -1105,5 +1105,8 @@ Iteration ladder:
 4. If topology quality improves but structure does not, strengthen the
    simplex-to-pair/single residual path or make `K`/long-contact bias a
    controlled ablation.
-5. Promote only changes that pass parameter-budget tests and at least a
+5. If selected face/tetra coordinate realization improves collapse but remains
+   too weak, tune those selected-cell realization weights directly rather than
+   adding a generic all-pairs C-alpha loss.
+6. Promote only changes that pass parameter-budget tests and at least a
    NanoFold smoke/short-run comparison.

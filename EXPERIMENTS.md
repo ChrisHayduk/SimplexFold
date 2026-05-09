@@ -117,7 +117,7 @@ Validation:
 
 ### E03: Warm-Started Simplex Boundary Messages
 
-Status: implemented locally; queued for Runpod.
+Status: implemented and under Runpod evaluation.
 
 Hypothesis: the current simplex adapter starts as an identity because the
 face/tetra residual projections into pair and single states are zero
@@ -156,3 +156,32 @@ are attached to `SimplexGeometryLoss` and add no parameters.
 
 Decision rule: keep if a Runpod pilot improves final `val_lddt_ca` over E03
 and reduces the predicted/true radius-of-gyration gap.
+
+Diagnostic result: the 1000-step Runpod pilot improved final `val_lddt_ca` to
+`0.2200`, the best result so far, but predicted C-alpha radius of gyration was
+still much smaller than the true structures.
+
+Scaled follow-up: a 3000-step Runpod pilot at crop 256 / MSA depth 64 is
+running on the dedicated SimplexFold pod.
+
+### E05: Tuned Selected-Cell Coordinate Realization
+
+Status: implemented locally; queued after E04 scaled completes.
+
+Hypothesis: E04 shows that selected simplex coordinate realization is the
+right topological pressure, but the default face/tetra coordinate weights are
+too weak to fix under-expansion at the larger crop/MSA setting.
+
+Mechanism: expose `--simplex-face-coordinate-weight` and
+`--simplex-tetra-coordinate-weight` so Runpod experiments can strengthen only
+the realized geometry terms attached to selected face/tetra cells. This keeps
+the objective mediated by `simplex_face_indices` and `simplex_tetra_indices`;
+it is not a generic all-pairs C-alpha loss.
+
+Initial Runpod test: run `full` with the E04 scaled protocol and stronger
+coordinate weights, beginning with `0.5` for both selected face and selected
+tetra realization terms.
+
+Decision rule: keep only if `val_lddt_ca` and the predicted/true
+radius-of-gyration ratio improve over E04 scaled without destabilizing the
+base AF2 loss.

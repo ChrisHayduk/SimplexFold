@@ -105,3 +105,19 @@
   are compared only on the model's selected sparse face/tetra cells. This is
   intended to address collapse while staying mediated by the explicit
   simplicial complex.
+- E04 1000-step Runpod diagnostic completed on pod `sytp4e4kjs7e61` at commit
+  `02a8bad`: final `val_lddt_ca=0.2200`, final FoldScore `0.2422`,
+  `val_ca_rmsd=14.1964`, `val_ca_drmsd=14.9499`,
+  `val_pred_ca_rg=5.3194`, `val_true_ca_rg=14.6867`. This is the best
+  validation score so far and supports the selected-simplex coordinate
+  realization direction.
+- E04 scaled Runpod follow-up is running with `train-limit=1024`,
+  `val-limit=128`, `steps=3000`, `crop=256`, `msa-depth=64`,
+  `mixed-precision=off`. Step 500 had `val_lddt_ca=0.1618`;
+  step 1000 improved to `val_lddt_ca=0.1777`. The final target is still
+  unmet, and under-expansion persists (`val_pred_ca_rg=4.5718` vs
+  `val_true_ca_rg=15.4034` at step 1000).
+- E05 exposes separate selected face/tetra coordinate-realization weights so
+  the next Runpod experiment can strengthen only the topology-mediated
+  coordinate terms. Defaults are unchanged unless the runner passes
+  `--simplex-face-coordinate-weight` or `--simplex-tetra-coordinate-weight`.

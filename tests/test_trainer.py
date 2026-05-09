@@ -496,6 +496,16 @@ def test_apply_loss_weight_schedule_ramps_research_weights():
     assert loss_fn.backbone_loss_weight == pytest.approx(6.0)
 
 
+def test_alphafold_loss_overrides_simplex_coordinate_weights():
+    loss_fn = AlphaFoldLoss(
+        simplex_face_coordinate_weight=0.4,
+        simplex_tetra_coordinate_weight=0.6,
+    )
+
+    assert loss_fn.simplex_geometry_loss.face_coordinate_weight == pytest.approx(0.4)
+    assert loss_fn.simplex_geometry_loss.tetra_coordinate_weight == pytest.approx(0.6)
+
+
 def test_build_dataloader_can_fix_training_features(tmp_path):
     feature_dir, label_dir = make_processed_cache_dirs(tmp_path)
     data_config = DataConfig(
