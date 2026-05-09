@@ -161,12 +161,15 @@ Diagnostic result: the 1000-step Runpod pilot improved final `val_lddt_ca` to
 `0.2200`, the best result so far, but predicted C-alpha radius of gyration was
 still much smaller than the true structures.
 
-Scaled follow-up: a 3000-step Runpod pilot at crop 256 / MSA depth 64 is
-running on the dedicated SimplexFold pod.
+Scaled follow-up: the 3000-step Runpod pilot at crop 256 / MSA depth 64
+reached best `val_lddt_ca=0.2394` at step 1500 and final
+`val_lddt_ca=0.1985`. This confirms the selected-coordinate realization loss
+is the strongest direction so far, but it still does not hold the structure
+open enough for the 0.7 target.
 
 ### E05: Tuned Selected-Cell Coordinate Realization
 
-Status: implemented locally; queued after E04 scaled completes.
+Status: implemented and launched on Runpod.
 
 Hypothesis: E04 shows that selected simplex coordinate realization is the
 right topological pressure, but the default face/tetra coordinate weights are
@@ -178,9 +181,9 @@ the realized geometry terms attached to selected face/tetra cells. This keeps
 the objective mediated by `simplex_face_indices` and `simplex_tetra_indices`;
 it is not a generic all-pairs C-alpha loss.
 
-Initial Runpod test: run `full` with the E04 scaled protocol and stronger
-coordinate weights, beginning with `0.5` for both selected face and selected
-tetra realization terms.
+Initial Runpod test: running `full` with the E04 scaled protocol and stronger
+coordinate weights: `--simplex-face-coordinate-weight 0.5` and
+`--simplex-tetra-coordinate-weight 0.5`.
 
 Decision rule: keep only if `val_lddt_ca` and the predicted/true
 radius-of-gyration ratio improve over E04 scaled without destabilizing the

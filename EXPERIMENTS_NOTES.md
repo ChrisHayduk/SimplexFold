@@ -84,6 +84,8 @@
 | E01 balanced contact | 400 | 0.1096 | 0.0316 | 0.1996 |
 | E02 topology neighborhood | 800 | 0.1127 | 0.0281 | 0.1944 |
 | E03 warm boundary | 800 | 0.1311 | 0.0742 | 0.2132 |
+| E04 coordinate cells diagnostic | 1000 | 0.2200 | 0.2200 | 0.2422 |
+| E04 coordinate cells scaled | 1500 | 0.2394 | 0.1985 | 0.2399 |
 
 ## Scaled E03 Pilot
 
@@ -111,13 +113,22 @@
   `val_pred_ca_rg=5.3194`, `val_true_ca_rg=14.6867`. This is the best
   validation score so far and supports the selected-simplex coordinate
   realization direction.
-- E04 scaled Runpod follow-up is running with `train-limit=1024`,
+- E04 scaled Runpod follow-up completed with `train-limit=1024`,
   `val-limit=128`, `steps=3000`, `crop=256`, `msa-depth=64`,
-  `mixed-precision=off`. Step 500 had `val_lddt_ca=0.1618`;
-  step 1000 improved to `val_lddt_ca=0.1777`. The final target is still
-  unmet, and under-expansion persists (`val_pred_ca_rg=4.5718` vs
-  `val_true_ca_rg=15.4034` at step 1000).
+  `mixed-precision=off`.
+- E04 scaled best checkpoint was step 1500: `val_lddt_ca=0.2394`,
+  `val_ca_rmsd=15.1042`, `val_ca_drmsd=15.2812`, FoldScore `0.2341`,
+  `val_pred_ca_rg=6.2108`, `val_true_ca_rg=15.4034`.
+- E04 scaled final checkpoint was step 3000: `val_lddt_ca=0.1985`,
+  `val_ca_rmsd=15.3330`, `val_ca_drmsd=16.7843`, FoldScore `0.2399`,
+  `val_pred_ca_rg=4.8384`, `val_true_ca_rg=15.7622`.
+- Interpretation: E04 is the strongest tested direction and confirms selected
+  simplex coordinate realization can lift scaled validation lDDT, but the
+  realized structure still collapses after the peak and remains far below the
+  `0.7` target.
 - E05 exposes separate selected face/tetra coordinate-realization weights so
   the next Runpod experiment can strengthen only the topology-mediated
   coordinate terms. Defaults are unchanged unless the runner passes
   `--simplex-face-coordinate-weight` or `--simplex-tetra-coordinate-weight`.
+- E05 launched on pod `sytp4e4kjs7e61` at commit `5672991` with the same
+  scaled protocol as E04 and both selected coordinate weights set to `0.5`.
