@@ -986,7 +986,17 @@ class SimplexGeometryLoss(torch.nn.Module):
                 contact_true,
                 reduction="none",
             )
-            contact_loss = (bce * pair_valid).sum(dim=(1, 2)) / pair_valid.sum(dim=(1, 2)).clamp_min(1.0)
+            positive_mask = pair_valid * contact_true
+            negative_mask = pair_valid * (1.0 - contact_true)
+            positive_count = positive_mask.sum(dim=(1, 2))
+            negative_count = negative_mask.sum(dim=(1, 2))
+            positive_loss = (bce * positive_mask).sum(dim=(1, 2)) / positive_count.clamp_min(1.0)
+            negative_loss = (bce * negative_mask).sum(dim=(1, 2)) / negative_count.clamp_min(1.0)
+            has_positive = (positive_count > 0).to(dtype)
+            has_negative = (negative_count > 0).to(dtype)
+            contact_loss = (
+                positive_loss * has_positive + negative_loss * has_negative
+            ) / (has_positive + has_negative).clamp_min(1.0)
             loss_terms["simplex_contact_loss"] = contact_loss
             weighted = self.contact_weight * contact_loss
             loss_terms["weighted_simplex_contact_loss"] = weighted

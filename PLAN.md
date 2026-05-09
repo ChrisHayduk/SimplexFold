@@ -1068,3 +1068,42 @@ That is the clean modern tensor implementation of your mentor’s idea without u
 
 [1]: https://github.com/ChrisHayduk/nanoFold-Competition/blob/main/docs/COMPETITION.md "nanoFold-Competition/docs/COMPETITION.md at main · ChrisHayduk/nanoFold-Competition · GitHub"
 [2]: https://www.nature.com/articles/s41586-021-03819-2 "Highly accurate protein structure prediction with AlphaFold | Nature"
+
+## 2026-05-09 NanoFold AF2-Medium-Matched Iteration Plan
+
+Target: improve `simplexfold_medium_param_matched` on NanoFold public
+validation toward `val_lddt_ca > 0.7` while keeping total parameters within
+5% of the AF2-medium pair-only baseline.
+
+Budget contract:
+
+- AF2-medium baseline is `configs/medium.toml` with
+  `use_simplicial_evoformer = false`: 3,106,642 parameters.
+- `configs/simplexfold_medium_param_matched.toml` is 3,106,690 parameters.
+- Allowed 5% upper bound is 3,261,974 parameters.
+- Prefer zero-parameter or near-zero-parameter changes first: topology
+  selection, simplex auxiliary objectives, cell construction, recycling
+  policy, and curriculum.
+
+Scientific constraint: every iteration must be justified through the
+simplicial/topological view. A change that would help a pair-only AF2 trunk
+equally well is not a SimplexFold result unless it is specifically mediated by
+the sparse face/tetra complex.
+
+Iteration ladder:
+
+1. Establish short-run controls for `no_simplex`, `faces`, and `full` using
+   the same AF2-medium-matched profile, same data subset, same seed, and
+   same recycle/crop/MSA settings.
+2. Improve the learned topology scorer first. The first-pass complex depends
+   on pair/contact logits, so contact supervision should be balanced enough
+   for true contacts to influence top-k neighbor selection instead of being
+   swamped by non-contacts.
+3. Keep simplex boundary supervision focused on selected cells: face/tetra
+   edge distances, face area, tetra volume/chirality, and boundary
+   consistency. Do not add a generic all-pairs C-alpha distance loss.
+4. If topology quality improves but structure does not, strengthen the
+   simplex-to-pair/single residual path or make `K`/long-contact bias a
+   controlled ablation.
+5. Promote only changes that pass parameter-budget tests and at least a
+   NanoFold smoke/short-run comparison.

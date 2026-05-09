@@ -1,0 +1,82 @@
+# SimplexFold NanoFold Experiments
+
+## Goal
+
+Improve AF2-medium-matched SimplexFold on NanoFold public validation toward
+`val_lddt_ca > 0.7` while keeping parameters within 5% of the AF2-medium
+pair-only baseline.
+
+## Fixed Evaluation Contract
+
+- Dataset: NanoFold public train/validation manifests from
+  `${NANOFOLD_ROOT}/data/manifests`.
+- Execution: experiment runs happen on Runpod CUDA pods. Local execution is
+  reserved for unit tests, lint checks, and non-evidential smoke debugging.
+- Templates: disabled with `--max-templates 0`.
+- Baseline model budget: `configs/medium.toml` with simplex disabled,
+  3,106,642 parameters.
+- Primary SimplexFold profile: `configs/simplexfold_medium_param_matched.toml`,
+  3,106,690 parameters.
+- Validation target: `val_lddt_ca`.
+- Control variants: `no_simplex`, `faces`, `full`.
+
+## Experiment Queue
+
+### E00: Matched Short-Run Baseline
+
+Purpose: measure current behavior before changing architecture or loss.
+
+Command template:
+
+```bash
+NANOFOLD_ROOT=/workspace/nanoFold-Competition
+python scripts/run_nanofold_public_benchmarks.py \
+  --nanofold-root "${NANOFOLD_ROOT}" \
+  --model-config simplexfold_medium_param_matched \
+  --variants no_simplex faces full \
+  --train-limit 256 \
+  --val-limit 64 \
+  --steps 1000 \
+  --eval-every 100 \
+  --max-val-batches 16 \
+  --crop-size 128 \
+  --msa-depth 32 \
+  --extra-msa-depth 0 \
+  --max-templates 0 \
+  --device cuda \
+  --run-name e00_runpod_baseline
+```
+
+Decision rule: use this as the Runpod control for short-run iteration. It is
+still not enough to claim the 0.7 target, but it is the comparison point for
+E01 and later changes.
+
+### E01: Balanced Topology Contact Supervision
+
+Status: implemented locally; queued for Runpod.
+
+Hypothesis: the learned contact/topology logits drive first-pass neighbor
+selection. A class-balanced contact loss should make selected neighbors more
+contact-like without adding parameters or introducing non-simplicial
+supervision.
+
+Mechanism: modify `SimplexGeometryLoss` so positive and negative contact
+terms are normalized separately, then averaged. This keeps the supervision on
+the topology scorer that builds `N(i)` for sparse faces/tetras.
+
+Decision rule: keep if targeted tests pass, parameter count remains within
+budget, and a short NanoFold run does not regress `full` relative to E00.
+
+Validation:
+
+- `pytest tests/test_simplex.py::test_simplex_contact_loss_balances_contacts_and_non_contacts`
+- `pytest tests/test_simplex.py::test_simplex_geometry_loss_adds_distance_and_consistency_terms`
+- `pytest tests/test_simplex.py::test_tiny_alphafold2_profile_emits_simplex_training_tensors`
+- `pytest tests/test_trainer.py::test_simplexfold_medium_param_matched_matches_af2_medium_budget`
+- `pytest tests/test_trainer.py::test_load_model_config_selects_requested_profile`
+
+### Rejected: Generic C-alpha Distance Loss
+
+Reason: an all-pairs C-alpha distance preservation loss is metric-aligned but
+not specifically simplicial. It could help a pair-only AF2 trunk in the same
+way and would blur the intended claim.

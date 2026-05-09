@@ -241,6 +241,45 @@ def test_simplex_geometry_loss_is_finite_with_and_without_tetrahedra():
     assert "simplex_tetra_geometry_loss" not in terms
 
 
+def test_simplex_contact_loss_balances_contacts_and_non_contacts():
+    true_ca = torch.tensor(
+        [
+            [
+                [0.0, 0.0, 0.0],
+                [4.0, 0.0, 0.0],
+                [20.0, 0.0, 0.0],
+                [40.0, 0.0, 0.0],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    ca_mask = torch.ones(1, 4)
+    contact_logits = torch.ones(1, 4, 4)
+    contact_logits[0, 0, 1] = -2.0
+    contact_logits[0, 1, 0] = -2.0
+    prediction = {"simplex_contact_logits": contact_logits}
+
+    terms = SimplexGeometryLoss(contact_weight=1.0)(prediction, true_ca, ca_mask)
+
+    distances = torch.cdist(true_ca, true_ca)
+    contact_true = (distances < 8.0).float()
+    valid = 1.0 - torch.eye(4).reshape(1, 4, 4)
+    bce = torch.nn.functional.binary_cross_entropy_with_logits(
+        contact_logits,
+        contact_true,
+        reduction="none",
+    )
+    positive = valid * contact_true
+    negative = valid * (1.0 - contact_true)
+    expected = 0.5 * (
+        (bce * positive).sum() / positive.sum()
+        + (bce * negative).sum() / negative.sum()
+    )
+
+    assert torch.allclose(terms["simplex_contact_loss"], expected.reshape(1))
+    assert torch.allclose(terms["weighted_simplex_contact_loss"], expected.reshape(1))
+
+
 def test_simplex_geometry_loss_adds_distance_and_consistency_terms():
     cfg = SimplexConfig()
     true_ca = torch.randn(1, 5, 3)
