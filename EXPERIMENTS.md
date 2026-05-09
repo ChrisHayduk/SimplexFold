@@ -95,7 +95,7 @@ way and would blur the intended claim.
 
 ### E02: Row-Wise Topology Neighborhood Loss
 
-Status: implemented locally; queued for Runpod.
+Status: Runpod pilot completed.
 
 Hypothesis: the sparse complex depends on each anchor's selected neighbor star
 `N(i)`. A row-wise contact-neighborhood objective should better train the
@@ -130,5 +130,6 @@ Mechanism: initialize the face-to-edge, face-to-single, face-to-tetra,
 tetra-to-face, tetra-to-edge, and tetra-to-single MLP output projections with
 the standard LeCun initializer instead of the zero "final" initializer.
 
-Decision rule: keep only if the Runpod pilot improves final `val_lddt_ca`
-without losing the best-interim gains seen in E02.
+Decision: keep as the leading candidate. The Runpod pilot improved both final
+and best-interim `val_lddt_ca` relative to the main/full control, E01, and
+E02.

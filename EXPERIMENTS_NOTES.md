@@ -70,3 +70,17 @@
 - E03 implemented warm-started simplex boundary message projections so
   face/tetra states influence pair and single streams immediately rather than
   starting as identity residuals. No parameter-count change.
+- E03 Runpod pilot completed on pod `sytp4e4kjs7e61`, treatment commit
+  `8320da1`, same 1000-step full-variant protocol. Final `val_lddt_ca`
+  improved to `0.0742`; best interim improved to `0.1311` at step 800.
+  This is the first tested change that improves both best interim and final
+  validation against the main/full control.
+
+## Current Runpod Pilot Summary
+
+| Run | Best step | Best `val_lddt_ca` | Final `val_lddt_ca` | Final FoldScore |
+| --- | ---: | ---: | ---: | ---: |
+| main/full control | 400 | 0.0992 | 0.0401 | 0.2024 |
+| E01 balanced contact | 400 | 0.1096 | 0.0316 | 0.1996 |
+| E02 topology neighborhood | 800 | 0.1127 | 0.0281 | 0.1944 |
+| E03 warm boundary | 800 | 0.1311 | 0.0742 | 0.2132 |
