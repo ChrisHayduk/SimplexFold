@@ -53,7 +53,7 @@ E01 and later changes.
 
 ### E01: Balanced Topology Contact Supervision
 
-Status: implemented locally; queued for Runpod.
+Status: implemented and queued for Runpod.
 
 Hypothesis: the learned contact/topology logits drive first-pass neighbor
 selection. A class-balanced contact loss should make selected neighbors more
@@ -66,6 +66,15 @@ the topology scorer that builds `N(i)` for sparse faces/tetras.
 
 Decision rule: keep if targeted tests pass, parameter count remains within
 budget, and a short NanoFold run does not regress `full` relative to E00.
+
+Runpod pilot:
+
+```bash
+bash scripts/run_runpod_e01_pilot.sh
+```
+
+This compares `full` on main commit `a299438` against E01 commit `6c20faa`
+with identical Runpod CUDA settings.
 
 Validation:
 
