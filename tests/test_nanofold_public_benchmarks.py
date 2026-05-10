@@ -31,3 +31,14 @@ def test_full_msa_to_face_mixed_variant_reserves_local_scaffold_slots():
     assert cfg.simplex_use_msa_to_face is True
     assert cfg.simplex_local_neighbor_k == 4
     assert cfg.simplex_local_bias == 0.0
+
+
+def test_full_msa_to_face_mixed_soft_variant_keeps_reduced_local_bias():
+    cfg = _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face_mixed_soft")
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_local_neighbor_k == 4
+    assert cfg.simplex_local_bias == 2.0

@@ -346,7 +346,7 @@ nonlocal cells before the topology scorer is reliable.
 
 ### E12: Continue Best Full MSA-to-Face Run
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E09 improved through the final 3000-step checkpoint, so the best
 topology/loss stack may still be undertrained rather than architecture-limited
@@ -360,9 +360,17 @@ improving under the same sparse face/tetra/MSA objective.
 Decision rule: keep as the new reference if it improves E09 final
 `val_lddt_ca=0.3429` without a severe FoldScore regression.
 
+Result: keep as a modest new reference, but not a breakthrough. The continued
+run reached best `val_lddt_ca=0.3472` at step 5000 and final
+`val_lddt_ca=0.3449` at step 6000. Final FoldScore improved to `0.2856`,
+final `val_ca_drmsd` improved to `11.7918`, and final predicted/true
+C-alpha radius of gyration improved to `9.8828 / 15.7622`. The improvement
+supports continued training of the E09 stack, but the score remains far from
+the `0.7` target.
+
 ### E13: Mixed Local/Global Simplex Neighbor Scaffold
 
-Status: implemented locally; pending Runpod launch.
+Status: stopped early on Runpod.
 
 Hypothesis: E11 failed because a blunt long-range bias selected noisy
 nonlocal cells before the topology scorer was reliable. The sparse complex
@@ -382,3 +390,28 @@ Decision rule: start with an early Runpod check and keep only if it beats
 E11's step-500 regression and approaches or exceeds E09/E12 lDDT without a
 FoldScore collapse. This is a topological selector change, not a loss hack:
 it changes which vertices are allowed to form persistent face/tetra cells.
+
+Result: reject. The step-500 point was `val_lddt_ca=0.2371`, FoldScore
+`0.2238`, `val_ca_drmsd=15.3413`, and predicted/true C-alpha radius of
+gyration `6.2290 / 15.4034`. It is only slightly better than E11's failed
+long-bias run and much worse than the E09/E12 early curve. Turning off the
+broad local bias makes the learned/global slots too noisy early.
+
+### E14: Soft Mixed Local/Global Simplex Neighbor Scaffold
+
+Status: implemented locally; pending Runpod launch.
+
+Hypothesis: E13's hard handoff from 4 local slots to 8 unbiased learned/global
+slots was too abrupt. The sparse complex may still need the same guaranteed
+local scaffold, but the remaining learned slots should keep a reduced local
+bias so they do not become arbitrary nonlocal cells before the topology scorer
+is reliable.
+
+Mechanism: add `full_msa_to_face_mixed_soft`, which keeps the E13
+`simplex_local_neighbor_k=4` local scaffold but uses `simplex_local_bias=2.0`
+instead of `0.0`. This is still a zero-parameter topological selector
+ablation: it changes how vertices are admitted into selected face/tetra cells.
+
+Decision rule: launch the same early Runpod check and keep only if the step-500
+point recovers toward E09/E12 while retaining better nonlocal capacity than
+the default local-biased selector.

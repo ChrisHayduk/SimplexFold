@@ -90,6 +90,7 @@
 | E06 coordinate weights 1.0 scaled | 3000 | 0.3127 | 0.3127 | 0.2511 |
 | E07 boundary coordinate d=0.5 scaled | 2000 | 0.3247 | 0.3187 | 0.2617 |
 | E09 full MSA-to-face d=0.5 scaled | 3000 | 0.3429 | 0.3429 | 0.2689 |
+| E12 E09 continuation to 6000 | 5000 | 0.3472 | 0.3449 | 0.2856 |
 
 ## Scaled E03 Pilot
 
@@ -219,6 +220,11 @@
 - E12 launched on pod `sytp4e4kjs7e61` at commit `14e14e2`, resuming E09's
   `full_msa_to_face` checkpoint from step 3000 and continuing the same
   scaled protocol to step 6000.
+- E12 completed on pod `sytp4e4kjs7e61`: best `val_lddt_ca=0.3472` at step
+  5000, final `val_lddt_ca=0.3449`, final FoldScore `0.2856`,
+  final `val_ca_drmsd=11.7918`, `val_pred_ca_rg=9.8828`, and
+  `val_true_ca_rg=15.7622`. Continuing E09 modestly improved the reference
+  and global geometry, but it remains far from the `0.7` target.
 - E13 implements a mixed local/global simplex selector. The new
   `simplex_local_neighbor_k` knob reserves nearest-neighbor sequence slots
   before filling the remaining simplex vertices from the learned topology
@@ -234,3 +240,16 @@
   `tests/test_trainer.py::test_simplexfold_medium_param_matched_matches_af2_medium_budget`,
   `tests/test_trainer.py::test_load_model_config_selects_requested_profile`, and
   `ruff check --select F821,F822,F823` on the touched files.
+- E13 launched on pod `sytp4e4kjs7e61` at commit `a9f63ac`, using
+  `--variants full_msa_to_face_mixed` with the E07/E09 selected-coordinate
+  and selected-boundary loss weights. It uses separate checkpoints/results
+  under `/workspace/codex-simplexfold-e13-runpod-20260510`.
+- E13 was stopped early after the step-500 validation point:
+  `val_lddt_ca=0.2371`, FoldScore `0.2238`, `val_ca_drmsd=15.3413`,
+  and `val_pred_ca_rg=6.2290`. Reserving 4 local slots while removing the
+  broad local bias appears too noisy for early learned/global cell selection.
+- E14 adds a soft mixed selector variant,
+  `full_msa_to_face_mixed_soft`, that keeps `simplex_local_neighbor_k=4` but
+  uses `simplex_local_bias=2.0` for the remaining learned slots. The intent is
+  to keep the E13 manifold scaffold while restoring enough local pressure to
+  prevent arbitrary early nonlocal cells.
