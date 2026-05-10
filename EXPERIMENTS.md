@@ -525,3 +525,29 @@ FoldScore/dRMSD at that point, but final 3000-step performance fell short:
 E09's final `0.3429`, `0.2689`, and `12.9189`. The larger simplex state is
 not harmful in the way the failed selector variants were, but extra face/tetra
 capacity alone does not break the lDDT plateau.
+
+### E19: Selected Simplex Boundary lDDT Realization
+
+Status: ready for Runpod.
+
+Hypothesis: E18 improved the mid-run geometry but not final local C-alpha
+lDDT, which suggests the selected complex can carry useful scale/packing
+information while still failing to realize local boundary distances under the
+tolerances that lDDT rewards. A dense all-pairs lDDT loss would be independent
+of the SimplexFold hypothesis. A loss on only selected face/tetra boundary
+edges is different: it makes the learned 2-/3-simplex complex realize the
+metric on its own 1-skeleton.
+
+Mechanism: add optional `simplex_face_boundary_lddt_weight` and
+`simplex_tetra_boundary_lddt_weight`. For each selected face or tetra, compute
+a differentiable lDDT-style tolerance loss on its boundary C-alpha edges,
+restricted to local true distances below 15 A and averaged over the usual
+0.5/1/2/4 A tolerance levels. Boundary edges selected by many cells naturally
+receive more weight through topological multiplicity. Run the E09/E15
+`full_msa_to_face` stack with the existing selected coordinate-distance
+weights plus modest selected-boundary lDDT weights.
+
+Decision rule: stop early if step 500 falls into the failed-selector band.
+Continue only if the curve improves on E09's lDDT/FoldScore trajectory without
+substantially worsening dRMSD/Rg. Promote only if it beats E15's current best
+`val_lddt_ca=0.3556` after continuation.

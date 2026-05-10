@@ -411,10 +411,12 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
         face_area_weight=0.0,
         face_coordinate_weight=1.0,
         face_coordinate_distance_weight=1.0,
+        face_boundary_lddt_weight=1.0,
         face_distance_weight=0.0,
         tetra_geometry_weight=0.0,
         tetra_coordinate_weight=1.0,
         tetra_coordinate_distance_weight=1.0,
+        tetra_boundary_lddt_weight=1.0,
         tetra_distance_weight=0.0,
         pair_face_consistency_weight=0.0,
         face_tetra_consistency_weight=0.0,
@@ -425,8 +427,10 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
 
     assert matching_terms["simplex_face_coordinate_area_loss"].item() < 1e-6
     assert matching_terms["simplex_face_coordinate_distance_loss"].item() < 1e-6
+    assert matching_terms["simplex_face_boundary_lddt_loss"].item() < 1e-6
     assert matching_terms["simplex_tetra_coordinate_geometry_loss"].item() < 1e-6
     assert matching_terms["simplex_tetra_coordinate_distance_loss"].item() < 1e-6
+    assert matching_terms["simplex_tetra_boundary_lddt_loss"].item() < 1e-6
     assert collapsed_terms["simplex_aux_loss"] > matching_terms["simplex_aux_loss"]
     assert collapsed_terms["simplex_face_coordinate_area_loss"] > matching_terms["simplex_face_coordinate_area_loss"]
     assert collapsed_terms["simplex_face_coordinate_distance_loss"] > matching_terms[
@@ -438,6 +442,8 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
     assert collapsed_terms["simplex_tetra_coordinate_distance_loss"] > matching_terms[
         "simplex_tetra_coordinate_distance_loss"
     ]
+    assert collapsed_terms["simplex_face_boundary_lddt_loss"] > matching_terms["simplex_face_boundary_lddt_loss"]
+    assert collapsed_terms["simplex_tetra_boundary_lddt_loss"] > matching_terms["simplex_tetra_boundary_lddt_loss"]
 
 
 def test_simplex_geometry_loss_skips_disabled_tetra_heads():

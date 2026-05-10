@@ -557,8 +557,10 @@ def _train_variant(
         simplex_aux_weight=training_config.simplex_aux_weight,
         simplex_face_coordinate_weight=training_config.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=training_config.simplex_face_coordinate_distance_weight,
+        simplex_face_boundary_lddt_weight=training_config.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=training_config.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=training_config.simplex_tetra_coordinate_distance_weight,
+        simplex_tetra_boundary_lddt_weight=training_config.simplex_tetra_boundary_lddt_weight,
         backbone_loss_weight=training_config.backbone_loss_weight,
         sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
         torsion_loss_weight=training_config.torsion_loss_weight,
@@ -754,9 +756,15 @@ def _train_variant(
                 "simplex_face_coordinate_distance_weight": float(
                     loss_fn.simplex_geometry_loss.face_coordinate_distance_weight
                 ),
+                "simplex_face_boundary_lddt_weight": float(
+                    loss_fn.simplex_geometry_loss.face_boundary_lddt_weight
+                ),
                 "simplex_tetra_coordinate_weight": float(loss_fn.simplex_geometry_loss.tetra_coordinate_weight),
                 "simplex_tetra_coordinate_distance_weight": float(
                     loss_fn.simplex_geometry_loss.tetra_coordinate_distance_weight
+                ),
+                "simplex_tetra_boundary_lddt_weight": float(
+                    loss_fn.simplex_geometry_loss.tetra_boundary_lddt_weight
                 ),
                 "backbone_loss_weight": float(loss_fn.backbone_loss_weight),
                 "sidechain_fape_loss_weight": float(loss_fn.sidechain_fape_loss_weight),
@@ -890,8 +898,10 @@ def _train_variant(
         "simplex_aux_weight": training_config.simplex_aux_weight,
         "simplex_face_coordinate_weight": training_config.simplex_face_coordinate_weight,
         "simplex_face_coordinate_distance_weight": training_config.simplex_face_coordinate_distance_weight,
+        "simplex_face_boundary_lddt_weight": training_config.simplex_face_boundary_lddt_weight,
         "simplex_tetra_coordinate_weight": training_config.simplex_tetra_coordinate_weight,
         "simplex_tetra_coordinate_distance_weight": training_config.simplex_tetra_coordinate_distance_weight,
+        "simplex_tetra_boundary_lddt_weight": training_config.simplex_tetra_boundary_lddt_weight,
         "backbone_loss_weight": training_config.backbone_loss_weight,
         "sidechain_fape_loss_weight": training_config.sidechain_fape_loss_weight,
         "torsion_loss_weight": training_config.torsion_loss_weight,
@@ -951,8 +961,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_aux_weight",
         "simplex_face_coordinate_weight",
         "simplex_face_coordinate_distance_weight",
+        "simplex_face_boundary_lddt_weight",
         "simplex_tetra_coordinate_weight",
         "simplex_tetra_coordinate_distance_weight",
+        "simplex_tetra_boundary_lddt_weight",
         "elapsed_seconds",
         "examples_per_second",
         "train_loss_final",
@@ -979,9 +991,11 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "val_simplex_aux_loss",
         "val_simplex_face_coordinate_area_loss",
         "val_simplex_face_coordinate_distance_loss",
+        "val_simplex_face_boundary_lddt_loss",
         "val_simplex_face_distance_loss",
         "val_simplex_tetra_coordinate_geometry_loss",
         "val_simplex_tetra_coordinate_distance_loss",
+        "val_simplex_tetra_boundary_lddt_loss",
         "val_simplex_tetra_distance_loss",
         "val_simplex_pair_face_consistency_loss",
         "val_simplex_face_tetra_consistency_loss",
@@ -1117,6 +1131,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the selected-face boundary-edge coordinate-distance realization loss weight.",
     )
     parser.add_argument(
+        "--simplex-face-boundary-lddt-weight",
+        type=float,
+        default=None,
+        help="Override the selected-face boundary-edge lDDT-style realization loss weight.",
+    )
+    parser.add_argument(
         "--simplex-tetra-coordinate-weight",
         type=float,
         default=None,
@@ -1127,6 +1147,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the selected-tetra boundary-edge coordinate-distance realization loss weight.",
+    )
+    parser.add_argument(
+        "--simplex-tetra-boundary-lddt-weight",
+        type=float,
+        default=None,
+        help="Override the selected-tetra boundary-edge lDDT-style realization loss weight.",
     )
     parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
     parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
@@ -1226,8 +1252,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_aux_weight=args.simplex_aux_weight,
         simplex_face_coordinate_weight=args.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=args.simplex_face_coordinate_distance_weight,
+        simplex_face_boundary_lddt_weight=args.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=args.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=args.simplex_tetra_coordinate_distance_weight,
+        simplex_tetra_boundary_lddt_weight=args.simplex_tetra_boundary_lddt_weight,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,
@@ -1295,8 +1323,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_aux_weight": args.simplex_aux_weight,
         "simplex_face_coordinate_weight": args.simplex_face_coordinate_weight,
         "simplex_face_coordinate_distance_weight": args.simplex_face_coordinate_distance_weight,
+        "simplex_face_boundary_lddt_weight": args.simplex_face_boundary_lddt_weight,
         "simplex_tetra_coordinate_weight": args.simplex_tetra_coordinate_weight,
         "simplex_tetra_coordinate_distance_weight": args.simplex_tetra_coordinate_distance_weight,
+        "simplex_tetra_boundary_lddt_weight": args.simplex_tetra_boundary_lddt_weight,
         "backbone_loss_weight": args.backbone_loss_weight,
         "sidechain_fape_loss_weight": args.sidechain_fape_loss_weight,
         "torsion_loss_weight": args.torsion_loss_weight,

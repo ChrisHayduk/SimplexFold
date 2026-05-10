@@ -314,3 +314,9 @@
   FoldScore/dRMSD, but final step 3000 did not beat E09 final
   (`0.3429`). Result: reject as a replacement; added simplex capacity alone
   improves mid-run geometry but does not solve the C-alpha lDDT plateau.
+- E19 implements selected-boundary lDDT realization. This deliberately avoids
+  a dense all-pairs C-alpha lDDT loss: the new terms only see boundary edges
+  of selected face/tetra cells, so they are still mediated by the learned
+  sparse simplex topology. The expectation is that tolerance-style local
+  distance pressure may improve lDDT where the existing smooth log-distance
+  losses improved global geometry but plateaued locally.

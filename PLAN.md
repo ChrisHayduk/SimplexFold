@@ -1125,5 +1125,10 @@ Iteration ladder:
    low-rank adapter while preserving the medium AF2 trunk and staying within
    the 5% parameter contract. This asks whether the higher-order state itself
    is currently under-capacitated.
-9. Promote only changes that pass parameter-budget tests and at least a
+9. If extra capacity helps mid-run geometry but not final lDDT, add a
+   tolerance-style metric realization loss only on the selected face/tetra
+   boundary edges. This is not a dense all-pairs lDDT objective; it asks the
+   learned sparse cell complex to realize its own 1-skeleton accurately under
+   the same local-distance tolerances used by C-alpha lDDT.
+10. Promote only changes that pass parameter-budget tests and at least a
    NanoFold smoke/short-run comparison.
