@@ -65,6 +65,7 @@ from minalphafold.trainer import (  # noqa: E402
     set_optimizer_learning_rate,
     set_seed,
     simplex_topology_teacher_forcing_weight_at_step,
+    simplex_update_scale_at_step,
     zero_dropout_model_config,
 )
 
@@ -723,6 +724,7 @@ def _train_variant(
             loss_fn.structural_violation_weight = min(target_violation_weight, ramp_progress * target_violation_weight)
         apply_loss_weight_schedule(loss_fn, training_config, step)
         teacher_forcing_weight = simplex_topology_teacher_forcing_weight_at_step(training_config, step)
+        simplex_update_scale = simplex_update_scale_at_step(training_config, step)
         optimizer.zero_grad(set_to_none=True)
         loss_accum = 0.0
         term_accum: dict[str, list[float]] = {}
@@ -742,6 +744,7 @@ def _train_variant(
                         batch,
                         training_config,
                         use_simplex_teacher_forcing=True,
+                        use_simplex_update_scale=True,
                         step=step,
                     )
                 )
@@ -818,6 +821,7 @@ def _train_variant(
                     loss_fn.simplex_geometry_loss.boundary_degree_normalize
                 ),
                 "simplex_topology_teacher_forcing_weight": teacher_forcing_weight,
+                "simplex_update_scale": float("nan") if simplex_update_scale is None else simplex_update_scale,
                 "backbone_loss_weight": float(loss_fn.backbone_loss_weight),
                 "sidechain_fape_loss_weight": float(loss_fn.sidechain_fape_loss_weight),
                 "torsion_loss_weight": float(loss_fn.torsion_loss_weight),
@@ -965,6 +969,10 @@ def _train_variant(
         "simplex_topology_teacher_forcing_ramp_steps": (
             training_config.simplex_topology_teacher_forcing_ramp_steps
         ),
+        "simplex_update_scale": training_config.simplex_update_scale,
+        "simplex_update_scale_final": training_config.simplex_update_scale_final,
+        "simplex_update_scale_ramp_start_step": training_config.simplex_update_scale_ramp_start_step,
+        "simplex_update_scale_ramp_steps": training_config.simplex_update_scale_ramp_steps,
         "backbone_loss_weight": training_config.backbone_loss_weight,
         "sidechain_fape_loss_weight": training_config.sidechain_fape_loss_weight,
         "torsion_loss_weight": training_config.torsion_loss_weight,
@@ -1039,6 +1047,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_topology_teacher_forcing_weight_final",
         "simplex_topology_teacher_forcing_ramp_start_step",
         "simplex_topology_teacher_forcing_ramp_steps",
+        "simplex_update_scale",
+        "simplex_update_scale_final",
+        "simplex_update_scale_ramp_start_step",
+        "simplex_update_scale_ramp_steps",
         "elapsed_seconds",
         "examples_per_second",
         "train_loss_final",
@@ -1248,6 +1260,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-topology-teacher-forcing-weight-final", type=float, default=None)
     parser.add_argument("--simplex-topology-teacher-forcing-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-topology-teacher-forcing-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-update-scale",
+        type=float,
+        default=None,
+        help="Training-only scale for simplex residual messages into pair/single states.",
+    )
+    parser.add_argument("--simplex-update-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-update-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-update-scale-ramp-steps", type=int, default=1)
     parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
     parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
     parser.add_argument("--torsion-loss-weight", type=float, default=1.0)
@@ -1355,6 +1376,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_topology_teacher_forcing_weight_final=args.simplex_topology_teacher_forcing_weight_final,
         simplex_topology_teacher_forcing_ramp_start_step=args.simplex_topology_teacher_forcing_ramp_start_step,
         simplex_topology_teacher_forcing_ramp_steps=args.simplex_topology_teacher_forcing_ramp_steps,
+        simplex_update_scale=args.simplex_update_scale,
+        simplex_update_scale_final=args.simplex_update_scale_final,
+        simplex_update_scale_ramp_start_step=args.simplex_update_scale_ramp_start_step,
+        simplex_update_scale_ramp_steps=args.simplex_update_scale_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,
@@ -1431,6 +1456,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_topology_teacher_forcing_weight_final": args.simplex_topology_teacher_forcing_weight_final,
         "simplex_topology_teacher_forcing_ramp_start_step": args.simplex_topology_teacher_forcing_ramp_start_step,
         "simplex_topology_teacher_forcing_ramp_steps": args.simplex_topology_teacher_forcing_ramp_steps,
+        "simplex_update_scale": args.simplex_update_scale,
+        "simplex_update_scale_final": args.simplex_update_scale_final,
+        "simplex_update_scale_ramp_start_step": args.simplex_update_scale_ramp_start_step,
+        "simplex_update_scale_ramp_steps": args.simplex_update_scale_ramp_steps,
         "backbone_loss_weight": args.backbone_loss_weight,
         "sidechain_fape_loss_weight": args.sidechain_fape_loss_weight,
         "torsion_loss_weight": args.torsion_loss_weight,

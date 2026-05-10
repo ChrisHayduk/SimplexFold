@@ -722,9 +722,18 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_teacher_ca_coords: Optional[torch.Tensor] = None,
         simplex_teacher_ca_mask: Optional[torch.Tensor] = None,
         simplex_teacher_forcing_weight: Optional[torch.Tensor] = None,
+        simplex_pair_update_scale_override: Optional[torch.Tensor] = None,
+        simplex_single_update_scale_override: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
         if pair.ndim != 4 or single.ndim != 3:
             raise ValueError("pair must be [B, L, L, Cz] and single must be [B, L, Cs]")
+
+        pair_update_scale = self.pair_update_scale
+        if simplex_pair_update_scale_override is not None:
+            pair_update_scale = max(float(simplex_pair_update_scale_override.detach().float().cpu().item()), 0.0)
+        single_update_scale = self.single_update_scale
+        if simplex_single_update_scale_override is not None:
+            single_update_scale = max(float(simplex_single_update_scale_override.detach().float().cpu().item()), 0.0)
 
         score_raw = self.topology_score(self.pair_score_norm(pair)).squeeze(-1)
         contact_logits = 0.5 * (score_raw + score_raw.transpose(1, 2))
@@ -882,9 +891,7 @@ class SimplicialAdapter(torch.nn.Module):
             pair_delta = pair_delta + tet_pair_delta
             pair_counts = pair_counts + tet_pair_counts
 
-        pair = pair + self.dropout(
-            self.pair_update_scale * pair_delta / pair_counts.clamp_min(1.0)
-        )
+        pair = pair + self.dropout(pair_update_scale * pair_delta / pair_counts.clamp_min(1.0))
         if pair_mask is not None:
             pair = pair * pair_mask[..., None]
 
@@ -912,9 +919,7 @@ class SimplicialAdapter(torch.nn.Module):
             single_delta = single_delta + tet_single_delta
             single_counts = single_counts + tet_single_counts
 
-        single_update = (
-            self.single_update_scale * single_delta / single_counts.clamp_min(1.0)
-        )
+        single_update = single_update_scale * single_delta / single_counts.clamp_min(1.0)
         single = single + self.dropout(torch.sigmoid(self.single_gate(self.single_norm(single))) * single_update)
         if seq_mask is not None:
             single = single * seq_mask[..., None]

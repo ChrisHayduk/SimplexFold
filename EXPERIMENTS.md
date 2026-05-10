@@ -836,7 +836,7 @@ teacher forcing, but it remains well below the E09/E15 early band.
 
 ### E30: Simplex Coupling Warmup
 
-Status: design candidate.
+Status: implemented locally and queued for Runpod.
 
 Hypothesis: teacher-forcing the selected complex did not help, while previous
 message-scale experiments showed strong coupling collapses and damping only
@@ -844,12 +844,20 @@ partially recovers. The persistent simplex states may need to learn their
 selected patch/packing geometry before their boundary messages are allowed to
 drive pair and single representations.
 
-Mechanism: add an opt-in schedule for `simplex_pair_update_scale` and
-`simplex_single_update_scale` during training. Start simplex residual coupling
-near `0.0`, keep the selected face/tetra auxiliary realization losses active,
-and ramp coupling back to `1.0`. This is an architectural curriculum for how
-the learned 2-/3-simplex cells communicate with the AF2 1-skeleton and
+Mechanism: add an opt-in training schedule for simplex residual update
+coupling. During training only, `model_inputs_from_batch` can pass scale
+overrides to the simplex adapter so the selected face/tetra states keep their
+auxiliary realization losses active while their residual messages into pair
+and single streams ramp back to full strength. Validation and inference keep
+the configured model coupling. This is an architectural curriculum for how the
+learned 2-/3-simplex cells communicate with the AF2 1-skeleton and
 0-skeleton, not a new metric loss.
+
+Initial Runpod gate: `full_msa_to_face` with the E09 selected coordinate and
+boundary-distance weights, `--simplex-update-scale 0.0`,
+`--simplex-update-scale-final 1.0`,
+`--simplex-update-scale-ramp-start-step 250`, and
+`--simplex-update-scale-ramp-steps 250`.
 
 Decision rule: implement narrowly and run a 500-step Runpod gate. Continue
 only if the warmup improves over the E09/E15 early band or preserves lDDT

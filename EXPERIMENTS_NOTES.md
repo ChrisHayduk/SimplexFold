@@ -476,3 +476,27 @@
 - E30 direction: add a simplex coupling warmup so selected face/tetra states
   are trained by their auxiliary realization losses before their residual
   messages are ramped back into pair/single streams at full strength.
+- E30 implemented locally as a training-only simplex update-scale curriculum.
+  `TrainingConfig.simplex_update_scale*` schedules optional residual coupling
+  overrides, `model_inputs_from_batch` passes them only for training calls, and
+  the simplex adapter applies the override to both face/tetra-to-pair and
+  face/tetra-to-single boundary messages. Evaluation/inference keep the model
+  config's static coupling.
+- E30 local checks: `pytest
+  tests/test_trainer.py::test_train_step_updates_model_parameters
+  tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula
+  tests/test_simplex.py::test_simplicial_adapter_update_scale_override_gates_boundary_residuals
+  tests/test_nanofold_public_benchmarks.py` passed (`11 passed`);
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py
+  minalphafold/model.py minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py` passed; `git diff --check`
+  passed; benchmark help exposes `--simplex-update-scale*`; parameter count
+  for `simplexfold_medium_param_matched` remains `3,106,690`. Ruff could not
+  be run locally because neither `ruff` nor `.venv/bin/ruff` is installed.
+- E30 Runpod gate plan: `full_msa_to_face`, E09 selected coordinate and
+  boundary-distance weights, `--simplex-update-scale 0.0`,
+  `--simplex-update-scale-final 1.0`,
+  `--simplex-update-scale-ramp-start-step 250`, and
+  `--simplex-update-scale-ramp-steps 250`, 500 steps. Do not add E30 to
+  `EXPERIMENT_RESULTS.md` until the run returns a final or early-stop
+  validation point.

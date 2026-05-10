@@ -48,6 +48,7 @@ from minalphafold.trainer import (
     main,
     model_inputs_from_batch,
     save_checkpoint,
+    simplex_update_scale_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     train_step,
     use_finetune_loss,
@@ -111,7 +112,7 @@ def test_train_step_updates_model_parameters(tmp_path):
     )
 
 
-def test_model_inputs_add_training_only_simplex_teacher_forcing():
+def test_model_inputs_add_training_only_simplex_curricula():
     batch = {
         "target_feat": torch.zeros(1, 4, 22),
         "residue_index": torch.arange(4).reshape(1, 4),
@@ -133,22 +134,31 @@ def test_model_inputs_add_training_only_simplex_teacher_forcing():
         simplex_topology_teacher_forcing_weight_final=0.0,
         simplex_topology_teacher_forcing_ramp_start_step=10,
         simplex_topology_teacher_forcing_ramp_steps=10,
+        simplex_update_scale=0.25,
+        simplex_update_scale_final=1.0,
+        simplex_update_scale_ramp_start_step=10,
+        simplex_update_scale_ramp_steps=10,
     )
 
     assert simplex_topology_teacher_forcing_weight_at_step(training_config, 15) == 0.5
+    assert simplex_update_scale_at_step(training_config, 15) == 0.625
 
     eval_inputs = model_inputs_from_batch(batch, training_config)
     assert "simplex_teacher_ca_coords" not in eval_inputs
+    assert "simplex_pair_update_scale_override" not in eval_inputs
 
     train_inputs = model_inputs_from_batch(
         batch,
         training_config,
         use_simplex_teacher_forcing=True,
+        use_simplex_update_scale=True,
         step=15,
     )
     assert torch.allclose(train_inputs["simplex_teacher_ca_coords"], batch["true_atom_positions"][:, :, 1, :])
     assert torch.allclose(train_inputs["simplex_teacher_ca_mask"], batch["seq_mask"])
     assert torch.allclose(train_inputs["simplex_teacher_forcing_weight"], torch.tensor(0.5))
+    assert torch.allclose(train_inputs["simplex_pair_update_scale_override"], torch.tensor(0.625))
+    assert torch.allclose(train_inputs["simplex_single_update_scale_override"], torch.tensor(0.625))
 
 
 def test_alphafold2_uses_canonical_constructor_initialization():

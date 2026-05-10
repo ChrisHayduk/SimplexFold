@@ -124,6 +124,46 @@ def test_simplicial_adapter_teacher_forcing_selects_true_nearest_neighbors():
     assert set(aux["simplex_face_indices"][0, 0, 0, 1:].tolist()) == {1, 2}
 
 
+def test_simplicial_adapter_update_scale_override_gates_boundary_residuals():
+    class FaceOnlyConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = False
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    torch.manual_seed(1)
+    adapter = SimplicialAdapter(FaceOnlyConfig())
+    pair = torch.randn(1, 5, 5, FaceOnlyConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, FaceOnlyConfig.c_s)
+    seq_mask = torch.ones(1, 5)
+    pair_mask = torch.ones(1, 5, 5)
+
+    pair_zero, single_zero, _ = adapter(
+        pair,
+        single,
+        seq_mask=seq_mask,
+        pair_mask=pair_mask,
+        simplex_pair_update_scale_override=torch.tensor(0.0),
+        simplex_single_update_scale_override=torch.tensor(0.0),
+    )
+    pair_full, single_full, _ = adapter(
+        pair,
+        single,
+        seq_mask=seq_mask,
+        pair_mask=pair_mask,
+        simplex_pair_update_scale_override=torch.tensor(1.0),
+        simplex_single_update_scale_override=torch.tensor(1.0),
+    )
+
+    assert torch.allclose(pair_zero, pair)
+    assert torch.allclose(single_zero, single)
+    assert not torch.allclose(pair_full, pair_zero)
+    assert not torch.allclose(single_full, single_zero)
+
+
 def test_simplex_geometry_features_are_rigid_transform_invariant():
     face_indices = torch.tensor([[[[0, 1, 2], [1, 2, 3]]]], dtype=torch.long)
     tetra_indices = torch.tensor([[[[0, 1, 2, 3]]]], dtype=torch.long)
