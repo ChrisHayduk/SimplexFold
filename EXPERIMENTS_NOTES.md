@@ -720,3 +720,18 @@
   margin term was active (`simplex_topology_margin_weight=0.05`,
   `val_weighted_simplex_topology_margin_loss=0.0160`), but validation local
   accuracy collapsed below the readout experiments. E36 is rejected.
+- E37 direction: add a selected-face normal orientation realization term. The
+  current selected face losses supervise edge lengths and area, but the
+  SimplexFold hypothesis specifically asks explicit 2-simplices to represent
+  oriented local patches. Compare predicted and true face normals after
+  expressing each normal in the local N-CA-C frame of the face's boundary
+  residues; this keeps the signal globally rigid-motion invariant and tied to
+  selected learned faces.
+- E37 local checks: `python -m py_compile minalphafold/simplex.py
+  minalphafold/losses.py minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py` passed; focused tests for
+  face-normal invariance, `AlphaFoldLoss` overrides, and benchmark CLI/loss
+  builder passed (`4 passed`); broader affected `pytest tests/test_simplex.py
+  tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights
+  tests/test_nanofold_public_benchmarks.py` passed (`36 passed`); parameter
+  audit remains AF2-medium `3,106,642`, E37 `3,106,690`, within 5% budget.

@@ -607,6 +607,7 @@ def _build_loss_fn(training_config: TrainingConfig) -> AlphaFoldLoss:
         simplex_aux_weight=training_config.simplex_aux_weight,
         simplex_face_coordinate_weight=training_config.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=training_config.simplex_face_coordinate_distance_weight,
+        simplex_face_normal_weight=training_config.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=training_config.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=training_config.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=training_config.simplex_tetra_coordinate_distance_weight,
@@ -845,6 +846,7 @@ def _train_variant(
                 "simplex_face_coordinate_distance_weight": float(
                     loss_fn.simplex_geometry_loss.face_coordinate_distance_weight
                 ),
+                "simplex_face_normal_weight": float(loss_fn.simplex_geometry_loss.face_normal_weight),
                 "simplex_face_boundary_lddt_weight": float(
                     loss_fn.simplex_geometry_loss.face_boundary_lddt_weight
                 ),
@@ -1084,6 +1086,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_aux_weight",
         "simplex_face_coordinate_weight",
         "simplex_face_coordinate_distance_weight",
+        "simplex_face_normal_weight",
         "simplex_face_boundary_lddt_weight",
         "simplex_tetra_coordinate_weight",
         "simplex_tetra_coordinate_distance_weight",
@@ -1276,6 +1279,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the selected-face boundary-edge coordinate-distance realization loss weight.",
     )
     parser.add_argument(
+        "--simplex-face-normal-weight",
+        type=float,
+        default=None,
+        help="Override the selected-face backbone-frame normal orientation realization loss weight.",
+    )
+    parser.add_argument(
         "--simplex-face-boundary-lddt-weight",
         type=float,
         default=None,
@@ -1438,6 +1447,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_aux_weight=args.simplex_aux_weight,
         simplex_face_coordinate_weight=args.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=args.simplex_face_coordinate_distance_weight,
+        simplex_face_normal_weight=args.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=args.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=args.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=args.simplex_tetra_coordinate_distance_weight,
@@ -1521,6 +1531,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_aux_weight": args.simplex_aux_weight,
         "simplex_face_coordinate_weight": args.simplex_face_coordinate_weight,
         "simplex_face_coordinate_distance_weight": args.simplex_face_coordinate_distance_weight,
+        "simplex_face_normal_weight": args.simplex_face_normal_weight,
         "simplex_face_boundary_lddt_weight": args.simplex_face_boundary_lddt_weight,
         "simplex_tetra_coordinate_weight": args.simplex_tetra_coordinate_weight,
         "simplex_tetra_coordinate_distance_weight": args.simplex_tetra_coordinate_distance_weight,

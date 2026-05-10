@@ -616,7 +616,8 @@ def test_alphafold_loss_overrides_simplex_coordinate_weights():
     loss_fn = AlphaFoldLoss(
         simplex_face_coordinate_weight=0.4,
         simplex_face_coordinate_distance_weight=0.45,
-        simplex_face_boundary_lddt_weight=0.5,
+        simplex_face_normal_weight=0.5,
+        simplex_face_boundary_lddt_weight=0.55,
         simplex_tetra_coordinate_weight=0.6,
         simplex_tetra_coordinate_distance_weight=0.65,
         simplex_tetra_boundary_lddt_weight=0.7,
@@ -628,7 +629,8 @@ def test_alphafold_loss_overrides_simplex_coordinate_weights():
 
     assert loss_fn.simplex_geometry_loss.face_coordinate_weight == pytest.approx(0.4)
     assert loss_fn.simplex_geometry_loss.face_coordinate_distance_weight == pytest.approx(0.45)
-    assert loss_fn.simplex_geometry_loss.face_boundary_lddt_weight == pytest.approx(0.5)
+    assert loss_fn.simplex_geometry_loss.face_normal_weight == pytest.approx(0.5)
+    assert loss_fn.simplex_geometry_loss.face_boundary_lddt_weight == pytest.approx(0.55)
     assert loss_fn.simplex_geometry_loss.tetra_coordinate_weight == pytest.approx(0.6)
     assert loss_fn.simplex_geometry_loss.tetra_coordinate_distance_weight == pytest.approx(0.65)
     assert loss_fn.simplex_geometry_loss.tetra_boundary_lddt_weight == pytest.approx(0.7)

@@ -170,6 +170,7 @@ class AlphaFoldLoss(torch.nn.Module):
         simplex_aux_weight: float = 1.0,
         simplex_face_coordinate_weight: Optional[float] = None,
         simplex_face_coordinate_distance_weight: Optional[float] = None,
+        simplex_face_normal_weight: Optional[float] = None,
         simplex_face_boundary_lddt_weight: Optional[float] = None,
         simplex_tetra_coordinate_weight: Optional[float] = None,
         simplex_tetra_coordinate_distance_weight: Optional[float] = None,
@@ -207,6 +208,8 @@ class AlphaFoldLoss(torch.nn.Module):
             self.simplex_geometry_loss.face_coordinate_weight = float(simplex_face_coordinate_weight)
         if simplex_face_coordinate_distance_weight is not None:
             self.simplex_geometry_loss.face_coordinate_distance_weight = float(simplex_face_coordinate_distance_weight)
+        if simplex_face_normal_weight is not None:
+            self.simplex_geometry_loss.face_normal_weight = float(simplex_face_normal_weight)
         if simplex_face_boundary_lddt_weight is not None:
             self.simplex_geometry_loss.face_boundary_lddt_weight = float(simplex_face_boundary_lddt_weight)
         if simplex_tetra_coordinate_weight is not None:
@@ -497,6 +500,8 @@ class AlphaFoldLoss(torch.nn.Module):
                 true_ca,
                 true_ca_mask,
                 seq_mask=seq_mask,
+                true_atom_positions=true_atom_positions,
+                true_atom_mask=true_atom_mask,
             )
             weighted_simplex_aux_loss = self.simplex_aux_weight * simplex_terms["simplex_aux_loss"]
             loss = loss + weighted_simplex_aux_loss

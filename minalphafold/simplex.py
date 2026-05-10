@@ -226,6 +226,24 @@ def _triangle_area(x_i: torch.Tensor, x_j: torch.Tensor, x_k: torch.Tensor) -> t
     return 0.5 * _safe_norm(torch.cross(x_j - x_i, x_k - x_i, dim=-1))
 
 
+def _backbone_frames_from_atom14(atom14_coords: torch.Tensor) -> torch.Tensor:
+    n = atom14_coords[..., 0, :]
+    ca = atom14_coords[..., 1, :]
+    c = atom14_coords[..., 2, :]
+    e1 = c - ca
+    e1 = e1 / _safe_norm(e1)[..., None].clamp_min(1e-8)
+    n_axis = n - ca
+    e2 = n_axis - torch.sum(n_axis * e1, dim=-1, keepdim=True) * e1
+    e2 = e2 / _safe_norm(e2)[..., None].clamp_min(1e-8)
+    e3 = torch.cross(e1, e2, dim=-1)
+    e3 = e3 / _safe_norm(e3)[..., None].clamp_min(1e-8)
+    return torch.stack([e1, e2, e3], dim=-1)
+
+
+def _express_in_frame(frames: torch.Tensor, vectors: torch.Tensor) -> torch.Tensor:
+    return torch.einsum("...ij,...i->...j", frames, vectors)
+
+
 def build_simplex_topology(
     score: torch.Tensor,
     *,
@@ -1050,6 +1068,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         face_area_weight: float = 0.05,
         face_coordinate_weight: float = 0.1,
         face_coordinate_distance_weight: float = 0.0,
+        face_normal_weight: float = 0.0,
         face_boundary_lddt_weight: float = 0.0,
         face_distance_weight: float = 0.05,
         tetra_geometry_weight: float = 0.02,
@@ -1074,6 +1093,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         self.face_area_weight = face_area_weight
         self.face_coordinate_weight = face_coordinate_weight
         self.face_coordinate_distance_weight = face_coordinate_distance_weight
+        self.face_normal_weight = face_normal_weight
         self.face_boundary_lddt_weight = face_boundary_lddt_weight
         self.face_distance_weight = face_distance_weight
         self.tetra_geometry_weight = tetra_geometry_weight
@@ -1095,6 +1115,8 @@ class SimplexGeometryLoss(torch.nn.Module):
         ca_mask: torch.Tensor,
         *,
         seq_mask: Optional[torch.Tensor] = None,
+        true_atom_positions: Optional[torch.Tensor] = None,
+        true_atom_mask: Optional[torch.Tensor] = None,
     ) -> dict[str, torch.Tensor]:
         b, l, _ = true_ca.shape
         device = true_ca.device
@@ -1260,6 +1282,68 @@ class SimplexGeometryLoss(torch.nn.Module):
                 weighted = self.face_coordinate_distance_weight * face_coordinate_distance_loss
                 loss_terms["weighted_simplex_face_coordinate_distance_loss"] = weighted
                 total = total + weighted
+
+                if (
+                    true_atom_positions is not None
+                    and true_atom_mask is not None
+                    and "atom14_mask" in prediction
+                ):
+                    pred_atom14 = prediction["atom14_coords"].to(dtype)
+                    pred_atom14_mask = prediction["atom14_mask"].to(dtype)
+                    true_atom14 = true_atom_positions.to(dtype)
+                    true_atom14_mask = true_atom_mask.to(dtype)
+                    true_frames = _backbone_frames_from_atom14(true_atom14)
+                    pred_frames = _backbone_frames_from_atom14(pred_atom14)
+                    true_normal = torch.cross(x_j - x_i, x_k - x_i, dim=-1)
+                    true_normal = true_normal / _safe_norm(true_normal)[..., None].clamp_min(1e-8)
+                    pred_normal = torch.cross(pred_j - pred_i, pred_k - pred_i, dim=-1)
+                    pred_normal = pred_normal / _safe_norm(pred_normal)[..., None].clamp_min(1e-8)
+                    true_frame_i = gather_single(true_frames, i)
+                    true_frame_j = gather_single(true_frames, j)
+                    true_frame_k = gather_single(true_frames, k)
+                    pred_frame_i = gather_single(pred_frames, i)
+                    pred_frame_j = gather_single(pred_frames, j)
+                    pred_frame_k = gather_single(pred_frames, k)
+                    true_local_normal = torch.stack(
+                        [
+                            _express_in_frame(true_frame_i, true_normal),
+                            _express_in_frame(true_frame_j, true_normal),
+                            _express_in_frame(true_frame_k, true_normal),
+                        ],
+                        dim=-2,
+                    )
+                    pred_local_normal = torch.stack(
+                        [
+                            _express_in_frame(pred_frame_i, pred_normal),
+                            _express_in_frame(pred_frame_j, pred_normal),
+                            _express_in_frame(pred_frame_k, pred_normal),
+                        ],
+                        dim=-2,
+                    )
+                    normal_dot = torch.sum(pred_local_normal * true_local_normal, dim=-1).clamp(-1.0, 1.0)
+                    normal_loss_per_frame = 0.5 * (1.0 - normal_dot)
+                    true_backbone_mask = (
+                        true_atom14_mask[..., 0] * true_atom14_mask[..., 1] * true_atom14_mask[..., 2]
+                    )
+                    pred_backbone_mask = (
+                        pred_atom14_mask[..., 0] * pred_atom14_mask[..., 1] * pred_atom14_mask[..., 2]
+                    )
+                    normal_valid = valid * (true_area > 1e-4).to(dtype)
+                    normal_frame_valid = torch.stack(
+                        [
+                            normal_valid * gather_single(true_backbone_mask, i) * gather_single(pred_backbone_mask, i),
+                            normal_valid * gather_single(true_backbone_mask, j) * gather_single(pred_backbone_mask, j),
+                            normal_valid * gather_single(true_backbone_mask, k) * gather_single(pred_backbone_mask, k),
+                        ],
+                        dim=-1,
+                    )
+                    face_normal_loss = (normal_loss_per_frame * normal_frame_valid).sum(dim=(1, 2, 3)) / (
+                        normal_frame_valid.sum(dim=(1, 2, 3)).clamp_min(1.0)
+                    )
+                    loss_terms["simplex_face_normal_loss"] = face_normal_loss
+                    weighted = self.face_normal_weight * face_normal_loss
+                    loss_terms["weighted_simplex_face_normal_loss"] = weighted
+                    total = total + weighted
 
                 face_boundary_lddt_loss = _selected_boundary_lddt_loss(
                     pred_face_distances_raw,

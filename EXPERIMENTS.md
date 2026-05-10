@@ -1070,3 +1070,27 @@ run reached only `val_lddt_ca=0.1286` at step 250, with FoldScore `0.1857`,
 `13.1096 / 15.4034`. The margin term did separate training contact logits,
 but it appears to over-constrain the selector and damages local structure
 quality. Do not continue hard topology-margin weighting in this form.
+
+### E37: Selected Face Normal Orientation
+
+Status: implementation candidate.
+
+Hypothesis: the strongest SimplexFold runs came from selected face/tetra
+coordinate realization, but the face realization terms only supervise edge
+lengths and area. The README motivation explicitly assigns oriented patch
+information to 2-simplices. A selected-face normal term may give each learned
+face state a real orientation target without adding a generic all-pairs
+coordinate loss.
+
+Mechanism: add an optional selected-face normal loss. For each selected face
+`(i, j, k)`, compute its C-alpha normal, express that normal in the local
+N-CA-C backbone frame at each boundary residue, and compare predicted versus
+true local normal directions. Expressing normals in residue-local frames keeps
+the loss invariant to global rigid motion while still supervising the
+orientation of the learned 2-simplex boundary. The term adds no parameters
+and is active only when `--simplex-face-normal-weight` is nonzero.
+
+Decision rule: run a 500-step Runpod gate on the E09 selected-coordinate stack
+with MSA-to-face enabled and a small face-normal weight. Continue only if the
+oriented-face signal improves over the E33-E36 weak band and approaches the
+E22/E25 early range without losing FoldScore.

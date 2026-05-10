@@ -1167,5 +1167,11 @@ Iteration ladder:
     preserve enough geometric diversity for face/tetra realization; forcing
     the 1-skeleton too aggressively toward binary contacts can damage local
     structure quality even when global radius improves.
-13. Promote only changes that pass parameter-budget tests and at least a
+13. Revisit the geometric content of selected cells before widening the
+    generic trunk. The current selected-face realization covers area and
+    boundary distances, but a 2-simplex in the README is also an oriented
+    patch. Orientation losses should be expressed in residue-local backbone
+    frames so they remain rigid-motion invariant and stay attached to the
+    selected sparse face complex.
+14. Promote only changes that pass parameter-budget tests and at least a
     NanoFold smoke/short-run comparison.

@@ -517,6 +517,58 @@ def test_simplex_geometry_loss_adds_distance_and_consistency_terms():
     assert torch.isfinite(terms["simplex_aux_loss"]).all()
 
 
+def test_simplex_face_normal_loss_is_global_rotation_invariant():
+    true_atom14 = torch.zeros(1, 3, 14, 3)
+    ca = torch.tensor(
+        [
+            [0.0, 0.0, 0.0],
+            [2.0, 0.0, 0.0],
+            [0.0, 2.0, 0.0],
+        ],
+        dtype=torch.float32,
+    )
+    true_atom14[0, :, 1, :] = ca
+    true_atom14[0, :, 0, :] = ca + torch.tensor([0.0, 1.0, 0.0])
+    true_atom14[0, :, 2, :] = ca + torch.tensor([1.0, 0.0, 0.0])
+    atom14_mask = torch.zeros(1, 3, 14)
+    atom14_mask[:, :, :3] = 1.0
+    theta = torch.tensor(0.7)
+    rotation = torch.tensor(
+        [
+            [torch.cos(theta), -torch.sin(theta), 0.0],
+            [torch.sin(theta), torch.cos(theta), 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    pred_atom14 = torch.einsum("...i,ji->...j", true_atom14, rotation) + torch.tensor([3.0, -2.0, 5.0])
+    prediction = {
+        "atom14_coords": pred_atom14,
+        "atom14_mask": atom14_mask,
+        "simplex_face_indices": torch.tensor([[[[0, 1, 2]]]]),
+        "simplex_face_mask": torch.ones(1, 1, 1),
+        "simplex_face_area_logits": torch.zeros(1, 1, 1),
+    }
+
+    terms = SimplexGeometryLoss(
+        contact_weight=0.0,
+        topology_neighborhood_weight=0.0,
+        face_area_weight=0.0,
+        face_coordinate_weight=0.0,
+        face_coordinate_distance_weight=0.0,
+        face_normal_weight=1.0,
+        face_distance_weight=0.0,
+    )(
+        prediction,
+        true_atom14[:, :, 1, :],
+        atom14_mask[:, :, 1],
+        true_atom_positions=true_atom14,
+        true_atom_mask=atom14_mask,
+    )
+
+    assert terms["simplex_face_normal_loss"].item() < 1e-6
+    assert terms["weighted_simplex_face_normal_loss"].item() < 1e-6
+
+
 def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
     true_ca = torch.tensor(
         [
