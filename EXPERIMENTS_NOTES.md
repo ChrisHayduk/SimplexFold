@@ -1421,3 +1421,14 @@
   auxiliary/readout paths and return to the E15 full-MSA-to-face family with
   an optimization or curriculum change around the existing selected-boundary
   coordinate losses.
+- E52 live plan: add selected cell dropout to the E15 `full_msa_to_face`
+  family. The new `simplex_cell_dropout` masks selected face/tetra cells
+  during training only, before higher-rank message passing and auxiliary
+  selected-boundary losses consume the masks. Evaluation uses the full
+  selected complex. This is a zero-parameter topological regularizer over
+  explicit 2-/3-cell cochains, not a dense coordinate or lDDT-targeted loss.
+- E52 proposed Runpod gate: `full_msa_to_face_cell_dropout`,
+  `simplex_cell_dropout=0.15`, crop 256, MSA depth 64, 500 steps, E15
+  selected coordinate and boundary-distance weights, and
+  `simplex_aux_weight` annealed `1.0 -> 0.5` over steps 250-500. Do not write
+  E52 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.

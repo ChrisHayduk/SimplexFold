@@ -1083,6 +1083,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.area_max = float(getattr(config, "simplex_area_max", 300.0))
         self.volume_scale = float(getattr(config, "simplex_volume_scale", 1000.0))
         self.dropout = torch.nn.Dropout(float(getattr(config, "simplex_dropout", 0.0)))
+        self.cell_dropout = min(max(float(getattr(config, "simplex_cell_dropout", 0.0)), 0.0), 0.95)
         self.pair_update_scale = float(getattr(config, "simplex_pair_update_scale", 1.0))
         self.single_update_scale = float(getattr(config, "simplex_single_update_scale", 1.0))
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
@@ -1184,6 +1185,29 @@ class SimplicialAdapter(torch.nn.Module):
         )
         return aux
 
+    def _apply_cell_dropout(self, topology: SimplexTopology) -> SimplexTopology:
+        if (not self.training) or self.cell_dropout <= 0.0:
+            return topology
+        keep_probability = 1.0 - self.cell_dropout
+        face_mask = topology.face_mask
+        tetra_mask = topology.tetra_mask
+        if face_mask.numel() > 0:
+            face_keep = (torch.rand_like(face_mask) < keep_probability).to(face_mask.dtype)
+            face_mask = face_mask * face_keep
+        if tetra_mask.numel() > 0:
+            tetra_keep = (torch.rand_like(tetra_mask) < keep_probability).to(tetra_mask.dtype)
+            tetra_mask = tetra_mask * tetra_keep
+        return SimplexTopology(
+            nbr_idx=topology.nbr_idx,
+            face_indices=topology.face_indices,
+            tetra_indices=topology.tetra_indices,
+            face_mask=face_mask,
+            tetra_mask=tetra_mask,
+            face_neighbor_slots=topology.face_neighbor_slots,
+            tetra_neighbor_slots=topology.tetra_neighbor_slots,
+            tetra_face_slots=topology.tetra_face_slots,
+        )
+
     def forward(
         self,
         pair: torch.Tensor,
@@ -1261,6 +1285,7 @@ class SimplicialAdapter(torch.nn.Module):
                 boundary_closure_weight=self.boundary_closure_weight,
                 boundary_closure_temperature=self.boundary_closure_temperature,
             )
+        topology = self._apply_cell_dropout(topology)
 
         face_indices = topology.face_indices
         if face_indices.shape[2] == 0:

@@ -1,19 +1,18 @@
-## Current Plan: Re-center After Segment-Cell Rejection
+## Current Plan: E52 Cell-Dropout Gate
 
-E33-E41 show that extra scalar supervision, shared-boundary face-neighborhood
-passes, edge-frame scalarized simplex readout, and latent contiguous segment
-cells are not enough to break the weak early-validation band. The next move
-should stop adding isolated side channels and re-center on the strongest
-observed branch: selected simplex boundary realization with MSA-to-face and
-auxiliary-weight annealing.
+E44-E51 show that closure masks, broader structure readouts, and stronger
+auxiliary expansion do not break the C-alpha lDDT plateau. The next move is
+to return to the strongest observed branch, E15's `full_msa_to_face` selected
+simplex realization scaffold, and test a smaller topological regularizer
+before spending on longer effective-batch-8 training.
 
-E43 combines the strongest known training context with the E42 topological
-architecture signal: selected simplex boundary realization, MSA-to-face,
-auxiliary-weight annealing toward the E15 setting, and the Hodge residual as a
-small architectural prior. The goal is to test whether the Hodge residual
-helps when the selected-simplex scaffold is relaxed during training rather
-than held at full strength. Keep `EXPERIMENT_RESULTS.md` only for returned
-Runpod results.
+E52 adds training-only dropout on selected face and tetra cells. The intent is
+to randomly train on subcomplexes of the learned 2-/3-cell complex so the AF2
+trunk cannot depend on a single noisy early set of selected cells. This is a
+topological architecture/curriculum change because the stochasticity acts on
+explicit higher-rank cochains and their boundary readouts, not on dense
+all-pairs coordinates or a generic lDDT surrogate. Keep
+`EXPERIMENT_RESULTS.md` only for returned Runpod results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired

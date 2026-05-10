@@ -1632,3 +1632,31 @@ radius of gyration `7.0810 / 15.4034`. The final step-500 checkpoint fell to
 effect and underperformed E50, E49, and the stronger E22/E25/E30 pilots.
 Do not pursue this combination without a more selective gate or a different
 readout mechanism.
+
+### E52: Selected Cell Dropout
+
+Status: implemented locally; queued for Runpod.
+
+Hypothesis: E15 is still the best branch, and E16/E17 suggest that simply
+continuing or further relaxing its auxiliary scaffold does not break the
+lDDT plateau. The selected complex may be too brittle: early learned topology
+chooses a fixed set of face/tetra cells, and the trunk can over-rely on noisy
+higher-order cells that later encourage collapsed geometry. Randomly thinning
+the selected 2-/3-cell cochains during training should make the pair/single
+trunk learn from many subcomplexes of the same selected boundary graph.
+
+Mechanism: add `simplex_cell_dropout` and the variant
+`full_msa_to_face_cell_dropout`. During training only, the adapter randomly
+drops selected face and tetra masks before face/tetra message passing,
+auxiliary heads, and selected-boundary losses consume them. Evaluation uses
+the full selected complex. This is a zero-parameter topological regularizer:
+the stochasticity acts on explicit cells in the learned complex, not on dense
+residue pairs or global coordinate scale.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with
+the E15 selected coordinate and boundary-distance losses and
+`simplex_aux_weight` annealed from `1.0` to `0.5`. Continue only if the run
+recovers the E22/E25/E30 early band while preserving FoldScore/radius better
+than E49-E51. If it only matches the weak post-E43 pilot band, reject and
+return to longer E15/effective-batch-8 optimization rather than adding more
+auxiliary losses.

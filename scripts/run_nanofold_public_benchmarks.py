@@ -523,6 +523,15 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_msa_to_face=True,
             simplex_neighbor_k=14,
         )
+    if variant == "full_msa_to_face_cell_dropout":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+            simplex_cell_dropout=0.15,
+        )
     if variant == "full_msa_to_face_long":
         return replace(
             base_config,
@@ -1198,6 +1207,9 @@ def _train_variant(
         "simplex_boundary_closure_temperature": (
             float(getattr(model_config, "simplex_boundary_closure_temperature", 1.0)) if use_simplicial else 0.0
         ),
+        "simplex_cell_dropout": (
+            float(getattr(model_config, "simplex_cell_dropout", 0.0)) if use_simplicial else 0.0
+        ),
         "simplex_pair_update_scale": (
             float(getattr(model_config, "simplex_pair_update_scale", 1.0)) if use_simplicial else 0.0
         ),
@@ -1336,6 +1348,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_long_bias",
         "simplex_boundary_closure_weight",
         "simplex_boundary_closure_temperature",
+        "simplex_cell_dropout",
         "simplex_pair_update_scale",
         "simplex_single_update_scale",
         "simplex_structure_readout_scale",
@@ -1381,6 +1394,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "full_msa_to_face_aux_closure",
             "full_msa_to_face_topology_curriculum",
             "full_msa_to_face_expanded_complex",
+            "full_msa_to_face_cell_dropout",
             "full_msa_to_face_long",
             "full_msa_to_face_mixed",
             "full_msa_to_face_mixed_soft",

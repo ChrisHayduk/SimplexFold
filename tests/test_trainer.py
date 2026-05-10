@@ -534,6 +534,21 @@ def test_simplicial_expanded_complex_adds_no_parameters():
     assert expanded_params == simplex_params
 
 
+def test_simplicial_cell_dropout_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    dropout_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_cell_dropout=0.15,
+    )
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    dropout_params = sum(parameter.numel() for parameter in AlphaFold2(dropout_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert dropout_params == simplex_params
+
+
 def test_simplicial_edge_frame_messages_stay_within_medium_budget():
     medium = load_model_config("medium")
     af2_medium = replace(medium, use_simplicial_evoformer=False)

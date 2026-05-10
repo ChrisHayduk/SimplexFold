@@ -3,6 +3,7 @@ import torch
 from minalphafold.evoformer import SimplicialEvoformer
 from minalphafold.simplex import (
     SimplexGeometryLoss,
+    SimplexTopology,
     SimplicialAdapter,
     _boundary_degree_weights,
     build_simplex_topology,
@@ -61,6 +62,7 @@ class SimplexConfig:
     simplex_area_max = 300.0
     simplex_volume_scale = 1000.0
     simplex_dropout = 0.0
+    simplex_cell_dropout = 0.0
     simplex_single_transition_n = 2
     simplex_structure_readout_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
@@ -228,6 +230,34 @@ def test_simplicial_adapter_update_scale_override_gates_boundary_residuals():
     assert torch.allclose(single_zero, single)
     assert not torch.allclose(pair_full, pair_zero)
     assert not torch.allclose(single_full, single_zero)
+
+
+def test_simplicial_adapter_cell_dropout_thins_training_complex(monkeypatch):
+    class CellDropConfig(SimplexConfig):
+        simplex_cell_dropout = 0.15
+
+    adapter = SimplicialAdapter(CellDropConfig())
+    topology = SimplexTopology(
+        nbr_idx=torch.zeros(1, 2, 2, dtype=torch.long),
+        face_indices=torch.zeros(1, 2, 1, 3, dtype=torch.long),
+        tetra_indices=torch.zeros(1, 2, 1, 4, dtype=torch.long),
+        face_mask=torch.ones(1, 2, 1),
+        tetra_mask=torch.ones(1, 2, 1),
+        face_neighbor_slots=torch.zeros(1, 2, dtype=torch.long),
+        tetra_neighbor_slots=torch.zeros(1, 3, dtype=torch.long),
+        tetra_face_slots=torch.zeros(1, 3, dtype=torch.long),
+    )
+
+    monkeypatch.setattr(torch, "rand_like", lambda value: torch.ones_like(value))
+    adapter.train()
+    dropped = adapter._apply_cell_dropout(topology)
+    adapter.eval()
+    kept = adapter._apply_cell_dropout(topology)
+
+    assert torch.all(dropped.face_mask == 0)
+    assert torch.all(dropped.tetra_mask == 0)
+    assert torch.allclose(kept.face_mask, topology.face_mask)
+    assert torch.allclose(kept.tetra_mask, topology.tetra_mask)
 
 
 def test_face_outer_edge_delta_uses_shared_boundary_edges_only():

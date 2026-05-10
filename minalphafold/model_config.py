@@ -135,6 +135,7 @@ class ModelConfig:
     # rather than model construction, but profiles can carry a recommended
     # default for runners that choose to honor it.
     recommended_n_cycles: int = 1
+    simplex_cell_dropout: float = 0.0
     simplex_pair_update_scale: float = 1.0
     simplex_single_update_scale: float = 1.0
     simplex_structure_readout_scale: float = 0.0
