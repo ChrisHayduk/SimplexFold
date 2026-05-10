@@ -9,6 +9,8 @@ from minalphafold.simplex import (
     face_edge_frame_features,
     face_outer_edge_delta,
     face_geometry_features,
+    segment_cell_indices,
+    segment_geometry_features,
     tetra_edge_frame_features,
     tetra_geometry_features,
 )
@@ -59,6 +61,9 @@ class SimplexConfig:
     simplex_structure_readout_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
     simplex_edge_frame_message_scale = 0.0
+    simplex_segment_cell_scale = 0.0
+    simplex_segment_radius = 2
+    simplex_c_segment = 8
     n_dist_bins = 16
 
 
@@ -336,6 +341,97 @@ def test_edge_frame_message_scale_changes_pair_readout_within_adapter():
     assert sum(p.numel() for p in on_adapter.parameters()) > sum(p.numel() for p in off_adapter.parameters())
     assert not torch.allclose(on_pair, off_pair)
     assert torch.allclose(on_single, off_single)
+
+
+def test_segment_cell_indices_are_contiguous_and_respect_sequence_mask():
+    seq_mask = torch.tensor([[1.0, 1.0, 1.0, 0.0, 1.0]])
+
+    indices, mask = segment_cell_indices(
+        batch_size=1,
+        num_residues=5,
+        radius=1,
+        device=seq_mask.device,
+        seq_mask=seq_mask,
+    )
+
+    assert indices.shape == (1, 5, 3)
+    assert mask.shape == (1, 5, 3)
+    assert indices[0, 2].tolist() == [1, 2, 3]
+    assert torch.allclose(mask[0, 2], torch.tensor([1.0, 1.0, 0.0]))
+    assert torch.all(mask[0, 3] == 0)
+
+
+def test_segment_geometry_features_are_rigid_transform_invariant():
+    indices = torch.tensor([[[0, 1, 2], [1, 2, 3]]], dtype=torch.long)
+    mask = torch.ones(1, 2, 3)
+    coords = torch.tensor(
+        [
+            [
+                [0.0, 0.0, 0.0],
+                [2.0, 0.0, 0.0],
+                [2.5, 1.5, 0.0],
+                [3.0, 1.5, 2.0],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    theta = torch.tensor(0.4)
+    rotation = torch.tensor(
+        [
+            [torch.cos(theta), -torch.sin(theta), 0.0],
+            [torch.sin(theta), torch.cos(theta), 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    rotated_coords = torch.einsum("ij,bnj->bni", rotation, coords) + torch.tensor([-3.0, 1.0, 0.25])
+
+    features = segment_geometry_features(
+        indices,
+        mask,
+        recycled_ca_coords=coords,
+        sequence_max=16.0,
+        distance_max=32.0,
+    )
+    rotated_features = segment_geometry_features(
+        indices,
+        mask,
+        recycled_ca_coords=rotated_coords,
+        sequence_max=16.0,
+        distance_max=32.0,
+    )
+
+    assert features.shape[-1] == 4
+    assert torch.allclose(features, rotated_features, atol=1e-5)
+
+
+def test_segment_cells_change_face_mediated_outputs_within_adapter():
+    class SegmentConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class SegmentEnabledConfig(SegmentConfig):
+        simplex_segment_cell_scale = 0.25
+        simplex_segment_radius = 1
+        simplex_c_segment = 8
+
+    torch.manual_seed(6)
+    off_adapter = SimplicialAdapter(SegmentConfig())
+    torch.manual_seed(6)
+    on_adapter = SimplicialAdapter(SegmentEnabledConfig())
+    pair = torch.randn(1, 5, 5, SegmentConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, SegmentConfig.c_s)
+    coords = torch.randn(1, 5, 3)
+
+    off_pair, off_single, _ = off_adapter(pair, single, recycled_ca_coords=coords)
+    on_pair, on_single, _ = on_adapter(pair, single, recycled_ca_coords=coords)
+
+    assert sum(p.numel() for p in on_adapter.parameters()) > sum(p.numel() for p in off_adapter.parameters())
+    assert not torch.allclose(on_pair, off_pair)
+    assert not torch.allclose(on_single, off_single)
 
 
 def test_simplex_geometry_features_are_rigid_transform_invariant():

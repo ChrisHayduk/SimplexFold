@@ -468,6 +468,28 @@ def test_simplicial_edge_frame_messages_stay_within_medium_budget():
     assert edge_frame_params <= int(af2_params * 1.05)
 
 
+def test_simplicial_segment_cells_stay_within_medium_budget():
+    medium = load_model_config("medium")
+    af2_medium = replace(medium, use_simplicial_evoformer=False)
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    segment_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_segment_cell_scale=0.25,
+        simplex_segment_radius=4,
+        simplex_c_segment=12,
+    )
+
+    af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    segment_params = sum(parameter.numel() for parameter in AlphaFold2(segment_medium).parameters())
+
+    assert af2_params == 3_106_642
+    assert simplex_params == 3_106_690
+    assert segment_params > simplex_params
+    assert segment_params <= int(af2_params * 1.05)
+
+
 def test_simplicial_structure_readout_forward_keeps_internal_tensors_private():
     model_config = replace(load_model_config("tiny"), simplex_structure_readout_scale=0.25)
     model = AlphaFold2(model_config)

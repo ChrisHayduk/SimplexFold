@@ -162,6 +162,27 @@ def test_full_msa_to_face_edge_frame_messages_variant_is_accepted_by_cli_parser(
     assert args.variants == ["full_msa_to_face_edge_frame_messages"]
 
 
+def test_full_msa_to_face_segment_cells_adds_latent_rank2_cells():
+    cfg = _variant_config(
+        load_model_config("simplexfold_medium_param_matched"),
+        "full_msa_to_face_segment_cells",
+    )
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_segment_cell_scale == 0.25
+    assert cfg.simplex_segment_radius == 4
+    assert cfg.simplex_c_segment == 12
+
+
+def test_full_msa_to_face_segment_cells_variant_is_accepted_by_cli_parser():
+    args = parse_args(["--variants", "full_msa_to_face_segment_cells"])
+
+    assert args.variants == ["full_msa_to_face_segment_cells"]
+
+
 def test_structure_readout_only_variant_is_accepted_by_cli_parser():
     args = parse_args(["--variants", "full_msa_to_face_structure_readout_only"])
 

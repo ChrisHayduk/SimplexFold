@@ -140,3 +140,6 @@ class ModelConfig:
     simplex_structure_readout_scale: float = 0.0
     simplex_outer_edge_update_scale: float = 0.0
     simplex_edge_frame_message_scale: float = 0.0
+    simplex_segment_cell_scale: float = 0.0
+    simplex_segment_radius: int = 4
+    simplex_c_segment: int = 12

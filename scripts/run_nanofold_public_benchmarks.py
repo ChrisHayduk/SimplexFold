@@ -596,6 +596,17 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_msa_to_face=True,
             simplex_edge_frame_message_scale=0.25,
         )
+    if variant == "full_msa_to_face_segment_cells":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+            simplex_segment_cell_scale=0.25,
+            simplex_segment_radius=4,
+            simplex_c_segment=12,
+        )
     if variant == "face_structure_readout_only":
         return replace(
             base_config,
@@ -1086,6 +1097,11 @@ def _train_variant(
         "simplex_edge_frame_message_scale": (
             float(getattr(model_config, "simplex_edge_frame_message_scale", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_segment_cell_scale": (
+            float(getattr(model_config, "simplex_segment_cell_scale", 0.0)) if use_simplicial else 0.0
+        ),
+        "simplex_segment_radius": int(getattr(model_config, "simplex_segment_radius", 0)) if use_simplicial else 0,
+        "simplex_c_segment": int(getattr(model_config, "simplex_c_segment", 0)) if use_simplicial else 0,
         "latest_checkpoint": str(latest_checkpoint_path),
         "resume_from_checkpoint": str(resume_checkpoint_path) if resume_checkpoint_path is not None else "",
         "eval_every": eval_every,
@@ -1186,6 +1202,9 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_structure_readout_scale",
         "simplex_outer_edge_update_scale",
         "simplex_edge_frame_message_scale",
+        "simplex_segment_cell_scale",
+        "simplex_segment_radius",
+        "simplex_c_segment",
     ]
     extra = sorted({key for row in rows for key in row} - set(preferred))
     fieldnames = [key for key in preferred if any(key in row for row in rows)] + extra
@@ -1228,6 +1247,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "full_msa_to_face_structure_readout_only",
             "full_msa_to_face_outer_edge",
             "full_msa_to_face_edge_frame_messages",
+            "full_msa_to_face_segment_cells",
             "face_structure_readout_only",
             "msa_to_face",
         ],

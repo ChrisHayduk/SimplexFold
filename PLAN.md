@@ -6,13 +6,14 @@ enough to break the weak early-validation band. The next architecture-facing
 direction should test the other Topotein-inspired idea from the PDFs: learned
 rank-2 segment cells for contiguous secondary-structure-like regions.
 
-Run the next short gate with `simplexfold_medium_param_matched` and a
-segment-cell variant. Segment cells must be latent and constructed only from
-official sequence/MSA features, pair features, and recycled geometry. They may
-cover contiguous local windows and exchange messages with residues, pair
-edges, and selected triangular/tetrahedral cells through incidence maps, but
-must not use templates, DSSP labels, external structures, pretrained weights,
-or hidden labels. Keep `EXPERIMENT_RESULTS.md` only for returned run results.
+E41 implements the next short gate with `simplexfold_medium_param_matched` and
+`full_msa_to_face_segment_cells`. Segment cells are latent rank-2 cells centered
+on residues over contiguous local windows. They are constructed only from
+official single/MSA-derived states, pair features, and recycled C-alpha
+geometry summaries, then write into selected triangular faces through
+incidence-style vertex membership. They do not use templates, DSSP labels,
+external structures, pretrained weights, or hidden labels. Keep
+`EXPERIMENT_RESULTS.md` only for returned Runpod results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired

@@ -939,3 +939,26 @@
   validation result was worse than E39 and stayed in the weak E33-E40 band.
   E40 is rejected; E41 latent rank-2 segment cells are the remaining
   Topotein-inspired branch to test.
+- E41 local implementation at 2026-05-10 12:36 EDT: add latent rank-2 segment
+  cells through `simplex_segment_cell_scale`, `simplex_segment_radius`,
+  `simplex_c_segment`, and the `full_msa_to_face_segment_cells` benchmark
+  variant. Each residue owns one contiguous local segment cell; the segment
+  state pools official single/MSA-derived states, anchor-to-window pair
+  features, and invariant recycled C-alpha segment geometry, then writes into
+  selected face states by vertex incidence. This is a topological architecture
+  change rather than an lDDT hack because it adds a learned cell rank and
+  explicit incidence communication into the selected two-skeleton.
+- E41 local checks so far: `python -m py_compile minalphafold/simplex.py
+  minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+  passed; focused segment-cell tests passed (`6 passed`); affected tests
+  passed (`50 passed`). Parameter audit gives AF2-medium `3,106,642`,
+  SimplexFold `3,106,690`, and E41 segment cells `3,234,450`, within the 5%
+  AF2-medium cap of `3,261,974`.
+- E41 broader local checks: full `python -m pytest -q` passed and
+  `git diff --check` passed. `python -m ruff check .` is unavailable locally
+  (`No module named ruff`). `python -m mypy minalphafold
+  scripts/run_nanofold_public_benchmarks.py` still fails on the pre-existing
+  structure-module typing, missing `nanofold.metrics`, EMA model typing, and
+  runner row typing issues. `python -m pyright --warnings` still fails broadly
+  because this local interpreter does not resolve Torch/NumPy/Modal/OpenMM and
+  reports existing optional/type issues.

@@ -652,6 +652,7 @@ def face_outer_edge_delta(
 
 FACE_EDGE_FRAME_DIM = 10
 TETRA_EDGE_FRAME_DIM = 18
+SEGMENT_GEOMETRY_DIM = 4
 
 
 def _fallback_axis(direction: torch.Tensor) -> torch.Tensor:
@@ -789,6 +790,70 @@ def tetra_edge_frame_features(
     )
 
 
+def segment_cell_indices(
+    *,
+    batch_size: int,
+    num_residues: int,
+    radius: int,
+    device: torch.device,
+    seq_mask: Optional[torch.Tensor] = None,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Return contiguous latent rank-2 segment cells centered on each residue."""
+
+    offsets = torch.arange(-int(radius), int(radius) + 1, device=device)
+    centers = torch.arange(num_residues, device=device)
+    raw = centers[:, None] + offsets[None, :]
+    in_bounds = (raw >= 0) & (raw < num_residues)
+    indices = raw.clamp(0, max(num_residues - 1, 0)).to(torch.long)
+    indices = indices[None, :, :].expand(batch_size, -1, -1)
+    mask = in_bounds[None, :, :].expand(batch_size, -1, -1).to(dtype=torch.float32)
+    if seq_mask is not None:
+        residue_mask = gather_single(seq_mask[..., None].to(mask.dtype), indices).squeeze(-1)
+        anchor_mask = seq_mask.to(mask.dtype)[..., None]
+        mask = mask * residue_mask * anchor_mask
+    return indices, mask
+
+
+def segment_geometry_features(
+    segment_indices: torch.Tensor,
+    segment_mask: torch.Tensor,
+    *,
+    recycled_ca_coords: Optional[torch.Tensor],
+    sequence_max: float,
+    distance_max: float,
+) -> torch.Tensor:
+    """Build invariant features for contiguous latent segment cells."""
+
+    dtype = torch.float32 if recycled_ca_coords is None else recycled_ca_coords.dtype
+    device = segment_indices.device
+    b, l, _ = segment_indices.shape
+    centers = torch.arange(l, device=device).reshape(1, l, 1).expand(b, -1, segment_indices.shape[-1])
+    mask = segment_mask.to(dtype)
+    count = mask.sum(dim=-1).clamp_min(1.0)
+    valid_fraction = mask.mean(dim=-1)
+    mean_abs_offset = (torch.abs(segment_indices - centers).to(dtype) * mask).sum(dim=-1) / count
+    seq_scale = max(float(sequence_max), 1.0)
+    if recycled_ca_coords is None:
+        mean_distance = torch.zeros_like(valid_fraction)
+        max_distance = torch.zeros_like(valid_fraction)
+    else:
+        x_center = gather_single(recycled_ca_coords, centers[..., 0])
+        x_window = gather_single(recycled_ca_coords, segment_indices)
+        distances = _safe_norm(x_window - x_center[..., None, :]) * mask
+        mean_distance = distances.sum(dim=-1) / count
+        max_distance = distances.masked_fill(mask <= 0, 0.0).amax(dim=-1)
+    dist_scale = max(float(distance_max), 1.0)
+    return torch.stack(
+        [
+            valid_fraction,
+            mean_abs_offset / seq_scale,
+            mean_distance / dist_scale,
+            max_distance / dist_scale,
+        ],
+        dim=-1,
+    ).to(dtype)
+
+
 class SimplexMLP(torch.nn.Module):
     """LayerNorm-ReLU MLP with AF2-style final initialisation."""
 
@@ -869,6 +934,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.c_s = config.c_s
         self.c_face = int(getattr(config, "simplex_c_face", 32))
         self.c_tetra = int(getattr(config, "simplex_c_tetra", 16))
+        self.c_segment = int(getattr(config, "simplex_c_segment", max(8, self.c_tetra)))
         self.hidden_dim = int(getattr(config, "simplex_hidden_dim", max(config.c_z, config.c_s)))
         self.neighbor_k = int(getattr(config, "simplex_neighbor_k", 12))
         self.use_faces = bool(getattr(config, "simplex_use_faces", True))
@@ -893,6 +959,8 @@ class SimplicialAdapter(torch.nn.Module):
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
         self.edge_frame_message_scale = float(getattr(config, "simplex_edge_frame_message_scale", 0.0))
+        self.segment_cell_scale = float(getattr(config, "simplex_segment_cell_scale", 0.0))
+        self.segment_radius = int(getattr(config, "simplex_segment_radius", 4))
 
         self.pair_score_norm = torch.nn.LayerNorm(config.c_z)
         self.topology_score = torch.nn.Linear(config.c_z, 1)
@@ -939,6 +1007,17 @@ class SimplicialAdapter(torch.nn.Module):
                     self.hidden_dim,
                     self.c_z,
                 )
+        if self.segment_cell_scale > 0.0:
+            self.segment_init = SimplexMLP(
+                2 * config.c_s + config.c_z + SEGMENT_GEOMETRY_DIM,
+                self.hidden_dim,
+                self.c_segment,
+            )
+            self.segment_to_face = SimplexMLP(
+                self.c_face + self.c_segment,
+                self.hidden_dim,
+                self.c_face,
+            )
 
     def _empty_outputs(
         self,
@@ -1054,12 +1133,33 @@ class SimplicialAdapter(torch.nn.Module):
         ).to(pair.dtype)
         face_state = self.face_init(torch.cat([z_ij, z_ik, z_jk, s_i, s_j, s_k, face_geom], dim=-1))
         face_state = face_state * topology.face_mask[..., None]
+        segment_state = pair.new_empty((pair.shape[0], pair.shape[1], 0))
+        if self.segment_cell_scale > 0.0:
+            segment_state = self._segment_pass(
+                pair,
+                single,
+                seq_mask=seq_mask,
+                recycled_ca_coords=coords_for_geometry,
+            )
         if self.use_msa_to_face and msa_representation is not None:
             face_state = face_state + self._msa_to_face_update(
                 msa_representation,
                 face_indices,
                 topology.face_mask,
                 msa_mask=msa_mask,
+            )
+            face_state = face_state * topology.face_mask[..., None]
+        if self.segment_cell_scale > 0.0:
+            seg_i = gather_single(segment_state, i)
+            seg_j = gather_single(segment_state, j)
+            seg_k = gather_single(segment_state, k)
+            segment_context = (seg_i + seg_j + seg_k) / 3.0
+            segment_msg = self.segment_to_face(torch.cat([face_state, segment_context], dim=-1))
+            face_state = face_state + self.dropout(
+                self.segment_cell_scale
+                * torch.sigmoid(self.face_gate(face_state))
+                * segment_msg
+                * topology.face_mask[..., None]
             )
             face_state = face_state * topology.face_mask[..., None]
 
@@ -1247,6 +1347,40 @@ class SimplicialAdapter(torch.nn.Module):
             aux["simplex_structure_pair_readout"] = pair_readout
             aux["simplex_structure_single_readout"] = single_readout
         return pair, single, aux
+
+    def _segment_pass(
+        self,
+        pair: torch.Tensor,
+        single: torch.Tensor,
+        *,
+        seq_mask: Optional[torch.Tensor],
+        recycled_ca_coords: Optional[torch.Tensor],
+    ) -> torch.Tensor:
+        b, l, _ = single.shape
+        segment_indices, segment_mask = segment_cell_indices(
+            batch_size=b,
+            num_residues=l,
+            radius=self.segment_radius,
+            device=single.device,
+            seq_mask=seq_mask,
+        )
+        mask = segment_mask.to(single.dtype)
+        count = mask.sum(dim=-1).clamp_min(1.0)
+        segment_single = gather_single(single, segment_indices)
+        pooled_single = (segment_single * mask[..., None]).sum(dim=-2) / count[..., None]
+        anchors = torch.arange(l, device=single.device).reshape(1, l, 1).expand(b, -1, segment_indices.shape[-1])
+        segment_pair = gather_pair(pair, anchors, segment_indices)
+        pooled_pair = (segment_pair * mask[..., None]).sum(dim=-2) / count[..., None]
+        geom = segment_geometry_features(
+            segment_indices,
+            segment_mask,
+            recycled_ca_coords=recycled_ca_coords,
+            sequence_max=self.sequence_max,
+            distance_max=self.distance_max,
+        ).to(single.dtype)
+        segment_state = self.segment_init(torch.cat([single, pooled_single, pooled_pair, geom], dim=-1))
+        anchor_mask = (count > 0).to(single.dtype)
+        return segment_state * anchor_mask[..., None]
 
     def _msa_to_face_update(
         self,

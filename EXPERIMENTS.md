@@ -1213,7 +1213,7 @@ cell messages more useful in this short gate.
 
 ### E41: Latent Rank-2 Segment Cells
 
-Status: next candidate, not implemented.
+Status: implemented locally and queued for Runpod.
 
 Hypothesis: Topotein's strongest protein-specific inductive bias is a rank-2
 cell for secondary-structure-like groups. NanoFold official runs cannot use
@@ -1222,11 +1222,26 @@ rank-2 segment cells from sequence-local windows and recycled geometry. These
 would complement sparse triangular faces: faces capture three-residue patches,
 while segment cells capture longer contiguous local topology.
 
-Mechanism: add a small set of contiguous segment cells per crop, initialize
-them from MSA/single and local pair features, and let them exchange messages
-with selected faces/tetras through incidence-style residue and boundary-edge
-maps. Any auxiliary target must be derived only from NanoFold training labels
-or model predictions.
+Mechanism: add `simplex_segment_cell_scale`, `simplex_segment_radius`, and
+`simplex_c_segment`, plus a `full_msa_to_face_segment_cells` benchmark
+variant. Each residue owns one latent contiguous segment cell over
+`i - r ... i + r`. The cell state is initialized from the anchor single state,
+the masked pooled single states in the window, masked anchor-to-window pair
+features, and invariant recycled C-alpha geometry summaries for the segment.
+Selected faces gather the three incident segment states at their vertices and
+receive a gated residual before the existing face-to-edge and face-to-single
+readouts. This keeps the change inside the simplicial/topological view: it
+adds another learned rank-2 cochain and an incidence map from segment cells to
+selected triangular faces.
 
-Decision rule: treat this as a larger architecture experiment and run only
-after cheaper E38-E40 gates clarify whether explicit cell communication helps.
+Local validation: segment-cell indexing respects sequence masks, segment
+geometry features are rigid-transform invariant, enabling the segment path
+changes adapter outputs, the CLI accepts the new variant, and the budget test
+keeps the model within 5% of AF2-medium. Parameter audit gives AF2-medium
+`3,106,642`, SimplexFold `3,106,690`, and E41 segment cells `3,234,450`,
+below the 5% cap of `3,261,974`.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with the
+current selected-coordinate stack. Continue only if the first validation point
+breaks out of the weak E33-E40 band or shows a meaningful improvement in
+FoldScore/dRMSD/radius-of-gyration behavior.
