@@ -320,3 +320,18 @@
   sparse simplex topology. The expectation is that tolerance-style local
   distance pressure may improve lDDT where the existing smooth log-distance
   losses improved global geometry but plateaued locally.
+- The original owned pod `sytp4e4kjs7e61` could not be restarted because
+  Runpod reported no free GPUs on that host. A new H100 pod,
+  `0hesaxxfhq8soj`, was launched for E19/E20. Only public processed features,
+  public processed labels, and public train/val manifests were used; the
+  accidentally transferred `hidden_val.txt` manifest was removed before any
+  experiment was launched.
+- E19 launched on pod `0hesaxxfhq8soj` at commit `add2cae` with selected
+  boundary-lDDT weights `0.25`. It was stopped after the step-500 validation:
+  `val_lddt_ca=0.2832`, FoldScore `0.2448`, `val_ca_drmsd=14.4789`,
+  `val_pred_ca_rg=7.1624`, and `val_true_ca_rg=15.4034`.
+- E20 reran the same setup with lower selected boundary-lDDT weights `0.05`.
+  It was stopped after the step-500 validation collapsed to
+  `val_lddt_ca=0.2364`, FoldScore `0.2447`, `val_ca_drmsd=15.5881`,
+  `val_pred_ca_rg=5.6076`, and `val_true_ca_rg=15.4034`. The new pod was then
+  stopped.

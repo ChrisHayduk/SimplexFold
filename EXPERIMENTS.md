@@ -528,7 +528,7 @@ capacity alone does not break the lDDT plateau.
 
 ### E19: Selected Simplex Boundary lDDT Realization
 
-Status: ready for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E18 improved the mid-run geometry but not final local C-alpha
 lDDT, which suggests the selected complex can carry useful scale/packing
@@ -551,3 +551,30 @@ Decision rule: stop early if step 500 falls into the failed-selector band.
 Continue only if the curve improves on E09's lDDT/FoldScore trajectory without
 substantially worsening dRMSD/Rg. Promote only if it beats E15's current best
 `val_lddt_ca=0.3556` after continuation.
+
+Result: reject. With face/tetra boundary-lDDT weights of `0.25`, step 500
+fell to `val_lddt_ca=0.2832`, FoldScore `0.2448`, `val_ca_drmsd=14.4789`,
+and predicted/true C-alpha radius of gyration `7.1624 / 15.4034`. This is
+below E09 at the same point (`0.2928`) and does not justify continuation.
+
+### E20: Lower-Weight Selected Boundary lDDT
+
+Status: stopped early on Runpod.
+
+Hypothesis: E19 may have failed because the selected-boundary lDDT term was
+too strong relative to the existing selected coordinate-distance terms. A
+fivefold smaller weight could preserve the topological metric-realization
+signal without overwhelming early structure formation.
+
+Mechanism: rerun the E19 setup with
+`simplex_face_boundary_lddt_weight=0.05` and
+`simplex_tetra_boundary_lddt_weight=0.05`, keeping the E09/E15 coordinate and
+boundary-distance weights unchanged.
+
+Decision rule: continue only if the step-500 point recovers to the E09/E18
+early band.
+
+Result: reject. Step 500 collapsed to `val_lddt_ca=0.2364`,
+FoldScore `0.2447`, `val_ca_drmsd=15.5881`, and predicted/true C-alpha
+radius of gyration `5.6076 / 15.4034`. The selected-boundary lDDT formulation
+is topologically motivated, but it is empirically harmful in this form.
