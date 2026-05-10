@@ -451,7 +451,7 @@ be relaxed after the face/tetra states have learned useful geometry.
 
 ### E16: Deeper Simplex Auxiliary Anneal
 
-Status: planned for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E15 improved after reducing `simplex_aux_weight` from `1.0` to
 `0.5`, and its best point was the final checkpoint. A further conservative
@@ -465,3 +465,23 @@ selected face/tetra coordinate and boundary-distance weights unchanged.
 
 Decision rule: keep if it improves E15 final `val_lddt_ca=0.3556` or preserves
 lDDT while improving FoldScore/dRMSD.
+
+Result: reject for the lDDT objective. The deeper anneal reached
+`val_lddt_ca=0.3506` at step 9500, `0.3400` at step 10000, and `0.3438` at
+step 10500, so it did not recover the E15 best. It briefly improved FoldScore
+to `0.3062`, but the lower auxiliary pressure appears to trade away C-alpha
+lDDT.
+
+### E17: Continue E15 With Constant Simplex Auxiliary Weight
+
+Status: planned for Runpod.
+
+Hypothesis: E15's `simplex_aux_weight=0.5` final checkpoint improved lDDT and
+FoldScore together, while E16's deeper anneal hurt lDDT. The best next test is
+not lower auxiliary pressure, but more training at the E15 scaffold strength.
+
+Mechanism: resume E15 at step 9000 and continue to step 12000 with
+`simplex_aux_weight=0.5` held constant. Keep the selected face/tetra
+coordinate and boundary-distance weights unchanged.
+
+Decision rule: keep if it improves E15 final `val_lddt_ca=0.3556`.

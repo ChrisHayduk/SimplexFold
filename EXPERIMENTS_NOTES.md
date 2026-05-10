@@ -279,3 +279,11 @@
 - E16 plan: resume E15 at step 9000 and continue to step 12000 while ramping
   `simplex_aux_weight` from `0.5` to `0.25` over steps 9000-10000. Keep the
   selected face/tetra coordinate and boundary-distance weights unchanged.
+- E16 launched on pod `sytp4e4kjs7e61` and was stopped after step 10500.
+  Best during the deeper anneal was `val_lddt_ca=0.3506` at step 9500; step
+  10000 reached FoldScore `0.3062` but lDDT fell to `0.3400`, and step 10500
+  was `val_lddt_ca=0.3438`. Lowering `simplex_aux_weight` to `0.25` improves
+  aggregate FoldScore briefly but hurts the C-alpha lDDT objective.
+- E17 plan: resume E15 again at step 9000 and continue to step 12000 with
+  `simplex_aux_weight=0.5` held constant, isolating more training at the E15
+  scaffold strength from E16's deeper anneal.
