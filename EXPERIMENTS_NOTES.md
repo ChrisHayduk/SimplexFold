@@ -585,7 +585,8 @@
   tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula
   tests/test_trainer.py::test_simplicial_structure_readout_adds_no_parameters
   tests/test_trainer.py::test_simplicial_structure_readout_forward_keeps_internal_tensors_private`
-  passed (`30 passed`); `git diff --check` passed. Parameter audit:
+  passed (`31 passed` after adding the CLI parser regression); `git diff
+  --check` passed. Parameter audit:
   AF2-medium `3,106,642`, SimplexFold medium `3,106,690`, E33 readout
   `3,106,690`, within 5% budget.
 - E33 Runpod gate plan: run `simplexfold_medium_param_matched` with variant
@@ -594,3 +595,17 @@
   MSA 64, no templates, fp32, and only public NanoFold train/val data. Add a
   row to `EXPERIMENT_RESULTS.md` only after the run returns a final or
   early-stop validation point.
+- E33 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 08:19 EDT.
+  The restarted workspace was empty before provisioning, then cloned
+  SimplexFold commit `a71cc25` and received only the public NanoFold
+  package/data needed for scoring. Remote audit before launch: train/val/all
+  counts `10000/1000/11000`, feature/label file counts `11000/11000`, no
+  hidden or sidecar data paths, no AppleDouble files, H100 CUDA available,
+  FoldScore import works, AF2-medium baseline `3,106,642`, E33 readout
+  `3,106,690`, `simplex_structure_readout_scale=0.25`, within the 5%
+  AF2-medium budget.
+- E33 first launch attempt exited before training because the new variant was
+  implemented in `_variant_config` but omitted from the CLI `--variants`
+  `choices` list. Fixed locally, added
+  `test_structure_readout_variant_is_accepted_by_cli_parser`, reran the
+  affected tests (`31 passed`), and will relaunch from the corrected commit.

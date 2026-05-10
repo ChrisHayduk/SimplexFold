@@ -1,5 +1,5 @@
 from minalphafold.trainer import load_model_config
-from scripts.run_nanofold_public_benchmarks import _variant_config
+from scripts.run_nanofold_public_benchmarks import _variant_config, parse_args
 
 
 def test_full_msa_to_face_variant_keeps_tetra_and_enables_msa_faces():
@@ -101,3 +101,9 @@ def test_full_msa_to_face_structure_readout_adds_simplicial_structure_path():
     assert cfg.simplex_use_tetra is True
     assert cfg.simplex_use_msa_to_face is True
     assert cfg.simplex_structure_readout_scale == 0.25
+
+
+def test_structure_readout_variant_is_accepted_by_cli_parser():
+    args = parse_args(["--variants", "full_msa_to_face_structure_readout"])
+
+    assert args.variants == ["full_msa_to_face_structure_readout"]

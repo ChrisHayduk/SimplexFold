@@ -1148,6 +1148,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "full_msa_to_face_damped_messages",
             "full_msa_to_face_edge_messages",
             "full_msa_to_face_no_recycled_topology",
+            "full_msa_to_face_structure_readout",
             "msa_to_face",
         ],
     )
