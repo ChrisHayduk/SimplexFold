@@ -204,3 +204,8 @@
   `val_pred_ca_rg=10.5325`. Warm-starting the MSA-to-face projection expands
   structures but damages lDDT/FoldScore, so the code was restored to the E09
   zero-final MSA-to-face initializer.
+- E11 adds a `full_msa_to_face_long` benchmark variant that keeps the E09
+  face/tetra/MSA-to-face pathway and biases sparse neighbor selection toward
+  nonlocal pairs with sequence separation at least 16. This tests whether the
+  explicit simplex complex needs more long-range cells to address remaining
+  under-expansion.

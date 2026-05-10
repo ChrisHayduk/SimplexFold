@@ -488,6 +488,16 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_tetra=True,
             simplex_use_msa_to_face=True,
         )
+    if variant == "full_msa_to_face_long":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+            simplex_long_min_sep=16,
+            simplex_long_bias=2.0,
+        )
     if variant == "msa_to_face":
         return replace(
             base_config,
@@ -886,6 +896,10 @@ def _train_variant(
         "simplex_use_tetra": use_simplicial and bool(getattr(model_config, "simplex_use_tetra", False)),
         "simplex_use_msa_to_face": use_simplicial and bool(getattr(model_config, "simplex_use_msa_to_face", False)),
         "simplex_neighbor_k": int(getattr(model_config, "simplex_neighbor_k", 0)) if use_simplicial else 0,
+        "simplex_local_radius": int(getattr(model_config, "simplex_local_radius", 0)) if use_simplicial else 0,
+        "simplex_local_bias": float(getattr(model_config, "simplex_local_bias", 0.0)) if use_simplicial else 0.0,
+        "simplex_long_min_sep": int(getattr(model_config, "simplex_long_min_sep", 0)) if use_simplicial else 0,
+        "simplex_long_bias": float(getattr(model_config, "simplex_long_bias", 0.0)) if use_simplicial else 0.0,
         "latest_checkpoint": str(latest_checkpoint_path),
         "resume_from_checkpoint": str(resume_checkpoint_path) if resume_checkpoint_path is not None else "",
         "eval_every": eval_every,
@@ -955,6 +969,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_use_tetra",
         "simplex_use_msa_to_face",
         "simplex_neighbor_k",
+        "simplex_local_radius",
+        "simplex_local_bias",
+        "simplex_long_min_sep",
+        "simplex_long_bias",
     ]
     extra = sorted({key for row in rows for key in row} - set(preferred))
     fieldnames = [key for key in preferred if any(key in row for row in rows)] + extra
@@ -981,7 +999,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--variants",
         nargs="+",
         default=["no_simplex", "faces", "full"],
-        choices=["no_simplex", "faces", "full", "full_msa_to_face", "msa_to_face"],
+        choices=["no_simplex", "faces", "full", "full_msa_to_face", "full_msa_to_face_long", "msa_to_face"],
     )
     parser.add_argument("--output-dir", type=Path, default=ROOT / "artifacts" / "nanofold_public_benchmarks")
     parser.add_argument(

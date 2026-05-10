@@ -317,3 +317,24 @@ Result: reject. The step-500 validation point fell to
 gyration rose to `10.5325`. The warm MSA-to-face path appears to inject too
 much noisy face information early, so the branch tip restores the zero final
 initializer used by E09.
+
+### E11: Long-Range Full MSA-to-Face Simplex Topology
+
+Status: implemented locally; queued for Runpod.
+
+Hypothesis: E09 is the strongest result, but the sparse complex still starts
+from a topology selector with a very strong local-neighborhood bias. That can
+leave too few nonlocal contacts for face/tetra cells to express global fold
+constraints.
+
+Mechanism: add a `full_msa_to_face_long` benchmark variant that keeps the E09
+full face/tetra/MSA-to-face path and adds a positive long-separation topology
+bias for residue pairs with sequence separation at least 16. This changes only
+the sparse complex construction, not parameter count or data.
+
+Initial Runpod test: repeat E09 with E07/E09 selected-coordinate and
+selected-boundary loss weights, but run
+`--variants full_msa_to_face_long`.
+
+Decision rule: keep only if it improves E09 best/final `val_lddt_ca` or
+improves radius-of-gyration/global geometry without a FoldScore regression.
