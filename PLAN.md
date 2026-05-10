@@ -1324,3 +1324,12 @@ signal at step 250, with predicted/true C-alpha radius of gyration
 `6.6087 / 15.4034`, below E49 and well below E15. The next branch should
 avoid simply increasing auxiliary expansion weight; it should make realized
 selected-boundary geometry influence the topology/readout stream directly.
+
+Immediate E51 branch: combine the selected-boundary expansion hinge with the
+existing simplicial structure-readout pathway. Keep the same selected
+face/tetra complex and expansion loss from E50, but use
+`full_msa_to_face_structure_readout` so the simplex pair/single boundary
+readouts are injected into the representation consumed by the structure
+module. This tests whether the topological realization signal must be on the
+same path that places atoms, rather than only an auxiliary loss attached
+after the fact.

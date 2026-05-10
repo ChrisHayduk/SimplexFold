@@ -1388,3 +1388,9 @@
   radius band. Reject as a standalone loss. The next idea should use
   expanded boundary geometry inside the selected topology/readout pathway
   rather than applying a stronger auxiliary coordinate-only penalty.
+- E51 live plan: run the E50 selected-boundary expansion hinge together with
+  `full_msa_to_face_structure_readout`. This keeps the same selected
+  2-/3-cell boundary realization objective, but routes simplex pair/single
+  readouts into the structure module with `simplex_structure_readout_scale=0.25`.
+  The point is to test whether expanded selected-boundary geometry needs to
+  be on the atom-placement path, not merely attached as an auxiliary loss.

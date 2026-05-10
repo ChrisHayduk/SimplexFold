@@ -1600,3 +1600,26 @@ radius `6.6087 / 15.4034`. The hinge helped early expansion but did not
 prevent final collapse or beat E49. This suggests the next branch should not
 just strengthen coordinate expansion; it needs to make the expanded selected
 boundary geometry feed back into the learned topology/readout path.
+
+### E51: Expansion Hinge With Structure Readout
+
+Status: planned for Runpod.
+
+Hypothesis: E50 failed because the expansion objective supervised selected
+simplex boundaries without putting that expanded boundary information on the
+path that the structure module uses to place atoms. If the same selected
+face/tetra states contribute pair/single readouts to the structure module,
+the contraction penalty may become a useful topological realization signal
+instead of a side loss that the trunk can ignore.
+
+Mechanism: reuse the existing `full_msa_to_face_structure_readout` variant
+and run it with the E50 face/tetra expansion hinge plus the E15 selected
+coordinate and boundary-distance losses. The readout keeps the explicit
+2-/3-cell boundary messages in the topology stream and injects their
+pair/single summaries before the structure module.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with
+the E50 expansion weights `0.5/0.5`, E15 auxiliary annealing, and
+`simplex_structure_readout_scale=0.25`. Continue only if the final lDDT and
+radius both improve over E50 and the run approaches or beats the E49/E22
+pilot band.
