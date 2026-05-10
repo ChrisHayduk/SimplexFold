@@ -1077,3 +1077,35 @@
   should be trusted only when their learned 1-skeleton is also plausible.
   Focused checks pass for closure-mask behavior, CLI variant parsing, and
   zero parameter growth.
+- E44 broader local checks: `python -m py_compile minalphafold/simplex.py
+  minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+  passed; affected tests passed (`110 passed`); full `python -m pytest -q`
+  passed; `git diff --check` passed. Parameter audit gives AF2-medium
+  `3,106,642`, SimplexFold `3,106,690`, and E44 flag closure `3,106,690`.
+  `python -m ruff check .` remains unavailable locally (`No module named
+  ruff`). `python -m mypy minalphafold scripts/run_nanofold_public_benchmarks.py`
+  still fails on the pre-existing structure-module typing, missing
+  `nanofold.metrics`, EMA model typing, and runner row typing issues.
+  `python -m pyright --warnings` still fails broadly because this local
+  interpreter does not resolve Torch/NumPy/Modal/OpenMM and reports existing
+  optional/type issues.
+- E44 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10
+  15:07 EDT from SimplexFold commit `808a3f0`. The stopped pod's
+  `/workspace` was empty, so I recloned the pushed SimplexFold branch and
+  copied only public NanoFold assets with `COPYFILE_DISABLE=1`: processed
+  features, processed labels, public train/val/all manifests, and `nanofold/`.
+  Remote audit: public train/val/all counts `10000/1000/11000`,
+  feature/label `.npz` counts `11000/11000`, no hidden or sidecar data paths,
+  H100 CUDA available, FoldScore import works, AF2-medium `3,106,642`, E44
+  flag closure `3,106,690`, `simplex_boundary_closure_weight=0.5`,
+  `simplex_boundary_closure_temperature=1.0`, within the 5% AF2-medium
+  budget. Run name: `e44_flag_closure_s500_c256_m64`.
+- E44 completed and the owned Runpod pod was stopped at 2026-05-10
+  19:20 UTC. Step 250 reached `val_lddt_ca=0.2449`, FoldScore `0.2105`,
+  `val_ca_drmsd=14.8883`, `val_pred_ca_rg=6.6400`, and
+  `val_true_ca_rg=15.4034` with `simplex_aux_weight=1.0`. Step 500 reached
+  `val_lddt_ca=0.2111`, FoldScore `0.2241`, `val_ca_drmsd=16.1468`,
+  `val_pred_ca_rg=5.0536`, and `val_true_ca_rg=15.4034` with
+  `simplex_aux_weight=0.5`. The run is rejected: fixed-strength flag closure
+  was not enough to beat E42 and appears to over-suppress the sparse complex
+  late in the gate.

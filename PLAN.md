@@ -1199,3 +1199,8 @@ keeps the intervention squarely in the simplicial/topological view: a filled
 2- or 3-simplex should be trusted most when the learned boundary edges are
 also trusted, instead of treating every pair or triplet of anchor neighbors
 as an equally valid higher-order cell.
+
+E44 result update: fixed-strength flag closure is too suppressive by the end
+of the 500-step gate. If closure is revisited, ramp it in after the topology
+scorer has learned useful edges, or apply it only to the auxiliary realization
+losses rather than to the message-passing masks from step 1.

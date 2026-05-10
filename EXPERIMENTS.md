@@ -1331,7 +1331,7 @@ downstream structure conditioning.
 
 ### E44: Soft Flag-Complex Closure
 
-Status: implemented locally; planned for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: the selected higher-order complex is currently too permissive.
 Each residue selects a top-k neighbor list, then every neighbor pair becomes a
@@ -1356,3 +1356,13 @@ E09/E15. Use the E15-style auxiliary anneal from `1.0` to `0.5` over steps
 250-500, because E43 confirmed that annealing improves the final checkpoint
 within a run even when the architecture is weak. Continue only if E44 beats
 E42/E43 and moves back toward the E22/E25/E30 early range.
+
+Result: reject. E44's soft flag-complex gate improved over E43 at the first
+checkpoint but not over E42: step 250 reached `val_lddt_ca=0.2449`,
+FoldScore `0.2105`, `val_ca_drmsd=14.8883`, and predicted/true C-alpha
+radius of gyration `6.6400 / 15.4034`. After the auxiliary anneal, step 500
+fell to `val_lddt_ca=0.2111`, FoldScore `0.2241`, `val_ca_drmsd=16.1468`,
+and radius of gyration `5.0536 / 15.4034`. This suggests the closure gate
+suppressed noisy higher-order cells, but also weakened the sparse complex too
+much for late structure expansion. If revisited, it should be staged or made
+temperature/weight-ramped rather than applied at fixed strength from step 1.
