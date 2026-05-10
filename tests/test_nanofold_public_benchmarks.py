@@ -1,5 +1,5 @@
-from minalphafold.trainer import load_model_config
-from scripts.run_nanofold_public_benchmarks import _variant_config, parse_args
+from minalphafold.trainer import TrainingConfig, load_model_config
+from scripts.run_nanofold_public_benchmarks import _build_loss_fn, _variant_config, parse_args
 
 
 def test_full_msa_to_face_variant_keeps_tetra_and_enables_msa_faces():
@@ -166,3 +166,17 @@ def test_topology_margin_args_are_accepted_by_cli_parser():
     assert args.simplex_topology_margin_weight == 0.05
     assert args.simplex_topology_margin == 1.25
     assert args.simplex_topology_margin_hard_negatives == 4
+
+
+def test_benchmark_loss_builder_applies_topology_margin_config():
+    loss_fn = _build_loss_fn(
+        TrainingConfig(
+            simplex_topology_margin_weight=0.05,
+            simplex_topology_margin=1.25,
+            simplex_topology_margin_hard_negatives=4,
+        )
+    )
+
+    assert loss_fn.simplex_geometry_loss.topology_margin_weight == 0.05
+    assert loss_fn.simplex_geometry_loss.topology_margin == 1.25
+    assert loss_fn.simplex_geometry_loss.topology_margin_hard_negatives == 4

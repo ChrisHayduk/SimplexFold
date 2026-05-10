@@ -600,6 +600,27 @@ def _variant_config(base_config: Any, variant: str) -> Any:
     raise ValueError(f"Unknown variant: {variant}")
 
 
+def _build_loss_fn(training_config: TrainingConfig) -> AlphaFoldLoss:
+    return AlphaFoldLoss(
+        finetune=False,
+        use_clamped_fape=training_config.use_clamped_fape,
+        simplex_aux_weight=training_config.simplex_aux_weight,
+        simplex_face_coordinate_weight=training_config.simplex_face_coordinate_weight,
+        simplex_face_coordinate_distance_weight=training_config.simplex_face_coordinate_distance_weight,
+        simplex_face_boundary_lddt_weight=training_config.simplex_face_boundary_lddt_weight,
+        simplex_tetra_coordinate_weight=training_config.simplex_tetra_coordinate_weight,
+        simplex_tetra_coordinate_distance_weight=training_config.simplex_tetra_coordinate_distance_weight,
+        simplex_tetra_boundary_lddt_weight=training_config.simplex_tetra_boundary_lddt_weight,
+        simplex_topology_margin_weight=training_config.simplex_topology_margin_weight,
+        simplex_topology_margin=training_config.simplex_topology_margin,
+        simplex_topology_margin_hard_negatives=training_config.simplex_topology_margin_hard_negatives,
+        simplex_boundary_degree_normalize=training_config.simplex_boundary_degree_normalize,
+        backbone_loss_weight=training_config.backbone_loss_weight,
+        sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
+        torsion_loss_weight=training_config.torsion_loss_weight,
+    )
+
+
 def _train_variant(
     *,
     variant: str,
@@ -622,21 +643,7 @@ def _train_variant(
     set_seed(training_config.seed)
     device = resolve_device(training_config.device)
     model = AlphaFold2(model_config).to(device)
-    loss_fn = AlphaFoldLoss(
-        finetune=False,
-        use_clamped_fape=training_config.use_clamped_fape,
-        simplex_aux_weight=training_config.simplex_aux_weight,
-        simplex_face_coordinate_weight=training_config.simplex_face_coordinate_weight,
-        simplex_face_coordinate_distance_weight=training_config.simplex_face_coordinate_distance_weight,
-        simplex_face_boundary_lddt_weight=training_config.simplex_face_boundary_lddt_weight,
-        simplex_tetra_coordinate_weight=training_config.simplex_tetra_coordinate_weight,
-        simplex_tetra_coordinate_distance_weight=training_config.simplex_tetra_coordinate_distance_weight,
-        simplex_tetra_boundary_lddt_weight=training_config.simplex_tetra_boundary_lddt_weight,
-        simplex_boundary_degree_normalize=training_config.simplex_boundary_degree_normalize,
-        backbone_loss_weight=training_config.backbone_loss_weight,
-        sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
-        torsion_loss_weight=training_config.torsion_loss_weight,
-    ).to(device)
+    loss_fn = _build_loss_fn(training_config).to(device)
     loss_fn.msa_weight = training_config.msa_loss_weight
     loss_fn.distogram_weight = training_config.distogram_loss_weight
     loss_fn.confidence_weight = training_config.confidence_loss_weight

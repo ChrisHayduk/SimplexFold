@@ -678,3 +678,30 @@
   hard-negative margin on `simplex_contact_logits` so true contact-neighborhood
   energy outranks the highest non-contact logits in each anchor row before
   the top-k face/tetra complex is constructed.
+- E36 local checks: `python -m py_compile minalphafold/simplex.py
+  minalphafold/losses.py minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py` passed; focused tests for the
+  margin loss, existing topology-neighborhood loss, `AlphaFoldLoss` overrides,
+  and benchmark CLI args passed (`4 passed`); broader affected
+  `pytest tests/test_simplex.py
+  tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights
+  tests/test_nanofold_public_benchmarks.py` passed (`34 passed`);
+  `git diff --check` passed; parameter audit remains AF2-medium
+  `3,106,642`, E36 `3,106,690`, within 5% budget.
+- E36 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 09:51 EDT
+  from SimplexFold commit `13607aa`. Remote audit before launch: branch
+  `codex/simplexfold-topology-e07-boundary-coordinate`, train/val/all counts
+  `10000/1000/11000`, feature/label file counts `11000/11000`, no hidden or
+  sidecar data paths, no AppleDouble files, H100 CUDA available, FoldScore
+  import works, AF2-medium baseline `3,106,642`, E36 topology-margin model
+  `3,106,690`, `simplex_use_faces=True`, `simplex_use_tetra=True`,
+  `simplex_use_msa_to_face=True`, `simplex_topology_margin_weight=0.05`,
+  `simplex_topology_margin=1.0`, `simplex_topology_margin_hard_negatives=8`,
+  within the 5% AF2-medium budget. Run name:
+  `e36_topology_margin_s500_c256_m64`.
+- E36 first launch was stopped as invalid before validation. The step-1
+  history row showed `simplex_topology_margin_loss` was computed but
+  `simplex_topology_margin_weight=0.0`, meaning the benchmark runner's local
+  `AlphaFoldLoss` construction path had not received the new override. Fixed
+  by centralizing the runner loss construction in `_build_loss_fn` and adding
+  a regression test for the margin override.
