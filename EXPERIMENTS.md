@@ -1038,7 +1038,7 @@ reliable.
 
 ### E36: Topology Margin Selector
 
-Status: implementation candidate.
+Status: stopped early on Runpod.
 
 Hypothesis: E33-E35 suggest that pooling selected face/tetra states into the
 structure module is not useful until the sparse complex itself is more
@@ -1060,3 +1060,13 @@ Decision rule: run a 500-step Runpod gate on the E09 selected-coordinate stack
 with MSA-to-face enabled. Continue only if the margin selector recovers above
 the weak E33-E35 readout band and approaches the E22/E25 early range without
 damaging FoldScore.
+
+Result: reject. The first Runpod launch was stopped as invalid before
+validation because the benchmark runner had not wired the new margin override
+into its local `AlphaFoldLoss` construction path. After fixing that path and
+verifying `simplex_topology_margin_weight=0.05` in the runner, the corrected
+run reached only `val_lddt_ca=0.1286` at step 250, with FoldScore `0.1857`,
+`val_ca_drmsd=13.5268`, and predicted/true C-alpha radius of gyration
+`13.1096 / 15.4034`. The margin term did separate training contact logits,
+but it appears to over-constrain the selector and damages local structure
+quality. Do not continue hard topology-margin weighting in this form.

@@ -1162,5 +1162,10 @@ Iteration ladder:
     2-skeleton before reusing it downstream, using selected-cell objectives,
     topology curricula, and selector regularization rather than dense
     structure losses that would be independent of the simplicial complex.
-12. Promote only changes that pass parameter-budget tests and at least a
+12. If selector regularization is revisited, prefer gentle or staged
+    curricula over always-on hard contact margins. The sparse complex should
+    preserve enough geometric diversity for face/tetra realization; forcing
+    the 1-skeleton too aggressively toward binary contacts can damage local
+    structure quality even when global radius improves.
+13. Promote only changes that pass parameter-budget tests and at least a
     NanoFold smoke/short-run comparison.

@@ -705,3 +705,18 @@
   `AlphaFoldLoss` construction path had not received the new override. Fixed
   by centralizing the runner loss construction in `_build_loss_fn` and adding
   a regression test for the margin override.
+- E36 relaunched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 09:55 EDT
+  from corrected SimplexFold commit `c44bf2c`. Remote re-audit: public
+  train/val/all counts `10000/1000/11000`, feature/label counts
+  `11000/11000`, no hidden or sidecar data paths, H100 CUDA available,
+  FoldScore import works, AF2-medium `3,106,642`, E36 `3,106,690`, runner
+  `_build_loss_fn` reports `simplex_topology_margin_weight=0.05`, within the
+  5% AF2-medium budget. Run name:
+  `e36_topology_margin_s500_c256_m64_r2`.
+- E36 was stopped early on owned Runpod pod `p2roc93zgk4ho9`, and the pod was
+  stopped. The corrected run reached step 250 with
+  `val_lddt_ca=0.1286`, FoldScore `0.1857`, `val_ca_drmsd=13.5268`,
+  `val_pred_ca_rg=13.1096`, and `val_true_ca_rg=15.4034`. The topology
+  margin term was active (`simplex_topology_margin_weight=0.05`,
+  `val_weighted_simplex_topology_margin_loss=0.0160`), but validation local
+  accuracy collapsed below the readout experiments. E36 is rejected.
