@@ -295,7 +295,7 @@ face states.
 
 ### E10: Warm-Started MSA-to-Face Moment
 
-Status: implemented locally; queued for Runpod.
+Status: launched on Runpod.
 
 Hypothesis: E09 improved the final score even though the MSA-to-face residual
 projection still used zero final initialization. As with E03's boundary

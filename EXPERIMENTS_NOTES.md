@@ -196,3 +196,6 @@
   zero to the default SimplexMLP initializer, matching the E03 principle that
   useful topology-mediated residual paths should not start as exact identity
   updates.
+- E10 launched on pod `sytp4e4kjs7e61` at commit `f10866b`, using
+  `--variants full_msa_to_face` with the E07/E09 selected-coordinate and
+  selected-boundary loss weights.
