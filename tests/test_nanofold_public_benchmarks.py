@@ -27,6 +27,42 @@ def test_full_msa_to_face_aux_closure_variant_is_accepted_by_cli_parser():
     assert args.variants == ["full_msa_to_face_aux_closure"]
 
 
+def test_full_msa_to_face_topology_curriculum_variant_keeps_base_topology():
+    cfg = _variant_config(
+        load_model_config("simplexfold_medium_param_matched"),
+        "full_msa_to_face_topology_curriculum",
+    )
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_local_neighbor_k == 0
+
+
+def test_topology_curriculum_flags_are_accepted_by_cli_parser():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face_topology_curriculum",
+            "--simplex-local-neighbor-k",
+            "4",
+            "--simplex-local-neighbor-k-final",
+            "0",
+            "--simplex-local-neighbor-k-ramp-start-step",
+            "250",
+            "--simplex-local-neighbor-k-ramp-steps",
+            "250",
+        ]
+    )
+
+    assert args.variants == ["full_msa_to_face_topology_curriculum"]
+    assert args.simplex_local_neighbor_k == 4.0
+    assert args.simplex_local_neighbor_k_final == 0.0
+    assert args.simplex_local_neighbor_k_ramp_start_step == 250
+    assert args.simplex_local_neighbor_k_ramp_steps == 250
+
+
 def test_full_msa_to_face_expanded_complex_increases_cell_coverage():
     cfg = _variant_config(
         load_model_config("simplexfold_medium_param_matched"),

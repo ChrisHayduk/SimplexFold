@@ -166,6 +166,28 @@ def test_simplicial_adapter_teacher_forcing_selects_true_nearest_neighbors():
     assert set(aux["simplex_face_indices"][0, 0, 0, 1:].tolist()) == {1, 2}
 
 
+def test_simplicial_adapter_local_neighbor_override_reserves_scaffold_slots():
+    class LocalOverrideConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    adapter = SimplicialAdapter(LocalOverrideConfig())
+    pair = torch.zeros(1, 6, 6, LocalOverrideConfig.c_z)
+    single = torch.randn(1, 6, LocalOverrideConfig.c_s)
+
+    _, _, aux = adapter(
+        pair,
+        single,
+        seq_mask=torch.ones(1, 6),
+        simplex_local_neighbor_k_override=torch.tensor(2.0),
+    )
+
+    assert set(aux["simplex_face_indices"][0, 2, 0, 1:].tolist()) == {1, 3}
+
+
 def test_simplicial_adapter_update_scale_override_gates_boundary_residuals():
     class FaceOnlyConfig(SimplexConfig):
         simplex_neighbor_k = 3

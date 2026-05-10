@@ -1246,3 +1246,40 @@ Closure appears harmful whether used as a message mask or as realization-loss
 weighting. The next branch should avoid closure heuristics and instead test
 an adaptive local-to-global topology curriculum or a longer confirmation run
 only for the still-best E15/E12 family.
+
+## 2026-05-10 Reference PDF Update
+
+Local reference copies were saved in `references/papers/`:
+
+- `hands_on_geometric_deep_learning_nodes_to_complexes.pdf`
+- `2509.03885v1.pdf`
+
+The PDFs are intentionally ignored by git until redistribution rights are
+confirmed. Tracked reading notes live in
+`references/papers/READING_NOTES.md`.
+
+The main planning update from reading both references is that closure should
+not be the next SimplexFold family. The Topotein paper explicitly motivates
+combinatorial complexes because protein hierarchy can benefit from flexible
+set-type cells without strict boundary constraints. That matches E44-E47:
+flag-complex closure, whether used as a message mask or only as an auxiliary
+realization weighting, weakens the validation curve.
+
+Immediate E48 branch: implement an adaptive local-to-global topology
+curriculum. Keep the E09/E15 `full_msa_to_face` architecture and selected
+coordinate/boundary losses, but schedule selected neighbor construction from
+a small sequence-local scaffold toward the ordinary learned/global selector.
+This follows the TDL view from the references: the neighborhood operator is
+part of the model, and changing it over training is a topological curriculum
+rather than a generic lDDT-targeted loss.
+
+E48 implementation update: the curriculum is implemented as a training-only
+`simplex_local_neighbor_k` override, scheduled from `4` to `0`. The benchmark
+variant is architecturally identical to `full_msa_to_face`; parameter count is
+unchanged at `3,106,690`.
+
+Follow-on branch if E48 fails: test Topotein-style outer-edge communication
+among selected cells. Instead of forcing filled faces/tetras to be closed,
+let face/tetra cochains exchange messages through selected boundary edges
+that leave one cell and enter another, preserving edge-level geometry and
+the combinatorial-complex flexibility.

@@ -1459,3 +1459,55 @@ closure ramp reached `0.5`, the final step-500 checkpoint fell to
 of gyration `5.5581 / 15.4034`. Auxiliary-only flag closure avoids directly
 suppressing messages, but it still weakens the same early band and does not
 prevent late collapse.
+
+### E48: Adaptive Local-to-Global Topology Curriculum
+
+Status: implemented locally and queued for Runpod.
+
+Hypothesis: recent failures are not caused by too little closure or too few
+static selected cells. The sparse complex may need a training curriculum for
+its neighborhood operator: start with a small local manifold scaffold so early
+faces/tetras are coherent, then anneal back to the learned/global E09 selector
+once pair/MSA topology has begun to stabilize.
+
+Mechanism: add training-time overrides for the local selected-neighbor
+scaffold. The implementation schedules `simplex_local_neighbor_k` from `4`
+to `0` over the 500-step gate while keeping the E09/E15
+`full_msa_to_face_topology_curriculum` pathway, selected face/tetra
+coordinate realization, and selected boundary-distance losses. Evaluation and
+inference keep the static model config, so this is a training curriculum on
+the selected-complex construction operator, not a dense coordinate metric.
+
+Local validation: py_compile passed for the changed model/trainer/runner
+files; focused tests passed for adapter local-slot overrides, schedule math,
+training-only model inputs, benchmark variant parsing, and parameter budget.
+Affected suites `tests/test_simplex.py`, `tests/test_nanofold_public_benchmarks.py`,
+and `tests/test_trainer.py` passed. Parameter audit: AF2-medium pair-only
+`3,106,642`, SimplexFold medium `3,106,690`, and E48 topology curriculum
+`3,106,690`.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with
+the E15 auxiliary anneal and compare against E47 and the stronger E22/E25/E30
+early range. Continue only if the run recovers the early lDDT/FoldScore band
+without late radius collapse.
+
+### E49: Outer-Edge Selected-Cell Communication
+
+Status: queued idea from Topotein.
+
+Hypothesis: selected face/tetra cells should communicate through boundary
+edges that connect one selected cell to another, preserving multiple
+edge-level geometric relationships instead of collapsing cell pairs into
+coarse superedges. This follows Topotein's outer-edge neighborhoods and keeps
+the model in the combinatorial-complex view.
+
+Mechanism: build an incidence-aware selected-cell message pass where a face
+or tetra gathers messages from boundary edges that leave its anchor/coface
+and enter another selected cell. Normalize by edge incidence and return the
+updated higher-rank state to the ordinary pair/single residual path. Start
+with a zero-parameter or very small-parameter residual before spending the
+remaining 5% budget.
+
+Decision rule: only implement after E48 or if a quick design audit shows it
+can be added with low memory overhead and clear tests for incidence,
+normalization, and parameter budget.

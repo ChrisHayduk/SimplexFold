@@ -1140,6 +1140,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_teacher_forcing_weight: Optional[torch.Tensor] = None,
         simplex_pair_update_scale_override: Optional[torch.Tensor] = None,
         simplex_single_update_scale_override: Optional[torch.Tensor] = None,
+        simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
         if pair.ndim != 4 or single.ndim != 3:
             raise ValueError("pair must be [B, L, L, Cz] and single must be [B, L, Cs]")
@@ -1150,6 +1151,11 @@ class SimplicialAdapter(torch.nn.Module):
         single_update_scale = self.single_update_scale
         if simplex_single_update_scale_override is not None:
             single_update_scale = max(float(simplex_single_update_scale_override.detach().float().cpu().item()), 0.0)
+        local_neighbor_k = self.local_neighbor_k
+        if simplex_local_neighbor_k_override is not None:
+            local_neighbor_k = int(
+                round(max(float(simplex_local_neighbor_k_override.detach().float().cpu().item()), 0.0))
+            )
 
         score_raw = self.topology_score(self.pair_score_norm(pair)).squeeze(-1)
         contact_logits = 0.5 * (score_raw + score_raw.transpose(1, 2))
@@ -1186,7 +1192,7 @@ class SimplicialAdapter(torch.nn.Module):
                 seq_mask=seq_mask,
                 pair_mask=topology_pair_mask,
                 recycled_ca_coords=coords_for_topology,
-                local_neighbor_k=self.local_neighbor_k,
+                local_neighbor_k=local_neighbor_k,
                 local_radius=self.local_radius,
                 local_bias=self.local_bias,
                 long_min_sep=self.long_min_sep,

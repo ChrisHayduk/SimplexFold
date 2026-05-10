@@ -48,6 +48,7 @@ from minalphafold.trainer import (
     main,
     model_inputs_from_batch,
     save_checkpoint,
+    simplex_local_neighbor_k_at_step,
     simplex_update_scale_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     train_step,
@@ -138,20 +139,27 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_update_scale_final=1.0,
         simplex_update_scale_ramp_start_step=10,
         simplex_update_scale_ramp_steps=10,
+        simplex_local_neighbor_k=4.0,
+        simplex_local_neighbor_k_final=0.0,
+        simplex_local_neighbor_k_ramp_start_step=10,
+        simplex_local_neighbor_k_ramp_steps=10,
     )
 
     assert simplex_topology_teacher_forcing_weight_at_step(training_config, 15) == 0.5
     assert simplex_update_scale_at_step(training_config, 15) == 0.625
+    assert simplex_local_neighbor_k_at_step(training_config, 15) == 2.0
 
     eval_inputs = model_inputs_from_batch(batch, training_config)
     assert "simplex_teacher_ca_coords" not in eval_inputs
     assert "simplex_pair_update_scale_override" not in eval_inputs
+    assert "simplex_local_neighbor_k_override" not in eval_inputs
 
     train_inputs = model_inputs_from_batch(
         batch,
         training_config,
         use_simplex_teacher_forcing=True,
         use_simplex_update_scale=True,
+        use_simplex_local_neighbor_k=True,
         step=15,
     )
     assert torch.allclose(train_inputs["simplex_teacher_ca_coords"], batch["true_atom_positions"][:, :, 1, :])
@@ -159,6 +167,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_teacher_forcing_weight"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_pair_update_scale_override"], torch.tensor(0.625))
     assert torch.allclose(train_inputs["simplex_single_update_scale_override"], torch.tensor(0.625))
+    assert torch.allclose(train_inputs["simplex_local_neighbor_k_override"], torch.tensor(2.0))
 
 
 def test_alphafold2_uses_canonical_constructor_initialization():

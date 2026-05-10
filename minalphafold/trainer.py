@@ -214,6 +214,10 @@ class TrainingConfig:
     simplex_update_scale_final: float | None = None
     simplex_update_scale_ramp_start_step: int | None = None
     simplex_update_scale_ramp_steps: int = 1
+    simplex_local_neighbor_k: float | None = None
+    simplex_local_neighbor_k_final: float | None = None
+    simplex_local_neighbor_k_ramp_start_step: int | None = None
+    simplex_local_neighbor_k_ramp_steps: int = 1
     backbone_loss_weight: float = 1.0
     sidechain_fape_loss_weight: float = 1.0
     torsion_loss_weight: float = 1.0
@@ -789,12 +793,27 @@ def simplex_update_scale_at_step(training_config: TrainingConfig, step: int | No
     )
 
 
+def simplex_local_neighbor_k_at_step(training_config: TrainingConfig, step: int | None) -> float | None:
+    if training_config.simplex_local_neighbor_k is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_local_neighbor_k)
+    return _ramped_value(
+        training_config.simplex_local_neighbor_k,
+        training_config.simplex_local_neighbor_k_final,
+        step=step,
+        start_step=training_config.simplex_local_neighbor_k_ramp_start_step,
+        ramp_steps=training_config.simplex_local_neighbor_k_ramp_steps,
+    )
+
+
 def model_inputs_from_batch(
     batch: dict[str, Any],
     training_config: TrainingConfig,
     *,
     use_simplex_teacher_forcing: bool = False,
     use_simplex_update_scale: bool = False,
+    use_simplex_local_neighbor_k: bool = False,
     step: int | None = None,
 ) -> dict[str, torch.Tensor | int]:
     """Unpack a collated batch into the kwargs ``AlphaFold2.forward`` expects."""
@@ -832,6 +851,9 @@ def model_inputs_from_batch(
         update_scale_tensor = batch["target_feat"].new_tensor(float(update_scale))
         inputs["simplex_pair_update_scale_override"] = update_scale_tensor
         inputs["simplex_single_update_scale_override"] = update_scale_tensor
+    local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
+    if use_simplex_local_neighbor_k and local_neighbor_k is not None:
+        inputs["simplex_local_neighbor_k_override"] = batch["target_feat"].new_tensor(float(local_neighbor_k))
     return inputs
 
 
@@ -931,6 +953,7 @@ def train_step(
             training_config,
             use_simplex_teacher_forcing=True,
             use_simplex_update_scale=True,
+            use_simplex_local_neighbor_k=True,
             step=1,
         )
     )
@@ -1252,6 +1275,7 @@ def fit(
                     training_config,
                     use_simplex_teacher_forcing=True,
                     use_simplex_update_scale=True,
+                    use_simplex_local_neighbor_k=True,
                     step=global_step + 1,
                 )
             )
@@ -1573,6 +1597,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-update-scale-final", type=float, default=None)
     parser.add_argument("--simplex-update-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-update-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-local-neighbor-k",
+        type=float,
+        default=None,
+        help="Training-only override for reserved local simplex neighbor slots.",
+    )
+    parser.add_argument("--simplex-local-neighbor-k-final", type=float, default=None)
+    parser.add_argument("--simplex-local-neighbor-k-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-local-neighbor-k-ramp-steps", type=int, default=1)
     parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
     parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
     parser.add_argument("--torsion-loss-weight", type=float, default=1.0)
@@ -1673,6 +1706,10 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_update_scale_final=args.simplex_update_scale_final,
         simplex_update_scale_ramp_start_step=args.simplex_update_scale_ramp_start_step,
         simplex_update_scale_ramp_steps=args.simplex_update_scale_ramp_steps,
+        simplex_local_neighbor_k=args.simplex_local_neighbor_k,
+        simplex_local_neighbor_k_final=args.simplex_local_neighbor_k_final,
+        simplex_local_neighbor_k_ramp_start_step=args.simplex_local_neighbor_k_ramp_start_step,
+        simplex_local_neighbor_k_ramp_steps=args.simplex_local_neighbor_k_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,

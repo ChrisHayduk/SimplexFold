@@ -1221,3 +1221,52 @@
   message-mask suppression of E44/E45 but still does not recover the stronger
   early-validation band and still collapses by the final checkpoint. Treat
   closure heuristics as a rejected family for now.
+- Reference PDFs saved locally under `references/papers/` and read in full:
+  `hands_on_geometric_deep_learning_nodes_to_complexes.pdf` and
+  `2509.03885v1.pdf`. The directory ignores PDFs by default, so the local
+  copies are available in the repo checkout but not tracked for public
+  redistribution. Tracked distilled notes were added to
+  `references/papers/READING_NOTES.md`.
+- Reading-note synthesis: the TDL guide reinforces that the topology
+  construction step, incidence/adjacency operators, and intra-/inter-rank
+  aggregation are part of the model. Topotein adds the protein-specific lesson
+  that combinatorial complexes are useful partly because they avoid strict
+  boundary constraints. This agrees with E44-E47: closure heuristics are a
+  principled idea in a flag/simplicial-complex view, but they appear mismatched
+  to the flexible protein complex we need here.
+- Updated next direction: E48 should test an adaptive local-to-global
+  topology curriculum rather than another closure variant. Follow-on E49
+  should test Topotein-style outer-edge selected-cell communication through
+  boundary edges if E48 does not recover the stronger early-validation band.
+- E48 local implementation: added a training-only
+  `simplex_local_neighbor_k` schedule that passes
+  `simplex_local_neighbor_k_override` through trainer/model/evoformer into
+  the simplex adapter. The override changes only selected-neighborhood
+  construction during training; eval/inference keep the static model config.
+  The new benchmark variant `full_msa_to_face_topology_curriculum` is
+  architecturally identical to `full_msa_to_face`.
+- E48 local checks: py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/evoformer.py`, `minalphafold/model.py`,
+  `minalphafold/trainer.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; focused tests passed for the
+  adapter override, schedule/model-input propagation, variant config, and CLI
+  parsing (`4 passed`); affected suites
+  `tests/test_simplex.py tests/test_nanofold_public_benchmarks.py
+  tests/test_trainer.py -q` passed; full `python -m pytest -q` passed;
+  `git diff --check` passed. `python -m ruff check .` could not run because
+  `ruff` is not installed. `python -m mypy minalphafold scripts` still fails
+  on pre-existing typing/import issues including NumPy savez typing,
+  structure-module list/tensor annotations, OpenMM/PDBFixer stubs,
+  `nanofold.metrics`, EMA model typing, and runner row typing.
+  `python -m pyright --warnings` still fails broadly because the local
+  pyright environment cannot resolve Torch/NumPy/Modal/OpenMM and reports
+  existing optional/type issues.
+- E48 parameter audit: AF2-medium pair-only baseline `3,106,642`,
+  SimplexFold medium `3,106,690`, and
+  `full_msa_to_face_topology_curriculum` `3,106,690`. The schedule is
+  zero-parameter and leaves the static `simplex_local_neighbor_k` at `0`.
+- E48 Runpod gate plan: 500 steps at crop 256 / MSA depth 64, E15 selected
+  coordinate and boundary-distance losses, `simplex_aux_weight` annealed
+  `1.0 -> 0.5` over steps 250-500, and `simplex_local_neighbor_k` annealed
+  `4 -> 0` over steps 250-500. Do not write to `EXPERIMENT_RESULTS.md` until
+  the Runpod validation returns.

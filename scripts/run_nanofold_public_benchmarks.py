@@ -64,6 +64,7 @@ from minalphafold.trainer import (  # noqa: E402
     resolve_device,
     set_optimizer_learning_rate,
     set_seed,
+    simplex_local_neighbor_k_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     simplex_update_scale_at_step,
     zero_dropout_model_config,
@@ -497,6 +498,14 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_tetra=True,
             simplex_use_msa_to_face=True,
         )
+    if variant == "full_msa_to_face_topology_curriculum":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+        )
     if variant == "full_msa_to_face_expanded_complex":
         return replace(
             base_config,
@@ -844,6 +853,7 @@ def _train_variant(
         apply_loss_weight_schedule(loss_fn, training_config, step)
         teacher_forcing_weight = simplex_topology_teacher_forcing_weight_at_step(training_config, step)
         simplex_update_scale = simplex_update_scale_at_step(training_config, step)
+        simplex_local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
         optimizer.zero_grad(set_to_none=True)
         loss_accum = 0.0
         term_accum: dict[str, list[float]] = {}
@@ -864,6 +874,7 @@ def _train_variant(
                         training_config,
                         use_simplex_teacher_forcing=True,
                         use_simplex_update_scale=True,
+                        use_simplex_local_neighbor_k=True,
                         step=step,
                     )
                 )
@@ -954,6 +965,9 @@ def _train_variant(
                 ),
                 "simplex_topology_teacher_forcing_weight": teacher_forcing_weight,
                 "simplex_update_scale": float("nan") if simplex_update_scale is None else simplex_update_scale,
+                "simplex_local_neighbor_k": (
+                    float("nan") if simplex_local_neighbor_k is None else simplex_local_neighbor_k
+                ),
                 "backbone_loss_weight": float(loss_fn.backbone_loss_weight),
                 "sidechain_fape_loss_weight": float(loss_fn.sidechain_fape_loss_weight),
                 "torsion_loss_weight": float(loss_fn.torsion_loss_weight),
@@ -1113,6 +1127,10 @@ def _train_variant(
         "simplex_update_scale_final": training_config.simplex_update_scale_final,
         "simplex_update_scale_ramp_start_step": training_config.simplex_update_scale_ramp_start_step,
         "simplex_update_scale_ramp_steps": training_config.simplex_update_scale_ramp_steps,
+        "simplex_local_neighbor_k": training_config.simplex_local_neighbor_k,
+        "simplex_local_neighbor_k_final": training_config.simplex_local_neighbor_k_final,
+        "simplex_local_neighbor_k_ramp_start_step": training_config.simplex_local_neighbor_k_ramp_start_step,
+        "simplex_local_neighbor_k_ramp_steps": training_config.simplex_local_neighbor_k_ramp_steps,
         "backbone_loss_weight": training_config.backbone_loss_weight,
         "sidechain_fape_loss_weight": training_config.sidechain_fape_loss_weight,
         "torsion_loss_weight": training_config.torsion_loss_weight,
@@ -1226,6 +1244,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_update_scale_final",
         "simplex_update_scale_ramp_start_step",
         "simplex_update_scale_ramp_steps",
+        "simplex_local_neighbor_k",
+        "simplex_local_neighbor_k_final",
+        "simplex_local_neighbor_k_ramp_start_step",
+        "simplex_local_neighbor_k_ramp_steps",
         "elapsed_seconds",
         "examples_per_second",
         "train_loss_final",
@@ -1315,6 +1337,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "full",
             "full_msa_to_face",
             "full_msa_to_face_aux_closure",
+            "full_msa_to_face_topology_curriculum",
             "full_msa_to_face_expanded_complex",
             "full_msa_to_face_long",
             "full_msa_to_face_mixed",
@@ -1513,6 +1536,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-update-scale-final", type=float, default=None)
     parser.add_argument("--simplex-update-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-update-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-local-neighbor-k",
+        type=float,
+        default=None,
+        help="Training-only override for reserved local simplex neighbor slots.",
+    )
+    parser.add_argument("--simplex-local-neighbor-k-final", type=float, default=None)
+    parser.add_argument("--simplex-local-neighbor-k-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-local-neighbor-k-ramp-steps", type=int, default=1)
     parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
     parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
     parser.add_argument("--torsion-loss-weight", type=float, default=1.0)
@@ -1636,6 +1668,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_update_scale_final=args.simplex_update_scale_final,
         simplex_update_scale_ramp_start_step=args.simplex_update_scale_ramp_start_step,
         simplex_update_scale_ramp_steps=args.simplex_update_scale_ramp_steps,
+        simplex_local_neighbor_k=args.simplex_local_neighbor_k,
+        simplex_local_neighbor_k_final=args.simplex_local_neighbor_k_final,
+        simplex_local_neighbor_k_ramp_start_step=args.simplex_local_neighbor_k_ramp_start_step,
+        simplex_local_neighbor_k_ramp_steps=args.simplex_local_neighbor_k_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,
@@ -1728,6 +1764,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_update_scale_final": args.simplex_update_scale_final,
         "simplex_update_scale_ramp_start_step": args.simplex_update_scale_ramp_start_step,
         "simplex_update_scale_ramp_steps": args.simplex_update_scale_ramp_steps,
+        "simplex_local_neighbor_k": args.simplex_local_neighbor_k,
+        "simplex_local_neighbor_k_final": args.simplex_local_neighbor_k_final,
+        "simplex_local_neighbor_k_ramp_start_step": args.simplex_local_neighbor_k_ramp_start_step,
+        "simplex_local_neighbor_k_ramp_steps": args.simplex_local_neighbor_k_ramp_steps,
         "backbone_loss_weight": args.backbone_loss_weight,
         "sidechain_fape_loss_weight": args.sidechain_fape_loss_weight,
         "torsion_loss_weight": args.torsion_loss_weight,
