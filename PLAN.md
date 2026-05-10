@@ -1,19 +1,20 @@
-## Current Plan: Damped Simplex Coupling Follow-Up
+## Current Plan: Topology Capacity With Auxiliary Anneal
 
-E21-E30 showed that message scaling, boundary-degree normalization, larger
+E21-E31 showed that message scaling, boundary-degree normalization, larger
 effective batch size, face-only 2-skeletons, removing recycled-coordinate
-topology, teacher-forced topology, and a `0.0 -> 1.0` simplex-coupling warmup
-do not break the lDDT plateau. E30 did improve global expansion and dRMSD
-once coupling ramped up, but local lDDT remained below the E09/E15 band and
-runtime increased sharply when full simplex residual coupling entered the main
-structure-loss path.
+topology, teacher-forced topology, and simplex-coupling warmups do not break
+the lDDT plateau. E30/E31 improved global expansion once coupling ramped up,
+but local lDDT and FoldScore stayed below the E09/E15 band, so coupling
+schedules are not the next promising lever.
 
-The next architecture-facing direction should preserve the useful part of E30
-while avoiding the full-coupling penalty: warm up selected face/tetra states
-and ramp their residual messages only to a damped target such as `0.5`. This
-tests whether explicit 2-/3-simplex states can act as a geometry scaffold for
-the AF2 1-skeleton without overpowering residue-local structure learning.
-Keep `EXPERIMENT_RESULTS.md` only for returned run results.
+The next architecture-facing direction should combine two prior positive
+signals: E18's simplex-only capacity increase stayed within the 5% AF2-medium
+budget and remained competitive, while E15's auxiliary scaffold anneal to
+`0.5` produced the best validation lDDT so far. Run a short gate with
+`simplexfold_medium_topology_plus`, `full_msa_to_face`, selected
+face/tetra coordinate and boundary-distance realization, and an auxiliary
+weight anneal from `1.0` to `0.5`. Keep `EXPERIMENT_RESULTS.md` only for
+returned run results.
 
 Yes. With templates forbidden, the right construction is:
 

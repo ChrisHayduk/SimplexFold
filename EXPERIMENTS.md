@@ -874,7 +874,7 @@ it does not break the lDDT plateau.
 
 ### E31: Damped Simplex Coupling Warmup
 
-Status: design candidate.
+Status: completed on Runpod.
 
 Hypothesis: E30 suggests that ramping simplex boundary messages into the AF2
 trunk can open the predicted structure, but full `1.0` coupling is too heavy
@@ -892,3 +892,32 @@ states.
 Decision rule: run the same 500-step Runpod gate. Continue only if final
 `val_lddt_ca` exceeds E22/E25's early band or if it preserves comparable
 lDDT while improving dRMSD/FoldScore enough to justify a longer run.
+
+Result: reject. Step 250 reached `val_lddt_ca=0.2422`, FoldScore `0.2133`,
+`val_ca_drmsd=14.8018`, and predicted/true C-alpha radius of gyration
+`6.7519 / 15.4034`. Final step 500, after the damped ramp reached `0.5`,
+reached only `val_lddt_ca=0.2578`, FoldScore `0.2332`,
+`val_ca_drmsd=14.7889`, and radius of gyration `8.9024 / 16.3091`. Damping
+preserved the global expansion seen in E30, but local lDDT and FoldScore
+worsened, so coupling warmups are not the next promising direction.
+
+### E32: Topology Capacity With Auxiliary Anneal
+
+Status: design candidate.
+
+Hypothesis: E18 showed that spending the allowed parameter headroom on
+simplex-only face/tetra capacity was competitive, while E15 showed that
+annealing the selected simplex auxiliary scaffold to `0.5` gave the best
+validation lDDT so far. Combining those two topological levers may help the
+higher-order states store patch/packing geometry without over-constraining
+the structure module late in training.
+
+Mechanism: run `simplexfold_medium_topology_plus` with `full_msa_to_face`,
+selected face/tetra coordinate weights, and selected boundary-distance
+weights. Add a short auxiliary-loss anneal from `simplex_aux_weight=1.0` to
+`0.5`, keeping the signal attached to selected face/tetra cells rather than a
+dense all-pairs metric.
+
+Decision rule: use a 500-step Runpod gate first. Continue only if it beats the
+E18/E25 early band or materially improves FoldScore/dRMSD without losing
+lDDT.

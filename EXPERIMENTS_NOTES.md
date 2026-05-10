@@ -523,3 +523,24 @@
   `1.0`. This follows E22's observation that damped simplex messages were
   less damaging than strong coupling, while keeping E30's staged
   higher-order-cell warmup.
+- E31 launched on owned Runpod pod `p2roc93zgk4ho9`, after re-provisioning
+  the empty restarted workspace with only public processed features, public
+  processed labels, public train/val/all manifests, and the NanoFold metrics
+  package. Mac tar emitted AppleDouble `._*` metadata files; these were
+  deleted before launch. Remote audit before launch: SimplexFold commit
+  `63f2640`, train/val/all counts `10000/1000/11000`, feature/label file
+  counts `11001/11000`, no hidden or sidecar data paths, H100 CUDA available,
+  FoldScore import works, and parameter count `3,106,690`.
+- E31 completed on owned pod `p2roc93zgk4ho9`, and the pod was stopped. Step
+  250 reached `val_lddt_ca=0.2422`, FoldScore `0.2133`,
+  `val_ca_drmsd=14.8018`, `val_pred_ca_rg=6.7519`, and
+  `val_true_ca_rg=15.4034` while `simplex_update_scale=0.0`. Final step 500,
+  after the ramp reached `0.5`, reached `val_lddt_ca=0.2578`, FoldScore
+  `0.2332`, `val_ca_drmsd=14.7889`, `val_pred_ca_rg=8.9024`, and
+  `val_true_ca_rg=16.3091`. The damped warmup kept the global expansion seen
+  in E30 but worsened lDDT/FoldScore, so E31 is rejected.
+- E32 live direction: combine the best architecture-facing capacity result
+  (E18 `simplexfold_medium_topology_plus`, within the 5% AF2-medium budget)
+  with the best curriculum result (E15 auxiliary scaffold annealed to `0.5`).
+  This stays within the simplex view: spend the allowed headroom on persistent
+  face/tetra state capacity, then relax selected-cell auxiliary pressure.
