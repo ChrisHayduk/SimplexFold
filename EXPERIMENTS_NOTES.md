@@ -1270,3 +1270,26 @@
   `1.0 -> 0.5` over steps 250-500, and `simplex_local_neighbor_k` annealed
   `4 -> 0` over steps 250-500. Do not write to `EXPERIMENT_RESULTS.md` until
   the Runpod validation returns.
+- E48 launched on newly owned Runpod pod `mttz64sa9mhut2`
+  (`codex-simplexfold-e48-runpod-20260510`) at 2026-05-10 17:50 EDT from
+  commit `30f51a3`. Clean launch audit: public train/val/all manifest counts
+  `10000/1000/11000`, feature/label `.npz` counts `11000/11000`,
+  `bad_paths=0`, H100 CUDA available, FoldScore import works, AF2-medium
+  pair-only `3,106,642`, SimplexFold medium `3,106,690`, E48 `3,106,690`,
+  and static `simplex_local_neighbor_k=0`.
+- E48 completed and the owned Runpod pod was stopped at 2026-05-10
+  17:59 EDT. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e48_topology_curriculum_s500_c256_m64/`.
+  Step 250 reached `val_lddt_ca=0.1002268809825182`, FoldScore
+  `0.18271444644778967`, `val_ca_drmsd=14.2001`, and predicted/true
+  C-alpha radius of gyration `13.9544 / 15.4034` while
+  `simplex_local_neighbor_k=4.0` and `simplex_aux_weight=1.0`. Step 500
+  ended at `val_lddt_ca=0.2273553814738989`, FoldScore
+  `0.21913115680217743`, `val_ca_drmsd=15.774888902902603`, radius of
+  gyration `5.532628566026688 / 15.403406739234924`,
+  `simplex_local_neighbor_k=0.0`, and `simplex_aux_weight=0.5`.
+- E48 interpretation: the sequence-local scaffold curriculum does not recover
+  the stronger early-validation band and still ends with coordinate collapse.
+  Move next to the Topotein-inspired outer-edge communication idea, which
+  changes inter-cell message passing rather than the selected-neighborhood
+  schedule.

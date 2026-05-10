@@ -1278,8 +1278,14 @@ E48 implementation update: the curriculum is implemented as a training-only
 variant is architecturally identical to `full_msa_to_face`; parameter count is
 unchanged at `3,106,690`.
 
-Follow-on branch if E48 fails: test Topotein-style outer-edge communication
-among selected cells. Instead of forcing filled faces/tetras to be closed,
-let face/tetra cochains exchange messages through selected boundary edges
-that leave one cell and enter another, preserving edge-level geometry and
-the combinatorial-complex flexibility.
+E48 result update: reject. The 500-step Runpod gate reached best/final
+`val_lddt_ca=0.2274`, FoldScore `0.2191`, `val_ca_drmsd=15.7749`, and
+predicted/true C-alpha radius of gyration `5.5326 / 15.4034`. The local
+scaffold did not recover the stronger early-validation band and still ended
+in coordinate collapse.
+
+Immediate E49 branch: test Topotein-style outer-edge communication among
+selected cells. Instead of forcing filled faces/tetras to be closed, let
+face/tetra cochains exchange messages through selected boundary edges that
+leave one cell and enter another, preserving edge-level geometry and the
+combinatorial-complex flexibility.

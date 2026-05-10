@@ -1462,7 +1462,7 @@ prevent late collapse.
 
 ### E48: Adaptive Local-to-Global Topology Curriculum
 
-Status: implemented locally and queued for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: recent failures are not caused by too little closure or too few
 static selected cells. The sparse complex may need a training curriculum for
@@ -1491,9 +1491,19 @@ the E15 auxiliary anneal and compare against E47 and the stronger E22/E25/E30
 early range. Continue only if the run recovers the early lDDT/FoldScore band
 without late radius collapse.
 
+Result: reject. The pre-ramp step-250 checkpoint reached only
+`val_lddt_ca=0.1002`, FoldScore `0.1827`, and predicted/true C-alpha radius
+of gyration `13.9544 / 15.4034`. After the neighborhood curriculum annealed
+`simplex_local_neighbor_k` from `4` to `0` and the simplex auxiliary weight
+from `1.0` to `0.5`, the final step-500 checkpoint recovered to
+`val_lddt_ca=0.2274`, FoldScore `0.2191`, `val_ca_drmsd=15.7749`, and radius
+of gyration `5.5326 / 15.4034`. The local scaffold did not recover the
+stronger E22/E25/E30 early band and still ended with strong coordinate
+collapse.
+
 ### E49: Outer-Edge Selected-Cell Communication
 
-Status: queued idea from Topotein.
+Status: next queued idea from Topotein after E48 rejection.
 
 Hypothesis: selected face/tetra cells should communicate through boundary
 edges that connect one selected cell to another, preserving multiple
