@@ -387,3 +387,21 @@
   batch size 8 (`batch_size=1`, `grad_accum_steps=8`) for a short 500-step
   Runpod gate. This aligns with the final objective's required optimization
   regime before spending on a 30,000-step confirmation run.
+- E25 completed on owned pod `0hesaxxfhq8soj` at commit `a54d709`, using
+  `full_msa_to_face`, the E09/E15 selected coordinate and boundary-distance
+  weights, `batch_size=1`, and `grad_accum_steps=8`. Step 250 reached
+  `val_lddt_ca=0.2637`, FoldScore `0.2294`, `val_ca_drmsd=14.5203`,
+  `val_pred_ca_rg=6.7816`, and `val_true_ca_rg=15.4034`. Final step 500
+  recovered to `val_lddt_ca=0.2946`, FoldScore `0.2466`,
+  `val_ca_drmsd=14.3073`, `val_pred_ca_rg=7.6818`, and
+  `val_true_ca_rg=15.7622`. Effective batch 8 is not harmful enough to fail
+  operationally, but it does not improve over the E09/E15 early band, so E25
+  is rejected.
+- After E25, pod `0hesaxxfhq8soj` was stopped. Both owned Runpod pods
+  (`sytp4e4kjs7e61` and `0hesaxxfhq8soj`) are stopped.
+- E26 live plan: run the existing `msa_to_face` variant as a 2-skeleton
+  stabilization gate. It keeps learned triangular face states and the
+  MSA-to-face moment but disables tetra states, testing whether the 3-simplex
+  packing layer is hurting before face geometry has stabilized. Use the same
+  500-step Runpod gate and E09 selected face coordinate/boundary-distance
+  weights.

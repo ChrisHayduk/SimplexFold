@@ -691,7 +691,7 @@ E22 does not justify continuation.
 
 ### E25: Effective-Batch-8 Optimization Pilot
 
-Status: ready for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: the current best topology-mediated stack was developed with
 effective batch size 1, while the target confirmation run should use effective
@@ -709,3 +709,30 @@ architecture benefits from the larger effective batch required for the final
 Decision rule: first run a small 500-step gate. Continue to longer effective
 batch-8 training only if the validation point improves over the E09/E15 early
 band or substantially improves global geometry without losing FoldScore.
+
+Result: reject. The 500-step effective-batch-8 gate reached
+`val_lddt_ca=0.2946`, FoldScore `0.2466`, `val_ca_drmsd=14.3073`, and
+predicted/true C-alpha radius of gyration `7.6818 / 15.7622`. It rebounded
+from the step-250 validation point (`val_lddt_ca=0.2637`), but still did not
+improve over the useful E09/E15 early band or the current E15 best. Effective
+batch size alone is not enough to break the topology-mediated lDDT plateau.
+
+### E26: MSA-to-Face Two-Skeleton Stabilization
+
+Status: ready for Runpod.
+
+Hypothesis: the E09/E15 stack may be asking the model to learn persistent
+3-simplex packing cells before the selected triangular face geometry is
+reliable. A protein's sparse 2-skeleton still carries explicit three-residue
+patch constraints, normals, areas, and boundary edges, while removing the
+noisier four-residue volume/packing pathway.
+
+Mechanism: run the existing `msa_to_face` variant, which enables explicit
+faces and the low-rank MSA-to-face moment while disabling tetra states. Keep
+the E09 selected face coordinate and boundary-distance weights; tetra loss
+weights are harmless because no tetra tensors are produced. This is an
+architecture ablation inside the simplicial view, not a generic loss change.
+
+Decision rule: use a 500-step Runpod gate. Continue only if the face-only
+2-skeleton improves over the E09/E15 early band or gives a clearly better
+global geometry/FoldScore tradeoff.

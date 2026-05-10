@@ -1,16 +1,16 @@
-## Current Plan: Boundary Incidence Normalization
+## Current Plan: Two-Skeleton Stabilization
 
-E21-E23 showed that scaling simplex messages is not enough: stronger coupling
-collapses global scale, damping mostly returns to the old early baseline, and
-edge-biased coupling also collapses. The next architectural/loss direction is
-therefore topology normalization rather than message amplitude.
+E21-E25 showed that message scaling, boundary-degree normalization, and a
+larger effective batch do not break the lDDT plateau. The next
+architecture-facing question is whether the current sparse 3-complex is too
+ambitious before the learned face geometry is stable.
 
-Implement and test degree-normalized selected boundary realization. Treat the
-selected face/tetra complex as a sparse chain complex whose boundary edges
-should be supervised without over-counting high-degree local edges. Keep the
-signal restricted to the boundary edges induced by selected simplex cells,
-leave parameter count unchanged, and use `EXPERIMENT_RESULTS.md` only for
-returned run results.
+Run a 2-skeleton stabilization gate: keep the explicit MSA-to-face path and
+selected face coordinate/boundary realization, but disable tetra states for a
+short Runpod pilot. This asks whether persistent learned triangular faces can
+provide a cleaner topological scaffold before reintroducing 3-simplex packing
+cells. Keep the parameter budget under the AF2-medium +5% cap and use
+`EXPERIMENT_RESULTS.md` only for returned run results.
 
 Yes. With templates forbidden, the right construction is:
 
