@@ -1142,7 +1142,7 @@ than improving explicit cell communication and local-frame message use.
 
 ### E39: Outer-Edge Cell Communication
 
-Status: implemented locally; Runpod gate queued.
+Status: stopped early on Runpod.
 
 Hypothesis: Topotein argues that higher-rank protein cells need dedicated
 neighborhoods; simply attaching a cell feature to an otherwise pairwise model
@@ -1167,9 +1167,15 @@ the 5% AF2-medium budget.
 Decision rule: keep if explicit inter-cell communication improves the early
 validation band without increasing parameters outside the AF2-medium budget.
 
+Result: reject. E39 was stable but did not break the weak E33-E38 band. The
+first validation point at step 250 reached `val_lddt_ca=0.2460`, FoldScore
+`0.2163`, `val_ca_drmsd=14.7805`, and predicted/true C-alpha radius of
+gyration `6.7531 / 15.4034`. The small FoldScore and dRMSD nudge over E38 is
+not enough to justify continuing this branch.
+
 ### E40: Edge-Frame Scalarized Simplex Messages
 
-Status: idea from Topotein, not implemented.
+Status: next candidate, not implemented.
 
 Hypothesis: Topotein's TCP module gets mileage from edge-centric local frames:
 vector information from higher-rank cells is scalarized in frames associated

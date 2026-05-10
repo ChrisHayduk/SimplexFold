@@ -861,3 +861,30 @@
   runner row typing issues. `python -m pyright --warnings` still fails broadly
   because this local interpreter does not resolve Torch/NumPy/Modal/OpenMM and
   reports existing optional/type issues.
+- E39 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 11:53 EDT
+  from SimplexFold commit `087308c`. The stopped pod's `/workspace` was empty,
+  so I recloned the pushed SimplexFold branch and copied only public NanoFold
+  assets: `data/processed_features`, `data/processed_labels`,
+  `data/manifests/train.txt`, `data/manifests/val.txt`,
+  `data/manifests/all.txt`, and `nanofold/`. Remote audit after AppleDouble
+  cleanup: public train/val/all counts `10000/1000/11000`, feature/label
+  counts `11000/11000`, no hidden or sidecar data paths, H100 CUDA available,
+  FoldScore components import works, AF2-medium `3,106,642`, E39 outer-edge
+  `3,106,690`, `simplex_outer_edge_update_scale=0.25`, within the 5%
+  AF2-medium budget. Run name: `e39_outer_edge_face_s500_c256_m64`.
+- E39 passed the previous NaN failure point: step 50 reached
+  `train_loss=8.1281`, `grad_norm=18.2726`; step 100 reached
+  `train_loss=7.8448`, `grad_norm=3.7852`; step 150 reached
+  `train_loss=6.1836`, `grad_norm=5.8400`; step 200 reached
+  `train_loss=6.4083`, `grad_norm=3.1336`.
+- E39 was stopped early on owned Runpod pod `p2roc93zgk4ho9`, and the pod was
+  stopped. Step 250 reached `val_lddt_ca=0.2460`, FoldScore `0.2163`,
+  `val_ca_drmsd=14.7805`, `val_pred_ca_rg=6.7531`, and
+  `val_true_ca_rg=15.4034`. The coordinate cell terms were active
+  (`val_weighted_simplex_face_coordinate_area_loss=0.0322`,
+  `val_weighted_simplex_face_coordinate_distance_loss=0.0147`,
+  `val_weighted_simplex_tetra_coordinate_geometry_loss=0.0738`,
+  `val_weighted_simplex_tetra_coordinate_distance_loss=0.0144`), but the
+  validation result stayed in the weak E33-E38 band. E39 is rejected; E40
+  should try edge-frame scalarized simplex messages if we continue the
+  Topotein-inspired branch.

@@ -1,20 +1,18 @@
-## Current Plan: Outer-Edge Cell Communication
+## Current Plan: Edge-Frame Scalarized Simplex Messages
 
-E33-E38 show that additional scalar supervision on selected cells is not
-enough to break the weak early-validation band. The next architecture-facing
-direction should return to the core SimplexFold claim: learned 2-/3-simplices
-should behave like persistent local cells, not just supervised readouts from
-boundary edges.
+E33-E39 show that extra scalar supervision and a simple shared-boundary
+face-neighborhood pass are not enough to break the weak early-validation band.
+The next architecture-facing direction should keep the Topotein lesson but
+make the messages more geometrically usable: scalarize selected face/tetra
+orientation and packing signals in local frames attached to their boundary
+edges before writing back to the AF2 pair stream.
 
-Run a short gate with `simplexfold_medium_param_matched` and a new
-`full_msa_to_face_outer_edge` variant. This keeps the E09 MSA-to-face path and
-adds a zero-parameter face-to-face residual through shared undirected boundary
-edges before the selected faces write back to pair/single states. This is
-topological rather than a metric hack: it implements an incidence-neighborhood
-message pass between cochains on selected 2-cells, exactly the kind of
-same-rank cell communication emphasized by the reference topological deep
-learning material and the Topotein-style cell-neighborhood view. Keep
-`EXPERIMENT_RESULTS.md` only for returned run results.
+Run the next short gate with `simplexfold_medium_param_matched` and an
+edge-frame simplex-message variant. Keep the construction inside the official
+NanoFold data contract: frames may come from recycled C-alpha coordinates or
+current selected-cell geometry, but not from templates, DSSP labels, external
+structures, pretrained weights, or hidden labels. Keep `EXPERIMENT_RESULTS.md`
+only for returned run results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired
