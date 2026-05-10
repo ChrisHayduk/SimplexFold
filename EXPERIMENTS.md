@@ -320,7 +320,7 @@ initializer used by E09.
 
 ### E11: Long-Range Full MSA-to-Face Simplex Topology
 
-Status: implemented locally; queued for Runpod.
+Status: launched on Runpod.
 
 Hypothesis: E09 is the strongest result, but the sparse complex still starts
 from a topology selector with a very strong local-neighborhood bias. That can

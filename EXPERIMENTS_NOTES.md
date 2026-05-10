@@ -209,3 +209,6 @@
   nonlocal pairs with sequence separation at least 16. This tests whether the
   explicit simplex complex needs more long-range cells to address remaining
   under-expansion.
+- E11 launched on pod `sytp4e4kjs7e61` at commit `91445a8`, using
+  `--variants full_msa_to_face_long` with the E07/E09 selected-coordinate
+  and selected-boundary loss weights.
