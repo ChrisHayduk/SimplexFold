@@ -1084,6 +1084,9 @@ Budget contract:
 - Prefer zero-parameter or near-zero-parameter changes first: topology
   selection, simplex auxiliary objectives, cell construction, recycling
   policy, and curriculum.
+- After the zero-parameter selector/curriculum pass, spend any remaining
+  budget only inside the explicit face/tetra/MSA-to-face pathway. Do not use
+  the slack to widen the generic AF2 MSA/pair/structure trunk.
 
 Scientific constraint: every iteration must be justified through the
 simplicial/topological view. A change that would help a pair-only AF2 trunk
@@ -1117,5 +1120,10 @@ Iteration ladder:
    sequence-local scaffold of neighbor slots and let the remaining slots be
    learned/global. This keeps local manifold continuity while giving selected
    faces and tetras room to include nonlocal packing edges.
-8. Promote only changes that pass parameter-budget tests and at least a
+8. If the E15 curriculum reaches a plateau, test a simplex-only capacity
+   profile that increases persistent face/tetra channels and the MSA-to-face
+   low-rank adapter while preserving the medium AF2 trunk and staying within
+   the 5% parameter contract. This asks whether the higher-order state itself
+   is currently under-capacitated.
+9. Promote only changes that pass parameter-budget tests and at least a
    NanoFold smoke/short-run comparison.

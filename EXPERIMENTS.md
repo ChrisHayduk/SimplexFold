@@ -492,3 +492,28 @@ with `val_lddt_ca=0.3554` and improved FoldScore to `0.3041`; step 10000 had
 to `0.3454` at step 10500 and `0.3441` at step 11000, so the run was stopped.
 More training at `simplex_aux_weight=0.5` improves aggregate FoldScore, but it
 does not break the C-alpha lDDT plateau.
+
+### E18: Simplex-Only Topology Capacity Within 5% Budget
+
+Status: ready for Runpod.
+
+Hypothesis: E15/E17 may be plateauing because the persistent higher-order
+state is too narrow, not because the AF2-style trunk needs more generic
+capacity. The exact-match profile leaves almost the full 5% allowance unused.
+Spending that slack only on face/tetra channels and the MSA-to-face adapter is
+a direct test of whether explicit 2-/3-simplex state helps when it has enough
+room to store selected patch and packing geometry.
+
+Mechanism: add `simplexfold_medium_topology_plus`, preserving all medium
+MSA/pair/template/structure dimensions and layer counts while increasing
+`simplex_c_face` from 24 to 28, `simplex_c_tetra` from 12 to 14,
+`simplex_hidden_dim` from 80 to 87, and `simplex_msa_to_face_rank` from 12 to
+16. The profile has 3,256,126 parameters, which is 4.81% above the AF2-medium
+baseline and below the 5% cap. Run it with the E09/E15 topology-mediated stack:
+`full_msa_to_face` plus selected face/tetra coordinate and boundary-distance
+losses.
+
+Decision rule: compare the 3000-step curve against E09's 3000-step result
+(`val_lddt_ca=0.3429`). Keep and continue with the E15 anneal schedule only if
+the early lDDT/FoldScore curve improves or reaches the same lDDT with better
+global geometry.

@@ -292,3 +292,14 @@
   FoldScore to `0.3041`; step 10000 reached FoldScore `0.3094` but lDDT was
   `0.3541`. The later checkpoints fell to `0.3454` and `0.3441`, so more
   training at `simplex_aux_weight=0.5` does not break the lDDT plateau.
+- E18 shifts from scheduler-only continuation to a simplex-only capacity test.
+  The new `simplexfold_medium_topology_plus` profile keeps the medium AF2
+  trunk fixed and spends the available 5% allowance inside persistent
+  face/tetra state and the MSA-to-face adapter: face channels 24 -> 28, tetra
+  channels 12 -> 14, simplex hidden 80 -> 87, and MSA-to-face rank 12 -> 16.
+  The parameter audit is 3,256,126 parameters versus the AF2-medium baseline
+  of 3,106,642, or +4.81%, under the 3,261,974 cap.
+- E18 is topologically motivated rather than a generic lDDT hack: it tests
+  whether the selected sparse 2-/3-simplex complex needs more representational
+  capacity to store patch/packing geometry while preserving the same
+  pair/MSA/structure trunk.

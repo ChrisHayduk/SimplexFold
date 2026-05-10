@@ -254,6 +254,7 @@ def test_load_model_config_selects_requested_profile():
     assert load_model_config("medium").model_profile == "medium"
     assert load_model_config("alphafold2").model_profile == "alphafold2"
     assert load_model_config("simplexfold_param_matched").model_profile == "simplexfold_param_matched"
+    assert load_model_config("simplexfold_medium_topology_plus").model_profile == "simplexfold_medium_topology_plus"
     assert load_model_config("simplexfold_medium_width_matched").model_profile == "simplexfold_medium_width_matched"
 
 
@@ -276,6 +277,7 @@ def test_list_available_profiles_includes_shipped_json_configs():
         "alphafold2",
         "simplexfold_param_matched",
         "simplexfold_medium_param_matched",
+        "simplexfold_medium_topology_plus",
         "simplexfold_medium_width_matched",
     }.issubset(set(profiles))
 
@@ -346,6 +348,29 @@ def test_simplexfold_medium_param_matched_matches_af2_medium_budget():
     assert af2_params == 3_106_642
     assert simplex_params == 3_106_690
     assert abs(simplex_params - af2_params) <= 64
+
+
+def test_simplexfold_medium_topology_plus_uses_only_allowed_simplex_headroom():
+    medium = load_model_config("medium")
+    af2_medium = replace(medium, use_simplicial_evoformer=False)
+    param_matched = load_model_config("simplexfold_medium_param_matched")
+    topology_plus = load_model_config("simplexfold_medium_topology_plus")
+
+    af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())
+    topology_plus_params = sum(parameter.numel() for parameter in AlphaFold2(topology_plus).parameters())
+
+    assert af2_params == 3_106_642
+    assert topology_plus_params == 3_256_126
+    assert topology_plus_params <= int(af2_params * 1.05)
+    assert topology_plus.c_m == param_matched.c_m
+    assert topology_plus.c_s == param_matched.c_s
+    assert topology_plus.c_z == param_matched.c_z
+    assert topology_plus.num_evoformer == param_matched.num_evoformer
+    assert topology_plus.structure_module_layers == param_matched.structure_module_layers
+    assert topology_plus.simplex_c_face > param_matched.simplex_c_face
+    assert topology_plus.simplex_c_tetra > param_matched.simplex_c_tetra
+    assert topology_plus.simplex_hidden_dim > param_matched.simplex_hidden_dim
+    assert topology_plus.simplex_msa_to_face_rank > param_matched.simplex_msa_to_face_rank
 
 
 def test_simplexfold_medium_width_matched_preserves_widths_near_af2_medium_budget():
