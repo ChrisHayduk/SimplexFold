@@ -1105,7 +1105,7 @@ E09 coordinate stack.
 
 ### E38: Selected Simplex Shape Realization
 
-Status: implemented locally and queued for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E37 adds orientation pressure to selected faces, but the core
 SimplexFold motivation is stronger: explicit faces and tetras should act like
@@ -1131,6 +1131,14 @@ validation after losses became `NaN` by step 50. The corrected E38r2 patch
 keeps the proper Kabsch alignment as a cell-local frame solve but computes the
 rotation without backpropagating through SVD, then backpropagates only through
 the aligned predicted vertices.
+
+Result: reject. The corrected E38r2 run was stable but weak at the first
+validation point: step 250 reached `val_lddt_ca=0.2402`, FoldScore `0.2113`,
+`val_ca_drmsd=14.9614`, and predicted/true C-alpha radius of gyration
+`6.6367 / 15.4034`. The selected-cell shape losses were active, but the run
+did not improve over E37 or approach the E22/E25 early range. This supports the
+PDF-derived lesson that additional scalar realization terms are less promising
+than improving explicit cell communication and local-frame message use.
 
 ### E39: Outer-Edge Cell Communication
 

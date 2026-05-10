@@ -817,3 +817,25 @@
   passed (`38 passed`), including a finite-gradient regression for collapsed
   selected cells; full `python -m pytest` passed (`215 passed`); `git diff
   --check` passed.
+- E38r2 relaunched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 11:36
+  EDT from SimplexFold commit `ec0d640`. Remote re-audit: public
+  train/val/all counts `10000/1000/11000`, feature/label counts
+  `11001/11000`, no hidden or sidecar data paths, no AppleDouble files, H100
+  CUDA available, FoldScore import works, AF2-medium `3,106,642`, E38r2
+  `3,106,690`, `simplex_face_shape_weight=0.1`,
+  `simplex_tetra_shape_weight=0.1`, within the 5% AF2-medium budget. Run
+  name: `e38r2_simplex_shape_detached_s500_c256_m64`.
+- E38r2 passed the E38 failure point: step 50 was finite with
+  `train_loss=8.2621`, `grad_norm=21.3335`, `train_simplex_face_shape_loss=0.1362`,
+  and `train_simplex_tetra_shape_loss=0.1710`. Step 100 remained finite with
+  `train_loss=7.9037`, `grad_norm=3.6255`, `train_simplex_face_shape_loss=0.1181`,
+  and `train_simplex_tetra_shape_loss=0.1557`.
+- E38r2 was stopped early on owned Runpod pod `p2roc93zgk4ho9`, and the pod
+  was stopped. Step 250 reached `val_lddt_ca=0.2402`, FoldScore `0.2113`,
+  `val_ca_drmsd=14.9614`, `val_pred_ca_rg=6.6367`, and
+  `val_true_ca_rg=15.4034`. The shape terms were active
+  (`val_weighted_simplex_face_shape_loss=0.0153`,
+  `val_weighted_simplex_tetra_shape_loss=0.0190`), but validation remained in
+  the weak E33-E38 band. E38 is rejected; next priority should be a
+  Topotein-inspired architecture change such as outer-edge cell communication
+  or edge-frame scalarized simplex messages.
