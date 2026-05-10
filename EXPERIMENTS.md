@@ -1503,7 +1503,7 @@ collapse.
 
 ### E49: Outer-Edge Selected-Cell Communication
 
-Status: implemented locally and queued for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: selected face/tetra cells should communicate through boundary
 edges that connect one selected cell to another, preserving multiple
@@ -1539,3 +1539,11 @@ the E15 selected coordinate and boundary-distance losses plus auxiliary
 annealing. Continue only if the outer-edge context recovers at least the
 E22/E25/E30 early-validation band without worsening the final radius
 collapse.
+
+Result: reject. The step-250 checkpoint reached `val_lddt_ca=0.2421`,
+FoldScore `0.2118`, `val_ca_drmsd=15.0993`, and predicted/true C-alpha
+radius of gyration `6.3380 / 15.4034`. The final step-500 checkpoint improved
+to `val_lddt_ca=0.2695`, FoldScore `0.2429`, `val_ca_drmsd=14.5377`, and
+radius of gyration `6.7858 / 15.4034`. Directed outer-edge context is better
+than E47/E48 final and roughly comparable to several weak pilots, but it does
+not recover the E22/E25/E30 early band or approach E15.

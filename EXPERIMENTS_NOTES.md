@@ -1313,3 +1313,25 @@
   E48/E47, E15 selected coordinate and boundary-distance losses,
   `simplex_aux_weight` annealed `1.0 -> 0.5`, and
   `full_msa_to_face_outer_edge_context`.
+- E49 launched on owned Runpod pod `mttz64sa9mhut2` after restart at
+  2026-05-10 18:15 EDT from commit `b546c79`. The restart did not preserve
+  `/workspace`, so the repo was cloned fresh and public data was restaged.
+  Clean launch audit: public train/val/all manifest counts `10000/1000/11000`,
+  feature/label `.npz` counts `11000/11000`, `bad_paths=0`, H100 CUDA
+  available, FoldScore import works, AF2-medium pair-only `3,106,642`,
+  SimplexFold medium `3,106,690`, E49 `3,183,282`, and
+  `simplex_outer_edge_context_scale=0.25`.
+- E49 completed and the owned Runpod pod was stopped at 2026-05-10
+  18:24 EDT. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e49_outer_edge_context_s500_c256_m64/`.
+  Step 250 reached `val_lddt_ca=0.24210394732654095`, FoldScore
+  `0.2118359049782157`, `val_ca_drmsd=15.099262595176697`, and
+  predicted/true C-alpha radius of gyration `6.338007271289825 /
+  15.403406739234924`. Step 500 ended at
+  `val_lddt_ca=0.26945804711431265`, FoldScore `0.24290458485484123`,
+  `val_ca_drmsd=14.537729948759079`, and radius of gyration
+  `6.785757273435593 / 15.403406739234924`.
+- E49 interpretation: directed outer-edge context helps over E47/E48 final
+  checkpoints but remains below E22/E25/E30 and far below E15. It is not the
+  next main branch by itself. Prefer a topology-grounded expansion/readout
+  change that directly counteracts the repeated radius-of-gyration collapse.

@@ -1298,3 +1298,11 @@ the higher-rank state before boundary readout. This is distinct from E39's
 shared-boundary face averaging and better matches the Topotein outer-edge
 neighborhood. Parameter count is `3,183,282`, within the 5% AF2-medium
 budget.
+
+E49 result update: reject. The 500-step Runpod gate reached best/final
+`val_lddt_ca=0.2695`, FoldScore `0.2429`, `val_ca_drmsd=14.5377`, and
+predicted/true C-alpha radius of gyration `6.7858 / 15.4034`. This is an
+improvement over E47/E48 but remains below the stronger E22/E25/E30 pilot
+band and far below E15. The next branch should probably address global
+coordinate expansion directly inside the topological readout, not add another
+same-rank or edge-context side pass.
