@@ -1255,7 +1255,7 @@ range.
 
 ### E42: Damped Hodge Face Residual
 
-Status: implemented locally and queued for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E39's lower face adjacency through shared boundary edges was too
 weak on its own, and E40/E41 added side channels that did not improve the pair
@@ -1284,3 +1284,12 @@ Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with the
 current selected-coordinate stack. Continue only if the first validation point
 beats the E33-E41 weak band or at least recovers the stronger E22/E25/E30
 early range while preserving FoldScore and radius-of-gyration behavior.
+
+Result: reject. E42 modestly improved over E33-E41 at the first validation
+point but did not recover the stronger E22/E25/E30 early range. Step 250
+reached `val_lddt_ca=0.2545`, FoldScore `0.2112`, `val_ca_drmsd=14.7096`,
+and predicted/true C-alpha radius of gyration `6.7897 / 15.4034`. The run
+continued through step 450 and entered the final full-validation path, but no
+new validation row was written after an extended wait, so the process was
+stopped and the pod was shut down. Treat the zero-parameter Hodge residual as
+a weak positive diagnostic, not a keep.

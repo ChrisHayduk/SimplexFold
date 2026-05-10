@@ -1011,3 +1011,31 @@
   runner row typing issues. `python -m pyright --warnings` still fails broadly
   because this local interpreter does not resolve Torch/NumPy/Modal/OpenMM and
   reports existing optional/type issues.
+- E42 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 13:20 EDT
+  from SimplexFold commit `9faa0fd`. The stopped pod's `/workspace` was
+  empty, so I recloned the pushed SimplexFold branch and copied only public
+  NanoFold assets: `data/processed_features`, `data/processed_labels`,
+  `data/manifests/train.txt`, `data/manifests/val.txt`,
+  `data/manifests/all.txt`, and `nanofold/`. Remote audit: public
+  train/val/all counts `10000/1000/11000`, feature/label `.npz` counts
+  `11000/11000`, no hidden or sidecar data paths, H100 CUDA available,
+  FoldScore import works, AF2-medium `3,106,642`, E42 Hodge residual
+  `3,106,690`, `simplex_hodge_face_update_scale=0.25`, within the 5%
+  AF2-medium budget. Run name: `e42_hodge_residual_s500_c256_m64`.
+- E42 was stable through the first validation point: step 50 reached
+  `train_loss=8.2494`, `grad_norm=20.9149`; step 100 reached
+  `train_loss=7.8037`, `grad_norm=3.1864`; step 150 reached
+  `train_loss=6.4399`, `grad_norm=5.5352`; step 200 reached
+  `train_loss=6.3583`, `grad_norm=3.0872`. Step 250 reached
+  `val_lddt_ca=0.2545`, FoldScore `0.2112`, `val_ca_drmsd=14.7096`,
+  `val_pred_ca_rg=6.7897`, and `val_true_ca_rg=15.4034`. The coordinate cell
+  terms were active (`val_weighted_simplex_face_coordinate_area_loss=0.0381`,
+  `val_weighted_simplex_face_coordinate_distance_loss=0.0174`,
+  `val_weighted_simplex_tetra_coordinate_geometry_loss=0.0763`,
+  `val_weighted_simplex_tetra_coordinate_distance_loss=0.0166`).
+- E42 continued through step 450 (`train_loss=6.1144`, `grad_norm=3.4824`)
+  and entered the final validation path, but no final validation row was
+  written after an extended wait. The process was stopped manually and the
+  pod was stopped at 2026-05-10 13:52 EDT. E42 is rejected: the Hodge residual
+  is a mild positive over E33-E41 but not strong enough to continue without a
+  better training/curriculum context.

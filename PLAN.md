@@ -7,13 +7,14 @@ should stop adding isolated side channels and re-center on the strongest
 observed branch: selected simplex boundary realization with MSA-to-face and
 auxiliary-weight annealing.
 
-E42 is the next architecture experiment. It keeps the topological
-justification and operates directly on boundary/co-boundary maps in the
-selected complex: lower face adjacency through shared boundary edges plus
-upper face adjacency through selected tetra cofaces. The goal is to improve
-the usable pair/single boundary messages rather than attach another scalar
-target or another weakly coupled cell type. Keep `EXPERIMENT_RESULTS.md` only
-for returned Runpod results.
+E42 showed a mild positive from a zero-parameter Hodge-style face residual,
+but not enough to keep as a standalone branch. The next move should combine
+the strongest known training context with the topological architecture signal:
+selected simplex boundary realization, MSA-to-face, auxiliary-weight annealing
+toward the E15 setting, and the Hodge residual as a small architectural prior.
+The goal is to test whether the Hodge residual helps when the loss/curriculum
+is in the best-known regime rather than the short-gate default. Keep
+`EXPERIMENT_RESULTS.md` only for returned Runpod results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired

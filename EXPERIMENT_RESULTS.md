@@ -59,3 +59,4 @@ recorded in the running notes for that run.
 | E39 outer-edge cell communication | stopped early | 250 | 0.2460 | 0.2460 | 0.2163 | 14.7805 | 6.7531 / 15.4034 | rejected |
 | E40 edge-frame scalarized messages | stopped early | 250 | 0.2350 | 0.2350 | 0.2139 | 15.2338 | 6.3502 / 15.4034 | rejected |
 | E41 latent rank-2 segment cells | stopped early | 250 | 0.2393 | 0.2393 | 0.2125 | 15.2012 | 6.2747 / 15.4034 | rejected |
+| E42 damped Hodge face residual | stopped early | 250 | 0.2545 | 0.2545 | 0.2112 | 14.7096 | 6.7897 / 15.4034 | rejected |
