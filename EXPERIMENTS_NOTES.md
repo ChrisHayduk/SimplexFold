@@ -1109,3 +1109,14 @@
   `simplex_aux_weight=0.5`. The run is rejected: fixed-strength flag closure
   was not enough to beat E42 and appears to over-suppress the sparse complex
   late in the gate.
+- E45 local implementation at 2026-05-10 15:23 EDT: add
+  `full_msa_to_face_flag_closure_soft` with the same soft flag-complex
+  construction as E44 but `simplex_boundary_closure_weight=0.1`. This is a
+  zero-parameter ablation to distinguish whether E44 failed because closure
+  is harmful or because a `0.5` mask blend suppresses selected cells too
+  strongly from step 1.
+- E45 local checks: `python -m py_compile scripts/run_nanofold_public_benchmarks.py`
+  passed; focused runner tests passed (`2 passed`); affected runner/trainer
+  tests passed (`82 passed`); full `python -m pytest -q` passed; `git diff
+  --check` passed. Parameter audit gives AF2-medium `3,106,642`,
+  SimplexFold `3,106,690`, and E45 soft flag closure `3,106,690`.

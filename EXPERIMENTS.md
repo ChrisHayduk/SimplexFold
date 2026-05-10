@@ -1366,3 +1366,21 @@ and radius of gyration `5.0536 / 15.4034`. This suggests the closure gate
 suppressed noisy higher-order cells, but also weakened the sparse complex too
 much for late structure expansion. If revisited, it should be staged or made
 temperature/weight-ramped rather than applied at fixed strength from step 1.
+
+### E45: Light Soft Flag-Complex Closure
+
+Status: implemented locally; planned for Runpod.
+
+Hypothesis: E44 may have failed because the closure gate was too strong from
+step 1, not because flag-complex closure is a bad topological prior. A much
+lighter blend should preserve most face/tetra messages while still gently
+downweighting open cells whose learned boundary 1-skeleton is implausible.
+
+Mechanism: add `full_msa_to_face_flag_closure_soft`, identical to E44 except
+`simplex_boundary_closure_weight=0.1` instead of `0.5`. This keeps the same
+zero-parameter flag-complex construction but reduces the maximum early mask
+suppression.
+
+Decision rule: run the same 500-step Runpod gate and E15-style auxiliary
+anneal as E44. Continue only if the lighter closure beats E44's step-250
+checkpoint and does not collapse the final checkpoint radius/lDDT.

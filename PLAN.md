@@ -1204,3 +1204,8 @@ E44 result update: fixed-strength flag closure is too suppressive by the end
 of the 500-step gate. If closure is revisited, ramp it in after the topology
 scorer has learned useful edges, or apply it only to the auxiliary realization
 losses rather than to the message-passing masks from step 1.
+
+Immediate E45 branch: run the same flag-complex idea at a much lighter mask
+blend (`0.1` instead of `0.5`). This tests whether the failure was the
+topological closure prior itself or simply too much early suppression of
+selected 2-/3-cells.

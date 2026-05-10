@@ -606,6 +606,16 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_boundary_closure_weight=0.5,
             simplex_boundary_closure_temperature=1.0,
         )
+    if variant == "full_msa_to_face_flag_closure_soft":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+            simplex_boundary_closure_weight=0.1,
+            simplex_boundary_closure_temperature=1.0,
+        )
     if variant == "full_msa_to_face_edge_frame_messages":
         return replace(
             base_config,
@@ -1279,6 +1289,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "full_msa_to_face_outer_edge",
             "full_msa_to_face_hodge_residual",
             "full_msa_to_face_flag_closure",
+            "full_msa_to_face_flag_closure_soft",
             "full_msa_to_face_edge_frame_messages",
             "full_msa_to_face_segment_cells",
             "face_structure_readout_only",
