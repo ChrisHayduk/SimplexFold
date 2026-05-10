@@ -42,3 +42,4 @@ recorded in the running notes for that run.
 | E26 MSA-to-face two-skeleton | completed | 250 | 0.2517 | 0.2489 | 0.2214 | 15.8143 | 5.9651 / 15.7622 | rejected |
 | E27 no recycled-coordinate topology | completed | 500 | 0.2369 | 0.2369 | 0.2354 | 16.3061 | 5.7967 / 15.7622 | rejected |
 | E28 topology teacher forcing 1.0->0.0 | completed | 500 | 0.2398 | 0.2398 | 0.2222 | 15.5485 | 6.1752 / 15.7622 | rejected |
+| E29 soft topology teacher forcing 0.25->0.0 | completed | 500 | 0.2451 | 0.2451 | 0.2169 | 15.4451 | 6.7226 / 15.7622 | rejected |

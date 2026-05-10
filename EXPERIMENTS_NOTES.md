@@ -460,3 +460,19 @@
 - E29 live plan: rerun the same topology-curriculum gate with a softer
   teacher blend, `simplex_topology_teacher_forcing_weight=0.25` annealed to
   `0.0` from step 250 to step 500.
+- E29 launched a fresh owned Runpod pod `p2roc93zgk4ho9`
+  (`codex-simplexfold-e29-runpod-20260510`) after both prior owned pods could
+  not restart due host GPU capacity. Only public processed features, public
+  processed labels, public train/val/all manifests, and the NanoFold metrics
+  package were transferred. Remote audit found no hidden or sidecar paths,
+  train/val/all counts were `10000/1000/11000`, official FoldScore import
+  worked, and the SimplexFold commit was `1531511`.
+- E29 completed and pod `p2roc93zgk4ho9` was stopped. Step 250 reached
+  `val_lddt_ca=0.2161`, FoldScore `0.2196`, `val_ca_drmsd=16.0005`,
+  `val_pred_ca_rg=5.5601`, and `val_true_ca_rg=15.4034`. Final step 500 was
+  `val_lddt_ca=0.2451`, FoldScore `0.2169`, `val_ca_drmsd=15.4451`,
+  `val_pred_ca_rg=6.7226`, and `val_true_ca_rg=15.7622`. Soft teacher forcing
+  is rejected.
+- E30 direction: add a simplex coupling warmup so selected face/tetra states
+  are trained by their auxiliary realization losses before their residual
+  messages are ramped back into pair/single streams at full strength.

@@ -810,7 +810,7 @@ topology is too disruptive for early validation geometry.
 
 ### E29: Soft Simplex Topology Teacher Forcing
 
-Status: ready for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E28 may have failed because full true-distance topology
 overrode the learned MSA/pair selector instead of stabilizing it. A small
@@ -825,3 +825,32 @@ boundary-distance weights and the `full_msa_to_face` architecture.
 Decision rule: use the same 500-step Runpod gate. Continue only if the soft
 teacher blend recovers above the E09/E15 early band or improves global scale
 without losing FoldScore.
+
+Result: reject. Step 250 improved over E28's full-teacher collapse but still
+reached only `val_lddt_ca=0.2161`, FoldScore `0.2196`,
+`val_ca_drmsd=16.0005`, and predicted/true C-alpha radius of gyration
+`5.5601 / 15.4034`. Final step 500 was `val_lddt_ca=0.2451`, FoldScore
+`0.2169`, `val_ca_drmsd=15.4451`, and radius of gyration
+`6.7226 / 15.7622`. A softer true-distance prior is less damaging than full
+teacher forcing, but it remains well below the E09/E15 early band.
+
+### E30: Simplex Coupling Warmup
+
+Status: design candidate.
+
+Hypothesis: teacher-forcing the selected complex did not help, while previous
+message-scale experiments showed strong coupling collapses and damping only
+partially recovers. The persistent simplex states may need to learn their
+selected patch/packing geometry before their boundary messages are allowed to
+drive pair and single representations.
+
+Mechanism: add an opt-in schedule for `simplex_pair_update_scale` and
+`simplex_single_update_scale` during training. Start simplex residual coupling
+near `0.0`, keep the selected face/tetra auxiliary realization losses active,
+and ramp coupling back to `1.0`. This is an architectural curriculum for how
+the learned 2-/3-simplex cells communicate with the AF2 1-skeleton and
+0-skeleton, not a new metric loss.
+
+Decision rule: implement narrowly and run a 500-step Runpod gate. Continue
+only if the warmup improves over the E09/E15 early band or preserves lDDT
+while materially improving global scale/FoldScore.

@@ -1,20 +1,19 @@
-## Current Plan: Soft Topology Teacher-Forcing
+## Current Plan: Simplex Coupling Warmup
 
-E21-E28 showed that message scaling, boundary-degree normalization, larger
+E21-E29 showed that message scaling, boundary-degree normalization, larger
 effective batch size, face-only 2-skeletons, removing recycled-coordinate
-topology, and full-strength topology teacher forcing do not break the lDDT
-plateau. Full teacher forcing severely hurt early validation geometry, which
-suggests replacing the learned selector with true-distance topology is too
-abrupt.
+topology, and both hard and soft topology teacher forcing do not break the
+lDDT plateau. Teacher-forced topology made early validation worse, so the
+selector alone is unlikely to be the only bottleneck.
 
-The current architecture-facing experiment is a soft training-only topology
-curriculum. Keep the same opt-in teacher-forcing implementation, but blend
-only a small true-distance prior into the learned MSA/pair selector and anneal
-it away. Validation and inference still use features only. This tests whether
-a light topological prior can stabilize sparse cell choice without overriding
-the learned selector, using no external data, hidden labels, templates, dense
-all-pairs metric losses, or extra parameters. Keep `EXPERIMENT_RESULTS.md`
-only for returned run results.
+The next architecture-facing direction is to warm up higher-order states
+before coupling them strongly back into the AF2 pair/single streams. Keep the
+selected face/tetra auxiliary realization losses active, but start
+simplex-to-pair and simplex-to-single residual updates near zero and ramp
+them toward the normal `1.0` coupling. This asks whether the explicit
+2-/3-simplex states need to learn useful patch/packing coordinates before
+their boundary messages perturb the trunk. Keep `EXPERIMENT_RESULTS.md` only
+for returned run results.
 
 Yes. With templates forbidden, the right construction is:
 
