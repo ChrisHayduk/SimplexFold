@@ -600,7 +600,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.msa_to_face_a = torch.nn.Linear(config.c_m, self.msa_to_face_rank, bias=False)
         self.msa_to_face_b = torch.nn.Linear(config.c_m, self.msa_to_face_rank, bias=False)
         self.msa_to_face_c = torch.nn.Linear(config.c_m, self.msa_to_face_rank, bias=False)
-        self.msa_to_face = SimplexMLP(self.msa_to_face_rank, self.hidden_dim, self.c_face, final_init="final")
+        self.msa_to_face = SimplexMLP(self.msa_to_face_rank, self.hidden_dim, self.c_face)
         init_linear(self.msa_to_face_a, init="default")
         init_linear(self.msa_to_face_b, init="default")
         init_linear(self.msa_to_face_c, init="default")

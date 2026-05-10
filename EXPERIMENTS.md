@@ -268,7 +268,7 @@ slow the useful structure expansion.
 
 ### E09: Full Simplex With MSA-to-Face Moment
 
-Status: implemented locally; queued for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: the explicit face states should be able to receive third-order
 evolutionary signals from the MSA, not only pair/single and recycled geometry
@@ -286,3 +286,28 @@ Initial Runpod test: use the E07 loss weights, but run
 
 Decision rule: keep only if it improves E07 best/final `val_lddt_ca` or
 improves early dRMSD/Rg without destabilizing FoldScore.
+
+Result: keep. The `full_msa_to_face` variant reached final and best
+`val_lddt_ca=0.3429`, final FoldScore `0.2689`, and final
+`val_ca_drmsd=12.9189`. It is the strongest Runpod result so far and supports
+the README's claim that MSA information can usefully interact with explicit
+face states.
+
+### E10: Warm-Started MSA-to-Face Moment
+
+Status: implemented locally; queued for Runpod.
+
+Hypothesis: E09 improved the final score even though the MSA-to-face residual
+projection still used zero final initialization. As with E03's boundary
+message warm start, the explicit MSA-to-face topological path may need a
+non-zero start to influence selected face states early enough.
+
+Mechanism: initialize the low-rank MSA-to-face projection with the standard
+SimplexMLP final initializer instead of the zero "final" initializer. This
+adds no parameters and only changes the active `full_msa_to_face` path.
+
+Initial Runpod test: repeat E09 with the E07 loss weights and
+`--variants full_msa_to_face`.
+
+Decision rule: keep only if it improves E09 best/final `val_lddt_ca` or
+improves early convergence without losing final FoldScore.

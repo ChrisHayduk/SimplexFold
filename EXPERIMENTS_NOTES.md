@@ -89,6 +89,7 @@
 | E05 coordinate weights 0.5 scaled | 3000 | 0.2948 | 0.2948 | 0.2647 |
 | E06 coordinate weights 1.0 scaled | 3000 | 0.3127 | 0.3127 | 0.2511 |
 | E07 boundary coordinate d=0.5 scaled | 2000 | 0.3247 | 0.3187 | 0.2617 |
+| E09 full MSA-to-face d=0.5 scaled | 3000 | 0.3429 | 0.3429 | 0.2689 |
 
 ## Scaled E03 Pilot
 
@@ -184,3 +185,14 @@
   path and directly tests the README's `MSA <-> sparse face tensor` claim.
 - E09 launched on pod `sytp4e4kjs7e61` at commit `680f68c` with the same
   scaled protocol and E07 loss weights, using `--variants full_msa_to_face`.
+- E09 completed on pod `sytp4e4kjs7e61`: final and best
+  `val_lddt_ca=0.3429`, final FoldScore `0.2689`, `val_ca_rmsd=15.0614`,
+  `val_ca_drmsd=12.9189`, `val_pred_ca_rg=8.6544`, and
+  `val_true_ca_rg=15.7622`.
+- E09 interpretation: activating the existing MSA-to-face topological pathway
+  improves over E07 and is now the strongest result, but the validation score
+  remains far from the `0.7` target.
+- E10 warms the MSA-to-face projection by switching its final initializer from
+  zero to the default SimplexMLP initializer, matching the E03 principle that
+  useful topology-mediated residual paths should not start as exact identity
+  updates.
