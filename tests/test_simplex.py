@@ -628,12 +628,20 @@ def test_simplex_shape_loss_is_local_rigid_motion_invariant():
     matching_terms = loss_fn({**base_prediction, "atom14_coords": matching_atom14}, true_ca, ca_mask)
     reflected_terms = loss_fn({**base_prediction, "atom14_coords": reflected_atom14}, true_ca, ca_mask)
     collapsed_terms = loss_fn({**base_prediction, "atom14_coords": collapsed_atom14}, true_ca, ca_mask)
+    learned_atom14 = collapsed_atom14.clone().requires_grad_(True)
+    learned_terms = loss_fn({**base_prediction, "atom14_coords": learned_atom14}, true_ca, ca_mask)
+    learned_loss = (
+        learned_terms["weighted_simplex_face_shape_loss"] + learned_terms["weighted_simplex_tetra_shape_loss"]
+    ).sum()
+    learned_loss.backward()
 
     assert matching_terms["simplex_face_shape_loss"].item() < 1e-6
     assert matching_terms["simplex_tetra_shape_loss"].item() < 1e-6
     assert reflected_terms["simplex_tetra_shape_loss"] > matching_terms["simplex_tetra_shape_loss"]
     assert collapsed_terms["simplex_face_shape_loss"] > matching_terms["simplex_face_shape_loss"]
     assert collapsed_terms["simplex_tetra_shape_loss"] > matching_terms["simplex_tetra_shape_loss"]
+    assert learned_atom14.grad is not None
+    assert torch.isfinite(learned_atom14.grad).all()
 
 
 def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():

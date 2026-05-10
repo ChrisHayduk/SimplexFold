@@ -14,6 +14,15 @@ vertex RMSD, so it is globally rigid-motion invariant and tied only to the
 sparse cell complex. Keep `EXPERIMENT_RESULTS.md` only for returned run
 results.
 
+The reference PDFs added in `references/papers/` sharpen the next branch of
+the plan. If E38 does not move the validation curve, prefer Topotein-inspired
+architecture changes over more scalar auxiliary losses: outer-edge style
+communication between selected cells, edge-frame scalarization for simplex
+messages, and possibly latent rank-2 segment cells built only from official
+inputs and recycled geometry. These keep the work in the topological view
+because they change how cochains on residues, edges, faces, and tetra-like
+cells exchange information.
+
 Yes. With templates forbidden, the right construction is:
 
 [

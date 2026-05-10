@@ -233,16 +233,21 @@ def _selected_simplex_shape_loss(
 
     pred_centered = pred_points - pred_points.mean(dim=-2, keepdim=True)
     true_centered = true_points - true_points.mean(dim=-2, keepdim=True)
-    covariance = torch.matmul(pred_centered.transpose(-1, -2), true_centered)
-    u, _, vh = torch.linalg.svd(covariance.to(torch.float32), full_matrices=False)
-    uvh = torch.matmul(u, vh)
-    correction = torch.ones(*covariance.shape[:-2], 3, device=pred_points.device, dtype=torch.float32)
-    correction[..., -1] = torch.where(
-        torch.linalg.det(uvh) < 0.0,
-        -1.0,
-        1.0,
-    )
-    rotation = torch.matmul(torch.matmul(u, torch.diag_embed(correction)), vh).to(pred_points.dtype)
+    with torch.no_grad():
+        covariance = torch.matmul(
+            pred_centered.detach().to(torch.float32).transpose(-1, -2),
+            true_centered.detach().to(torch.float32),
+        )
+        u, _, vh = torch.linalg.svd(covariance, full_matrices=False)
+        uvh = torch.matmul(u, vh)
+        correction = torch.ones(*covariance.shape[:-2], 3, device=pred_points.device, dtype=torch.float32)
+        correction[..., -1] = torch.where(
+            torch.linalg.det(uvh) < 0.0,
+            -1.0,
+            1.0,
+        )
+        rotation = torch.matmul(torch.matmul(u, torch.diag_embed(correction)), vh)
+    rotation = rotation.to(pred_points.dtype)
     aligned_pred = torch.matmul(pred_centered, rotation)
     squared_error = torch.sum((aligned_pred - true_centered) ** 2, dim=-1)
     cell_rmsd = torch.sqrt(squared_error.mean(dim=-1).clamp_min(0.0))

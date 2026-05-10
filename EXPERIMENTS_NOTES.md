@@ -778,3 +778,42 @@
   runner row typing. `python -m pyright --warnings` still fails broadly because
   this local interpreter does not resolve Torch/NumPy/Modal/OpenMM plus
   existing optional/type issues.
+- Reference PDFs saved for later use in `references/papers/`:
+  `hands_on_geometric_deep_learning_nodes_to_complexes.pdf` and
+  `2509.03885v1.pdf`. I read both extracted texts in full and visually skimmed
+  rendered page contact sheets. The hands-on TDL guide reinforces the basic
+  modeling discipline: topological models should explicitly construct domains,
+  maintain signals on multiple ranks, and use incidence/adjacency operators for
+  intra- and inter-neighborhood message passing. This supports keeping E38 tied
+  to selected cells rather than using a dense all-pairs lDDT-shaped objective.
+- The Topotein paper is directly relevant. Its Protein Combinatorial Complex
+  uses ranks for residues, directed interaction edges, secondary-structure
+  cells, and a protein-level cell; its TCPNet uses edge-centric local frames and
+  a bottom-up/down message order across ranks. Two lessons matter for
+  SimplexFold: first, topological enhancements are most useful when deeply
+  integrated into the architecture; second, superficial SSE/topology features
+  can hurt if higher-rank cells are not updated by dedicated neighborhoods.
+  Candidate follow-ups after E38 should therefore prioritize cell communication
+  and local-frame scalarization over additional standalone scalar losses.
+- E38 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 11:26 EDT
+  from SimplexFold commit `64a9598`. Remote audit before launch: branch
+  `codex/simplexfold-topology-e07-boundary-coordinate`, public train/val/all
+  counts `10000/1000/11000`, feature/label file counts `11001/11000`,
+  no hidden or sidecar data paths, no AppleDouble files, H100 CUDA available,
+  FoldScore import works, AF2-medium baseline `3,106,642`, E38
+  `full_msa_to_face` model `3,106,690`, `simplex_use_faces=True`,
+  `simplex_use_tetra=True`, `simplex_use_msa_to_face=True`,
+  `simplex_face_shape_weight=0.1`, `simplex_tetra_shape_weight=0.1`, within
+  the 5% AF2-medium budget. Run name: `e38_simplex_shape_s500_c256_m64`.
+- E38 first launch was stopped as invalid before validation. Step 1 was finite
+  and the shape losses were active, but by step 50 all reported losses were
+  `NaN`. The likely cause is backpropagation through SVD in the per-cell Kabsch
+  alignment when selected cells become near-degenerate early in training. Patch
+  direction: compute the proper Kabsch rotation under `no_grad` and backprop
+  only through the aligned predicted cell vertices, then relaunch as E38r2.
+- E38r2 local patch checks: `python -m py_compile minalphafold/simplex.py
+  minalphafold/losses.py minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py` passed; focused/affected tests
+  passed (`38 passed`), including a finite-gradient regression for collapsed
+  selected cells; full `python -m pytest` passed (`215 passed`); `git diff
+  --check` passed.

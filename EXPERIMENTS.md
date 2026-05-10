@@ -1125,3 +1125,72 @@ Decision rule: run a 500-step Runpod gate on the E09 selected-coordinate stack
 with MSA-to-face enabled and small face/tetra shape weights. Continue only if
 the local rigid-cell signal improves over the E33-E37 weak band and approaches
 the E22/E25 early range without losing FoldScore.
+
+First launch note: the initial E38 Runpod launch was stopped as invalid before
+validation after losses became `NaN` by step 50. The corrected E38r2 patch
+keeps the proper Kabsch alignment as a cell-local frame solve but computes the
+rotation without backpropagating through SVD, then backpropagates only through
+the aligned predicted vertices.
+
+### E39: Outer-Edge Cell Communication
+
+Status: idea from Topotein, not implemented.
+
+Hypothesis: Topotein argues that higher-rank protein cells need dedicated
+neighborhoods; simply attaching a cell feature to an otherwise pairwise model
+can be counterproductive. SimplexFold currently builds explicit selected faces
+and tetras, but the most useful cell-to-cell information may flow through
+boundary edges that leave one local cell and enter another, analogous to
+Topotein's outer-edge neighborhoods for secondary-structure cells.
+
+Mechanism: add a zero- or low-parameter message path that lets selected faces
+exchange information through shared or nearby boundary edges before writing
+back to pair/single states. Keep the construction based only on official MSA
+features, selected topology logits, and recycled coordinates. Do not use DSSP
+or external secondary-structure labels.
+
+Decision rule: gate only after E38 returns. Keep if explicit inter-cell
+communication improves the early validation band without increasing parameters
+outside the AF2-medium budget.
+
+### E40: Edge-Frame Scalarized Simplex Messages
+
+Status: idea from Topotein, not implemented.
+
+Hypothesis: Topotein's TCP module gets mileage from edge-centric local frames:
+vector information from higher-rank cells is scalarized in frames associated
+with directed edges. SimplexFold already has selected face normals and
+tetrahedral geometry, but most of this information is used as scalar targets or
+raw geometric features. Projecting face/tetra orientation signals into boundary
+edge frames may make higher-order messages more usable by the AF2-style pair
+stream.
+
+Mechanism: construct local frames from selected boundary edges using recycled
+C-alpha coordinates and add frame-projected face/tetra orientation features to
+the simplex geometry inputs or simplex-to-pair messages. This remains a
+topological architecture change because the frames live on the selected
+1-skeleton boundaries of the explicit cells.
+
+Decision rule: keep the parameter change near zero. Continue only if the
+frame-scalarized cell messages beat the E33-E38 weak band and preserve
+FoldScore.
+
+### E41: Latent Rank-2 Segment Cells
+
+Status: idea from Topotein, not implemented.
+
+Hypothesis: Topotein's strongest protein-specific inductive bias is a rank-2
+cell for secondary-structure-like groups. NanoFold official runs cannot use
+external DSSP or template-derived labels, but SimplexFold could learn latent
+rank-2 segment cells from sequence-local windows and recycled geometry. These
+would complement sparse triangular faces: faces capture three-residue patches,
+while segment cells capture longer contiguous local topology.
+
+Mechanism: add a small set of contiguous segment cells per crop, initialize
+them from MSA/single and local pair features, and let them exchange messages
+with selected faces/tetras through incidence-style residue and boundary-edge
+maps. Any auxiliary target must be derived only from NanoFold training labels
+or model predictions.
+
+Decision rule: treat this as a larger architecture experiment and run only
+after cheaper E38-E40 gates clarify whether explicit cell communication helps.
