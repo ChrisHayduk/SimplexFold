@@ -1293,3 +1293,26 @@ continued through step 450 and entered the final full-validation path, but no
 new validation row was written after an extended wait, so the process was
 stopped and the pod was shut down. Treat the zero-parameter Hodge residual as
 a weak positive diagnostic, not a keep.
+
+### E43: Hodge Residual With Auxiliary Anneal
+
+Status: planned for Runpod.
+
+Hypothesis: E42 shows the Hodge face residual is a mild positive architectural
+prior, while E15 shows that the selected-simplex auxiliary scaffold should be
+relaxed after it has helped face/tetra states learn geometry. Combining the
+zero-parameter Hodge residual with an E15-style auxiliary anneal may preserve
+the pair/single boundary-message benefit without overconstraining the
+structure module late in the short gate.
+
+Mechanism: run `full_msa_to_face_hodge_residual` with the same selected
+face/tetra coordinate and boundary-distance weights as E09/E15/E42. Add a
+short overall auxiliary-weight ramp from `simplex_aux_weight=1.0` to `0.5`
+over steps 250-500. This keeps the change in the topological view because the
+annealed terms are still the selected face/tetra/contact topology scaffold,
+not a dense lDDT-targeting loss.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with
+bounded 16-batch validation at the intermediate and final checkpoints. Keep
+only if the final/best validation point improves over E42 and approaches the
+E22/E25/E30 early range without a FoldScore or radius-of-gyration collapse.

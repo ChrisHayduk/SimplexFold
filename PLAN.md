@@ -7,14 +7,13 @@ should stop adding isolated side channels and re-center on the strongest
 observed branch: selected simplex boundary realization with MSA-to-face and
 auxiliary-weight annealing.
 
-E42 showed a mild positive from a zero-parameter Hodge-style face residual,
-but not enough to keep as a standalone branch. The next move should combine
-the strongest known training context with the topological architecture signal:
-selected simplex boundary realization, MSA-to-face, auxiliary-weight annealing
-toward the E15 setting, and the Hodge residual as a small architectural prior.
-The goal is to test whether the Hodge residual helps when the loss/curriculum
-is in the best-known regime rather than the short-gate default. Keep
-`EXPERIMENT_RESULTS.md` only for returned Runpod results.
+E43 combines the strongest known training context with the E42 topological
+architecture signal: selected simplex boundary realization, MSA-to-face,
+auxiliary-weight annealing toward the E15 setting, and the Hodge residual as a
+small architectural prior. The goal is to test whether the Hodge residual
+helps when the selected-simplex scaffold is relaxed during training rather
+than held at full strength. Keep `EXPERIMENT_RESULTS.md` only for returned
+Runpod results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired

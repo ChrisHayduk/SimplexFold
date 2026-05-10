@@ -1039,3 +1039,11 @@
   pod was stopped at 2026-05-10 13:52 EDT. E42 is rejected: the Hodge residual
   is a mild positive over E33-E41 but not strong enough to continue without a
   better training/curriculum context.
+- E43 plan at 2026-05-10 13:55 EDT: run the zero-parameter
+  `full_msa_to_face_hodge_residual` architecture inside the E15-style
+  selected-simplex scaffold relaxation. Keep selected face/tetra coordinate
+  weights at `1.0` and boundary-distance weights at `0.5`, but ramp only the
+  overall `simplex_aux_weight` from `1.0` to `0.5` over steps 250-500. Use
+  16-batch validation for both intermediate and final checkpoints so the
+  pilot returns promptly; do not write to `EXPERIMENT_RESULTS.md` until a
+  validation point returns.
