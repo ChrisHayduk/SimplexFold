@@ -87,6 +87,7 @@
 | E04 coordinate cells diagnostic | 1000 | 0.2200 | 0.2200 | 0.2422 |
 | E04 coordinate cells scaled | 1500 | 0.2394 | 0.1985 | 0.2399 |
 | E05 coordinate weights 0.5 scaled | 3000 | 0.2948 | 0.2948 | 0.2647 |
+| E06 coordinate weights 1.0 scaled | 3000 | 0.3127 | 0.3127 | 0.2511 |
 
 ## Scaled E03 Pilot
 
@@ -143,6 +144,14 @@
   radius of gyration. The run still remains far below the `0.7` target.
 - E06 launched on pod `sytp4e4kjs7e61` at commit `1b5fae3` with the same
   scaled protocol and both selected coordinate weights set to `1.0`.
+- E06 completed on pod `sytp4e4kjs7e61`: final and best
+  `val_lddt_ca=0.3127`, final FoldScore `0.2511`, `val_ca_rmsd=15.5934`,
+  `val_ca_drmsd=14.5496`, `val_pred_ca_rg=7.1388`, and
+  `val_true_ca_rg=15.7622`.
+- E06 interpretation: stronger selected face/tetra coordinate realization
+  improved final lDDT and dRMSD over E05 and opened the structure further,
+  but the radius-of-gyration gap remains large and the run is still far from
+  the `0.7` target.
 - E07 implemented selected simplex boundary-coordinate realization losses.
   The new losses supervise predicted C-alpha edge lengths only on boundary
   edges of the model-selected face/tetra cells, so the signal is mediated by
@@ -150,3 +159,6 @@
   Defaults are off unless the runner passes
   `--simplex-face-coordinate-distance-weight` or
   `--simplex-tetra-coordinate-distance-weight`.
+- E07 launched on pod `sytp4e4kjs7e61` at commit `b880e43` with the same
+  scaled protocol as E06, selected face/tetra coordinate weights set to
+  `1.0`, and selected boundary coordinate-distance weights set to `0.5`.

@@ -195,7 +195,7 @@ final `0.1985` and best `0.2394`.
 
 ### E06: Strong Selected-Cell Coordinate Realization
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E05 improved the full scaled curve without destabilizing training,
 so the coordinate-realization pressure may still be too weak relative to the
@@ -210,9 +210,14 @@ Decision rule: keep only if it improves over E05 on final `val_lddt_ca` or
 materially improves predicted C-alpha radius of gyration without a large
 FoldScore regression.
 
+Result: keep as the current reference. The `1.0` selected-coordinate weights
+reached final and best `val_lddt_ca=0.3127`, final FoldScore `0.2511`,
+final `val_ca_drmsd=14.5496`, and final predicted/true C-alpha radius of
+gyration `7.1388 / 15.7622`.
+
 ### E07: Selected Simplex Boundary Coordinate Realization
 
-Status: implemented locally; queued for Runpod after E06 finishes.
+Status: launched on Runpod.
 
 Hypothesis: E04-E06 show that selected face/tetra realization helps, but the
 model is still under-expanding the realized structure. Area, volume, and
@@ -225,9 +230,9 @@ lengths. For selected tetras, compare the six boundary edges. This is the
 metric 1-skeleton induced by `simplex_face_indices` and
 `simplex_tetra_indices`; it is not a generic all-pairs C-alpha loss.
 
-Initial Runpod test: use the same scaled protocol as E05/E06, keep
-`--simplex-face-coordinate-weight 0.5` and
-`--simplex-tetra-coordinate-weight 0.5`, and add
+Initial Runpod test: use the same scaled protocol as E05/E06, keep the E06
+selected area/volume/Rg weights with `--simplex-face-coordinate-weight 1.0`
+and `--simplex-tetra-coordinate-weight 1.0`, and add
 `--simplex-face-coordinate-distance-weight 0.5` plus
 `--simplex-tetra-coordinate-distance-weight 0.5`.
 
