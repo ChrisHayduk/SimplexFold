@@ -1,3 +1,17 @@
+## Current Plan: Boundary Incidence Normalization
+
+E21-E23 showed that scaling simplex messages is not enough: stronger coupling
+collapses global scale, damping mostly returns to the old early baseline, and
+edge-biased coupling also collapses. The next architectural/loss direction is
+therefore topology normalization rather than message amplitude.
+
+Implement and test degree-normalized selected boundary realization. Treat the
+selected face/tetra complex as a sparse chain complex whose boundary edges
+should be supervised without over-counting high-degree local edges. Keep the
+signal restricted to the boundary edges induced by selected simplex cells,
+leave parameter count unchanged, and use `EXPERIMENT_RESULTS.md` only for
+returned run results.
+
 Yes. With templates forbidden, the right construction is:
 
 [

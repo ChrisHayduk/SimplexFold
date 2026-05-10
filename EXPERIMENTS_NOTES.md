@@ -366,3 +366,12 @@
   selected or normalized.
 - After E21-E23, pod `0hesaxxfhq8soj` was stopped. Both owned Runpod pods
   (`sytp4e4kjs7e61` and `0hesaxxfhq8soj`) are stopped.
+- `EXPERIMENT_RESULTS.md` is now the durable returned-results tracker. Keep
+  live planning and in-flight notes here, and add a row to results only after
+  a Runpod experiment returns a final or early-stop validation point.
+- E24 live plan: add degree-normalized selected simplex boundary realization.
+  The current selected boundary losses count an edge once per incident
+  selected face/tetra; E24 weights boundary losses by inverse undirected edge
+  incidence so the selected cell complex supervises its 1-skeleton evenly
+  instead of over-weighting high-degree local edges. This is a simplicial
+  boundary-normalization change, not a dense all-pairs metric loss.

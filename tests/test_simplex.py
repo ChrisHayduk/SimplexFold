@@ -4,6 +4,7 @@ from minalphafold.evoformer import SimplicialEvoformer
 from minalphafold.simplex import (
     SimplexGeometryLoss,
     SimplicialAdapter,
+    _boundary_degree_weights,
     build_simplex_topology,
     face_geometry_features,
     tetra_geometry_features,
@@ -444,6 +445,21 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
     ]
     assert collapsed_terms["simplex_face_boundary_lddt_loss"] > matching_terms["simplex_face_boundary_lddt_loss"]
     assert collapsed_terms["simplex_tetra_boundary_lddt_loss"] > matching_terms["simplex_tetra_boundary_lddt_loss"]
+
+
+def test_boundary_degree_weights_normalize_repeated_edges():
+    edge_indices = torch.tensor(
+        [[[[[[0, 1], [0, 2], [1, 2]], [[0, 1], [0, 3], [1, 3]]]]]],
+        dtype=torch.long,
+    )
+    edge_mask = torch.ones(1, 1, 1, 2, 3)
+
+    weights = _boundary_degree_weights(edge_indices, edge_mask, num_residues=4)
+
+    assert weights.shape == edge_mask.shape
+    assert torch.allclose(weights[0, 0, 0, :, 0], torch.full((2,), 0.5))
+    assert torch.allclose(weights[0, 0, 0, :, 1:], torch.ones(2, 2))
+    assert torch.allclose(weights.sum(), torch.tensor(5.0))
 
 
 def test_simplex_geometry_loss_skips_disabled_tetra_heads():

@@ -529,6 +529,7 @@ def test_alphafold_loss_overrides_simplex_coordinate_weights():
         simplex_tetra_coordinate_weight=0.6,
         simplex_tetra_coordinate_distance_weight=0.65,
         simplex_tetra_boundary_lddt_weight=0.7,
+        simplex_boundary_degree_normalize=True,
     )
 
     assert loss_fn.simplex_geometry_loss.face_coordinate_weight == pytest.approx(0.4)
@@ -537,6 +538,7 @@ def test_alphafold_loss_overrides_simplex_coordinate_weights():
     assert loss_fn.simplex_geometry_loss.tetra_coordinate_weight == pytest.approx(0.6)
     assert loss_fn.simplex_geometry_loss.tetra_coordinate_distance_weight == pytest.approx(0.65)
     assert loss_fn.simplex_geometry_loss.tetra_boundary_lddt_weight == pytest.approx(0.7)
+    assert loss_fn.simplex_geometry_loss.boundary_degree_normalize is True
 
 
 def test_build_dataloader_can_fix_training_features(tmp_path):

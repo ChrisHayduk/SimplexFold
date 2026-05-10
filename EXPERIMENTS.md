@@ -658,3 +658,27 @@ coupling: `val_lddt_ca=0.2509`, FoldScore `0.2355`,
 `val_ca_drmsd=15.0561`, and predicted/true C-alpha radius of gyration
 `6.2181 / 15.4034`. Biasing the simplex pathway toward pair updates while
 damping single updates does not preserve global scale.
+
+### E24: Degree-Normalized Simplex Boundary Realization
+
+Status: ready for Runpod.
+
+Hypothesis: E19-E23 suggest the problem is not simply too little lDDT pressure
+or too weak simplex-to-trunk messages. The selected boundary losses currently
+count an edge once for every incident selected face or tetra. That topological
+multiplicity can over-weight local/high-degree boundary edges and encourage a
+compact structure that satisfies repeated short constraints while failing
+global scale. Normalizing by undirected boundary-edge incidence should make
+the selected complex supervise its 1-skeleton more evenly.
+
+Mechanism: add an opt-in `simplex_boundary_degree_normalize` loss flag. When
+enabled, selected face/tetra boundary distance, boundary lDDT, and distance
+head losses are weighted by inverse undirected edge degree within the selected
+cell complex. The supervision remains restricted to boundary edges induced by
+`simplex_face_indices` and `simplex_tetra_indices`; no dense all-pairs loss or
+new parameters are added.
+
+Decision rule: run the E09/E15 stack with selected coordinate and boundary
+distance weights, plus degree normalization. Continue past step 500 only if
+the run improves on the E09/E22 early band or materially improves predicted
+C-alpha radius of gyration without sacrificing FoldScore.

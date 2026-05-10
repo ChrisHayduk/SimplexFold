@@ -199,6 +199,29 @@ def _selected_boundary_lddt_loss(
     return (edge_loss * local_mask).sum(dim=reduce_dims) / local_mask.sum(dim=reduce_dims).clamp_min(1.0)
 
 
+def _boundary_degree_weights(
+    edge_indices: torch.Tensor,
+    edge_mask: torch.Tensor,
+    *,
+    num_residues: int,
+) -> torch.Tensor:
+    """Weight selected boundary edges by inverse undirected incidence degree."""
+
+    if edge_mask.numel() == 0:
+        return edge_mask
+    a, c = edge_indices.unbind(dim=-1)
+    lo = torch.minimum(a, c)
+    hi = torch.maximum(a, c)
+    edge_ids = lo * int(num_residues) + hi
+    batch = edge_indices.shape[0]
+    flat_ids = edge_ids.reshape(batch, -1)
+    flat_mask = edge_mask.reshape(batch, -1).to(edge_mask.dtype)
+    degree = edge_mask.new_zeros((batch, int(num_residues) * int(num_residues)))
+    degree.scatter_add_(1, flat_ids, flat_mask)
+    flat_degree = torch.gather(degree, 1, flat_ids).reshape_as(edge_mask)
+    return edge_mask / flat_degree.clamp_min(1.0)
+
+
 def _triangle_area(x_i: torch.Tensor, x_j: torch.Tensor, x_k: torch.Tensor) -> torch.Tensor:
     return 0.5 * _safe_norm(torch.cross(x_j - x_i, x_k - x_i, dim=-1))
 
@@ -995,6 +1018,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         tetra_distance_weight: float = 0.05,
         pair_face_consistency_weight: float = 0.02,
         face_tetra_consistency_weight: float = 0.02,
+        boundary_degree_normalize: bool = False,
         distance_scale: float = 32.0,
         volume_scale: float = 1000.0,
         area_scale: float = 300.0,
@@ -1015,6 +1039,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         self.tetra_distance_weight = tetra_distance_weight
         self.pair_face_consistency_weight = pair_face_consistency_weight
         self.face_tetra_consistency_weight = face_tetra_consistency_weight
+        self.boundary_degree_normalize = boundary_degree_normalize
         self.distance_scale = distance_scale
         self.volume_scale = volume_scale
         self.area_scale = area_scale
@@ -1133,6 +1158,20 @@ class SimplexGeometryLoss(torch.nn.Module):
                 target_face_distances = torch.log1p(true_face_distances) / distance_denom
                 pred_face_distances = torch.log1p(pred_face_distances_raw) / distance_denom
                 face_distance_valid = valid[..., None].expand_as(true_face_distances)
+                face_edge_indices = torch.stack(
+                    [
+                        torch.stack([i, j], dim=-1),
+                        torch.stack([i, k], dim=-1),
+                        torch.stack([j, k], dim=-1),
+                    ],
+                    dim=-2,
+                )
+                if self.boundary_degree_normalize:
+                    face_distance_valid = _boundary_degree_weights(
+                        face_edge_indices,
+                        face_distance_valid,
+                        num_residues=l,
+                    )
                 face_coordinate_loss = (
                     torch.nn.functional.smooth_l1_loss(pred_area_from_coords, target_area, reduction="none") * valid
                 ).sum(dim=(1, 2)) / valid.sum(dim=(1, 2)).clamp_min(1.0)
@@ -1168,6 +1207,16 @@ class SimplexGeometryLoss(torch.nn.Module):
                 face_distance_logits = prediction["simplex_face_distance_logits"]
                 target_bins = _distance_bin_indices(true_face_distances, n_bins=face_distance_logits.shape[-1])
                 distance_mask = valid[..., None].expand_as(true_face_distances)
+                if self.boundary_degree_normalize:
+                    face_edge_indices = torch.stack(
+                        [
+                            torch.stack([i, j], dim=-1),
+                            torch.stack([i, k], dim=-1),
+                            torch.stack([j, k], dim=-1),
+                        ],
+                        dim=-2,
+                    )
+                    distance_mask = _boundary_degree_weights(face_edge_indices, distance_mask, num_residues=l)
                 face_distance_loss = _masked_cross_entropy_from_bins(
                     face_distance_logits,
                     target_bins,
@@ -1307,6 +1356,23 @@ class SimplexGeometryLoss(torch.nn.Module):
                 target_tetra_distances = torch.log1p(true_tetra_distances) / distance_denom
                 pred_tetra_distances = torch.log1p(pred_tetra_distances_raw) / distance_denom
                 tetra_distance_valid = valid[..., None].expand_as(true_tetra_distances)
+                tetra_edge_indices = torch.stack(
+                    [
+                        torch.stack([i, j], dim=-1),
+                        torch.stack([i, k], dim=-1),
+                        torch.stack([i, l_idx], dim=-1),
+                        torch.stack([j, k], dim=-1),
+                        torch.stack([j, l_idx], dim=-1),
+                        torch.stack([k, l_idx], dim=-1),
+                    ],
+                    dim=-2,
+                )
+                if self.boundary_degree_normalize:
+                    tetra_distance_valid = _boundary_degree_weights(
+                        tetra_edge_indices,
+                        tetra_distance_valid,
+                        num_residues=l,
+                    )
                 tetra_coordinate_distance_loss = (
                     torch.nn.functional.smooth_l1_loss(
                         pred_tetra_distances,
@@ -1334,6 +1400,19 @@ class SimplexGeometryLoss(torch.nn.Module):
                 tetra_distance_logits = prediction["simplex_tetra_distance_logits"]
                 target_bins = _distance_bin_indices(true_tetra_distances, n_bins=tetra_distance_logits.shape[-1])
                 distance_mask = valid[..., None].expand_as(true_tetra_distances)
+                if self.boundary_degree_normalize:
+                    tetra_edge_indices = torch.stack(
+                        [
+                            torch.stack([i, j], dim=-1),
+                            torch.stack([i, k], dim=-1),
+                            torch.stack([i, l_idx], dim=-1),
+                            torch.stack([j, k], dim=-1),
+                            torch.stack([j, l_idx], dim=-1),
+                            torch.stack([k, l_idx], dim=-1),
+                        ],
+                        dim=-2,
+                    )
+                    distance_mask = _boundary_degree_weights(tetra_edge_indices, distance_mask, num_residues=l)
                 tetra_distance_loss = _masked_cross_entropy_from_bins(
                     tetra_distance_logits,
                     target_bins,
