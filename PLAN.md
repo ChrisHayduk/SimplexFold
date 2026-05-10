@@ -1,19 +1,19 @@
-## Current Plan: Simplex Coupling Warmup
+## Current Plan: Damped Simplex Coupling Follow-Up
 
-E21-E29 showed that message scaling, boundary-degree normalization, larger
+E21-E30 showed that message scaling, boundary-degree normalization, larger
 effective batch size, face-only 2-skeletons, removing recycled-coordinate
-topology, and both hard and soft topology teacher forcing do not break the
-lDDT plateau. Teacher-forced topology made early validation worse, so the
-selector alone is unlikely to be the only bottleneck.
+topology, teacher-forced topology, and a `0.0 -> 1.0` simplex-coupling warmup
+do not break the lDDT plateau. E30 did improve global expansion and dRMSD
+once coupling ramped up, but local lDDT remained below the E09/E15 band and
+runtime increased sharply when full simplex residual coupling entered the main
+structure-loss path.
 
-The next architecture-facing direction is to warm up higher-order states
-before coupling them strongly back into the AF2 pair/single streams. Keep the
-selected face/tetra auxiliary realization losses active, but start
-simplex-to-pair and simplex-to-single residual updates near zero and ramp
-them toward the normal `1.0` coupling. This asks whether the explicit
-2-/3-simplex states need to learn useful patch/packing coordinates before
-their boundary messages perturb the trunk. Keep `EXPERIMENT_RESULTS.md` only
-for returned run results.
+The next architecture-facing direction should preserve the useful part of E30
+while avoiding the full-coupling penalty: warm up selected face/tetra states
+and ramp their residual messages only to a damped target such as `0.5`. This
+tests whether explicit 2-/3-simplex states can act as a geometry scaffold for
+the AF2 1-skeleton without overpowering residue-local structure learning.
+Keep `EXPERIMENT_RESULTS.md` only for returned run results.
 
 Yes. With templates forbidden, the right construction is:
 

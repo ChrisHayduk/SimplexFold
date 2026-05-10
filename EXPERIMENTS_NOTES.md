@@ -500,3 +500,26 @@
   `--simplex-update-scale-ramp-steps 250`, 500 steps. Do not add E30 to
   `EXPERIMENT_RESULTS.md` until the run returns a final or early-stop
   validation point.
+- E30 launched on owned Runpod pod `p2roc93zgk4ho9`, reusing the fresh pod
+  created for E29 after restart. The pod was re-provisioned from an empty
+  workspace with only public processed features, public processed labels,
+  public train/val/all manifests, and the NanoFold metrics package. Remote
+  audit before launch: SimplexFold commit `6d66960`, train/val/all counts
+  `10000/1000/11000`, feature/label file counts `11001/11000`, no hidden or
+  sidecar data paths, H100 CUDA available, FoldScore import works, and
+  parameter count `3,106,690`.
+- E30 completed on owned pod `p2roc93zgk4ho9`, and the pod was stopped. Step
+  250 reached `val_lddt_ca=0.2411`, FoldScore `0.2168`,
+  `val_ca_drmsd=15.4721`, `val_pred_ca_rg=5.8110`, and
+  `val_true_ca_rg=15.4034` while `simplex_update_scale=0.0`. Final step 500,
+  after the ramp reached `1.0`, reached `val_lddt_ca=0.2854`, FoldScore
+  `0.2405`, `val_ca_drmsd=13.9247`, `val_pred_ca_rg=8.9047`, and
+  `val_true_ca_rg=16.3091`. The warmup improved global expansion and dRMSD
+  during the ramp but remained below the E09/E15 lDDT band, so E30 is
+  rejected. Runtime also increased sharply once simplex coupling entered the
+  main structure-loss path.
+- E31 live direction: reuse the E30 training-only coupling schedule but ramp
+  to a damped target, `simplex_update_scale_final=0.5`, rather than full
+  `1.0`. This follows E22's observation that damped simplex messages were
+  less damaging than strong coupling, while keeping E30's staged
+  higher-order-cell warmup.

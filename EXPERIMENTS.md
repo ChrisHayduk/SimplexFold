@@ -836,7 +836,7 @@ teacher forcing, but it remains well below the E09/E15 early band.
 
 ### E30: Simplex Coupling Warmup
 
-Status: implemented locally and queued for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: teacher-forcing the selected complex did not help, while previous
 message-scale experiments showed strong coupling collapses and damping only
@@ -862,3 +862,33 @@ boundary-distance weights, `--simplex-update-scale 0.0`,
 Decision rule: implement narrowly and run a 500-step Runpod gate. Continue
 only if the warmup improves over the E09/E15 early band or preserves lDDT
 while materially improving global scale/FoldScore.
+
+Result: reject. Step 250, before coupling had ramped up, reached
+`val_lddt_ca=0.2411`, FoldScore `0.2168`, `val_ca_drmsd=15.4721`, and
+predicted/true C-alpha radius of gyration `5.8110 / 15.4034`. After the
+scale ramp reached `1.0`, final step 500 improved global shape to
+`val_ca_drmsd=13.9247` and radius of gyration `8.9047 / 16.3091`, but local
+accuracy remained low at `val_lddt_ca=0.2854` with FoldScore `0.2405`. The
+warmup supports the idea that simplex coupling can help global expansion, but
+it does not break the lDDT plateau.
+
+### E31: Damped Simplex Coupling Warmup
+
+Status: design candidate.
+
+Hypothesis: E30 suggests that ramping simplex boundary messages into the AF2
+trunk can open the predicted structure, but full `1.0` coupling is too heavy
+and still underperforms the damped static-message pilot. A smaller coupling
+target may preserve the global-expansion benefit while reducing disruption to
+residue-local accuracy.
+
+Mechanism: reuse the E30 training-only coupling schedule, but ramp
+`simplex_update_scale` from `0.0` to `0.5` instead of `1.0`. Keep selected
+face/tetra coordinate and boundary-distance losses active. This remains a
+simplex communication curriculum: persistent 2-/3-simplex states learn their
+patch/packing geometry, then write a damped boundary message into pair/single
+states.
+
+Decision rule: run the same 500-step Runpod gate. Continue only if final
+`val_lddt_ca` exceeds E22/E25's early band or if it preserves comparable
+lDDT while improving dRMSD/FoldScore enough to justify a longer run.
