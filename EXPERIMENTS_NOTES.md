@@ -350,3 +350,11 @@
   and realization losses, but scale pair/single simplex residuals by `0.5`.
   This asks whether higher-order cells should be a softer topological scaffold
   rather than a strong residual driver of early coordinate formation.
+- E22 was stopped after step 500 on owned pod `0hesaxxfhq8soj`:
+  `val_lddt_ca=0.2917`, FoldScore `0.2458`, `val_ca_drmsd=14.4541`,
+  `val_pred_ca_rg=6.6487`, and `val_true_ca_rg=15.4034`. Damping recovers the
+  E09 early band but does not improve it.
+- E23 tests an edge-biased coupling split: scale the simplex-to-pair residual
+  up to `1.5` while damping the simplex-to-single residual to `0.5`. This
+  keeps the explicit higher-order cells active in the pair/edge 1-skeleton but
+  reduces direct residue-state pressure that may be collapsing coordinates.

@@ -608,7 +608,7 @@ structure formation in a harmful way.
 
 ### E22: Damped Simplex Boundary Messages
 
-Status: ready for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E21 shows the selected simplex messages are not merely too weak;
 amplifying them collapses global scale. The complementary topological question
@@ -625,3 +625,30 @@ it adds no parameters and introduces no new loss.
 Decision rule: stop early if step 500 remains below E09's early lDDT band.
 Continue if damping recovers or improves lDDT while increasing predicted
 C-alpha radius of gyration toward the true value.
+
+Result: reject. Step 500 recovered from E21 but did not improve over the
+useful early baselines: `val_lddt_ca=0.2917`, FoldScore `0.2458`,
+`val_ca_drmsd=14.4541`, and predicted/true C-alpha radius of gyration
+`6.6487 / 15.4034`. Damping both pair and single simplex residuals is safer
+than amplifying them, but it does not make the selected complex more useful
+than E09.
+
+### E23: Edge-Biased Simplex Messages
+
+Status: ready for Runpod.
+
+Hypothesis: E21 and E22 suggest that the direct simplex-to-single update is a
+likely source of early coordinate-scale collapse, while the pair stream is the
+natural 1-skeleton boundary representation that face/tetra cells should refine.
+The higher-order states may be useful if their signal is routed mainly through
+pair/edge geometry before the structure module converts it into coordinates.
+
+Mechanism: add `full_msa_to_face_edge_messages`, keeping the E09 selected
+complex and MSA-to-face path but setting `simplex_pair_update_scale=1.5` and
+`simplex_single_update_scale=0.5`. This biases learned face/tetra boundary
+messages toward pair/edge updates and dampens direct residue-state forcing. It
+adds no parameters and no new objective.
+
+Decision rule: use the same step-500 gate. Continue only if the edge-biased
+coupling beats E09/E22 on lDDT or recovers a substantially better radius of
+gyration without losing FoldScore.
