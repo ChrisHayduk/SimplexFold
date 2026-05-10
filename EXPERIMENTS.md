@@ -1296,7 +1296,7 @@ a weak positive diagnostic, not a keep.
 
 ### E43: Hodge Residual With Auxiliary Anneal
 
-Status: planned for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E42 shows the Hodge face residual is a mild positive architectural
 prior, while E15 shows that the selected-simplex auxiliary scaffold should be
@@ -1316,3 +1316,15 @@ Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with
 bounded 16-batch validation at the intermediate and final checkpoints. Keep
 only if the final/best validation point improves over E42 and approaches the
 E22/E25/E30 early range without a FoldScore or radius-of-gyration collapse.
+
+Result: reject. E43 verified that the auxiliary-weight anneal was applied to
+the selected-simplex scaffold: `simplex_aux_weight` was `1.0` through step
+250, then ramped to `0.5` by step 500. Validation improved during the anneal
+from `val_lddt_ca=0.2388`, FoldScore `0.2120`, and
+`val_ca_drmsd=15.0913` at step 250 to `val_lddt_ca=0.2492`, FoldScore
+`0.2232`, and `val_ca_drmsd=15.1139` at step 500, with predicted/true
+C-alpha radius of gyration `6.1772 / 15.4034`. This did not beat E42 and did
+not approach the E22/E25/E30 early range. The result argues that the Hodge
+face residual is not enough on its own; the next iteration should improve
+how the sparse complex is constructed or realized before adding more
+downstream structure conditioning.

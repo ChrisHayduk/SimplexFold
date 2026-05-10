@@ -1047,3 +1047,23 @@
   16-batch validation for both intermediate and final checkpoints so the
   pilot returns promptly; do not write to `EXPERIMENT_RESULTS.md` until a
   validation point returns.
+- E43 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 14:28 EDT
+  from SimplexFold commit `bb17c86`. The first staging attempt produced
+  macOS AppleDouble sidecars, so it was interrupted and restarted with
+  `COPYFILE_DISABLE=1`. Remote audit for the clean staging pass: public
+  train/val/all counts `10000/1000/11000`, feature/label `.npz` counts
+  `11000/11000`, no hidden, sidecar, or `.DS_Store` paths, H100 CUDA
+  available, FoldScore import works, AF2-medium `3,106,642`, SimplexFold and
+  E43 Hodge residual `3,106,690`, `simplex_hodge_face_update_scale=0.25`,
+  within the 5% AF2-medium budget. Run name:
+  `e43_hodge_aux_anneal_s500_c256_m64`.
+- E43 completed and the owned Runpod pod was stopped at 2026-05-10
+  14:38 UTC. Step 250 reached `val_lddt_ca=0.2388`, FoldScore `0.2120`,
+  `val_ca_drmsd=15.0913`, `val_pred_ca_rg=6.5181`, and
+  `val_true_ca_rg=15.4034` with `simplex_aux_weight=1.0`. The anneal was
+  active afterward: steps 300/350/400/450/500 recorded
+  `simplex_aux_weight=0.9/0.8/0.7/0.6/0.5`. Step 500 reached
+  `val_lddt_ca=0.2492`, FoldScore `0.2232`, `val_ca_drmsd=15.1139`,
+  `val_pred_ca_rg=6.1772`, and `val_true_ca_rg=15.4034`. The run is rejected:
+  the anneal improved the E43 checkpoint internally but still trailed E42 and
+  the stronger E22/E25/E30 early range.

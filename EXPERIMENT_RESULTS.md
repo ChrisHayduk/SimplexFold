@@ -60,3 +60,4 @@ recorded in the running notes for that run.
 | E40 edge-frame scalarized messages | stopped early | 250 | 0.2350 | 0.2350 | 0.2139 | 15.2338 | 6.3502 / 15.4034 | rejected |
 | E41 latent rank-2 segment cells | stopped early | 250 | 0.2393 | 0.2393 | 0.2125 | 15.2012 | 6.2747 / 15.4034 | rejected |
 | E42 damped Hodge face residual | stopped early | 250 | 0.2545 | 0.2545 | 0.2112 | 14.7096 | 6.7897 / 15.4034 | rejected |
+| E43 Hodge residual aux anneal | completed | 500 | 0.2492 | 0.2492 | 0.2232 | 15.1139 | 6.1772 / 15.4034 | rejected |

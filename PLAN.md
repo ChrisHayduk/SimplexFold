@@ -1183,3 +1183,12 @@ Iteration ladder:
     selected sparse face complex.
 14. Promote only changes that pass parameter-budget tests and at least a
     NanoFold smoke/short-run comparison.
+
+Current direction after E43: the zero-parameter Hodge residual and auxiliary
+anneal did not recover the stronger early-validation band. Treat this as
+evidence that downstream face-state smoothing is less important than the
+construction and realization of the selected sparse complex. The next branch
+should change the selected 2-/3-cell construction or boundary realization
+itself, using topological operators or incidence-aware curricula from the
+reference PDFs, before spending parameter budget on additional structure
+readouts.
