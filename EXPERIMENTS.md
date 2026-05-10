@@ -635,7 +635,7 @@ than E09.
 
 ### E23: Edge-Biased Simplex Messages
 
-Status: ready for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E21 and E22 suggest that the direct simplex-to-single update is a
 likely source of early coordinate-scale collapse, while the pair stream is the
@@ -652,3 +652,9 @@ adds no parameters and no new objective.
 Decision rule: use the same step-500 gate. Continue only if the edge-biased
 coupling beats E09/E22 on lDDT or recovers a substantially better radius of
 gyration without losing FoldScore.
+
+Result: reject. Step 500 was worse than both E09 and the fully damped E22
+coupling: `val_lddt_ca=0.2509`, FoldScore `0.2355`,
+`val_ca_drmsd=15.0561`, and predicted/true C-alpha radius of gyration
+`6.2181 / 15.4034`. Biasing the simplex pathway toward pair updates while
+damping single updates does not preserve global scale.

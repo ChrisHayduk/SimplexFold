@@ -358,3 +358,11 @@
   up to `1.5` while damping the simplex-to-single residual to `0.5`. This
   keeps the explicit higher-order cells active in the pair/edge 1-skeleton but
   reduces direct residue-state pressure that may be collapsing coordinates.
+- E23 was stopped after step 500 on owned pod `0hesaxxfhq8soj`:
+  `val_lddt_ca=0.2509`, FoldScore `0.2355`, `val_ca_drmsd=15.0561`,
+  `val_pred_ca_rg=6.2181`, and `val_true_ca_rg=15.4034`. Edge-biased simplex
+  coupling is worse than damping both streams, so the message-scale direction
+  is not a promising path without a more structural change to how cells are
+  selected or normalized.
+- After E21-E23, pod `0hesaxxfhq8soj` was stopped. Both owned Runpod pods
+  (`sytp4e4kjs7e61` and `0hesaxxfhq8soj`) are stopped.
