@@ -45,3 +45,4 @@ recorded in the running notes for that run.
 | E29 soft topology teacher forcing 0.25->0.0 | completed | 500 | 0.2451 | 0.2451 | 0.2169 | 15.4451 | 6.7226 / 15.7622 | rejected |
 | E30 simplex coupling warmup 0.0->1.0 | completed | 500 | 0.2854 | 0.2854 | 0.2405 | 13.9247 | 8.9047 / 16.3091 | rejected |
 | E31 damped simplex coupling warmup 0.0->0.5 | completed | 500 | 0.2578 | 0.2578 | 0.2332 | 14.7889 | 8.9024 / 16.3091 | rejected |
+| E32 topology-plus aux anneal | stopped early | 250 | 0.2545 | 0.2545 | 0.2059 | 14.2821 | 7.2877 / 15.4034 | rejected |

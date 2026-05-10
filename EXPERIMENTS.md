@@ -903,7 +903,7 @@ worsened, so coupling warmups are not the next promising direction.
 
 ### E32: Topology Capacity With Auxiliary Anneal
 
-Status: design candidate.
+Status: stopped early on Runpod.
 
 Hypothesis: E18 showed that spending the allowed parameter headroom on
 simplex-only face/tetra capacity was competitive, while E15 showed that
@@ -921,3 +921,37 @@ dense all-pairs metric.
 Decision rule: use a 500-step Runpod gate first. Continue only if it beats the
 E18/E25 early band or materially improves FoldScore/dRMSD without losing
 lDDT.
+
+Result: reject. The run was stopped early at step 250 after reaching only
+`val_lddt_ca=0.2545`, FoldScore `0.2059`, `val_ca_drmsd=14.2821`, and
+predicted/true C-alpha radius of gyration `7.2877 / 15.4034`. The
+topology-plus profile remained within the 5% AF2-medium parameter budget
+(`3,256,126` versus AF2-medium `3,106,642`), but combining extra persistent
+face/tetra capacity with E15-style auxiliary annealing did not recover the
+E18/E25 early band and weakened FoldScore. Capacity plus auxiliary anneal is
+therefore not the next scaling path.
+
+### E33: Simplicial Structure Readout
+
+Status: design candidate.
+
+Hypothesis: E30/E31 showed that simplex boundary messages can improve global
+expansion but disrupt local lDDT, while E32 showed that adding persistent
+face/tetra capacity does not help if the states still influence the model
+mainly through the same trunk-level residual path. The higher-order cells may
+be learning useful local patch/packing information but writing it into the
+wrong place.
+
+Mechanism: add a small gated readout from selected face/tetra states into the
+structure input. Pool each learned face/tetra state back onto its boundary
+residues and/or boundary edges, then project that summary into the structure
+module's single/pair conditioning. This keeps the change simplicial: the
+model realizes coordinates from the boundary summaries of its own sparse
+2-/3-simplex complex rather than adding a generic dense coordinate loss or
+widening the AF2 trunk.
+
+Decision rule: keep the AF2-medium trunk fixed and stay within the 5%
+parameter budget. First run a short Runpod gate using the E09 selected
+coordinate and boundary-distance losses. Continue only if the new readout
+preserves at least the E22/E25 early lDDT band while improving FoldScore or
+global scale.

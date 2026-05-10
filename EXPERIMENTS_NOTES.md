@@ -544,3 +544,25 @@
   with the best curriculum result (E15 auxiliary scaffold annealed to `0.5`).
   This stays within the simplex view: spend the allowed headroom on persistent
   face/tetra state capacity, then relax selected-cell auxiliary pressure.
+- E32 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 07:19 EDT.
+  The restarted workspace was re-provisioned with only public processed
+  features, public processed labels, public train/val/all manifests, and the
+  NanoFold metrics package. Remote audit before launch: SimplexFold commit
+  `3f21b94`, train/val/all counts `10000/1000/11000`, feature/label file
+  counts `11001/11000`, no hidden or sidecar data paths, H100 CUDA available,
+  FoldScore import works, AF2-medium baseline parameter count `3,106,642`,
+  topology-plus parameter count `3,256,126`, and the topology-plus profile is
+  within the 5% AF2-medium budget.
+- E32 was stopped early on owned Runpod pod `p2roc93zgk4ho9`, and the pod was
+  stopped. Step 250 reached only `val_lddt_ca=0.2545`, FoldScore `0.2059`,
+  `val_ca_drmsd=14.2821`, `val_pred_ca_rg=7.2877`, and
+  `val_true_ca_rg=15.4034`. The topology-plus capacity profile combined with
+  E15-style auxiliary annealing underperformed the E18/E25 early band and did
+  not improve FoldScore enough to justify waiting for the full 500-step
+  final validation. E32 is rejected.
+- E33 direction: stop trying to improve the selected simplex scaffold through
+  stronger auxiliary/coupling schedules alone. The next topological change
+  should change the readout path: let persistent face/tetra states contribute
+  a small gated boundary summary directly to the structure input, so the
+  learned 2-/3-cells influence coordinate generation as realized cells rather
+  than only as repeated residual perturbations to the AF2 pair/single trunk.

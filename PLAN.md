@@ -1148,5 +1148,11 @@ Iteration ladder:
    boundary edges. This is not a dense all-pairs lDDT objective; it asks the
    learned sparse cell complex to realize its own 1-skeleton accurately under
    the same local-distance tolerances used by C-alpha lDDT.
-10. Promote only changes that pass parameter-budget tests and at least a
+10. If simplex capacity, auxiliary schedules, and coupling warmups remain
+    below the E09/E15 band, change the readout path rather than adding more
+    scalar loss pressure. Pool persistent face/tetra states back to their
+    boundary residues/edges and gate that summary into the structure input, so
+    coordinates are generated from realized 2-/3-cells instead of only from
+    residual perturbations to the AF2 trunk.
+11. Promote only changes that pass parameter-budget tests and at least a
    NanoFold smoke/short-run comparison.
