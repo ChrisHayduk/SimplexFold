@@ -320,7 +320,7 @@ initializer used by E09.
 
 ### E11: Long-Range Full MSA-to-Face Simplex Topology
 
-Status: launched on Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E09 is the strongest result, but the sparse complex still starts
 from a topology selector with a very strong local-neighborhood bias. That can
@@ -338,3 +338,24 @@ selected-boundary loss weights, but run
 
 Decision rule: keep only if it improves E09 best/final `val_lddt_ca` or
 improves radius-of-gyration/global geometry without a FoldScore regression.
+
+Result: reject. The step-500 validation point regressed to
+`val_lddt_ca=0.2288`, FoldScore `0.2244`, and predicted C-alpha radius of
+gyration `6.0858`. The explicit long-range bias appears to choose harmful
+nonlocal cells before the topology scorer is reliable.
+
+### E12: Continue Best Full MSA-to-Face Run
+
+Status: launched on Runpod.
+
+Hypothesis: E09 improved through the final 3000-step checkpoint, so the best
+topology/loss stack may still be undertrained rather than architecture-limited
+at the current protocol length.
+
+Mechanism: resume E09's `full_msa_to_face` checkpoint from step 3000 and
+continue the same Runpod protocol to step 6000. This does not change
+parameters or data; it tests whether the current SimplexFold stack can keep
+improving under the same sparse face/tetra/MSA objective.
+
+Decision rule: keep as the new reference if it improves E09 final
+`val_lddt_ca=0.3429` without a severe FoldScore regression.

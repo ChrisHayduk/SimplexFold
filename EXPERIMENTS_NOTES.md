@@ -212,3 +212,10 @@
 - E11 launched on pod `sytp4e4kjs7e61` at commit `91445a8`, using
   `--variants full_msa_to_face_long` with the E07/E09 selected-coordinate
   and selected-boundary loss weights.
+- E11 was stopped early after the step-500 validation point regressed to
+  `val_lddt_ca=0.2288`, FoldScore `0.2244`, `val_ca_drmsd=15.2809`, and
+  `val_pred_ca_rg=6.0858`. A direct long-range topology bias is harmful under
+  the current selector and loss settings.
+- E12 launched on pod `sytp4e4kjs7e61` at commit `14e14e2`, resuming E09's
+  `full_msa_to_face` checkpoint from step 3000 and continuing the same
+  scaled protocol to step 6000.
