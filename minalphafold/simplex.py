@@ -650,6 +650,45 @@ def face_outer_edge_delta(
     return (face_outer_mean - face_state) * has_neighbor * face_mask[..., None]
 
 
+def face_tetra_coboundary_delta(
+    face_state: torch.Tensor,
+    face_mask: torch.Tensor,
+    tetra_face_slots: torch.Tensor,
+    tetra_mask: torch.Tensor,
+) -> torch.Tensor:
+    """Average sibling face states through selected tetra cofaces."""
+
+    if face_state.numel() == 0 or tetra_face_slots.numel() == 0 or tetra_mask.numel() == 0:
+        return torch.zeros_like(face_state)
+
+    b, l, _, c_face = face_state.shape
+    num_tetra = tetra_face_slots.shape[0]
+    face_slot_ids = tetra_face_slots.reshape(1, 1, num_tetra, 3).expand(b, l, -1, -1)
+    flat_face_slots = face_slot_ids.reshape(b, l, -1)
+    gathered_face = face_state.gather(
+        2,
+        flat_face_slots[..., None].expand(-1, -1, -1, c_face),
+    ).reshape(b, l, num_tetra, 3, c_face)
+    gathered_face_mask = face_mask.gather(2, flat_face_slots).reshape(b, l, num_tetra, 3)
+    incident_mask = gathered_face_mask.to(face_state.dtype) * tetra_mask[..., None].to(face_state.dtype)
+
+    tetra_face_sum = (gathered_face * incident_mask[..., None]).sum(dim=-2, keepdim=True)
+    tetra_face_count = incident_mask.sum(dim=-1, keepdim=True)
+    sibling_count = (tetra_face_count - incident_mask).clamp_min(0.0)
+    sibling_sum = tetra_face_sum - gathered_face * incident_mask[..., None]
+    sibling_mean = sibling_sum / sibling_count[..., None].clamp_min(1.0)
+    has_sibling = (sibling_count > 0).to(face_state.dtype) * incident_mask
+    sibling_update = (sibling_mean - gathered_face) * has_sibling[..., None]
+
+    flat_updates = sibling_update.reshape(b, l, -1, c_face)
+    flat_counts = has_sibling.reshape(b, l, -1, 1)
+    delta = torch.zeros_like(face_state)
+    counts = face_state.new_zeros(*face_state.shape[:-1], 1)
+    delta.scatter_add_(2, flat_face_slots[..., None].expand(-1, -1, -1, c_face), flat_updates)
+    counts.scatter_add_(2, flat_face_slots[..., None], flat_counts)
+    return (delta / counts.clamp_min(1.0)) * face_mask[..., None]
+
+
 FACE_EDGE_FRAME_DIM = 10
 TETRA_EDGE_FRAME_DIM = 18
 SEGMENT_GEOMETRY_DIM = 4
@@ -958,6 +997,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.single_update_scale = float(getattr(config, "simplex_single_update_scale", 1.0))
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
+        self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
         self.edge_frame_message_scale = float(getattr(config, "simplex_edge_frame_message_scale", 0.0))
         self.segment_cell_scale = float(getattr(config, "simplex_segment_cell_scale", 0.0))
         self.segment_radius = int(getattr(config, "simplex_segment_radius", 4))
@@ -1176,6 +1216,32 @@ class SimplicialAdapter(torch.nn.Module):
             )
             face_state = face_state + self.dropout(
                 self.outer_edge_update_scale * torch.sigmoid(self.face_gate(face_state)) * outer_msg
+            )
+            face_state = face_state * topology.face_mask[..., None]
+        if self.hodge_face_update_scale > 0.0:
+            hodge_parts = [
+                face_outer_edge_delta(
+                    face_state,
+                    face_indices,
+                    topology.face_mask,
+                    num_residues=pair.shape[1],
+                )
+            ]
+            if self.use_tetra and topology.tetra_indices.shape[2] > 0:
+                hodge_parts.append(
+                    face_tetra_coboundary_delta(
+                        face_state,
+                        topology.face_mask,
+                        topology.tetra_face_slots,
+                        topology.tetra_mask,
+                    )
+                )
+            hodge_msg = sum(hodge_parts) / float(len(hodge_parts))
+            face_state = face_state + self.dropout(
+                self.hodge_face_update_scale
+                * torch.sigmoid(self.face_gate(face_state))
+                * hodge_msg
+                * topology.face_mask[..., None]
             )
             face_state = face_state * topology.face_mask[..., None]
 

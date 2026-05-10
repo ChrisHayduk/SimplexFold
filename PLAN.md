@@ -7,13 +7,13 @@ should stop adding isolated side channels and re-center on the strongest
 observed branch: selected simplex boundary realization with MSA-to-face and
 auxiliary-weight annealing.
 
-The next architecture experiment should keep the topological justification but
-operate directly on the boundary/co-boundary maps that already helped: learned
-degree-normalized Hodge-style residuals on the selected 1-/2-/3-cell complex,
-or a smaller damped version of those residuals added to the E09/E15 stack.
-The goal is to improve the usable pair/single boundary messages rather than
-attach another scalar target or another weakly coupled cell type. Keep
-`EXPERIMENT_RESULTS.md` only for returned Runpod results.
+E42 is the next architecture experiment. It keeps the topological
+justification and operates directly on boundary/co-boundary maps in the
+selected complex: lower face adjacency through shared boundary edges plus
+upper face adjacency through selected tetra cofaces. The goal is to improve
+the usable pair/single boundary messages rather than attach another scalar
+target or another weakly coupled cell type. Keep `EXPERIMENT_RESULTS.md` only
+for returned Runpod results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired

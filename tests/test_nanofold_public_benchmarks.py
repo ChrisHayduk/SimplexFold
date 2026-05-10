@@ -183,6 +183,25 @@ def test_full_msa_to_face_segment_cells_variant_is_accepted_by_cli_parser():
     assert args.variants == ["full_msa_to_face_segment_cells"]
 
 
+def test_full_msa_to_face_hodge_residual_adds_zero_parameter_face_laplacian():
+    cfg = _variant_config(
+        load_model_config("simplexfold_medium_param_matched"),
+        "full_msa_to_face_hodge_residual",
+    )
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_hodge_face_update_scale == 0.25
+
+
+def test_full_msa_to_face_hodge_residual_variant_is_accepted_by_cli_parser():
+    args = parse_args(["--variants", "full_msa_to_face_hodge_residual"])
+
+    assert args.variants == ["full_msa_to_face_hodge_residual"]
+
+
 def test_structure_readout_only_variant_is_accepted_by_cli_parser():
     args = parse_args(["--variants", "full_msa_to_face_structure_readout_only"])
 

@@ -1252,3 +1252,35 @@ Result: reject. E41 was stable but weak at the first validation point: step
 `6.2747 / 15.4034`. The selected-coordinate terms were active, but the latent
 segment cells did not improve over E39/E40 or the older E22/E25/E30 early
 range.
+
+### E42: Damped Hodge Face Residual
+
+Status: implemented locally and queued for Runpod.
+
+Hypothesis: E39's lower face adjacency through shared boundary edges was too
+weak on its own, and E40/E41 added side channels that did not improve the pair
+stream. A better topological intervention is to update selected face cochains
+with a small Hodge-style residual before face/tetra states write back into the
+AF2 pair and single streams. The residual combines lower adjacency through
+shared selected boundary edges with upper adjacency through selected tetra
+cofaces.
+
+Mechanism: add `simplex_hodge_face_update_scale` and the
+`full_msa_to_face_hodge_residual` benchmark variant. The lower term reuses the
+shared-boundary-edge face delta from E39. The upper term gathers the three
+selected anchored faces incident on each selected tetra, averages sibling
+face states within each coface, scatters those co-boundary messages back to
+face slots with degree normalization, and applies a gated face-state residual.
+This adds no parameters and does not add a new loss; it changes message
+passing on the selected 2-/3-cell complex itself.
+
+Local validation: focused tests pass for tetra co-boundary averaging, adapter
+output changes without parameter growth, CLI parser acceptance, and zero
+parameter budget. Parameter audit gives AF2-medium `3,106,642`, SimplexFold
+`3,106,690`, and E42 Hodge residual `3,106,690`, within the 5% AF2-medium
+budget.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with the
+current selected-coordinate stack. Continue only if the first validation point
+beats the E33-E41 weak band or at least recovers the stronger E22/E25/E30
+early range while preserving FoldScore and radius-of-gyration behavior.

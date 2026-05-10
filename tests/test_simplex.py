@@ -8,6 +8,7 @@ from minalphafold.simplex import (
     build_simplex_topology,
     face_edge_frame_features,
     face_outer_edge_delta,
+    face_tetra_coboundary_delta,
     face_geometry_features,
     segment_cell_indices,
     segment_geometry_features,
@@ -60,6 +61,7 @@ class SimplexConfig:
     simplex_single_transition_n = 2
     simplex_structure_readout_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
+    simplex_hodge_face_update_scale = 0.0
     simplex_edge_frame_message_scale = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
@@ -232,6 +234,53 @@ def test_outer_edge_adapter_scale_changes_outputs_without_new_parameters():
     pair = torch.randn(1, 5, 5, OuterEdgeConfig.c_z)
     pair = 0.5 * (pair + pair.transpose(1, 2))
     single = torch.randn(1, 5, OuterEdgeConfig.c_s)
+
+    off_params = sum(p.numel() for p in off_adapter.parameters())
+    on_params = sum(p.numel() for p in on_adapter.parameters())
+    off_pair, off_single, _ = off_adapter(pair, single)
+    on_pair, on_single, _ = on_adapter(pair, single)
+
+    assert on_params == off_params
+    assert not torch.allclose(on_pair, off_pair)
+    assert not torch.allclose(on_single, off_single)
+
+
+def test_face_tetra_coboundary_delta_uses_sibling_faces_in_selected_tetras():
+    face_state = torch.tensor([[[[1.0, 0.0], [3.0, 0.0], [7.0, 0.0], [11.0, 0.0]]]])
+    face_mask = torch.ones(1, 1, 4)
+    tetra_face_slots = torch.tensor([[0, 1, 2], [0, 2, 3]], dtype=torch.long)
+    tetra_mask = torch.ones(1, 1, 2)
+
+    delta = face_tetra_coboundary_delta(face_state, face_mask, tetra_face_slots, tetra_mask)
+
+    expected = torch.tensor([[[[6.0, 0.0], [1.0, 0.0], [-3.0, 0.0], [-7.0, 0.0]]]])
+    assert torch.allclose(delta, expected)
+    assert torch.isfinite(delta).all()
+    assert torch.allclose(
+        face_tetra_coboundary_delta(face_state, face_mask, tetra_face_slots, torch.zeros_like(tetra_mask)),
+        torch.zeros_like(face_state),
+    )
+
+
+def test_hodge_face_adapter_scale_changes_outputs_without_new_parameters():
+    class HodgeConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class HodgeEnabledConfig(HodgeConfig):
+        simplex_hodge_face_update_scale = 0.25
+
+    torch.manual_seed(7)
+    off_adapter = SimplicialAdapter(HodgeConfig())
+    torch.manual_seed(7)
+    on_adapter = SimplicialAdapter(HodgeEnabledConfig())
+    pair = torch.randn(1, 5, 5, HodgeConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, HodgeConfig.c_s)
 
     off_params = sum(p.numel() for p in off_adapter.parameters())
     on_params = sum(p.numel() for p in on_adapter.parameters())

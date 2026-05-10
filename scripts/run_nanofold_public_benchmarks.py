@@ -587,6 +587,15 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_msa_to_face=True,
             simplex_outer_edge_update_scale=0.25,
         )
+    if variant == "full_msa_to_face_hodge_residual":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+            simplex_hodge_face_update_scale=0.25,
+        )
     if variant == "full_msa_to_face_edge_frame_messages":
         return replace(
             base_config,
@@ -1094,6 +1103,9 @@ def _train_variant(
         "simplex_outer_edge_update_scale": (
             float(getattr(model_config, "simplex_outer_edge_update_scale", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_hodge_face_update_scale": (
+            float(getattr(model_config, "simplex_hodge_face_update_scale", 0.0)) if use_simplicial else 0.0
+        ),
         "simplex_edge_frame_message_scale": (
             float(getattr(model_config, "simplex_edge_frame_message_scale", 0.0)) if use_simplicial else 0.0
         ),
@@ -1201,6 +1213,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_single_update_scale",
         "simplex_structure_readout_scale",
         "simplex_outer_edge_update_scale",
+        "simplex_hodge_face_update_scale",
         "simplex_edge_frame_message_scale",
         "simplex_segment_cell_scale",
         "simplex_segment_radius",
@@ -1246,6 +1259,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "full_msa_to_face_structure_readout",
             "full_msa_to_face_structure_readout_only",
             "full_msa_to_face_outer_edge",
+            "full_msa_to_face_hodge_residual",
             "full_msa_to_face_edge_frame_messages",
             "full_msa_to_face_segment_cells",
             "face_structure_readout_only",

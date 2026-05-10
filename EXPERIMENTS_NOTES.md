@@ -988,3 +988,26 @@
   `val_weighted_simplex_tetra_coordinate_geometry_loss=0.0662`,
   `val_weighted_simplex_tetra_coordinate_distance_loss=0.0143`), but the
   validation result stayed in the weak E33-E41 band. E41 is rejected.
+- E42 local implementation at 2026-05-10 12:58 EDT: add
+  `simplex_hodge_face_update_scale`, `face_tetra_coboundary_delta`, and the
+  `full_msa_to_face_hodge_residual` benchmark variant. The residual averages
+  selected face states through both lower shared-boundary-edge adjacency and
+  upper selected-tetra coface adjacency, then applies a damped gated update
+  before face/tetra states write back to pair/single streams. This is a
+  topological architecture change, not a loss hack: no new scalar objective is
+  added, and the update operates on cochains and incidence maps in the
+  selected complex.
+- E42 local checks so far: `python -m py_compile minalphafold/simplex.py
+  minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+  passed; focused Hodge tests passed (`5 passed`); affected tests passed
+  (`55 passed`). Parameter audit gives AF2-medium `3,106,642`, SimplexFold
+  `3,106,690`, and E42 Hodge residual `3,106,690`, adding no parameters and
+  staying within the 5% AF2-medium budget.
+- E42 broader local checks: full `python -m pytest -q` passed and
+  `git diff --check` passed. `python -m ruff check .` is unavailable locally
+  (`No module named ruff`). `python -m mypy minalphafold
+  scripts/run_nanofold_public_benchmarks.py` still fails on the pre-existing
+  structure-module typing, missing `nanofold.metrics`, EMA model typing, and
+  runner row typing issues. `python -m pyright --warnings` still fails broadly
+  because this local interpreter does not resolve Torch/NumPy/Modal/OpenMM and
+  reports existing optional/type issues.
