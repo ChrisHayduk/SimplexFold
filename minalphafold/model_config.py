@@ -138,3 +138,4 @@ class ModelConfig:
     simplex_pair_update_scale: float = 1.0
     simplex_single_update_scale: float = 1.0
     simplex_structure_readout_scale: float = 0.0
+    simplex_outer_edge_update_scale: float = 0.0

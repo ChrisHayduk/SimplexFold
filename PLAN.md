@@ -1,18 +1,20 @@
-## Current Plan: Selected Simplex Shape Realization
+## Current Plan: Outer-Edge Cell Communication
 
-E33-E37 show that routing explicit face/tetra states into the structure module,
-making the topology selector more aggressive, and supervising selected face
-orientation do not break the lDDT plateau. The next architecture-facing
+E33-E38 show that additional scalar supervision on selected cells is not
+enough to break the weak early-validation band. The next architecture-facing
 direction should return to the core SimplexFold claim: learned 2-/3-simplices
-should behave like persistent local cells, not just bags of boundary edges.
+should behave like persistent local cells, not just supervised readouts from
+boundary edges.
 
-Run a short gate with `simplexfold_medium_param_matched`, `full_msa_to_face`,
-the E09 selected coordinate and boundary-distance realization stack, and a
-small rigid local shape realization term on selected faces and tetras. The
-term aligns each selected cell by a proper Kabsch rotation before scoring its
-vertex RMSD, so it is globally rigid-motion invariant and tied only to the
-sparse cell complex. Keep `EXPERIMENT_RESULTS.md` only for returned run
-results.
+Run a short gate with `simplexfold_medium_param_matched` and a new
+`full_msa_to_face_outer_edge` variant. This keeps the E09 MSA-to-face path and
+adds a zero-parameter face-to-face residual through shared undirected boundary
+edges before the selected faces write back to pair/single states. This is
+topological rather than a metric hack: it implements an incidence-neighborhood
+message pass between cochains on selected 2-cells, exactly the kind of
+same-rank cell communication emphasized by the reference topological deep
+learning material and the Topotein-style cell-neighborhood view. Keep
+`EXPERIMENT_RESULTS.md` only for returned run results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired

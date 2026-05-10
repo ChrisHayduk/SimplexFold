@@ -437,6 +437,17 @@ def test_simplicial_structure_readout_adds_no_parameters():
     assert readout_params == simplex_params
 
 
+def test_simplicial_outer_edge_update_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    outer_edge_medium = replace(simplex_medium, simplex_outer_edge_update_scale=0.25)
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    outer_edge_params = sum(parameter.numel() for parameter in AlphaFold2(outer_edge_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert outer_edge_params == simplex_params
+
+
 def test_simplicial_structure_readout_forward_keeps_internal_tensors_private():
     model_config = replace(load_model_config("tiny"), simplex_structure_readout_scale=0.25)
     model = AlphaFold2(model_config)

@@ -839,3 +839,25 @@
   the weak E33-E38 band. E38 is rejected; next priority should be a
   Topotein-inspired architecture change such as outer-edge cell communication
   or edge-frame scalarized simplex messages.
+- E39 local implementation: add `simplex_outer_edge_update_scale` and
+  `full_msa_to_face_outer_edge`. The adapter now has an optional zero-parameter
+  face-to-face update through shared undirected boundary edges: selected face
+  states scatter to their boundary edges, gather other incident face states,
+  and apply a gated residual before pair/single readout. This directly follows
+  the reference topological-deep-learning lesson that useful higher-rank cells
+  need incidence/adjacency neighborhoods, not just scalar cell losses.
+- E39 local checks so far: `python -m py_compile minalphafold/simplex.py
+  minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+  passed. Focused tests for outer-edge incidence behavior, output changes,
+  parser acceptance, and zero-parameter behavior passed (`41 passed` across
+  the affected selections). Parameter audit gives AF2-medium `3,106,642`,
+  SimplexFold `3,106,690`, and E39 outer-edge `3,106,690`, within the 5%
+  budget.
+- E39 broader local checks: full `python -m pytest -q` passed and
+  `git diff --check` passed. `python -m ruff check .` is unavailable locally
+  (`No module named ruff`). `python -m mypy minalphafold
+  scripts/run_nanofold_public_benchmarks.py` still fails on the pre-existing
+  structure-module typing, missing `nanofold.metrics`, EMA model typing, and
+  runner row typing issues. `python -m pyright --warnings` still fails broadly
+  because this local interpreter does not resolve Torch/NumPy/Modal/OpenMM and
+  reports existing optional/type issues.

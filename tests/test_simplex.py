@@ -6,6 +6,7 @@ from minalphafold.simplex import (
     SimplicialAdapter,
     _boundary_degree_weights,
     build_simplex_topology,
+    face_outer_edge_delta,
     face_geometry_features,
     tetra_geometry_features,
 )
@@ -54,6 +55,7 @@ class SimplexConfig:
     simplex_dropout = 0.0
     simplex_single_transition_n = 2
     simplex_structure_readout_scale = 0.0
+    simplex_outer_edge_update_scale = 0.0
     n_dist_bins = 16
 
 
@@ -163,6 +165,74 @@ def test_simplicial_adapter_update_scale_override_gates_boundary_residuals():
     assert torch.allclose(single_zero, single)
     assert not torch.allclose(pair_full, pair_zero)
     assert not torch.allclose(single_full, single_zero)
+
+
+def test_face_outer_edge_delta_uses_shared_boundary_edges_only():
+    face_state = torch.tensor(
+        [
+            [
+                [[1.0, 0.0], [3.0, 0.0], [7.0, 0.0]],
+                [[11.0, 0.0], [13.0, 0.0], [17.0, 0.0]],
+                [[19.0, 0.0], [23.0, 0.0], [29.0, 0.0]],
+                [[31.0, 0.0], [37.0, 0.0], [41.0, 0.0]],
+            ]
+        ]
+    )
+    face_indices = torch.tensor(
+        [
+            [
+                [[0, 1, 2], [0, 1, 3], [0, 2, 3]],
+                [[1, 0, 2], [1, 0, 3], [1, 2, 3]],
+                [[2, 0, 1], [2, 0, 3], [2, 1, 3]],
+                [[3, 0, 1], [3, 0, 2], [3, 1, 2]],
+            ]
+        ],
+        dtype=torch.long,
+    )
+    face_mask = torch.ones(1, 4, 3)
+
+    delta = face_outer_edge_delta(face_state, face_indices, face_mask, num_residues=4)
+
+    expected_face_012 = torch.tensor([19.4, 0.0])
+    assert torch.allclose(delta[0, 0, 0], expected_face_012 - face_state[0, 0, 0])
+    assert torch.isfinite(delta).all()
+    isolated_delta = face_outer_edge_delta(
+        face_state[:, :1, :1],
+        face_indices[:, :1, :1],
+        face_mask[:, :1, :1],
+        num_residues=4,
+    )
+    assert torch.allclose(isolated_delta, torch.zeros_like(isolated_delta))
+
+
+def test_outer_edge_adapter_scale_changes_outputs_without_new_parameters():
+    class OuterEdgeConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = False
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class OuterEdgeEnabledConfig(OuterEdgeConfig):
+        simplex_outer_edge_update_scale = 0.25
+
+    torch.manual_seed(4)
+    off_adapter = SimplicialAdapter(OuterEdgeConfig())
+    torch.manual_seed(4)
+    on_adapter = SimplicialAdapter(OuterEdgeEnabledConfig())
+    pair = torch.randn(1, 5, 5, OuterEdgeConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, OuterEdgeConfig.c_s)
+
+    off_params = sum(p.numel() for p in off_adapter.parameters())
+    on_params = sum(p.numel() for p in on_adapter.parameters())
+    off_pair, off_single, _ = off_adapter(pair, single)
+    on_pair, on_single, _ = on_adapter(pair, single)
+
+    assert on_params == off_params
+    assert not torch.allclose(on_pair, off_pair)
+    assert not torch.allclose(on_single, off_single)
 
 
 def test_simplex_geometry_features_are_rigid_transform_invariant():

@@ -1142,7 +1142,7 @@ than improving explicit cell communication and local-frame message use.
 
 ### E39: Outer-Edge Cell Communication
 
-Status: idea from Topotein, not implemented.
+Status: implemented locally; Runpod gate queued.
 
 Hypothesis: Topotein argues that higher-rank protein cells need dedicated
 neighborhoods; simply attaching a cell feature to an otherwise pairwise model
@@ -1151,15 +1151,21 @@ and tetras, but the most useful cell-to-cell information may flow through
 boundary edges that leave one local cell and enter another, analogous to
 Topotein's outer-edge neighborhoods for secondary-structure cells.
 
-Mechanism: add a zero- or low-parameter message path that lets selected faces
-exchange information through shared or nearby boundary edges before writing
-back to pair/single states. Keep the construction based only on official MSA
-features, selected topology logits, and recycled coordinates. Do not use DSSP
-or external secondary-structure labels.
+Mechanism: add a zero-parameter `simplex_outer_edge_update_scale` path and a
+`full_msa_to_face_outer_edge` benchmark variant. The adapter scatters each
+selected face state to its three undirected boundary edges, gathers the average
+state of other selected faces incident on those edges, and applies a gated
+face-state residual before pair/single readout. Keep the construction based
+only on official MSA features, selected topology logits, and recycled
+coordinates. Do not use DSSP or external secondary-structure labels.
 
-Decision rule: gate only after E38 returns. Keep if explicit inter-cell
-communication improves the early validation band without increasing parameters
-outside the AF2-medium budget.
+Local validation: focused tests pass for shared-edge communication, CLI
+variant parsing, and zero-parameter behavior. Parameter audit gives AF2-medium
+`3,106,642`, SimplexFold `3,106,690`, and E39 outer-edge `3,106,690`, within
+the 5% AF2-medium budget.
+
+Decision rule: keep if explicit inter-cell communication improves the early
+validation band without increasing parameters outside the AF2-medium budget.
 
 ### E40: Edge-Frame Scalarized Simplex Messages
 

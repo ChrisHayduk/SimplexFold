@@ -602,6 +602,54 @@ def scatter_to_single(
     return delta, counts
 
 
+def face_outer_edge_delta(
+    face_state: torch.Tensor,
+    face_indices: torch.Tensor,
+    face_mask: torch.Tensor,
+    *,
+    num_residues: int,
+) -> torch.Tensor:
+    """Average neighboring face states through shared undirected boundary edges."""
+
+    if face_state.numel() == 0:
+        return torch.zeros_like(face_state)
+
+    b, _, _, c_face = face_state.shape
+    i, j, k = face_indices.unbind(dim=-1)
+    face_edges = torch.stack(
+        [
+            torch.stack([i, j], dim=-1),
+            torch.stack([i, k], dim=-1),
+            torch.stack([j, k], dim=-1),
+        ],
+        dim=-2,
+    )
+    edge_lo = torch.minimum(face_edges[..., 0], face_edges[..., 1])
+    edge_hi = torch.maximum(face_edges[..., 0], face_edges[..., 1])
+    edge_ids = edge_lo * num_residues + edge_hi
+
+    edge_mask = face_mask[..., None].to(face_state.dtype).expand_as(edge_ids)
+    edge_values = face_state[..., None, :].expand(*edge_ids.shape, c_face) * edge_mask[..., None]
+    flat_ids = edge_ids.reshape(b, -1)
+    flat_values = edge_values.reshape(b, -1, c_face)
+
+    edge_sum = face_state.new_zeros((b, num_residues * num_residues, c_face))
+    edge_sum.scatter_add_(1, flat_ids[..., None].expand(-1, -1, c_face), flat_values)
+    edge_count = face_state.new_zeros((b, num_residues * num_residues, 1))
+    edge_count.scatter_add_(1, flat_ids[..., None], edge_mask.reshape(b, -1, 1))
+
+    gathered_sum = edge_sum.gather(1, flat_ids[..., None].expand(-1, -1, c_face)).reshape(*edge_ids.shape, c_face)
+    gathered_count = edge_count.gather(1, flat_ids[..., None]).reshape(*edge_ids.shape, 1)
+    self_values = face_state[..., None, :] * edge_mask[..., None]
+    outer_sum = gathered_sum - self_values
+    outer_count = (gathered_count - edge_mask[..., None]).clamp_min(0.0)
+    has_outer = (outer_count > 0).to(face_state.dtype)
+    outer_mean_by_edge = outer_sum / outer_count.clamp_min(1.0)
+    face_outer_mean = (outer_mean_by_edge * has_outer).sum(dim=-2) / has_outer.sum(dim=-2).clamp_min(1.0)
+    has_neighbor = (has_outer.sum(dim=-2) > 0).to(face_state.dtype)
+    return (face_outer_mean - face_state) * has_neighbor * face_mask[..., None]
+
+
 class SimplexMLP(torch.nn.Module):
     """LayerNorm-ReLU MLP with AF2-style final initialisation."""
 
@@ -704,6 +752,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.pair_update_scale = float(getattr(config, "simplex_pair_update_scale", 1.0))
         self.single_update_scale = float(getattr(config, "simplex_single_update_scale", 1.0))
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
+        self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
 
         self.pair_score_norm = torch.nn.LayerNorm(config.c_z)
         self.topology_score = torch.nn.Linear(config.c_z, 1)
@@ -866,6 +915,17 @@ class SimplicialAdapter(torch.nn.Module):
         face_state = face_state + self.dropout(
             torch.sigmoid(self.face_gate(face_state)) * edge_msg * topology.face_mask[..., None]
         )
+        if self.outer_edge_update_scale > 0.0:
+            outer_msg = face_outer_edge_delta(
+                face_state,
+                face_indices,
+                topology.face_mask,
+                num_residues=pair.shape[1],
+            )
+            face_state = face_state + self.dropout(
+                self.outer_edge_update_scale * torch.sigmoid(self.face_gate(face_state)) * outer_msg
+            )
+            face_state = face_state * topology.face_mask[..., None]
 
         tetra_state = pair.new_empty((pair.shape[0], pair.shape[1], 0, self.c_tetra))
         if self.use_tetra and topology.tetra_indices.shape[2] > 0:

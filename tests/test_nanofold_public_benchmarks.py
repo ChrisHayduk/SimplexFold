@@ -124,6 +124,25 @@ def test_full_msa_to_face_structure_readout_only_disables_trunk_residuals():
     assert cfg.simplex_structure_readout_scale == 0.5
 
 
+def test_full_msa_to_face_outer_edge_enables_cell_neighborhood_update():
+    cfg = _variant_config(
+        load_model_config("simplexfold_medium_param_matched"),
+        "full_msa_to_face_outer_edge",
+    )
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_outer_edge_update_scale == 0.25
+
+
+def test_full_msa_to_face_outer_edge_variant_is_accepted_by_cli_parser():
+    args = parse_args(["--variants", "full_msa_to_face_outer_edge"])
+
+    assert args.variants == ["full_msa_to_face_outer_edge"]
+
+
 def test_structure_readout_only_variant_is_accepted_by_cli_parser():
     args = parse_args(["--variants", "full_msa_to_face_structure_readout_only"])
 
