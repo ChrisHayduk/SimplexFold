@@ -1175,7 +1175,7 @@ not enough to justify continuing this branch.
 
 ### E40: Edge-Frame Scalarized Simplex Messages
 
-Status: implemented locally; Runpod gate queued.
+Status: stopped early on Runpod.
 
 Hypothesis: Topotein's TCP module gets mileage from edge-centric local frames:
 vector information from higher-rank cells is scalarized in frames associated
@@ -1205,9 +1205,15 @@ Decision rule: keep the parameter change near zero. Continue only if the
 frame-scalarized cell messages beat the E33-E38 weak band and preserve
 FoldScore.
 
+Result: reject. E40 was stable but worse than E39 at the first validation
+point: step 250 reached `val_lddt_ca=0.2350`, FoldScore `0.2139`,
+`val_ca_drmsd=15.2338`, and predicted/true C-alpha radius of gyration
+`6.3502 / 15.4034`. The added edge-frame readout did not make the selected
+cell messages more useful in this short gate.
+
 ### E41: Latent Rank-2 Segment Cells
 
-Status: idea from Topotein, not implemented.
+Status: next candidate, not implemented.
 
 Hypothesis: Topotein's strongest protein-specific inductive bias is a rank-2
 cell for secondary-structure-like groups. NanoFold official runs cannot use
