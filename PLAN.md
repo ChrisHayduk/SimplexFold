@@ -1,18 +1,18 @@
-## Current Plan: Latent Rank-2 Segment Cells
+## Current Plan: Re-center After Segment-Cell Rejection
 
-E33-E40 show that extra scalar supervision, a simple shared-boundary
-face-neighborhood pass, and edge-frame scalarized simplex readout are not
-enough to break the weak early-validation band. The next architecture-facing
-direction should test the other Topotein-inspired idea from the PDFs: learned
-rank-2 segment cells for contiguous secondary-structure-like regions.
+E33-E41 show that extra scalar supervision, shared-boundary face-neighborhood
+passes, edge-frame scalarized simplex readout, and latent contiguous segment
+cells are not enough to break the weak early-validation band. The next move
+should stop adding isolated side channels and re-center on the strongest
+observed branch: selected simplex boundary realization with MSA-to-face and
+auxiliary-weight annealing.
 
-E41 implements the next short gate with `simplexfold_medium_param_matched` and
-`full_msa_to_face_segment_cells`. Segment cells are latent rank-2 cells centered
-on residues over contiguous local windows. They are constructed only from
-official single/MSA-derived states, pair features, and recycled C-alpha
-geometry summaries, then write into selected triangular faces through
-incidence-style vertex membership. They do not use templates, DSSP labels,
-external structures, pretrained weights, or hidden labels. Keep
+The next architecture experiment should keep the topological justification but
+operate directly on the boundary/co-boundary maps that already helped: learned
+degree-normalized Hodge-style residuals on the selected 1-/2-/3-cell complex,
+or a smaller damped version of those residuals added to the E09/E15 stack.
+The goal is to improve the usable pair/single boundary messages rather than
+attach another scalar target or another weakly coupled cell type. Keep
 `EXPERIMENT_RESULTS.md` only for returned Runpod results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of

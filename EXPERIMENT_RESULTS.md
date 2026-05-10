@@ -58,3 +58,4 @@ recorded in the running notes for that run.
 | E38 selected simplex shape realization | stopped early | 250 | 0.2402 | 0.2402 | 0.2113 | 14.9614 | 6.6367 / 15.4034 | rejected |
 | E39 outer-edge cell communication | stopped early | 250 | 0.2460 | 0.2460 | 0.2163 | 14.7805 | 6.7531 / 15.4034 | rejected |
 | E40 edge-frame scalarized messages | stopped early | 250 | 0.2350 | 0.2350 | 0.2139 | 15.2338 | 6.3502 / 15.4034 | rejected |
+| E41 latent rank-2 segment cells | stopped early | 250 | 0.2393 | 0.2393 | 0.2125 | 15.2012 | 6.2747 / 15.4034 | rejected |

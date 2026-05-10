@@ -1213,7 +1213,7 @@ cell messages more useful in this short gate.
 
 ### E41: Latent Rank-2 Segment Cells
 
-Status: implemented locally and queued for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: Topotein's strongest protein-specific inductive bias is a rank-2
 cell for secondary-structure-like groups. NanoFold official runs cannot use
@@ -1245,3 +1245,10 @@ Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with the
 current selected-coordinate stack. Continue only if the first validation point
 breaks out of the weak E33-E40 band or shows a meaningful improvement in
 FoldScore/dRMSD/radius-of-gyration behavior.
+
+Result: reject. E41 was stable but weak at the first validation point: step
+250 reached `val_lddt_ca=0.2393`, FoldScore `0.2125`,
+`val_ca_drmsd=15.2012`, and predicted/true C-alpha radius of gyration
+`6.2747 / 15.4034`. The selected-coordinate terms were active, but the latent
+segment cells did not improve over E39/E40 or the older E22/E25/E30 early
+range.

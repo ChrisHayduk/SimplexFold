@@ -962,3 +962,29 @@
   runner row typing issues. `python -m pyright --warnings` still fails broadly
   because this local interpreter does not resolve Torch/NumPy/Modal/OpenMM and
   reports existing optional/type issues.
+- E41 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 12:47 EDT
+  from SimplexFold commit `355d4b7`. The stopped pod's `/workspace` was
+  empty, so I recloned the pushed SimplexFold branch and copied only public
+  NanoFold assets: `data/processed_features`, `data/processed_labels`,
+  `data/manifests/train.txt`, `data/manifests/val.txt`,
+  `data/manifests/all.txt`, and `nanofold/`. Remote audit: public
+  train/val/all counts `10000/1000/11000`, feature/label counts
+  `11000/11000`, no hidden or sidecar data paths, H100 CUDA available,
+  FoldScore import works, AF2-medium `3,106,642`, E41 segment cells
+  `3,234,450`, `simplex_segment_cell_scale=0.25`,
+  `simplex_segment_radius=4`, `simplex_c_segment=12`, within the 5%
+  AF2-medium budget. Run name: `e41_segment_cells_s500_c256_m64`.
+- E41 passed the previous NaN failure point: step 50 reached
+  `train_loss=8.0738`, `grad_norm=13.5769`; step 100 reached
+  `train_loss=7.8239`, `grad_norm=4.3516`; step 150 reached
+  `train_loss=6.4231`, `grad_norm=6.8139`; step 200 reached
+  `train_loss=6.2640`, `grad_norm=3.1682`.
+- E41 was stopped early on owned Runpod pod `p2roc93zgk4ho9`, and the pod was
+  stopped. Step 250 reached `val_lddt_ca=0.2393`, FoldScore `0.2125`,
+  `val_ca_drmsd=15.2012`, `val_pred_ca_rg=6.2747`, and
+  `val_true_ca_rg=15.4034`. The coordinate cell terms were active
+  (`val_weighted_simplex_face_coordinate_area_loss=0.0312`,
+  `val_weighted_simplex_face_coordinate_distance_loss=0.0147`,
+  `val_weighted_simplex_tetra_coordinate_geometry_loss=0.0662`,
+  `val_weighted_simplex_tetra_coordinate_distance_loss=0.0143`), but the
+  validation result stayed in the weak E33-E41 band. E41 is rejected.
