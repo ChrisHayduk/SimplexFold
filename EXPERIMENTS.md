@@ -933,7 +933,7 @@ therefore not the next scaling path.
 
 ### E33: Simplicial Structure Readout
 
-Status: implemented locally; Runpod gate pending.
+Status: stopped early on Runpod.
 
 Hypothesis: E30/E31 showed that simplex boundary messages can improve global
 expansion but disrupt local lDDT, while E32 showed that adding persistent
@@ -965,3 +965,35 @@ count unchanged at `3,106,690`, versus AF2-medium `3,106,642`, and remains
 within the 5% budget. Focused tests cover adapter readout emission, benchmark
 variant wiring, train-step behavior, simplex curricula, and the parameter
 budget.
+
+Result: reject. The corrected Runpod launch reached only
+`val_lddt_ca=0.2405` at step 250, with FoldScore `0.2108`,
+`val_ca_drmsd=14.8467`, and predicted/true C-alpha radius of gyration
+`6.9826 / 15.4034`. This is below the E22/E25 early band and does not improve
+FoldScore enough to continue. The result suggests that adding structure
+readout on top of the usual repeated simplex residual updates still perturbs
+the trunk more than it helps coordinate realization.
+
+### E34: Readout-Only Simplicial Sidecar
+
+Status: design candidate.
+
+Hypothesis: E33 did not isolate the new readout path because the simplex
+adapter still wrote its usual boundary residuals into the pair and single
+streams inside every enabled Evoformer block. If those residual perturbations
+are the source of the local-lDDT damage seen in E21-E33, a sidecar mode may
+let persistent face/tetra states learn patch/packing summaries and pass them
+only to the structure module.
+
+Mechanism: reuse the E33 structure readout but set
+`simplex_pair_update_scale=0.0` and `simplex_single_update_scale=0.0`. Keep
+the selected face/tetra auxiliary losses active, and inject only a small
+readout summary into the final structure input. The benchmark variant
+`full_msa_to_face_structure_readout_only` uses
+`simplex_structure_readout_scale=0.5` while adding no parameters. This keeps
+the topology explicit while separating "learn higher-order cells" from
+"rewrite the AF2 trunk after every block."
+
+Decision rule: run a short Runpod gate. Continue only if readout-only
+recovers at least the E22/E25 early lDDT band or materially improves
+FoldScore/global scale without a further local-accuracy drop.

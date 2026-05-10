@@ -107,3 +107,24 @@ def test_structure_readout_variant_is_accepted_by_cli_parser():
     args = parse_args(["--variants", "full_msa_to_face_structure_readout"])
 
     assert args.variants == ["full_msa_to_face_structure_readout"]
+
+
+def test_full_msa_to_face_structure_readout_only_disables_trunk_residuals():
+    cfg = _variant_config(
+        load_model_config("simplexfold_medium_param_matched"),
+        "full_msa_to_face_structure_readout_only",
+    )
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_pair_update_scale == 0.0
+    assert cfg.simplex_single_update_scale == 0.0
+    assert cfg.simplex_structure_readout_scale == 0.5
+
+
+def test_structure_readout_only_variant_is_accepted_by_cli_parser():
+    args = parse_args(["--variants", "full_msa_to_face_structure_readout_only"])
+
+    assert args.variants == ["full_msa_to_face_structure_readout_only"]

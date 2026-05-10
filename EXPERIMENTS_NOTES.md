@@ -609,3 +609,24 @@
   `choices` list. Fixed locally, added
   `test_structure_readout_variant_is_accepted_by_cli_parser`, reran the
   affected tests (`31 passed`), and will relaunch from the corrected commit.
+- E33 relaunched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 08:22 EDT
+  from corrected SimplexFold commit `855bce5`; public data audit from the
+  same provisioned workspace remains clean. Run name:
+  `e33_structure_readout_s500_c256_m64_r2`.
+- E33 was stopped early on owned Runpod pod `p2roc93zgk4ho9`, and the pod was
+  stopped. Step 250 reached `val_lddt_ca=0.2405`, FoldScore `0.2108`,
+  `val_ca_drmsd=14.8467`, `val_pred_ca_rg=6.9826`, and
+  `val_true_ca_rg=15.4034`. This misses the E22/E25 early band and does not
+  justify a longer run. E33 is rejected.
+- E34 direction: isolate the new structure readout from the repeated
+  simplex-to-trunk residual path. Add a readout-only sidecar variant with
+  `simplex_pair_update_scale=0.0`, `simplex_single_update_scale=0.0`, and a
+  `simplex_structure_readout_scale=0.5`, so selected 2-/3-simplex states
+  learn under auxiliary supervision and feed only the structure input.
+- E34 implemented locally as the zero-parameter benchmark variant
+  `full_msa_to_face_structure_readout_only`. Local checks:
+  `python -m py_compile scripts/run_nanofold_public_benchmarks.py` passed;
+  `pytest tests/test_nanofold_public_benchmarks.py
+  tests/test_trainer.py::test_simplicial_structure_readout_adds_no_parameters`
+  passed (`13 passed`); parameter audit remains AF2-medium `3,106,642`,
+  E34 readout-only `3,106,690`, within 5% budget.
