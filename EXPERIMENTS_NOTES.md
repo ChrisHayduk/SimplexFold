@@ -566,3 +566,31 @@
   a small gated boundary summary directly to the structure input, so the
   learned 2-/3-cells influence coordinate generation as realized cells rather
   than only as repeated residual perturbations to the AF2 pair/single trunk.
+- E33 implemented locally as a zero-parameter simplicial structure readout.
+  `SimplicialAdapter` now exposes the normalized selected face/tetra boundary
+  summaries it already scatters to pair/single streams when
+  `simplex_structure_readout_scale > 0`. `AlphaFold2` accumulates those
+  summaries across ensembles and injects a scaled copy into the structure
+  module's single/pair inputs, while keeping the dense readout tensors out of
+  the final prediction dictionary. The benchmark variant
+  `full_msa_to_face_structure_readout` enables `full_msa_to_face` with
+  `simplex_structure_readout_scale=0.25`.
+- E33 local checks: `python -m py_compile minalphafold/model_config.py
+  minalphafold/simplex.py minalphafold/model.py
+  scripts/run_nanofold_public_benchmarks.py` passed; focused `pytest`
+  covering the adapter readout, benchmark variant, and no-parameter budget
+  passed (`5 passed`); broader affected `pytest tests/test_simplex.py
+  tests/test_nanofold_public_benchmarks.py
+  tests/test_trainer.py::test_train_step_updates_model_parameters
+  tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula
+  tests/test_trainer.py::test_simplicial_structure_readout_adds_no_parameters
+  tests/test_trainer.py::test_simplicial_structure_readout_forward_keeps_internal_tensors_private`
+  passed (`30 passed`); `git diff --check` passed. Parameter audit:
+  AF2-medium `3,106,642`, SimplexFold medium `3,106,690`, E33 readout
+  `3,106,690`, within 5% budget.
+- E33 Runpod gate plan: run `simplexfold_medium_param_matched` with variant
+  `full_msa_to_face_structure_readout`, E09 selected coordinate and
+  boundary-distance weights, 500 steps, validation every 250 steps, crop 256,
+  MSA 64, no templates, fp32, and only public NanoFold train/val data. Add a
+  row to `EXPERIMENT_RESULTS.md` only after the run returns a final or
+  early-stop validation point.

@@ -53,6 +53,7 @@ class SimplexConfig:
     simplex_volume_scale = 1000.0
     simplex_dropout = 0.0
     simplex_single_transition_n = 2
+    simplex_structure_readout_scale = 0.0
     n_dist_bins = 16
 
 
@@ -273,6 +274,34 @@ def test_simplicial_adapter_shapes_masks_and_gradients():
     assert pair.grad is not None
     assert single.grad is not None
     assert adapter.topology_score.weight.grad is not None
+
+
+def test_simplicial_adapter_can_emit_structure_readout_from_selected_cells():
+    class ReadoutConfig(SimplexConfig):
+        simplex_structure_readout_scale = 0.25
+
+    torch.manual_seed(3)
+    cfg = ReadoutConfig()
+    adapter = SimplicialAdapter(cfg)
+    pair = torch.randn(2, 6, 6, cfg.c_z)
+    single = torch.randn(2, 6, cfg.c_s)
+    seq_mask = torch.tensor(
+        [
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0, 0.0],
+        ]
+    )
+    pair_mask = seq_mask[:, :, None] * seq_mask[:, None, :]
+
+    _, _, aux = adapter(pair, single, seq_mask=seq_mask, pair_mask=pair_mask)
+
+    assert aux["simplex_structure_pair_readout"].shape == pair.shape
+    assert aux["simplex_structure_single_readout"].shape == single.shape
+    assert not torch.allclose(aux["simplex_structure_pair_readout"][0], torch.zeros_like(pair[0]))
+    assert not torch.allclose(aux["simplex_structure_single_readout"][0], torch.zeros_like(single[0]))
+    assert torch.all(aux["simplex_structure_single_readout"][1, 4:] == 0)
+    assert torch.all(aux["simplex_structure_pair_readout"][1, 4:, :, :] == 0)
+    assert torch.all(aux["simplex_structure_pair_readout"][1, :, 4:, :] == 0)
 
 
 def test_optional_low_rank_msa_to_face_path_runs():

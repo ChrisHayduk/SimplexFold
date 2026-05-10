@@ -137,3 +137,4 @@ class ModelConfig:
     recommended_n_cycles: int = 1
     simplex_pair_update_scale: float = 1.0
     simplex_single_update_scale: float = 1.0
+    simplex_structure_readout_scale: float = 0.0

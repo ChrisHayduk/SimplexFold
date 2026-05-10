@@ -51,6 +51,7 @@ class AlphaFold2(torch.nn.Module):
     def __init__(self, config):
         super().__init__()
         self.use_simplicial_evoformer = bool(getattr(config, "use_simplicial_evoformer", False))
+        self.simplex_structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
         simplex_every_n = max(int(getattr(config, "simplex_every_n_blocks", 1)), 1)
         if self.use_simplicial_evoformer:
             self.evoformer_blocks = torch.nn.ModuleList(
@@ -231,11 +232,14 @@ class AlphaFold2(torch.nn.Module):
         # Default masks: all ones (no padding).
         if seq_mask is None:
             seq_mask = target_feat.new_ones(batch_size, N_res)
+        assert seq_mask is not None
         pair_mask = seq_mask[:, :, None] * seq_mask[:, None, :]  # (batch, N_res, N_res)
         if msa_mask is None:
             msa_mask = target_feat.new_ones(batch_size, msa_feat.shape[1], N_res)
+        assert msa_mask is not None
         if extra_msa_mask is None:
             extra_msa_mask = target_feat.new_ones(batch_size, extra_msa_feat.shape[1], N_res)
+        assert extra_msa_mask is not None
 
         # Algorithm 2 line 1: m̂_1i^prev, ẑ_ij^prev, x̄_i^{prev,Cβ} ← 0, 0, 0.
         single_rep_prev = torch.zeros(batch_size, N_res, c_m, device=msa_feat.device)
@@ -261,11 +265,14 @@ class AlphaFold2(torch.nn.Module):
                 single_rep_accum = torch.zeros(batch_size, N_res, c_m, device=msa_feat.device)
                 structure_single_accum = torch.zeros(batch_size, N_res, self.config.c_s, device=msa_feat.device)
                 pair_repr_accum = torch.zeros(batch_size, N_res, N_res, c_z, device=msa_feat.device)
+                simplex_structure_single_accum = torch.zeros_like(structure_single_accum)
+                simplex_structure_pair_accum = torch.zeros_like(pair_repr_accum)
                 msa_repr_last: torch.Tensor | None = None
                 simplex_aux_last: dict[str, torch.Tensor] | None = None
 
                 # Algorithm 2 line 4: ensemble loop.
                 for ensemble_index in range(n_ensemble):
+                    simplex_aux_current: dict[str, torch.Tensor] | None = None
                     msa_feat_current = self._sampled_feature_slice(msa_feat, i, ensemble_index, base_ndim=4)
                     extra_msa_feat_current = self._sampled_feature_slice(extra_msa_feat, i, ensemble_index, base_ndim=4)
                     msa_mask_current = self._sampled_feature_slice(msa_mask, i, ensemble_index, base_ndim=3)
@@ -401,9 +408,10 @@ class AlphaFold2(torch.nn.Module):
                                     simplex_teacher_forcing_weight=simplex_teacher_forcing_weight,
                                     simplex_pair_update_scale_override=simplex_pair_update_scale_override,
                                     simplex_single_update_scale_override=simplex_single_update_scale_override,
-                                )
+                            )
                             if simplex_aux:
                                 simplex_aux_last = simplex_aux
+                                simplex_aux_current = simplex_aux
                         elif self.training:
                             msa_repr, pair_repr = cast(
                                 tuple[torch.Tensor, torch.Tensor],
@@ -428,6 +436,13 @@ class AlphaFold2(torch.nn.Module):
                     single_rep_accum = single_rep_accum + msa_repr[:, 0, :, :]
                     structure_single_accum = structure_single_accum + single_repr
                     pair_repr_accum = pair_repr_accum + pair_repr
+                    if self.simplex_structure_readout_scale > 0.0 and simplex_aux_current is not None:
+                        simplex_single_readout = simplex_aux_current.get("simplex_structure_single_readout")
+                        if simplex_single_readout is not None:
+                            simplex_structure_single_accum = simplex_structure_single_accum + simplex_single_readout
+                        simplex_pair_readout = simplex_aux_current.get("simplex_structure_pair_readout")
+                        if simplex_pair_readout is not None:
+                            simplex_structure_pair_accum = simplex_structure_pair_accum + simplex_pair_readout
                     msa_repr_last = msa_repr[:, :msa_feat_current.shape[1], :, :]
 
                 # Algorithm 2 line 20: m̂_1i, ẑ_ij /= N_ensemble.
@@ -442,6 +457,12 @@ class AlphaFold2(torch.nn.Module):
                     single_rep = structure_single_accum / n_ensemble
                 else:
                     single_rep = self.single_rep_proj(msa_first_row)
+                if self.simplex_structure_readout_scale > 0.0:
+                    readout_scale = self.simplex_structure_readout_scale
+                    single_rep = single_rep + readout_scale * (simplex_structure_single_accum / n_ensemble)
+                    pair_repr = pair_repr + readout_scale * (simplex_structure_pair_accum / n_ensemble)
+                    single_rep = single_rep * seq_mask[..., None]
+                    pair_repr = pair_repr * pair_mask[..., None]
 
                 # Algorithm 2 line 21: StructureModule consumes (ŝ_i, ẑ_ij).
                 structure_predictions = self.structure_model(
@@ -479,7 +500,13 @@ class AlphaFold2(torch.nn.Module):
                         "sampled_n_ensemble": n_ensemble,
                     }
                     if simplex_aux_last is not None:
-                        output.update(simplex_aux_last)
+                        output.update(
+                            {
+                                key: value
+                                for key, value in simplex_aux_last.items()
+                                if not key.startswith("simplex_structure_")
+                            }
+                        )
                     return output
 
                 # Algorithm 2 line 22: store averaged m̂_1i, ẑ_ij (pre-projection,

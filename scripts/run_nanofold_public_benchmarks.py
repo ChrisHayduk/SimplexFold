@@ -558,6 +558,15 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_msa_to_face=True,
             simplex_use_recycled_geometry=False,
         )
+    if variant == "full_msa_to_face_structure_readout":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+            simplex_structure_readout_scale=0.25,
+        )
     if variant == "msa_to_face":
         return replace(
             base_config,
@@ -1008,6 +1017,9 @@ def _train_variant(
         "simplex_single_update_scale": (
             float(getattr(model_config, "simplex_single_update_scale", 1.0)) if use_simplicial else 0.0
         ),
+        "simplex_structure_readout_scale": (
+            float(getattr(model_config, "simplex_structure_readout_scale", 0.0)) if use_simplicial else 0.0
+        ),
         "latest_checkpoint": str(latest_checkpoint_path),
         "resume_from_checkpoint": str(resume_checkpoint_path) if resume_checkpoint_path is not None else "",
         "eval_every": eval_every,
@@ -1097,6 +1109,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_long_bias",
         "simplex_pair_update_scale",
         "simplex_single_update_scale",
+        "simplex_structure_readout_scale",
     ]
     extra = sorted({key for row in rows for key in row} - set(preferred))
     fieldnames = [key for key in preferred if any(key in row for row in rows)] + extra

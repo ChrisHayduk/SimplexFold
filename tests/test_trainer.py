@@ -426,6 +426,44 @@ def test_simplexfold_medium_topology_plus_uses_only_allowed_simplex_headroom():
     assert topology_plus.simplex_msa_to_face_rank > param_matched.simplex_msa_to_face_rank
 
 
+def test_simplicial_structure_readout_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    readout_medium = replace(simplex_medium, simplex_structure_readout_scale=0.25)
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    readout_params = sum(parameter.numel() for parameter in AlphaFold2(readout_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert readout_params == simplex_params
+
+
+def test_simplicial_structure_readout_forward_keeps_internal_tensors_private():
+    model_config = replace(load_model_config("tiny"), simplex_structure_readout_scale=0.25)
+    model = AlphaFold2(model_config)
+    model.eval()
+    target_feat = torch.zeros(1, 4, 22)
+    residue_index = torch.arange(4).reshape(1, 4)
+    msa_feat = torch.zeros(1, 2, 4, 49)
+    extra_msa_feat = torch.zeros(1, 0, 4, 25)
+    template_pair_feat = torch.zeros(1, 0, 4, 4, 88)
+    aatype = torch.zeros(1, 4, dtype=torch.long)
+
+    with torch.no_grad():
+        outputs = model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=1,
+        )
+
+    assert outputs["atom14_coords"].shape == (1, 4, 14, 3)
+    assert "simplex_structure_single_readout" not in outputs
+    assert "simplex_structure_pair_readout" not in outputs
+
+
 def test_simplexfold_medium_width_matched_preserves_widths_near_af2_medium_budget():
     medium = load_model_config("medium")
     af2_medium = replace(medium, use_simplicial_evoformer=False)

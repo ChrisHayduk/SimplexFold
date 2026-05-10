@@ -651,6 +651,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.dropout = torch.nn.Dropout(float(getattr(config, "simplex_dropout", 0.0)))
         self.pair_update_scale = float(getattr(config, "simplex_pair_update_scale", 1.0))
         self.single_update_scale = float(getattr(config, "simplex_single_update_scale", 1.0))
+        self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
 
         self.pair_score_norm = torch.nn.LayerNorm(config.c_z)
         self.topology_score = torch.nn.Linear(config.c_z, 1)
@@ -891,7 +892,10 @@ class SimplicialAdapter(torch.nn.Module):
             pair_delta = pair_delta + tet_pair_delta
             pair_counts = pair_counts + tet_pair_counts
 
-        pair = pair + self.dropout(pair_update_scale * pair_delta / pair_counts.clamp_min(1.0))
+        pair_readout = pair_delta / pair_counts.clamp_min(1.0)
+        if pair_mask is not None:
+            pair_readout = pair_readout * pair_mask[..., None]
+        pair = pair + self.dropout(pair_update_scale * pair_readout)
         if pair_mask is not None:
             pair = pair * pair_mask[..., None]
 
@@ -919,8 +923,11 @@ class SimplicialAdapter(torch.nn.Module):
             single_delta = single_delta + tet_single_delta
             single_counts = single_counts + tet_single_counts
 
-        single_update = single_update_scale * single_delta / single_counts.clamp_min(1.0)
-        single = single + self.dropout(torch.sigmoid(self.single_gate(self.single_norm(single))) * single_update)
+        single_gate = torch.sigmoid(self.single_gate(self.single_norm(single)))
+        single_readout = single_gate * (single_delta / single_counts.clamp_min(1.0))
+        if seq_mask is not None:
+            single_readout = single_readout * seq_mask[..., None]
+        single = single + self.dropout(single_update_scale * single_readout)
         if seq_mask is not None:
             single = single * seq_mask[..., None]
 
@@ -935,6 +942,9 @@ class SimplicialAdapter(torch.nn.Module):
                 "simplex_tetra_face_slots": topology.tetra_face_slots,
             }
         )
+        if self.structure_readout_scale > 0.0:
+            aux["simplex_structure_pair_readout"] = pair_readout
+            aux["simplex_structure_single_readout"] = single_readout
         return pair, single, aux
 
     def _msa_to_face_update(

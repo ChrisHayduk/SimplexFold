@@ -933,7 +933,7 @@ therefore not the next scaling path.
 
 ### E33: Simplicial Structure Readout
 
-Status: design candidate.
+Status: implemented locally; Runpod gate pending.
 
 Hypothesis: E30/E31 showed that simplex boundary messages can improve global
 expansion but disrupt local lDDT, while E32 showed that adding persistent
@@ -944,14 +944,24 @@ wrong place.
 
 Mechanism: add a small gated readout from selected face/tetra states into the
 structure input. Pool each learned face/tetra state back onto its boundary
-residues and/or boundary edges, then project that summary into the structure
-module's single/pair conditioning. This keeps the change simplicial: the
-model realizes coordinates from the boundary summaries of its own sparse
-2-/3-simplex complex rather than adding a generic dense coordinate loss or
-widening the AF2 trunk.
+residues and boundary edges, then inject a scaled copy of that boundary
+summary into the structure module's single/pair conditioning. The first
+implementation is zero-parameter: it reuses the adapter's existing
+selected-cell boundary summaries and gates, with
+`simplex_structure_readout_scale=0.25` only in the
+`full_msa_to_face_structure_readout` benchmark variant. This keeps the change
+simplicial: the model realizes coordinates from the boundary summaries of its
+own sparse 2-/3-simplex complex rather than adding a generic dense coordinate
+loss or widening the AF2 trunk.
 
 Decision rule: keep the AF2-medium trunk fixed and stay within the 5%
 parameter budget. First run a short Runpod gate using the E09 selected
 coordinate and boundary-distance losses. Continue only if the new readout
 preserves at least the E22/E25 early lDDT band while improving FoldScore or
 global scale.
+
+Local validation: `full_msa_to_face_structure_readout` leaves the parameter
+count unchanged at `3,106,690`, versus AF2-medium `3,106,642`, and remains
+within the 5% budget. Focused tests cover adapter readout emission, benchmark
+variant wiring, train-step behavior, simplex curricula, and the parameter
+budget.

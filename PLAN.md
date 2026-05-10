@@ -1153,6 +1153,8 @@ Iteration ladder:
     scalar loss pressure. Pool persistent face/tetra states back to their
     boundary residues/edges and gate that summary into the structure input, so
     coordinates are generated from realized 2-/3-cells instead of only from
-    residual perturbations to the AF2 trunk.
+    residual perturbations to the AF2 trunk. Prefer a zero-parameter readout
+    first by reusing the adapter's existing selected-boundary summaries before
+    spending any remaining parameter headroom.
 11. Promote only changes that pass parameter-budget tests and at least a
-   NanoFold smoke/short-run comparison.
+    NanoFold smoke/short-run comparison.
