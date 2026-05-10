@@ -340,3 +340,13 @@
   selected face/tetra boundary messages before they are added back into pair
   and single streams. This tests whether the explicit higher-order states are
   under-coupled to the structure module after averaging over incident cells.
+- E21 was stopped after its first validation on owned pod `0hesaxxfhq8soj`.
+  Step 500 reached only `val_lddt_ca=0.2315`, FoldScore `0.2328`,
+  `val_ca_drmsd=15.1343`, `val_pred_ca_rg=6.3715`, and
+  `val_true_ca_rg=15.4034`. Scaling simplex-to-trunk messages up by `1.5`
+  worsens collapse, so message strength is not a simple under-coupling issue.
+- E22 tests the complementary coupling direction with
+  `full_msa_to_face_damped_messages`: keep the same selected simplex complex
+  and realization losses, but scale pair/single simplex residuals by `0.5`.
+  This asks whether higher-order cells should be a softer topological scaffold
+  rather than a strong residual driver of early coordinate formation.

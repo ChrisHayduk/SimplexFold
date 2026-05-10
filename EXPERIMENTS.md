@@ -581,7 +581,7 @@ is topologically motivated, but it is empirically harmful in this form.
 
 ### E21: Stronger Simplex Boundary Messages
 
-Status: ready for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E15 shows that selected simplex realization helps, but E18 shows
 that simply widening face/tetra states is not enough. The useful signal may be
@@ -599,3 +599,29 @@ introducing a new loss.
 
 Decision rule: compare the 3000-step curve against E09. Continue only if the
 scaled messages improve lDDT or match lDDT with better FoldScore/dRMSD.
+
+Result: reject. Step 500 fell into a stronger collapse band than E09/E18:
+`val_lddt_ca=0.2315`, FoldScore `0.2328`, `val_ca_drmsd=15.1343`, and
+predicted/true C-alpha radius of gyration `6.3715 / 15.4034`. Amplifying the
+selected face/tetra messages makes the higher-order pathway dominate early
+structure formation in a harmful way.
+
+### E22: Damped Simplex Boundary Messages
+
+Status: ready for Runpod.
+
+Hypothesis: E21 shows the selected simplex messages are not merely too weak;
+amplifying them collapses global scale. The complementary topological question
+is whether the explicit 2-/3-simplex states should act as a gentler scaffold
+whose geometric signal is integrated by the AF2 pair/single streams rather
+than injected at full residual strength.
+
+Mechanism: add `full_msa_to_face_damped_messages`, preserving the E09 selected
+complex and MSA-to-face construction but setting `simplex_pair_update_scale`
+and `simplex_single_update_scale` to `0.5`. This changes only how strongly
+learned face/tetra boundary messages are coupled back to residues and pairs;
+it adds no parameters and introduces no new loss.
+
+Decision rule: stop early if step 500 remains below E09's early lDDT band.
+Continue if damping recovers or improves lDDT while increasing predicted
+C-alpha radius of gyration toward the true value.
