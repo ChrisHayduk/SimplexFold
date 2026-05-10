@@ -1156,5 +1156,11 @@ Iteration ladder:
     residual perturbations to the AF2 trunk. Prefer a zero-parameter readout
     first by reusing the adapter's existing selected-boundary summaries before
     spending any remaining parameter headroom.
-11. Promote only changes that pass parameter-budget tests and at least a
+11. If structure readouts fail, treat that as evidence that the selected
+    simplex states are not yet reliable enough to condition coordinates
+    directly. Return to the topology construction path: improve the sparse
+    2-skeleton before reusing it downstream, using selected-cell objectives,
+    topology curricula, and selector regularization rather than dense
+    structure losses that would be independent of the simplicial complex.
+12. Promote only changes that pass parameter-budget tests and at least a
     NanoFold smoke/short-run comparison.

@@ -48,3 +48,4 @@ recorded in the running notes for that run.
 | E32 topology-plus aux anneal | stopped early | 250 | 0.2545 | 0.2545 | 0.2059 | 14.2821 | 7.2877 / 15.4034 | rejected |
 | E33 simplicial structure readout | stopped early | 250 | 0.2405 | 0.2405 | 0.2108 | 14.8467 | 6.9826 / 15.4034 | rejected |
 | E34 readout-only simplicial sidecar | stopped early | 250 | 0.2426 | 0.2426 | 0.2103 | 14.9311 | 6.5743 / 15.4034 | rejected |
+| E35 face-only structure sidecar | stopped early | 250 | 0.2406 | 0.2406 | 0.2062 | 13.0352 | 9.1316 / 15.4034 | rejected |

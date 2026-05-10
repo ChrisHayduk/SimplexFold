@@ -658,3 +658,18 @@
   tests/test_trainer.py::test_simplicial_structure_readout_adds_no_parameters`
   passed (`15 passed`); parameter audit remains AF2-medium `3,106,642`,
   E35 face-only readout `3,106,690`, within 5% budget.
+- E35 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 09:13 EDT
+  from SimplexFold commit `b6fd28a`. Remote audit before launch: branch
+  `codex/simplexfold-topology-e07-boundary-coordinate`, train/val/all counts
+  `10000/1000/11000`, feature/label file counts `11000/11000`, no hidden or
+  sidecar data paths, no AppleDouble files, H100 CUDA available, FoldScore
+  import works, AF2-medium baseline `3,106,642`, E35 face-only readout
+  `3,106,690`, `simplex_use_tetra=False`,
+  `simplex_pair_update_scale=0.0`, `simplex_single_update_scale=0.0`,
+  `simplex_structure_readout_scale=0.5`, within the 5% AF2-medium budget.
+  Run name: `e35_face_readout_only_s500_c256_m64`.
+- E35 was stopped early on owned Runpod pod `p2roc93zgk4ho9`, and the pod was
+  stopped. Step 250 reached `val_lddt_ca=0.2406`, FoldScore `0.2062`,
+  `val_ca_drmsd=13.0352`, `val_pred_ca_rg=9.1316`, and
+  `val_true_ca_rg=15.4034`. Face-only structure sidecar readout did not
+  improve over E33/E34 and misses the E22/E25 early band, so E35 is rejected.

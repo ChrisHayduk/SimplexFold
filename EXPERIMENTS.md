@@ -1006,7 +1006,7 @@ useful structure-conditioning signal.
 
 ### E35: Face-Only Structure Sidecar
 
-Status: design candidate.
+Status: stopped early on Runpod.
 
 Hypothesis: E33/E34 both used face and tetra summaries in the structure
 readout. The tetra summaries may still be too noisy early in training and may
@@ -1027,3 +1027,11 @@ learned faces, not a dense all-pairs metric loss.
 Decision rule: run a short Runpod gate. Continue only if the face-only
 readout recovers above the E33/E34 band and approaches the E22/E25 early
 range without worsening FoldScore.
+
+Result: reject. Step 250 reached `val_lddt_ca=0.2406`, FoldScore `0.2062`,
+`val_ca_drmsd=13.0352`, and predicted/true C-alpha radius of gyration
+`9.1316 / 15.4034`. The larger predicted radius suggests face-only readout
+can pass some expansion signal, but local lDDT and FoldScore remained in the
+same weak band as E33/E34. The readout family is therefore not the next
+scaling path until the selected 2-simplex states themselves become more
+reliable.
