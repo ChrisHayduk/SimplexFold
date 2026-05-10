@@ -719,7 +719,7 @@ batch size alone is not enough to break the topology-mediated lDDT plateau.
 
 ### E26: MSA-to-Face Two-Skeleton Stabilization
 
-Status: ready for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: the E09/E15 stack may be asking the model to learn persistent
 3-simplex packing cells before the selected triangular face geometry is
@@ -736,3 +736,29 @@ architecture ablation inside the simplicial view, not a generic loss change.
 Decision rule: use a 500-step Runpod gate. Continue only if the face-only
 2-skeleton improves over the E09/E15 early band or gives a clearly better
 global geometry/FoldScore tradeoff.
+
+Result: reject. The official-metrics rerun reached `val_lddt_ca=0.2517` at
+step 250 and final `val_lddt_ca=0.2489`, FoldScore `0.2214`,
+`val_ca_drmsd=15.8143`, and predicted/true C-alpha radius of gyration
+`5.9651 / 15.7622`. Removing tetra states worsened both local lDDT and global
+scale, so the full 3-simplex pathway remains preferable despite its plateau.
+
+### E27: No Recycled-Coordinate Topology Feedback
+
+Status: implemented and ready for Runpod.
+
+Hypothesis: SimplexFold's README motivates recycling geometry back into the
+simplex trunk, but the current runs repeatedly show under-expanded predicted
+coordinates. If those collapsed coordinates participate in neighbor selection
+and simplex geometry features, recycling may reinforce a poor sparse complex.
+
+Mechanism: add `full_msa_to_face_no_recycled_topology`, which keeps faces,
+tetras, the MSA-to-face moment, and the E09/E15 selected-coordinate losses,
+but sets `simplex_use_recycled_geometry=false`. The selected complex is then
+driven by learned MSA/pair topology rather than predicted coordinate feedback.
+This is a topology-construction ablation inside the SimplexFold view, not a
+dense metric loss.
+
+Decision rule: use a 500-step Runpod gate. Continue only if disabling
+recycled-coordinate topology improves over the E09/E15 early band or improves
+global scale without sacrificing FoldScore.

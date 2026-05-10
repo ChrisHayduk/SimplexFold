@@ -75,3 +75,16 @@ def test_full_msa_to_face_edge_messages_biases_updates_to_pair_stream():
     assert cfg.simplex_use_msa_to_face is True
     assert cfg.simplex_pair_update_scale == 1.5
     assert cfg.simplex_single_update_scale == 0.5
+
+
+def test_full_msa_to_face_no_recycled_topology_keeps_latent_selector():
+    cfg = _variant_config(
+        load_model_config("simplexfold_medium_param_matched"),
+        "full_msa_to_face_no_recycled_topology",
+    )
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_use_recycled_geometry is False

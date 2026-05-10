@@ -1,15 +1,16 @@
-## Current Plan: Two-Skeleton Stabilization
+## Current Plan: Recycled Topology Feedback Ablation
 
-E21-E25 showed that message scaling, boundary-degree normalization, and a
-larger effective batch do not break the lDDT plateau. The next
-architecture-facing question is whether the current sparse 3-complex is too
-ambitious before the learned face geometry is stable.
+E21-E26 showed that message scaling, boundary-degree normalization, larger
+effective batch size, and a face-only 2-skeleton do not break the lDDT
+plateau. The next architecture-facing question is whether the model's
+under-expanded recycled coordinates are feeding back into the sparse simplex
+selector and reinforcing bad higher-order cells.
 
-Run a 2-skeleton stabilization gate: keep the explicit MSA-to-face path and
-selected face coordinate/boundary realization, but disable tetra states for a
-short Runpod pilot. This asks whether persistent learned triangular faces can
-provide a cleaner topological scaffold before reintroducing 3-simplex packing
-cells. Keep the parameter budget under the AF2-medium +5% cap and use
+Run a recycled-topology ablation: keep the full explicit face/tetra complex
+and MSA-to-face path, but disable recycled-coordinate terms in topology and
+simplex geometry construction for a short Runpod pilot. This keeps the sparse
+complex driven by learned MSA/pair topology rather than by collapsed early
+coordinates. Keep the parameter budget under the AF2-medium +5% cap and use
 `EXPERIMENT_RESULTS.md` only for returned run results.
 
 Yes. With templates forbidden, the right construction is:

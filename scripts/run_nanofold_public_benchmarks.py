@@ -53,10 +53,9 @@ from minalphafold.trainer import (  # noqa: E402
     DataConfig,
     TrainingConfig,
     apply_loss_weight_schedule,
-    build_ema_model,
     build_dataloader,
+    build_ema_model,
     build_optimizer,
-    collapse_sampled_batch_tensor,
     learning_rate_at_step,
     load_model_config,
     loss_inputs_from_batch,
@@ -547,6 +546,15 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_msa_to_face=True,
             simplex_pair_update_scale=1.5,
             simplex_single_update_scale=0.5,
+        )
+    if variant == "full_msa_to_face_no_recycled_topology":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+            simplex_use_recycled_geometry=False,
         )
     if variant == "msa_to_face":
         return replace(
@@ -1090,6 +1098,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "full_msa_to_face_strong_messages",
             "full_msa_to_face_damped_messages",
             "full_msa_to_face_edge_messages",
+            "full_msa_to_face_no_recycled_topology",
             "msa_to_face",
         ],
     )

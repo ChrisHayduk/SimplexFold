@@ -405,3 +405,20 @@
   packing layer is hurting before face geometry has stabilized. Use the same
   500-step Runpod gate and E09 selected face coordinate/boundary-distance
   weights.
+- E26 first attempt was killed before validation because the fresh pod had
+  public data but not the NanoFold Python package, so official FoldScore
+  components were unavailable. The local `nanofold/` package was synced to the
+  remote NanoFold root, the import was verified, and the run was restarted
+  under `e26_msa_face_2skeleton_s500_c256_m64_v2`.
+- E26 completed on owned pod `0hesaxxfhq8soj`: step 250 reached
+  `val_lddt_ca=0.2517`, FoldScore `0.2106`, `val_ca_drmsd=14.9939`,
+  `val_pred_ca_rg=6.4038`, and `val_true_ca_rg=15.4034`. Final step 500 was
+  `val_lddt_ca=0.2489`, FoldScore `0.2214`, `val_ca_drmsd=15.8143`,
+  `val_pred_ca_rg=5.9651`, and `val_true_ca_rg=15.7622`. The 2-skeleton is
+  worse than the full E09/E15 complex and is rejected.
+- After E26, pod `0hesaxxfhq8soj` was stopped. Both owned Runpod pods
+  (`sytp4e4kjs7e61` and `0hesaxxfhq8soj`) are stopped.
+- E27 live plan: add and run `full_msa_to_face_no_recycled_topology`, keeping
+  the full selected face/tetra complex and MSA-to-face path but setting
+  `simplex_use_recycled_geometry=false`. This tests whether collapsed recycled
+  coordinates are contaminating the learned sparse simplex selector.

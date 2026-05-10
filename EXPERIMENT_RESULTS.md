@@ -39,3 +39,4 @@ recorded in the running notes for that run.
 | E23 edge-biased simplex messages | stopped early | 500 | 0.2509 | 0.2509 | 0.2355 | 15.0561 | 6.2181 / 15.4034 | rejected |
 | E24 degree-normalized boundary realization | stopped early | 500 | 0.2724 | 0.2724 | 0.2383 | 14.1528 | 7.2673 / 15.4034 | rejected |
 | E25 effective-batch-8 optimization | completed | 500 | 0.2946 | 0.2946 | 0.2466 | 14.3073 | 7.6818 / 15.7622 | rejected |
+| E26 MSA-to-face two-skeleton | completed | 250 | 0.2517 | 0.2489 | 0.2214 | 15.8143 | 5.9651 / 15.7622 | rejected |
