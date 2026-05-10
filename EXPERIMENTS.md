@@ -773,7 +773,7 @@ coordinate feedback contaminating cell selection.
 
 ### E28: Training-Only Simplex Topology Teacher Forcing
 
-Status: implemented and ready for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: the repeated collapse across E21-E27 suggests the sparse simplex
 selector may be too noisy before the structure module has learned useful
@@ -800,3 +800,28 @@ boundary-distance weights, `--simplex-topology-teacher-forcing-weight 1.0`,
 Decision rule: run a 500-step Runpod gate. Continue only if the learned
 selector handoff improves over the E09/E15 early band without making
 FoldScore or global scale worse.
+
+Result: reject. Full teacher forcing reached only `val_lddt_ca=0.1560` at
+step 250 while the teacher weight was still 1.0. After annealing to zero, the
+final step 500 validation recovered only to `val_lddt_ca=0.2398`, FoldScore
+`0.2222`, `val_ca_drmsd=15.5485`, and predicted/true C-alpha radius of
+gyration `6.1752 / 15.7622`. Replacing the selector with true-distance
+topology is too disruptive for early validation geometry.
+
+### E29: Soft Simplex Topology Teacher Forcing
+
+Status: ready for Runpod.
+
+Hypothesis: E28 may have failed because full true-distance topology
+overrode the learned MSA/pair selector instead of stabilizing it. A small
+teacher-distance blend could bias the sparse complex toward plausible local
+cells while preserving learned topology information.
+
+Mechanism: use the E28 implementation but reduce
+`simplex_topology_teacher_forcing_weight` from `1.0` to `0.25`, then anneal
+to `0.0` from step 250 to step 500. Keep the E09 selected coordinate and
+boundary-distance weights and the `full_msa_to_face` architecture.
+
+Decision rule: use the same 500-step Runpod gate. Continue only if the soft
+teacher blend recovers above the E09/E15 early band or improves global scale
+without losing FoldScore.

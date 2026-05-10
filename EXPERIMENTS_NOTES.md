@@ -446,3 +446,17 @@
 - E28 Runpod gate plan: use `full_msa_to_face` with E09 selected coordinate
   and boundary-distance weights, teacher weight `1.0`, final teacher weight
   `0.0`, ramp start step `250`, and ramp length `250`, for a 500-step gate.
+- E28 ran on owned pod `sytp4e4kjs7e61` at commit `d2b1cd1`. The stale
+  `/workspace/nanoFold-Competition/data/manifests/hidden_val.txt` manifest on
+  that pod was removed before launch; the remote data audit then found no
+  hidden or sidecar paths, train/val/all counts were `10000/1000/11000`, and
+  official FoldScore import was verified.
+- E28 completed and the owned pod was stopped. Step 250 reached
+  `val_lddt_ca=0.1560`, FoldScore `0.2252`, `val_ca_drmsd=17.2788`,
+  `val_pred_ca_rg=4.2006`, and `val_true_ca_rg=15.4034`. Final step 500 was
+  `val_lddt_ca=0.2398`, FoldScore `0.2222`, `val_ca_drmsd=15.5485`,
+  `val_pred_ca_rg=6.1752`, and `val_true_ca_rg=15.7622`. Full
+  teacher-forced topology is rejected.
+- E29 live plan: rerun the same topology-curriculum gate with a softer
+  teacher blend, `simplex_topology_teacher_forcing_weight=0.25` annealed to
+  `0.0` from step 250 to step 500.

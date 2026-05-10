@@ -1,20 +1,20 @@
-## Current Plan: Topology Teacher-Forcing Curriculum
+## Current Plan: Soft Topology Teacher-Forcing
 
-E21-E27 showed that message scaling, boundary-degree normalization, larger
-effective batch size, face-only 2-skeletons, and removing recycled-coordinate
-topology do not break the lDDT plateau. The common failure mode is still
-under-expanded coordinates, which suggests the learned sparse complex may be
-too noisy early for persistent face/tetra states to become useful.
+E21-E28 showed that message scaling, boundary-degree normalization, larger
+effective batch size, face-only 2-skeletons, removing recycled-coordinate
+topology, and full-strength topology teacher forcing do not break the lDDT
+plateau. Full teacher forcing severely hurt early validation geometry, which
+suggests replacing the learned selector with true-distance topology is too
+abrupt.
 
-The current architecture-facing experiment is a training-only topology
-curriculum. The implementation adds opt-in teacher forcing of the sparse
-face/tetra selector from public training-label C-alpha distances, with a
-linear schedule back to the learned MSA/pair selector. Validation and
-inference still use features only. This tests whether the explicit
-higher-order states help once the model sees a plausible simplex complex,
-without using external data, hidden labels, templates, dense all-pairs metric
-losses, or extra parameters. Keep `EXPERIMENT_RESULTS.md` only for returned
-run results.
+The current architecture-facing experiment is a soft training-only topology
+curriculum. Keep the same opt-in teacher-forcing implementation, but blend
+only a small true-distance prior into the learned MSA/pair selector and anneal
+it away. Validation and inference still use features only. This tests whether
+a light topological prior can stabilize sparse cell choice without overriding
+the learned selector, using no external data, hidden labels, templates, dense
+all-pairs metric losses, or extra parameters. Keep `EXPERIMENT_RESULTS.md`
+only for returned run results.
 
 Yes. With templates forbidden, the right construction is:
 

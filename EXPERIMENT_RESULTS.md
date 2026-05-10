@@ -41,3 +41,4 @@ recorded in the running notes for that run.
 | E25 effective-batch-8 optimization | completed | 500 | 0.2946 | 0.2946 | 0.2466 | 14.3073 | 7.6818 / 15.7622 | rejected |
 | E26 MSA-to-face two-skeleton | completed | 250 | 0.2517 | 0.2489 | 0.2214 | 15.8143 | 5.9651 / 15.7622 | rejected |
 | E27 no recycled-coordinate topology | completed | 500 | 0.2369 | 0.2369 | 0.2354 | 16.3061 | 5.7967 / 15.7622 | rejected |
+| E28 topology teacher forcing 1.0->0.0 | completed | 500 | 0.2398 | 0.2398 | 0.2222 | 15.5485 | 6.1752 / 15.7622 | rejected |
