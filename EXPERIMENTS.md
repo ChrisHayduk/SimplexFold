@@ -140,7 +140,7 @@ direction is useful but not sufficient for the 0.7 target.
 
 ### E04: Selected-Simplex Coordinate Realization Loss
 
-Status: implemented locally; queued for Runpod.
+Status: launched on Runpod.
 
 Hypothesis: the pilots show persistent under-expansion of predicted C-alpha
 geometry. The model may learn useful face/tetra latent geometry while the

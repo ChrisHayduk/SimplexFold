@@ -182,3 +182,5 @@
   receive low-rank third-order MSA moments while keeping tetra message passing
   active. This is a zero-parameter activation of the existing MSA-to-face
   path and directly tests the README's `MSA <-> sparse face tensor` claim.
+- E09 launched on pod `sytp4e4kjs7e61` at commit `680f68c` with the same
+  scaled protocol and E07 loss weights, using `--variants full_msa_to_face`.
