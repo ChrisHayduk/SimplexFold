@@ -1293,3 +1293,23 @@
   Move next to the Topotein-inspired outer-edge communication idea, which
   changes inter-cell message passing rather than the selected-neighborhood
   schedule.
+- E49 local implementation: added `cell_outer_edge_context` and
+  `simplex_outer_edge_context_scale`. For each selected face/tetra, the pass
+  gathers selected directed pair edges from vertices in the cell to neighbors
+  outside the cell, plus reverse directed states, then updates the higher-rank
+  cochain from that pooled edge context. This is the Topotein-style
+  outer-edge neighborhood; it differs from E39's shared-boundary face
+  averaging.
+- E49 local checks: `python -m py_compile minalphafold/simplex.py
+  minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+  passed; focused tests for the context mask, adapter effect, runner variant,
+  and parameter budget passed (`5 passed`); affected suites
+  `tests/test_simplex.py tests/test_nanofold_public_benchmarks.py
+  tests/test_trainer.py -q` passed.
+- E49 parameter audit: AF2-medium pair-only baseline `3,106,642`,
+  SimplexFold medium `3,106,690`, and
+  `full_msa_to_face_outer_edge_context` `3,183,282`, within the 5% budget.
+  Proposed Runpod gate: same 500-step crop 256 / MSA depth 64 protocol as
+  E48/E47, E15 selected coordinate and boundary-distance losses,
+  `simplex_aux_weight` annealed `1.0 -> 0.5`, and
+  `full_msa_to_face_outer_edge_context`.

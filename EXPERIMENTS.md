@@ -1503,7 +1503,7 @@ collapse.
 
 ### E49: Outer-Edge Selected-Cell Communication
 
-Status: next queued idea from Topotein after E48 rejection.
+Status: implemented locally and queued for Runpod.
 
 Hypothesis: selected face/tetra cells should communicate through boundary
 edges that connect one selected cell to another, preserving multiple
@@ -1518,6 +1518,24 @@ updated higher-rank state to the ordinary pair/single residual path. Start
 with a zero-parameter or very small-parameter residual before spending the
 remaining 5% budget.
 
-Decision rule: only implement after E48 or if a quick design audit shows it
-can be added with low memory overhead and clear tests for incidence,
-normalization, and parameter budget.
+Implementation: add `simplex_outer_edge_context_scale`, a directed
+outer-edge context pass distinct from the older shared-boundary face averaging
+variant. For each selected face/tetra cell, gather the selected topology
+edges that originate from a cell vertex and terminate outside the cell, plus
+the reverse directed pair states. The pooled outgoing/incoming pair context
+updates the face or tetra cochain before the ordinary boundary readout.
+This follows Topotein's `B^{2->0} B^{0->1} - B^{2->1}` idea more closely
+than requiring two selected cells to share an existing boundary edge.
+
+Local validation: focused tests passed for the outer-edge context exclusion
+rule, adapter behavior, runner variant parsing, and parameter headroom.
+Affected suites `tests/test_simplex.py`, `tests/test_nanofold_public_benchmarks.py`,
+and `tests/test_trainer.py` passed. Parameter audit: AF2-medium pair-only
+`3,106,642`, SimplexFold medium `3,106,690`, and E49
+`3,183,282` parameters.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with
+the E15 selected coordinate and boundary-distance losses plus auxiliary
+annealing. Continue only if the outer-edge context recovers at least the
+E22/E25/E30 early-validation band without worsening the final radius
+collapse.

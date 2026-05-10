@@ -730,6 +730,33 @@ def face_tetra_coboundary_delta(
     return (delta / counts.clamp_min(1.0)) * face_mask[..., None]
 
 
+def cell_outer_edge_context(
+    pair: torch.Tensor,
+    cell_indices: torch.Tensor,
+    cell_mask: torch.Tensor,
+    nbr_idx: torch.Tensor,
+) -> torch.Tensor:
+    """Pool directed edges that leave or enter selected higher-rank cells."""
+
+    if cell_indices.numel() == 0:
+        return pair.new_empty(*cell_indices.shape[:-1], 2 * pair.shape[-1])
+
+    vertices = cell_indices
+    outer_nbrs = gather_single(nbr_idx, vertices)
+    if outer_nbrs.shape[-1] == 0:
+        return pair.new_zeros(*cell_indices.shape[:-1], 2 * pair.shape[-1])
+
+    src = vertices[..., None].expand_as(outer_nbrs)
+    is_inner = (outer_nbrs[..., None] == vertices[..., None, None, :]).any(dim=-1)
+    outer_mask = cell_mask[..., None, None].to(pair.dtype) * (~is_inner).to(pair.dtype)
+
+    outgoing = gather_pair(pair, src, outer_nbrs)
+    incoming = gather_pair(pair, outer_nbrs, src)
+    edge_context = torch.cat([outgoing, incoming], dim=-1) * outer_mask[..., None]
+    count = outer_mask.sum(dim=(-2, -1)).clamp_min(1.0)
+    return edge_context.sum(dim=(-3, -2)) / count[..., None]
+
+
 FACE_EDGE_FRAME_DIM = 10
 TETRA_EDGE_FRAME_DIM = 18
 SEGMENT_GEOMETRY_DIM = 4
@@ -1040,6 +1067,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.single_update_scale = float(getattr(config, "simplex_single_update_scale", 1.0))
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
+        self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
         self.edge_frame_message_scale = float(getattr(config, "simplex_edge_frame_message_scale", 0.0))
         self.segment_cell_scale = float(getattr(config, "simplex_segment_cell_scale", 0.0))
@@ -1078,6 +1106,18 @@ class SimplicialAdapter(torch.nn.Module):
         init_gate_linear(self.single_gate)
         self.single_norm = torch.nn.LayerNorm(config.c_s)
         self.auxiliary_heads = SimplexAuxiliaryHeads(config)
+        if self.outer_edge_context_scale > 0.0:
+            self.face_outer_edge_context = SimplexMLP(
+                self.c_face + 2 * config.c_z,
+                self.hidden_dim,
+                self.c_face,
+            )
+            if self.use_tetra:
+                self.tetra_outer_edge_context = SimplexMLP(
+                    self.c_tetra + 2 * config.c_z,
+                    self.hidden_dim,
+                    self.c_tetra,
+                )
         if self.edge_frame_message_scale > 0.0:
             self.face_edge_frame_to_edge = SimplexMLP(
                 self.c_face + FACE_EDGE_FRAME_DIM,
@@ -1258,6 +1298,16 @@ class SimplicialAdapter(torch.nn.Module):
         face_state = face_state + self.dropout(
             torch.sigmoid(self.face_gate(face_state)) * edge_msg * topology.face_mask[..., None]
         )
+        if self.outer_edge_context_scale > 0.0:
+            outer_context = cell_outer_edge_context(pair, face_indices, topology.face_mask, topology.nbr_idx)
+            outer_msg = self.face_outer_edge_context(torch.cat([face_state, outer_context], dim=-1))
+            face_state = face_state + self.dropout(
+                self.outer_edge_context_scale
+                * torch.sigmoid(self.face_gate(face_state))
+                * outer_msg
+                * topology.face_mask[..., None]
+            )
+            face_state = face_state * topology.face_mask[..., None]
         if self.outer_edge_update_scale > 0.0:
             outer_msg = face_outer_edge_delta(
                 face_state,
@@ -1584,6 +1634,16 @@ class SimplicialAdapter(torch.nn.Module):
         tetra_state = tetra_state + self.dropout(
             torch.sigmoid(self.tetra_gate(tetra_state)) * tetra_msg * topology.tetra_mask[..., None]
         )
+        if self.outer_edge_context_scale > 0.0:
+            outer_context = cell_outer_edge_context(pair, topology.tetra_indices, topology.tetra_mask, topology.nbr_idx)
+            outer_msg = self.tetra_outer_edge_context(torch.cat([tetra_state, outer_context], dim=-1))
+            tetra_state = tetra_state + self.dropout(
+                self.outer_edge_context_scale
+                * torch.sigmoid(self.tetra_gate(tetra_state))
+                * outer_msg
+                * topology.tetra_mask[..., None]
+            )
+            tetra_state = tetra_state * topology.tetra_mask[..., None]
         return tetra_state
 
 

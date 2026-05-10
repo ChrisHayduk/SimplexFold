@@ -6,6 +6,7 @@ from minalphafold.simplex import (
     SimplicialAdapter,
     _boundary_degree_weights,
     build_simplex_topology,
+    cell_outer_edge_context,
     face_edge_frame_features,
     face_outer_edge_delta,
     face_tetra_coboundary_delta,
@@ -63,6 +64,7 @@ class SimplexConfig:
     simplex_single_transition_n = 2
     simplex_structure_readout_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
+    simplex_outer_edge_context_scale = 0.0
     simplex_hodge_face_update_scale = 0.0
     simplex_edge_frame_message_scale = 0.0
     simplex_segment_cell_scale = 0.0
@@ -266,6 +268,25 @@ def test_face_outer_edge_delta_uses_shared_boundary_edges_only():
     assert torch.allclose(isolated_delta, torch.zeros_like(isolated_delta))
 
 
+def test_cell_outer_edge_context_excludes_edges_inside_cell():
+    pair = torch.zeros(1, 4, 4, 1)
+    for src in range(4):
+        for dst in range(4):
+            pair[0, src, dst, 0] = 10 * src + dst
+    cell_indices = torch.tensor([[[[0, 1]]]], dtype=torch.long)
+    cell_mask = torch.ones(1, 1, 1)
+    nbr_idx = torch.tensor([[[1, 2, 3], [0, 2, 3], [0, 1, 3], [0, 1, 2]]], dtype=torch.long)
+
+    context = cell_outer_edge_context(pair, cell_indices, cell_mask, nbr_idx)
+
+    assert context.shape == (1, 1, 1, 2)
+    assert torch.allclose(context[0, 0, 0], torch.tensor([7.5, 25.5]))
+
+    inner_only = torch.tensor([[[1], [0], [3], [2]]], dtype=torch.long)
+    empty_context = cell_outer_edge_context(pair, cell_indices, cell_mask, inner_only)
+    assert torch.allclose(empty_context, torch.zeros_like(empty_context))
+
+
 def test_outer_edge_adapter_scale_changes_outputs_without_new_parameters():
     class OuterEdgeConfig(SimplexConfig):
         simplex_neighbor_k = 3
@@ -292,6 +313,37 @@ def test_outer_edge_adapter_scale_changes_outputs_without_new_parameters():
     on_pair, on_single, _ = on_adapter(pair, single)
 
     assert on_params == off_params
+    assert not torch.allclose(on_pair, off_pair)
+    assert not torch.allclose(on_single, off_single)
+
+
+def test_outer_edge_context_adapter_scale_changes_outputs_with_budgeted_parameters():
+    class OuterEdgeContextConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class OuterEdgeContextEnabledConfig(OuterEdgeContextConfig):
+        simplex_outer_edge_context_scale = 0.25
+
+    torch.manual_seed(14)
+    off_adapter = SimplicialAdapter(OuterEdgeContextConfig())
+    torch.manual_seed(14)
+    on_adapter = SimplicialAdapter(OuterEdgeContextEnabledConfig())
+    pair = torch.randn(1, 5, 5, OuterEdgeContextConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, OuterEdgeContextConfig.c_s)
+
+    off_params = sum(p.numel() for p in off_adapter.parameters())
+    on_params = sum(p.numel() for p in on_adapter.parameters())
+    off_pair, off_single, _ = off_adapter(pair, single)
+    on_pair, on_single, _ = on_adapter(pair, single)
+
+    assert on_params > off_params
+    assert on_params - off_params < 10_000
     assert not torch.allclose(on_pair, off_pair)
     assert not torch.allclose(on_single, off_single)
 

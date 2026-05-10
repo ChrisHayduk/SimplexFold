@@ -1289,3 +1289,12 @@ selected cells. Instead of forcing filled faces/tetras to be closed, let
 face/tetra cochains exchange messages through selected boundary edges that
 leave one cell and enter another, preserving edge-level geometry and the
 combinatorial-complex flexibility.
+
+E49 implementation update: implemented a directed outer-edge context pass
+with `simplex_outer_edge_context_scale=0.25`. Each selected face/tetra
+cochain gathers outgoing and incoming pair-edge states from its vertices to
+selected neighbors outside the cell, then uses that pooled context to update
+the higher-rank state before boundary readout. This is distinct from E39's
+shared-boundary face averaging and better matches the Topotein outer-edge
+neighborhood. Parameter count is `3,183,282`, within the 5% AF2-medium
+budget.

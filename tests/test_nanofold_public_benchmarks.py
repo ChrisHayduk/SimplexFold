@@ -214,6 +214,25 @@ def test_full_msa_to_face_outer_edge_variant_is_accepted_by_cli_parser():
     assert args.variants == ["full_msa_to_face_outer_edge"]
 
 
+def test_full_msa_to_face_outer_edge_context_adds_directed_edge_context():
+    cfg = _variant_config(
+        load_model_config("simplexfold_medium_param_matched"),
+        "full_msa_to_face_outer_edge_context",
+    )
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_outer_edge_context_scale == 0.25
+
+
+def test_full_msa_to_face_outer_edge_context_variant_is_accepted_by_cli_parser():
+    args = parse_args(["--variants", "full_msa_to_face_outer_edge_context"])
+
+    assert args.variants == ["full_msa_to_face_outer_edge_context"]
+
+
 def test_full_msa_to_face_edge_frame_messages_adds_local_frame_readout():
     cfg = _variant_config(
         load_model_config("simplexfold_medium_param_matched"),
