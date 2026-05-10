@@ -189,10 +189,12 @@ class TrainingConfig:
     simplex_aux_weight: float = 1.0
     simplex_face_coordinate_weight: float | None = None
     simplex_face_coordinate_distance_weight: float | None = None
+    simplex_face_shape_weight: float | None = None
     simplex_face_normal_weight: float | None = None
     simplex_face_boundary_lddt_weight: float | None = None
     simplex_tetra_coordinate_weight: float | None = None
     simplex_tetra_coordinate_distance_weight: float | None = None
+    simplex_tetra_shape_weight: float | None = None
     simplex_tetra_boundary_lddt_weight: float | None = None
     simplex_topology_margin_weight: float | None = None
     simplex_topology_margin: float | None = None
@@ -1098,10 +1100,12 @@ def fit(
         simplex_aux_weight=training_config.simplex_aux_weight,
         simplex_face_coordinate_weight=training_config.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=training_config.simplex_face_coordinate_distance_weight,
+        simplex_face_shape_weight=training_config.simplex_face_shape_weight,
         simplex_face_normal_weight=training_config.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=training_config.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=training_config.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=training_config.simplex_tetra_coordinate_distance_weight,
+        simplex_tetra_shape_weight=training_config.simplex_tetra_shape_weight,
         simplex_tetra_boundary_lddt_weight=training_config.simplex_tetra_boundary_lddt_weight,
         simplex_topology_margin_weight=training_config.simplex_topology_margin_weight,
         simplex_topology_margin=training_config.simplex_topology_margin,
@@ -1117,10 +1121,12 @@ def fit(
         simplex_aux_weight=training_config.simplex_aux_weight,
         simplex_face_coordinate_weight=training_config.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=training_config.simplex_face_coordinate_distance_weight,
+        simplex_face_shape_weight=training_config.simplex_face_shape_weight,
         simplex_face_normal_weight=training_config.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=training_config.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=training_config.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=training_config.simplex_tetra_coordinate_distance_weight,
+        simplex_tetra_shape_weight=training_config.simplex_tetra_shape_weight,
         simplex_tetra_boundary_lddt_weight=training_config.simplex_tetra_boundary_lddt_weight,
         simplex_topology_margin_weight=training_config.simplex_topology_margin_weight,
         simplex_topology_margin=training_config.simplex_topology_margin,
@@ -1455,6 +1461,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the selected-face boundary-edge coordinate-distance realization loss weight.",
     )
     parser.add_argument(
+        "--simplex-face-shape-weight",
+        type=float,
+        default=None,
+        help="Override the selected-face rigid local shape realization loss weight.",
+    )
+    parser.add_argument(
         "--simplex-face-normal-weight",
         type=float,
         default=None,
@@ -1477,6 +1489,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the selected-tetra boundary-edge coordinate-distance realization loss weight.",
+    )
+    parser.add_argument(
+        "--simplex-tetra-shape-weight",
+        type=float,
+        default=None,
+        help="Override the selected-tetra rigid local shape realization loss weight.",
     )
     parser.add_argument(
         "--simplex-tetra-boundary-lddt-weight",
@@ -1600,10 +1618,12 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_aux_weight=args.simplex_aux_weight,
         simplex_face_coordinate_weight=args.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=args.simplex_face_coordinate_distance_weight,
+        simplex_face_shape_weight=args.simplex_face_shape_weight,
         simplex_face_normal_weight=args.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=args.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=args.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=args.simplex_tetra_coordinate_distance_weight,
+        simplex_tetra_shape_weight=args.simplex_tetra_shape_weight,
         simplex_tetra_boundary_lddt_weight=args.simplex_tetra_boundary_lddt_weight,
         simplex_topology_margin_weight=args.simplex_topology_margin_weight,
         simplex_topology_margin=args.simplex_topology_margin,

@@ -366,9 +366,10 @@
   selected or normalized.
 - After E21-E23, pod `0hesaxxfhq8soj` was stopped. Both owned Runpod pods
   (`sytp4e4kjs7e61` and `0hesaxxfhq8soj`) are stopped.
-- `EXPERIMENT_RESULTS.md` is now the durable returned-results tracker. Keep
-  live planning and in-flight notes here, and add a row to results only after
-  a Runpod experiment returns a final or early-stop validation point.
+- `EXPERIMENTS_NOTES.md` is the live lab notebook for plans, launch commands,
+  audits, and in-flight observations. `EXPERIMENT_RESULTS.md` is the durable
+  returned-results tracker; add a row there only after a Runpod experiment
+  returns a final or early-stop validation point.
 - E24 live plan: add degree-normalized selected simplex boundary realization.
   The current selected boundary losses count an edge once per incident
   selected face/tetra; E24 weights boundary losses by inverse undirected edge
@@ -751,3 +752,29 @@
   (`simplex_face_normal_weight=0.1`,
   `val_weighted_simplex_face_normal_loss=0.0501`) but did not improve beyond
   the weak E33-E35 band, so E37 is rejected.
+- E38 direction: add selected simplex shape realization. E37's face-normal
+  signal was topologically motivated but still scalar; E38 supervises each
+  selected face/tetra as a local cell by centering its predicted and true
+  C-alpha vertices, aligning with a proper Kabsch rotation, and scoring
+  normalized vertex RMSD. This keeps the loss globally rigid-motion invariant,
+  preserves tetra chirality by disallowing reflection, and stays tied to the
+  selected sparse 2-/3-simplex complex rather than adding a dense all-pairs
+  lDDT-shaped objective.
+- E38 focused local checks so far: `python -m py_compile minalphafold/simplex.py
+  minalphafold/losses.py minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py` passed. Focused tests for local
+  shape invariance, `AlphaFoldLoss` overrides, and benchmark CLI/loss builder
+  passed (`4 passed`).
+- E38 broader local checks: `pytest tests/test_simplex.py
+  tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights
+  tests/test_nanofold_public_benchmarks.py` passed (`38 passed`), full
+  `python -m pytest` passed (`215 passed`), and `git diff --check` passed.
+  Parameter audit using `configs/medium.toml` with
+  `use_simplicial_evoformer=false` gives AF2-medium `3,106,642` and E38
+  `full_msa_to_face` `3,106,690`, within the 5% budget. `python -m ruff` is
+  unavailable locally. `python -m mypy minalphafold
+  scripts/run_nanofold_public_benchmarks.py` still fails on pre-existing
+  structure-module typing, missing `nanofold.metrics`, EMA model typing, and
+  runner row typing. `python -m pyright --warnings` still fails broadly because
+  this local interpreter does not resolve Torch/NumPy/Modal/OpenMM plus
+  existing optional/type issues.

@@ -569,6 +569,73 @@ def test_simplex_face_normal_loss_is_global_rotation_invariant():
     assert terms["weighted_simplex_face_normal_loss"].item() < 1e-6
 
 
+def test_simplex_shape_loss_is_local_rigid_motion_invariant():
+    true_ca = torch.tensor(
+        [
+            [
+                [0.0, 0.0, 0.0],
+                [4.0, 0.0, 0.0],
+                [0.0, 5.0, 0.0],
+                [0.0, 0.0, 6.0],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    theta = torch.tensor(0.7)
+    rotation = torch.tensor(
+        [
+            [torch.cos(theta), -torch.sin(theta), 0.0],
+            [torch.sin(theta), torch.cos(theta), 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    rotated_ca = torch.einsum("...i,ji->...j", true_ca, rotation) + torch.tensor([3.0, -2.0, 5.0])
+    reflected_ca = true_ca.clone()
+    reflected_ca[:, 3, 2] = -reflected_ca[:, 3, 2]
+    collapsed_ca = torch.zeros_like(true_ca)
+    ca_mask = torch.ones(1, 4)
+    matching_atom14 = torch.zeros(1, 4, 14, 3)
+    matching_atom14[:, :, 1, :] = rotated_ca
+    reflected_atom14 = torch.zeros(1, 4, 14, 3)
+    reflected_atom14[:, :, 1, :] = reflected_ca
+    collapsed_atom14 = torch.zeros(1, 4, 14, 3)
+    collapsed_atom14[:, :, 1, :] = collapsed_ca
+    base_prediction = {
+        "simplex_face_indices": torch.tensor([[[[0, 1, 2]]]]),
+        "simplex_face_mask": torch.ones(1, 1, 1),
+        "simplex_face_area_logits": torch.zeros(1, 1, 1),
+        "simplex_tetra_indices": torch.tensor([[[[0, 1, 2, 3]]]]),
+        "simplex_tetra_mask": torch.ones(1, 1, 1),
+        "simplex_tetra_geometry_logits": torch.zeros(1, 1, 1, 3),
+    }
+    loss_fn = SimplexGeometryLoss(
+        contact_weight=0.0,
+        topology_neighborhood_weight=0.0,
+        face_area_weight=0.0,
+        face_coordinate_weight=0.0,
+        face_coordinate_distance_weight=0.0,
+        face_shape_weight=1.0,
+        face_distance_weight=0.0,
+        tetra_geometry_weight=0.0,
+        tetra_coordinate_weight=0.0,
+        tetra_coordinate_distance_weight=0.0,
+        tetra_shape_weight=1.0,
+        tetra_distance_weight=0.0,
+        pair_face_consistency_weight=0.0,
+        face_tetra_consistency_weight=0.0,
+    )
+
+    matching_terms = loss_fn({**base_prediction, "atom14_coords": matching_atom14}, true_ca, ca_mask)
+    reflected_terms = loss_fn({**base_prediction, "atom14_coords": reflected_atom14}, true_ca, ca_mask)
+    collapsed_terms = loss_fn({**base_prediction, "atom14_coords": collapsed_atom14}, true_ca, ca_mask)
+
+    assert matching_terms["simplex_face_shape_loss"].item() < 1e-6
+    assert matching_terms["simplex_tetra_shape_loss"].item() < 1e-6
+    assert reflected_terms["simplex_tetra_shape_loss"] > matching_terms["simplex_tetra_shape_loss"]
+    assert collapsed_terms["simplex_face_shape_loss"] > matching_terms["simplex_face_shape_loss"]
+    assert collapsed_terms["simplex_tetra_shape_loss"] > matching_terms["simplex_tetra_shape_loss"]
+
+
 def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
     true_ca = torch.tensor(
         [

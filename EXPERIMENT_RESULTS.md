@@ -5,6 +5,10 @@ Last updated: 2026-05-10.
 Best validation C-alpha lDDT so far: **E15**, `val_lddt_ca=0.3556` at step
 9000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
+This file records only returned Runpod results. In-flight plans, launch notes,
+and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
+final or early-stop validation point.
+
 `Final/stop` means the final checkpoint for completed runs or the early-stop
 validation checkpoint for rejected pilot runs. `-` means the metric was not
 recorded in the running notes for that run.

@@ -1102,3 +1102,26 @@ Result: reject. Step 250 reached `val_lddt_ca=0.2464`, FoldScore `0.2109`,
 above the E33-E35 readout band or approach the E22/E25 early range. The
 selected-face orientation signal is not useful at this weight on the current
 E09 coordinate stack.
+
+### E38: Selected Simplex Shape Realization
+
+Status: implemented locally and queued for Runpod.
+
+Hypothesis: E37 adds orientation pressure to selected faces, but the core
+SimplexFold motivation is stronger: explicit faces and tetras should act like
+learned local geometric cells. The existing selected-coordinate terms supervise
+area, volume/radius, and boundary distances separately. A rigid local cell
+realization term may help the model learn each selected 2-/3-simplex as one
+coherent shape instead of optimizing disconnected scalars.
+
+Mechanism: add optional selected face/tetra shape losses. For each selected
+face `(i, j, k)` or tetra `(i, j, k, l)`, gather predicted and true C-alpha
+vertices, center the cell, align predicted to true by a proper Kabsch rotation,
+and score normalized vertex RMSD. The term is globally rigid-motion invariant,
+preserves tetra chirality by disallowing reflection in the alignment, adds no
+parameters, and only supervises cells chosen by the sparse simplex topology.
+
+Decision rule: run a 500-step Runpod gate on the E09 selected-coordinate stack
+with MSA-to-face enabled and small face/tetra shape weights. Continue only if
+the local rigid-cell signal improves over the E33-E37 weak band and approaches
+the E22/E25 early range without losing FoldScore.

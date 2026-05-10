@@ -154,8 +154,12 @@ def test_face_structure_readout_only_variant_is_accepted_by_cli_parser():
 def test_topology_margin_args_are_accepted_by_cli_parser():
     args = parse_args(
         [
+            "--simplex-face-shape-weight",
+            "0.2",
             "--simplex-face-normal-weight",
             "0.1",
+            "--simplex-tetra-shape-weight",
+            "0.3",
             "--simplex-topology-margin-weight",
             "0.05",
             "--simplex-topology-margin",
@@ -165,7 +169,9 @@ def test_topology_margin_args_are_accepted_by_cli_parser():
         ]
     )
 
+    assert args.simplex_face_shape_weight == 0.2
     assert args.simplex_face_normal_weight == 0.1
+    assert args.simplex_tetra_shape_weight == 0.3
     assert args.simplex_topology_margin_weight == 0.05
     assert args.simplex_topology_margin == 1.25
     assert args.simplex_topology_margin_hard_negatives == 4
@@ -174,14 +180,18 @@ def test_topology_margin_args_are_accepted_by_cli_parser():
 def test_benchmark_loss_builder_applies_topology_margin_config():
     loss_fn = _build_loss_fn(
         TrainingConfig(
+            simplex_face_shape_weight=0.2,
             simplex_face_normal_weight=0.1,
+            simplex_tetra_shape_weight=0.3,
             simplex_topology_margin_weight=0.05,
             simplex_topology_margin=1.25,
             simplex_topology_margin_hard_negatives=4,
         )
     )
 
+    assert loss_fn.simplex_geometry_loss.face_shape_weight == 0.2
     assert loss_fn.simplex_geometry_loss.face_normal_weight == 0.1
+    assert loss_fn.simplex_geometry_loss.tetra_shape_weight == 0.3
     assert loss_fn.simplex_geometry_loss.topology_margin_weight == 0.05
     assert loss_fn.simplex_geometry_loss.topology_margin == 1.25
     assert loss_fn.simplex_geometry_loss.topology_margin_hard_negatives == 4

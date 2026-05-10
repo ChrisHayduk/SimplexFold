@@ -1,20 +1,18 @@
-## Current Plan: Topology Capacity With Auxiliary Anneal
+## Current Plan: Selected Simplex Shape Realization
 
-E21-E31 showed that message scaling, boundary-degree normalization, larger
-effective batch size, face-only 2-skeletons, removing recycled-coordinate
-topology, teacher-forced topology, and simplex-coupling warmups do not break
-the lDDT plateau. E30/E31 improved global expansion once coupling ramped up,
-but local lDDT and FoldScore stayed below the E09/E15 band, so coupling
-schedules are not the next promising lever.
+E33-E37 show that routing explicit face/tetra states into the structure module,
+making the topology selector more aggressive, and supervising selected face
+orientation do not break the lDDT plateau. The next architecture-facing
+direction should return to the core SimplexFold claim: learned 2-/3-simplices
+should behave like persistent local cells, not just bags of boundary edges.
 
-The next architecture-facing direction should combine two prior positive
-signals: E18's simplex-only capacity increase stayed within the 5% AF2-medium
-budget and remained competitive, while E15's auxiliary scaffold anneal to
-`0.5` produced the best validation lDDT so far. Run a short gate with
-`simplexfold_medium_topology_plus`, `full_msa_to_face`, selected
-face/tetra coordinate and boundary-distance realization, and an auxiliary
-weight anneal from `1.0` to `0.5`. Keep `EXPERIMENT_RESULTS.md` only for
-returned run results.
+Run a short gate with `simplexfold_medium_param_matched`, `full_msa_to_face`,
+the E09 selected coordinate and boundary-distance realization stack, and a
+small rigid local shape realization term on selected faces and tetras. The
+term aligns each selected cell by a proper Kabsch rotation before scoring its
+vertex RMSD, so it is globally rigid-motion invariant and tied only to the
+sparse cell complex. Keep `EXPERIMENT_RESULTS.md` only for returned run
+results.
 
 Yes. With templates forbidden, the right construction is:
 
