@@ -680,6 +680,10 @@ def test_apply_loss_weight_schedule_ramps_research_weights():
         msa_loss_weight=2.0,
         distogram_loss_weight=0.3,
         simplex_aux_weight=1.0,
+        simplex_cell_closure_weight=0.0,
+        simplex_cell_closure_weight_final=0.5,
+        simplex_cell_closure_ramp_start_step=10,
+        simplex_cell_closure_ramp_steps=10,
         backbone_loss_weight=1.0,
         sidechain_fape_loss_weight=1.0,
         torsion_loss_weight=1.0,
@@ -697,17 +701,20 @@ def test_apply_loss_weight_schedule_ramps_research_weights():
     apply_loss_weight_schedule(loss_fn, cfg, step=5)
     assert loss_fn.msa_weight == pytest.approx(2.0)
     assert loss_fn.backbone_loss_weight == pytest.approx(1.0)
+    assert loss_fn.simplex_geometry_loss.cell_closure_weight == pytest.approx(0.0)
 
     apply_loss_weight_schedule(loss_fn, cfg, step=15)
     assert loss_fn.msa_weight == pytest.approx(1.25)
     assert loss_fn.distogram_weight == pytest.approx(0.2)
     assert loss_fn.simplex_aux_weight == pytest.approx(0.5)
+    assert loss_fn.simplex_geometry_loss.cell_closure_weight == pytest.approx(0.25)
     assert loss_fn.backbone_loss_weight == pytest.approx(3.5)
     assert loss_fn.sidechain_fape_loss_weight == pytest.approx(1.5)
     assert loss_fn.torsion_loss_weight == pytest.approx(0.625)
 
     apply_loss_weight_schedule(loss_fn, cfg, step=20)
     assert loss_fn.msa_weight == pytest.approx(0.5)
+    assert loss_fn.simplex_geometry_loss.cell_closure_weight == pytest.approx(0.5)
     assert loss_fn.backbone_loss_weight == pytest.approx(6.0)
 
 
@@ -726,6 +733,9 @@ def test_alphafold_loss_overrides_simplex_coordinate_weights():
         simplex_topology_margin=1.5,
         simplex_topology_margin_hard_negatives=3,
         simplex_boundary_degree_normalize=True,
+        simplex_cell_closure_weight=0.25,
+        simplex_cell_closure_cutoff=12.0,
+        simplex_cell_closure_temperature=1.5,
     )
 
     assert loss_fn.simplex_geometry_loss.face_coordinate_weight == pytest.approx(0.4)
@@ -741,6 +751,9 @@ def test_alphafold_loss_overrides_simplex_coordinate_weights():
     assert loss_fn.simplex_geometry_loss.topology_margin == pytest.approx(1.5)
     assert loss_fn.simplex_geometry_loss.topology_margin_hard_negatives == 3
     assert loss_fn.simplex_geometry_loss.boundary_degree_normalize is True
+    assert loss_fn.simplex_geometry_loss.cell_closure_weight == pytest.approx(0.25)
+    assert loss_fn.simplex_geometry_loss.cell_closure_cutoff == pytest.approx(12.0)
+    assert loss_fn.simplex_geometry_loss.cell_closure_temperature == pytest.approx(1.5)
 
 
 def test_build_dataloader_can_fix_training_features(tmp_path):

@@ -489,6 +489,14 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_tetra=True,
             simplex_use_msa_to_face=True,
         )
+    if variant == "full_msa_to_face_aux_closure":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+        )
     if variant == "full_msa_to_face_expanded_complex":
         return replace(
             base_config,
@@ -685,6 +693,9 @@ def _build_loss_fn(training_config: TrainingConfig) -> AlphaFoldLoss:
         simplex_topology_margin=training_config.simplex_topology_margin,
         simplex_topology_margin_hard_negatives=training_config.simplex_topology_margin_hard_negatives,
         simplex_boundary_degree_normalize=training_config.simplex_boundary_degree_normalize,
+        simplex_cell_closure_weight=training_config.simplex_cell_closure_weight,
+        simplex_cell_closure_cutoff=training_config.simplex_cell_closure_cutoff,
+        simplex_cell_closure_temperature=training_config.simplex_cell_closure_temperature,
         backbone_loss_weight=training_config.backbone_loss_weight,
         sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
         torsion_loss_weight=training_config.torsion_loss_weight,
@@ -936,6 +947,11 @@ def _train_variant(
                 "simplex_boundary_degree_normalize": int(
                     loss_fn.simplex_geometry_loss.boundary_degree_normalize
                 ),
+                "simplex_cell_closure_weight": float(loss_fn.simplex_geometry_loss.cell_closure_weight),
+                "simplex_cell_closure_cutoff": float(loss_fn.simplex_geometry_loss.cell_closure_cutoff),
+                "simplex_cell_closure_temperature": float(
+                    loss_fn.simplex_geometry_loss.cell_closure_temperature
+                ),
                 "simplex_topology_teacher_forcing_weight": teacher_forcing_weight,
                 "simplex_update_scale": float("nan") if simplex_update_scale is None else simplex_update_scale,
                 "backbone_loss_weight": float(loss_fn.backbone_loss_weight),
@@ -1077,6 +1093,12 @@ def _train_variant(
         "simplex_tetra_shape_weight": training_config.simplex_tetra_shape_weight,
         "simplex_tetra_boundary_lddt_weight": training_config.simplex_tetra_boundary_lddt_weight,
         "simplex_boundary_degree_normalize": training_config.simplex_boundary_degree_normalize,
+        "simplex_cell_closure_weight": training_config.simplex_cell_closure_weight,
+        "simplex_cell_closure_weight_final": training_config.simplex_cell_closure_weight_final,
+        "simplex_cell_closure_ramp_start_step": training_config.simplex_cell_closure_ramp_start_step,
+        "simplex_cell_closure_ramp_steps": training_config.simplex_cell_closure_ramp_steps,
+        "simplex_cell_closure_cutoff": training_config.simplex_cell_closure_cutoff,
+        "simplex_cell_closure_temperature": training_config.simplex_cell_closure_temperature,
         "simplex_topology_teacher_forcing_weight": training_config.simplex_topology_teacher_forcing_weight,
         "simplex_topology_teacher_forcing_weight_final": (
             training_config.simplex_topology_teacher_forcing_weight_final
@@ -1190,6 +1212,12 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_topology_margin",
         "simplex_topology_margin_hard_negatives",
         "simplex_boundary_degree_normalize",
+        "simplex_cell_closure_weight",
+        "simplex_cell_closure_weight_final",
+        "simplex_cell_closure_ramp_start_step",
+        "simplex_cell_closure_ramp_steps",
+        "simplex_cell_closure_cutoff",
+        "simplex_cell_closure_temperature",
         "simplex_topology_teacher_forcing_weight",
         "simplex_topology_teacher_forcing_weight_final",
         "simplex_topology_teacher_forcing_ramp_start_step",
@@ -1286,6 +1314,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "faces",
             "full",
             "full_msa_to_face",
+            "full_msa_to_face_aux_closure",
             "full_msa_to_face_expanded_complex",
             "full_msa_to_face_long",
             "full_msa_to_face_mixed",
@@ -1456,6 +1485,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Normalize selected simplex boundary-edge losses by undirected edge incidence degree.",
     )
     parser.add_argument(
+        "--simplex-cell-closure-weight",
+        type=float,
+        default=0.0,
+        help="Weight selected-cell coordinate realization by true boundary flag-complex closure.",
+    )
+    parser.add_argument("--simplex-cell-closure-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-cell-closure-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-cell-closure-ramp-steps", type=int, default=1)
+    parser.add_argument("--simplex-cell-closure-cutoff", type=float, default=15.0)
+    parser.add_argument("--simplex-cell-closure-temperature", type=float, default=2.0)
+    parser.add_argument(
         "--simplex-topology-teacher-forcing-weight",
         type=float,
         default=0.0,
@@ -1582,6 +1622,12 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_topology_margin=args.simplex_topology_margin,
         simplex_topology_margin_hard_negatives=args.simplex_topology_margin_hard_negatives,
         simplex_boundary_degree_normalize=args.simplex_boundary_degree_normalize,
+        simplex_cell_closure_weight=args.simplex_cell_closure_weight,
+        simplex_cell_closure_weight_final=args.simplex_cell_closure_weight_final,
+        simplex_cell_closure_ramp_start_step=args.simplex_cell_closure_ramp_start_step,
+        simplex_cell_closure_ramp_steps=args.simplex_cell_closure_ramp_steps,
+        simplex_cell_closure_cutoff=args.simplex_cell_closure_cutoff,
+        simplex_cell_closure_temperature=args.simplex_cell_closure_temperature,
         simplex_topology_teacher_forcing_weight=args.simplex_topology_teacher_forcing_weight,
         simplex_topology_teacher_forcing_weight_final=args.simplex_topology_teacher_forcing_weight_final,
         simplex_topology_teacher_forcing_ramp_start_step=args.simplex_topology_teacher_forcing_ramp_start_step,
@@ -1668,6 +1714,12 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_topology_margin": args.simplex_topology_margin,
         "simplex_topology_margin_hard_negatives": args.simplex_topology_margin_hard_negatives,
         "simplex_boundary_degree_normalize": args.simplex_boundary_degree_normalize,
+        "simplex_cell_closure_weight": args.simplex_cell_closure_weight,
+        "simplex_cell_closure_weight_final": args.simplex_cell_closure_weight_final,
+        "simplex_cell_closure_ramp_start_step": args.simplex_cell_closure_ramp_start_step,
+        "simplex_cell_closure_ramp_steps": args.simplex_cell_closure_ramp_steps,
+        "simplex_cell_closure_cutoff": args.simplex_cell_closure_cutoff,
+        "simplex_cell_closure_temperature": args.simplex_cell_closure_temperature,
         "simplex_topology_teacher_forcing_weight": args.simplex_topology_teacher_forcing_weight,
         "simplex_topology_teacher_forcing_weight_final": args.simplex_topology_teacher_forcing_weight_final,
         "simplex_topology_teacher_forcing_ramp_start_step": args.simplex_topology_teacher_forcing_ramp_start_step,

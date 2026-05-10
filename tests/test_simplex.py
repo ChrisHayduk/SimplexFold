@@ -1059,6 +1059,66 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
     assert collapsed_terms["simplex_tetra_boundary_lddt_loss"] > matching_terms["simplex_tetra_boundary_lddt_loss"]
 
 
+def test_cell_closure_weight_downweights_open_coordinate_realization_cells():
+    true_ca = torch.tensor(
+        [
+            [
+                [0.0, 0.0, 0.0],
+                [4.0, 0.0, 0.0],
+                [0.0, 4.0, 0.0],
+                [40.0, 0.0, 0.0],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    ca_mask = torch.ones(1, 4)
+    collapsed_atom14 = torch.zeros(1, 4, 14, 3)
+    prediction = {
+        "simplex_face_indices": torch.tensor([[[[0, 1, 2], [0, 1, 3]]]]),
+        "simplex_face_mask": torch.ones(1, 1, 2),
+        "simplex_face_area_logits": torch.zeros(1, 1, 2),
+        "atom14_coords": collapsed_atom14,
+    }
+    base_loss = SimplexGeometryLoss(
+        contact_weight=0.0,
+        topology_neighborhood_weight=0.0,
+        face_area_weight=0.0,
+        face_coordinate_weight=1.0,
+        face_coordinate_distance_weight=1.0,
+        face_distance_weight=0.0,
+        tetra_geometry_weight=0.0,
+        tetra_distance_weight=0.0,
+        pair_face_consistency_weight=0.0,
+        face_tetra_consistency_weight=0.0,
+        cell_closure_weight=0.0,
+        cell_closure_cutoff=8.0,
+        cell_closure_temperature=0.5,
+    )
+    closure_loss = SimplexGeometryLoss(
+        contact_weight=0.0,
+        topology_neighborhood_weight=0.0,
+        face_area_weight=0.0,
+        face_coordinate_weight=1.0,
+        face_coordinate_distance_weight=1.0,
+        face_distance_weight=0.0,
+        tetra_geometry_weight=0.0,
+        tetra_distance_weight=0.0,
+        pair_face_consistency_weight=0.0,
+        face_tetra_consistency_weight=0.0,
+        cell_closure_weight=1.0,
+        cell_closure_cutoff=8.0,
+        cell_closure_temperature=0.5,
+    )
+
+    base_terms = base_loss(prediction, true_ca, ca_mask)
+    closure_terms = closure_loss(prediction, true_ca, ca_mask)
+
+    assert closure_terms["simplex_face_coordinate_distance_loss"] < base_terms[
+        "simplex_face_coordinate_distance_loss"
+    ]
+    assert torch.isfinite(closure_terms["simplex_aux_loss"]).all()
+
+
 def test_boundary_degree_weights_normalize_repeated_edges():
     edge_indices = torch.tensor(
         [[[[[[0, 1], [0, 2], [1, 2]], [[0, 1], [0, 3], [1, 3]]]]]],

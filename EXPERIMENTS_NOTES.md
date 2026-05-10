@@ -1172,3 +1172,28 @@
   itself. The early checkpoint is slightly better than E43-E45 but remains
   below the more promising E22/E25/E30 gates, and the final radius-of-gyration
   collapse argues against carrying a larger fixed `K` into the main branch.
+- E47 local implementation at 2026-05-10 16:31 EDT: add an auxiliary
+  flag-closure curriculum. The new `simplex_cell_closure_weight` reweights
+  selected face/tetra coordinate-realization losses by a soft true-boundary
+  closure score, but leaves the selected cell masks and message passing
+  unchanged. The `full_msa_to_face_aux_closure` variant is architecturally
+  identical to `full_msa_to_face`, so this is a zero-parameter topological
+  loss/curriculum rather than a new module.
+- E47 focused local checks: `python -m py_compile minalphafold/simplex.py
+  minalphafold/losses.py minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py` passed; focused closure,
+  scheduler, loss-builder, and CLI tests passed (`7 passed`).
+- E47 broader local checks: affected suites
+  `tests/test_simplex.py tests/test_nanofold_public_benchmarks.py
+  tests/test_trainer.py -q` passed; full `python -m pytest -q` passed;
+  `git diff --check` passed. `python -m ruff check .` could not run because
+  `ruff` is not installed in the local interpreter. `python -m mypy
+  minalphafold scripts` still fails on pre-existing typing/import issues,
+  including `nanofold.metrics`, OpenMM/PDBFixer stubs, and existing
+  structure-module/script annotations. `python -m pyright --warnings` still
+  fails because the local pyright environment cannot resolve `torch`, `numpy`,
+  `nanofold.metrics`, and other existing optional dependencies.
+- E47 parameter audit: AF2-medium pair-only baseline `3,106,642`,
+  SimplexFold medium `3,106,690`, and `full_msa_to_face_aux_closure`
+  `3,106,690`. The variant leaves `simplex_boundary_closure_weight=0.0`, so
+  it does not apply the E44/E45 message-mask closure.

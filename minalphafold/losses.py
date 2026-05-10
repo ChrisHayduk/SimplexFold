@@ -181,6 +181,9 @@ class AlphaFoldLoss(torch.nn.Module):
         simplex_topology_margin: Optional[float] = None,
         simplex_topology_margin_hard_negatives: Optional[int] = None,
         simplex_boundary_degree_normalize: bool = False,
+        simplex_cell_closure_weight: Optional[float] = None,
+        simplex_cell_closure_cutoff: float = 15.0,
+        simplex_cell_closure_temperature: float = 2.0,
         backbone_loss_weight: float = 1.0,
         sidechain_fape_loss_weight: float = 1.0,
         torsion_loss_weight: float = 1.0,
@@ -233,6 +236,10 @@ class AlphaFoldLoss(torch.nn.Module):
         if simplex_topology_margin_hard_negatives is not None:
             self.simplex_geometry_loss.topology_margin_hard_negatives = int(simplex_topology_margin_hard_negatives)
         self.simplex_geometry_loss.boundary_degree_normalize = bool(simplex_boundary_degree_normalize)
+        if simplex_cell_closure_weight is not None:
+            self.simplex_geometry_loss.cell_closure_weight = float(simplex_cell_closure_weight)
+        self.simplex_geometry_loss.cell_closure_cutoff = float(simplex_cell_closure_cutoff)
+        self.simplex_geometry_loss.cell_closure_temperature = float(simplex_cell_closure_temperature)
         self.backbone_loss = BackboneTrajectoryLoss()
         self.sidechain_fape_loss = AllAtomFAPE()
 

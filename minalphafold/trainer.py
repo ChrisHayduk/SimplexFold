@@ -200,6 +200,12 @@ class TrainingConfig:
     simplex_topology_margin: float | None = None
     simplex_topology_margin_hard_negatives: int | None = None
     simplex_boundary_degree_normalize: bool = False
+    simplex_cell_closure_weight: float = 0.0
+    simplex_cell_closure_weight_final: float | None = None
+    simplex_cell_closure_ramp_start_step: int | None = None
+    simplex_cell_closure_ramp_steps: int = 1
+    simplex_cell_closure_cutoff: float = 15.0
+    simplex_cell_closure_temperature: float = 2.0
     simplex_topology_teacher_forcing_weight: float = 0.0
     simplex_topology_teacher_forcing_weight_final: float | None = None
     simplex_topology_teacher_forcing_ramp_start_step: int | None = None
@@ -727,6 +733,13 @@ def apply_loss_weight_schedule(loss_fn: AlphaFoldLoss, training_config: Training
         start_step=start_step,
         ramp_steps=ramp_steps,
     )
+    loss_fn.simplex_geometry_loss.cell_closure_weight = _ramped_value(
+        training_config.simplex_cell_closure_weight,
+        training_config.simplex_cell_closure_weight_final,
+        step=step,
+        start_step=training_config.simplex_cell_closure_ramp_start_step,
+        ramp_steps=training_config.simplex_cell_closure_ramp_steps,
+    )
     loss_fn.backbone_loss_weight = _ramped_value(
         training_config.backbone_loss_weight,
         training_config.backbone_loss_weight_final,
@@ -1111,6 +1124,9 @@ def fit(
         simplex_topology_margin=training_config.simplex_topology_margin,
         simplex_topology_margin_hard_negatives=training_config.simplex_topology_margin_hard_negatives,
         simplex_boundary_degree_normalize=training_config.simplex_boundary_degree_normalize,
+        simplex_cell_closure_weight=training_config.simplex_cell_closure_weight,
+        simplex_cell_closure_cutoff=training_config.simplex_cell_closure_cutoff,
+        simplex_cell_closure_temperature=training_config.simplex_cell_closure_temperature,
         backbone_loss_weight=training_config.backbone_loss_weight,
         sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
         torsion_loss_weight=training_config.torsion_loss_weight,
@@ -1132,6 +1148,9 @@ def fit(
         simplex_topology_margin=training_config.simplex_topology_margin,
         simplex_topology_margin_hard_negatives=training_config.simplex_topology_margin_hard_negatives,
         simplex_boundary_degree_normalize=training_config.simplex_boundary_degree_normalize,
+        simplex_cell_closure_weight=training_config.simplex_cell_closure_weight,
+        simplex_cell_closure_cutoff=training_config.simplex_cell_closure_cutoff,
+        simplex_cell_closure_temperature=training_config.simplex_cell_closure_temperature,
         backbone_loss_weight=training_config.backbone_loss_weight,
         sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
         torsion_loss_weight=training_config.torsion_loss_weight,
@@ -1526,6 +1545,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Normalize selected simplex boundary-edge losses by undirected edge incidence degree.",
     )
     parser.add_argument(
+        "--simplex-cell-closure-weight",
+        type=float,
+        default=0.0,
+        help="Weight selected-cell coordinate realization by true boundary flag-complex closure.",
+    )
+    parser.add_argument("--simplex-cell-closure-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-cell-closure-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-cell-closure-ramp-steps", type=int, default=1)
+    parser.add_argument("--simplex-cell-closure-cutoff", type=float, default=15.0)
+    parser.add_argument("--simplex-cell-closure-temperature", type=float, default=2.0)
+    parser.add_argument(
         "--simplex-topology-teacher-forcing-weight",
         type=float,
         default=0.0,
@@ -1629,6 +1659,12 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_topology_margin=args.simplex_topology_margin,
         simplex_topology_margin_hard_negatives=args.simplex_topology_margin_hard_negatives,
         simplex_boundary_degree_normalize=args.simplex_boundary_degree_normalize,
+        simplex_cell_closure_weight=args.simplex_cell_closure_weight,
+        simplex_cell_closure_weight_final=args.simplex_cell_closure_weight_final,
+        simplex_cell_closure_ramp_start_step=args.simplex_cell_closure_ramp_start_step,
+        simplex_cell_closure_ramp_steps=args.simplex_cell_closure_ramp_steps,
+        simplex_cell_closure_cutoff=args.simplex_cell_closure_cutoff,
+        simplex_cell_closure_temperature=args.simplex_cell_closure_temperature,
         simplex_topology_teacher_forcing_weight=args.simplex_topology_teacher_forcing_weight,
         simplex_topology_teacher_forcing_weight_final=args.simplex_topology_teacher_forcing_weight_final,
         simplex_topology_teacher_forcing_ramp_start_step=args.simplex_topology_teacher_forcing_ramp_start_step,

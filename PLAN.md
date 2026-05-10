@@ -1229,3 +1229,12 @@ adaptive over training: either schedule flag/closure weights only on
 auxiliary realization losses, anneal the neighbor complex from local to
 learned/global cells, or add an incidence-aware objective that improves cell
 quality without suppressing message-passing masks from the first step.
+
+Immediate E47 branch: revisit flag-complex closure as an auxiliary
+realization curriculum rather than a message mask. Keep the learned
+face/tetra states and their pair/single boundary messages on the ordinary
+E09/E15 `full_msa_to_face` path, but ramp a true-boundary closure weight onto
+only the selected-cell coordinate realization losses. This tests whether
+filled 2-/3-cells should be trusted most when their boundary 1-skeleton is a
+plausible local complex, without starving early message passing through
+potentially useful open cells.

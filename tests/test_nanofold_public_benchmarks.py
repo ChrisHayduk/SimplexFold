@@ -11,6 +11,22 @@ def test_full_msa_to_face_variant_keeps_tetra_and_enables_msa_faces():
     assert cfg.simplex_use_msa_to_face is True
 
 
+def test_full_msa_to_face_aux_closure_variant_keeps_message_masks_unchanged():
+    cfg = _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face_aux_closure")
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_boundary_closure_weight == 0.0
+
+
+def test_full_msa_to_face_aux_closure_variant_is_accepted_by_cli_parser():
+    args = parse_args(["--variants", "full_msa_to_face_aux_closure"])
+
+    assert args.variants == ["full_msa_to_face_aux_closure"]
+
+
 def test_full_msa_to_face_expanded_complex_increases_cell_coverage():
     cfg = _variant_config(
         load_model_config("simplexfold_medium_param_matched"),
@@ -303,6 +319,18 @@ def test_topology_margin_args_are_accepted_by_cli_parser():
             "1.25",
             "--simplex-topology-margin-hard-negatives",
             "4",
+            "--simplex-cell-closure-weight",
+            "0.1",
+            "--simplex-cell-closure-weight-final",
+            "0.5",
+            "--simplex-cell-closure-ramp-start-step",
+            "250",
+            "--simplex-cell-closure-ramp-steps",
+            "250",
+            "--simplex-cell-closure-cutoff",
+            "12.0",
+            "--simplex-cell-closure-temperature",
+            "1.5",
         ]
     )
 
@@ -312,6 +340,12 @@ def test_topology_margin_args_are_accepted_by_cli_parser():
     assert args.simplex_topology_margin_weight == 0.05
     assert args.simplex_topology_margin == 1.25
     assert args.simplex_topology_margin_hard_negatives == 4
+    assert args.simplex_cell_closure_weight == 0.1
+    assert args.simplex_cell_closure_weight_final == 0.5
+    assert args.simplex_cell_closure_ramp_start_step == 250
+    assert args.simplex_cell_closure_ramp_steps == 250
+    assert args.simplex_cell_closure_cutoff == 12.0
+    assert args.simplex_cell_closure_temperature == 1.5
 
 
 def test_benchmark_loss_builder_applies_topology_margin_config():
@@ -323,6 +357,9 @@ def test_benchmark_loss_builder_applies_topology_margin_config():
             simplex_topology_margin_weight=0.05,
             simplex_topology_margin=1.25,
             simplex_topology_margin_hard_negatives=4,
+            simplex_cell_closure_weight=0.25,
+            simplex_cell_closure_cutoff=12.0,
+            simplex_cell_closure_temperature=1.5,
         )
     )
 
@@ -332,3 +369,6 @@ def test_benchmark_loss_builder_applies_topology_margin_config():
     assert loss_fn.simplex_geometry_loss.topology_margin_weight == 0.05
     assert loss_fn.simplex_geometry_loss.topology_margin == 1.25
     assert loss_fn.simplex_geometry_loss.topology_margin_hard_negatives == 4
+    assert loss_fn.simplex_geometry_loss.cell_closure_weight == 0.25
+    assert loss_fn.simplex_geometry_loss.cell_closure_cutoff == 12.0
+    assert loss_fn.simplex_geometry_loss.cell_closure_temperature == 1.5

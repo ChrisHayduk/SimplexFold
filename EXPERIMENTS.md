@@ -1424,3 +1424,29 @@ step-500 checkpoint fell to `val_lddt_ca=0.2327`, FoldScore `0.2215`,
 the selected complex modestly improved over E43-E45 early but did not recover
 the stronger E22/E25/E30 range and still collapsed late, so simple K-expansion
 should not remain in the main path.
+
+### E47: Auxiliary Flag-Closure Curriculum
+
+Status: implemented locally; planned for Runpod.
+
+Hypothesis: E44/E45 may have failed because closure was applied directly to
+the selected cell masks, suppressing face/tetra message passing before the
+topology scorer had learned useful edges. The topological prior is still
+sound: a filled face or tetra should be a stronger coordinate-realization
+target when its boundary 1-skeleton is itself locally plausible.
+
+Mechanism: add a training-only `simplex_cell_closure_weight` loss knob. For
+each selected face or tetra, compute a soft flag-closure score from the true
+C-alpha boundary-edge distances and blend that score into only the selected
+coordinate-realization masks. The learned geometry heads, topology/contact
+losses, and message-passing masks remain unchanged. The benchmark variant
+`full_msa_to_face_aux_closure` is architecturally identical to
+`full_msa_to_face`; the intervention is the scheduled auxiliary realization
+weight, not a new parameterized module.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with the
+E15 selected coordinate and boundary-distance weights, `simplex_aux_weight`
+annealed from `1.0` to `0.5`, and `simplex_cell_closure_weight` ramped from
+`0.0` to `0.5` over steps 250-500. Continue only if the run recovers above
+the weak E43-E46 band and approaches the E22/E25/E30 early range without
+late radius collapse.
