@@ -169,7 +169,7 @@ open enough for the 0.7 target.
 
 ### E05: Tuned Selected-Cell Coordinate Realization
 
-Status: implemented and launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E04 shows that selected simplex coordinate realization is the
 right topological pressure, but the default face/tetra coordinate weights are
@@ -188,3 +188,24 @@ coordinate weights: `--simplex-face-coordinate-weight 0.5` and
 Decision rule: keep only if `val_lddt_ca` and the predicted/true
 radius-of-gyration ratio improve over E04 scaled without destabilizing the
 base AF2 loss.
+
+Result: keep. The `0.5` selected-coordinate weights reached final
+`val_lddt_ca=0.2948` and final FoldScore `0.2647`, improving over E04 scaled
+final `0.1985` and best `0.2394`.
+
+### E06: Strong Selected-Cell Coordinate Realization
+
+Status: launched on Runpod.
+
+Hypothesis: E05 improved the full scaled curve without destabilizing training,
+so the coordinate-realization pressure may still be too weak relative to the
+base AF2 losses.
+
+Mechanism: run the same scaled protocol with
+`--simplex-face-coordinate-weight 1.0` and
+`--simplex-tetra-coordinate-weight 1.0`, keeping the pressure restricted to
+the selected sparse face/tetra cells.
+
+Decision rule: keep only if it improves over E05 on final `val_lddt_ca` or
+materially improves predicted C-alpha radius of gyration without a large
+FoldScore regression.

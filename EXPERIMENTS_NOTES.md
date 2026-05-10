@@ -86,6 +86,7 @@
 | E03 warm boundary | 800 | 0.1311 | 0.0742 | 0.2132 |
 | E04 coordinate cells diagnostic | 1000 | 0.2200 | 0.2200 | 0.2422 |
 | E04 coordinate cells scaled | 1500 | 0.2394 | 0.1985 | 0.2399 |
+| E05 coordinate weights 0.5 scaled | 3000 | 0.2948 | 0.2948 | 0.2647 |
 
 ## Scaled E03 Pilot
 
@@ -132,3 +133,13 @@
   `--simplex-face-coordinate-weight` or `--simplex-tetra-coordinate-weight`.
 - E05 launched on pod `sytp4e4kjs7e61` at commit `5672991` with the same
   scaled protocol as E04 and both selected coordinate weights set to `0.5`.
+- E05 completed on pod `sytp4e4kjs7e61`: final and best
+  `val_lddt_ca=0.2948`, final FoldScore `0.2647`, `val_ca_rmsd=15.1656`,
+  `val_ca_drmsd=14.9898`, `val_pred_ca_rg=6.5441`, and
+  `val_true_ca_rg=15.7622`.
+- E05 interpretation: increasing selected face/tetra coordinate weights from
+  `0.1` to `0.5` improved every scaled comparison point that matters for the
+  collapse diagnosis: final lDDT, final FoldScore, final dRMSD, and realized
+  radius of gyration. The run still remains far below the `0.7` target.
+- E06 launched on pod `sytp4e4kjs7e61` at commit `1b5fae3` with the same
+  scaled protocol and both selected coordinate weights set to `1.0`.
