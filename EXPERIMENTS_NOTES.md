@@ -199,3 +199,8 @@
 - E10 launched on pod `sytp4e4kjs7e61` at commit `f10866b`, using
   `--variants full_msa_to_face` with the E07/E09 selected-coordinate and
   selected-boundary loss weights.
+- E10 was stopped early after the step-500 validation point regressed to
+  `val_lddt_ca=0.2232`, FoldScore `0.2190`, `val_ca_drmsd=12.3197`, and
+  `val_pred_ca_rg=10.5325`. Warm-starting the MSA-to-face projection expands
+  structures but damages lDDT/FoldScore, so the code was restored to the E09
+  zero-final MSA-to-face initializer.

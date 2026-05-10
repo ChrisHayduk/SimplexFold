@@ -295,7 +295,7 @@ face states.
 
 ### E10: Warm-Started MSA-to-Face Moment
 
-Status: launched on Runpod.
+Status: stopped early on Runpod and reverted.
 
 Hypothesis: E09 improved the final score even though the MSA-to-face residual
 projection still used zero final initialization. As with E03's boundary
@@ -311,3 +311,9 @@ Initial Runpod test: repeat E09 with the E07 loss weights and
 
 Decision rule: keep only if it improves E09 best/final `val_lddt_ca` or
 improves early convergence without losing final FoldScore.
+
+Result: reject. The step-500 validation point fell to
+`val_lddt_ca=0.2232` and FoldScore `0.2190`, even though predicted radius of
+gyration rose to `10.5325`. The warm MSA-to-face path appears to inject too
+much noisy face information early, so the branch tip restores the zero final
+initializer used by E09.

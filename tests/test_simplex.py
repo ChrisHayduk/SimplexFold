@@ -200,7 +200,6 @@ def test_optional_low_rank_msa_to_face_path_runs():
 
     assert aux["simplex_face_area_logits"].shape[:2] == (1, 6)
     assert adapter.msa_to_face_a.weight.shape == (cfg.simplex_msa_to_face_rank, cfg.c_m)
-    assert adapter.msa_to_face.linear_2.weight.abs().sum() > 0
 
 
 def test_simplicial_evoformer_returns_auxiliary_simplex_outputs():
