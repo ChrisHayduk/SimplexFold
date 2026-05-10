@@ -495,7 +495,7 @@ does not break the C-alpha lDDT plateau.
 
 ### E18: Simplex-Only Topology Capacity Within 5% Budget
 
-Status: ready for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E15/E17 may be plateauing because the persistent higher-order
 state is too narrow, not because the AF2-style trunk needs more generic
@@ -517,3 +517,11 @@ Decision rule: compare the 3000-step curve against E09's 3000-step result
 (`val_lddt_ca=0.3429`). Keep and continue with the E15 anneal schedule only if
 the early lDDT/FoldScore curve improves or reaches the same lDDT with better
 global geometry.
+
+Result: reject as a replacement for E09/E15. E18 briefly beat the E09 curve at
+step 2000 (`val_lddt_ca=0.3324` versus E09's `0.3283`) and had a better
+FoldScore/dRMSD at that point, but final 3000-step performance fell short:
+`val_lddt_ca=0.3350`, FoldScore `0.2655`, and `val_ca_drmsd=13.4524`, versus
+E09's final `0.3429`, `0.2689`, and `12.9189`. The larger simplex state is
+not harmful in the way the failed selector variants were, but extra face/tetra
+capacity alone does not break the lDDT plateau.

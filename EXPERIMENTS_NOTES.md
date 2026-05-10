@@ -303,3 +303,14 @@
   whether the selected sparse 2-/3-simplex complex needs more representational
   capacity to store patch/packing geometry while preserving the same
   pair/MSA/structure trunk.
+- E18 launched on owned Runpod pod `sytp4e4kjs7e61` at commit `6b35675`,
+  under `/workspace/codex-simplexfold-e18-runpod-20260510`, using
+  `simplexfold_medium_topology_plus`, `full_msa_to_face`, and the E09/E15
+  selected-coordinate plus selected-boundary loss weights.
+- E18 completed and the owned pod was stopped. The validation curve was:
+  step 500 `val_lddt_ca=0.3032`, step 1000 `0.3029`, step 1500 `0.3196`,
+  step 2000 `0.3324`, step 2500 `0.3313`, final step 3000 `0.3350`.
+  Step 2000 briefly beat E09 at the same point (`0.3283`) with better
+  FoldScore/dRMSD, but final step 3000 did not beat E09 final
+  (`0.3429`). Result: reject as a replacement; added simplex capacity alone
+  improves mid-run geometry but does not solve the C-alpha lDDT plateau.
