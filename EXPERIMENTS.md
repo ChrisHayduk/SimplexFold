@@ -1397,7 +1397,7 @@ should not remain a fixed mask in the main path.
 
 ### E46: Expanded Selected Complex
 
-Status: implemented locally; planned for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: the default selected complex may under-cover local packing
 constraints. With `simplex_neighbor_k=12`, each anchor can form 66 selected
@@ -1415,3 +1415,12 @@ same selected face/tetra coordinate and boundary-distance weights as E15 and
 the same auxiliary anneal from `1.0` to `0.5` over steps 250-500. Continue
 only if expanded coverage recovers the E22/E25/E30 early range or improves
 FoldScore/radius behavior without a compute or stability penalty.
+
+Result: reject. E46 reached its best checkpoint at step 250 with
+`val_lddt_ca=0.2517`, FoldScore `0.2069`, `val_ca_drmsd=14.4515`, and
+predicted/true C-alpha radius of gyration `7.1049 / 15.4034`. The final
+step-500 checkpoint fell to `val_lddt_ca=0.2327`, FoldScore `0.2215`,
+`val_ca_drmsd=15.5059`, and radius of gyration `5.7840 / 15.4034`. Expanding
+the selected complex modestly improved over E43-E45 early but did not recover
+the stronger E22/E25/E30 range and still collapsed late, so simple K-expansion
+should not remain in the main path.

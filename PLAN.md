@@ -1220,3 +1220,12 @@ parameters by raising `simplex_neighbor_k` from 12 to 14. This expands the
 available faces and tetra cofaces while preserving the same AF2 trunk and
 learned simplex channels, testing whether recent failures were caused by
 under-covering the sparse packing complex rather than by weak state updates.
+
+E46 result update: fixed K-expansion is not the missing piece. The step-250
+checkpoint reached only `val_lddt_ca=0.2517`, and the step-500 checkpoint
+fell to `0.2327` with renewed radius collapse. The next branch should stop
+changing static cell count alone and instead make the selected complex
+adaptive over training: either schedule flag/closure weights only on
+auxiliary realization losses, anneal the neighbor complex from local to
+learned/global cells, or add an incidence-aware objective that improves cell
+quality without suppressing message-passing masks from the first step.

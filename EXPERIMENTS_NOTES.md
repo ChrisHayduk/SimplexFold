@@ -1152,3 +1152,23 @@
   passed; `git diff --check` passed. Parameter audit gives AF2-medium
   `3,106,642`, SimplexFold `3,106,690`, and E46 expanded complex
   `3,106,690` with `simplex_neighbor_k=14`.
+- E46 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10
+  15:59 EDT from commit `a53fe3f`, with the full public NanoFold manifests
+  staged cleanly (`10000/1000/11000` train/val/all; `11000/11000`
+  feature/label files; `bad_paths=0`). H100 CUDA was available, FoldScore
+  import worked, AF2-medium had `3,106,642` parameters, and E46 had
+  `3,106,690` parameters.
+- E46 completed and the owned Runpod pod was stopped at 2026-05-10
+  16:08 EDT. Step 250 was best:
+  `val_lddt_ca=0.25172581151127815`, FoldScore `0.20692050736397505`,
+  `val_ca_drmsd=14.45149451494217`, `val_pred_ca_rg=7.104867935180664`,
+  and `val_true_ca_rg=15.403406739234924` with
+  `simplex_aux_weight=1.0`. Step 500 ended at
+  `val_lddt_ca=0.23270462825894356`, FoldScore `0.22145121730864048`,
+  `val_ca_drmsd=15.505868315696716`, `val_pred_ca_rg=5.784029453992844`,
+  and `val_true_ca_rg=15.403406739234924` with
+  `simplex_aux_weight=0.5`.
+- E46 interpretation: increasing selected complex coverage is not enough by
+  itself. The early checkpoint is slightly better than E43-E45 but remains
+  below the more promising E22/E25/E30 gates, and the final radius-of-gyration
+  collapse argues against carrying a larger fixed `K` into the main branch.

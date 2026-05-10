@@ -63,3 +63,4 @@ recorded in the running notes for that run.
 | E43 Hodge residual aux anneal | completed | 500 | 0.2492 | 0.2492 | 0.2232 | 15.1139 | 6.1772 / 15.4034 | rejected |
 | E44 soft flag-complex closure | completed | 250 | 0.2449 | 0.2111 | 0.2241 | 16.1468 | 5.0536 / 15.4034 | rejected |
 | E45 light flag-complex closure | completed | 250 | 0.2477 | 0.2273 | 0.1992 | 14.9228 | 7.3539 / 15.4034 | rejected |
+| E46 expanded selected complex | completed | 250 | 0.2517 | 0.2327 | 0.2215 | 15.5059 | 5.7840 / 15.4034 | rejected |
