@@ -219,3 +219,18 @@
 - E12 launched on pod `sytp4e4kjs7e61` at commit `14e14e2`, resuming E09's
   `full_msa_to_face` checkpoint from step 3000 and continuing the same
   scaled protocol to step 6000.
+- E13 implements a mixed local/global simplex selector. The new
+  `simplex_local_neighbor_k` knob reserves nearest-neighbor sequence slots
+  before filling the remaining simplex vertices from the learned topology
+  score. The `full_msa_to_face_mixed` variant uses 4 reserved local slots,
+  disables the broad local bias, and keeps the E09 MSA-to-face face/tetra
+  pathway. This is intended to keep local manifold continuity without the
+  harmful static long-range bias observed in E11.
+- E13 focused local checks passed:
+  `tests/test_simplex.py::test_build_simplex_topology_excludes_self_and_respects_masks`,
+  `tests/test_simplex.py::test_build_simplex_topology_reserves_local_neighbor_slots`,
+  `tests/test_simplex.py::test_optional_low_rank_msa_to_face_path_runs`,
+  `tests/test_nanofold_public_benchmarks.py`,
+  `tests/test_trainer.py::test_simplexfold_medium_param_matched_matches_af2_medium_budget`,
+  `tests/test_trainer.py::test_load_model_config_selects_requested_profile`, and
+  `ruff check --select F821,F822,F823` on the touched files.

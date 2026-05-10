@@ -94,6 +94,7 @@ class ModelConfig:
     simplex_use_msa_to_face: bool
     simplex_msa_to_face_rank: int
     simplex_use_recycled_geometry: bool
+    simplex_local_neighbor_k: int
     simplex_local_radius: int
     simplex_local_bias: float
     simplex_long_min_sep: int

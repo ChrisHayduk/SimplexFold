@@ -39,6 +39,7 @@ class SimplexConfig:
     simplex_use_msa_to_face = False
     simplex_msa_to_face_rank = 8
     simplex_use_recycled_geometry = True
+    simplex_local_neighbor_k = 0
     simplex_local_radius = 2
     simplex_local_bias = 4.0
     simplex_long_min_sep = 8
@@ -73,6 +74,25 @@ def test_build_simplex_topology_excludes_self_and_respects_masks():
     assert torch.all(topology.face_mask[:, 4] == 0)
     assert topology.face_indices.shape == (1, 5, 3, 3)
     assert topology.tetra_indices.shape == (1, 5, 1, 4)
+
+
+def test_build_simplex_topology_reserves_local_neighbor_slots():
+    score = torch.zeros((1, 6, 6), dtype=torch.float32)
+    score[:, :, 5] = 100.0
+
+    topology = build_simplex_topology(
+        score,
+        neighbor_k=4,
+        local_neighbor_k=2,
+        local_radius=-1,
+        local_bias=0.0,
+        long_min_sep=-1,
+    )
+
+    assert set(topology.nbr_idx[0, 2, :2].tolist()) == {1, 3}
+    assert 5 in topology.nbr_idx[0, 2, 2:].tolist()
+    assert topology.face_indices.shape == (1, 6, 6, 3)
+    assert topology.tetra_indices.shape == (1, 6, 4, 4)
 
 
 def test_simplex_geometry_features_are_rigid_transform_invariant():

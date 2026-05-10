@@ -20,3 +20,14 @@ def test_full_msa_to_face_long_variant_adds_long_range_topology_bias():
     assert cfg.simplex_use_msa_to_face is True
     assert cfg.simplex_long_min_sep == 16
     assert cfg.simplex_long_bias == 2.0
+
+
+def test_full_msa_to_face_mixed_variant_reserves_local_scaffold_slots():
+    cfg = _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face_mixed")
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_local_neighbor_k == 4
+    assert cfg.simplex_local_bias == 0.0

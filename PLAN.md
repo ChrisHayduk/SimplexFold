@@ -1113,5 +1113,9 @@ Iteration ladder:
    inside the simplicial chain view: the model realizes the metric 1-skeleton
    induced by its own sparse 2-/3-simplex complex, not a dense all-pairs
    distance matrix.
-7. Promote only changes that pass parameter-budget tests and at least a
+7. If direct long-range bias destabilizes the complex, reserve a small
+   sequence-local scaffold of neighbor slots and let the remaining slots be
+   learned/global. This keeps local manifold continuity while giving selected
+   faces and tetras room to include nonlocal packing edges.
+8. Promote only changes that pass parameter-budget tests and at least a
    NanoFold smoke/short-run comparison.

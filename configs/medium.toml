@@ -65,6 +65,7 @@ simplex_use_tetra = true
 simplex_use_msa_to_face = false
 simplex_msa_to_face_rank = 16
 simplex_use_recycled_geometry = true
+simplex_local_neighbor_k = 0
 simplex_local_radius = 4
 simplex_local_bias = 5.0
 simplex_long_min_sep = 24

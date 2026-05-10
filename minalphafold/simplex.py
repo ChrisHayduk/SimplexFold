@@ -188,6 +188,7 @@ def build_simplex_topology(
     seq_mask: Optional[torch.Tensor] = None,
     pair_mask: Optional[torch.Tensor] = None,
     recycled_ca_coords: Optional[torch.Tensor] = None,
+    local_neighbor_k: int = 0,
     local_radius: int = 4,
     local_bias: float = 5.0,
     long_min_sep: int = 24,
@@ -230,8 +231,25 @@ def build_simplex_topology(
     very_negative = torch.finfo(dtype).min / 4
     work_score = work_score.masked_fill(~valid_pair, very_negative)
 
+    self_mask = torch.eye(l, device=device, dtype=torch.bool)[None, :, :]
+    work_score = work_score.masked_fill(self_mask, very_negative * 2)
+
+    local_k = min(max(int(local_neighbor_k), 0), k)
     if k == 0:
         nbr_idx = torch.empty((b, l, 0), device=device, dtype=torch.long)
+    elif local_k > 0:
+        local_score = (-sep).to(dtype)[None, :, :].expand(b, -1, -1).clone()
+        local_score = local_score.masked_fill(~valid_pair, very_negative)
+        local_score = local_score.masked_fill(self_mask, very_negative * 2)
+        local_idx = torch.topk(local_score, k=local_k, dim=-1).indices
+        global_k = k - local_k
+        if global_k == 0:
+            nbr_idx = local_idx
+        else:
+            global_score = work_score.clone()
+            global_score.scatter_(dim=-1, index=local_idx, value=very_negative)
+            global_idx = torch.topk(global_score, k=global_k, dim=-1).indices
+            nbr_idx = torch.cat([local_idx, global_idx], dim=-1)
     else:
         nbr_idx = torch.topk(work_score, k=k, dim=-1).indices
 
@@ -574,6 +592,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.use_msa_to_face = bool(getattr(config, "simplex_use_msa_to_face", False))
         self.msa_to_face_rank = int(getattr(config, "simplex_msa_to_face_rank", 16))
         self.use_recycled_geometry = bool(getattr(config, "simplex_use_recycled_geometry", True))
+        self.local_neighbor_k = int(getattr(config, "simplex_local_neighbor_k", 0))
         self.local_radius = int(getattr(config, "simplex_local_radius", 4))
         self.local_bias = float(getattr(config, "simplex_local_bias", 5.0))
         self.long_min_sep = int(getattr(config, "simplex_long_min_sep", 24))
@@ -672,6 +691,7 @@ class SimplicialAdapter(torch.nn.Module):
                 seq_mask=seq_mask,
                 pair_mask=pair_mask,
                 recycled_ca_coords=coords_for_topology,
+                local_neighbor_k=self.local_neighbor_k,
                 local_radius=self.local_radius,
                 local_bias=self.local_bias,
                 long_min_sep=self.long_min_sep,

@@ -359,3 +359,26 @@ improving under the same sparse face/tetra/MSA objective.
 
 Decision rule: keep as the new reference if it improves E09 final
 `val_lddt_ca=0.3429` without a severe FoldScore regression.
+
+### E13: Mixed Local/Global Simplex Neighbor Scaffold
+
+Status: implemented locally; pending Runpod launch.
+
+Hypothesis: E11 failed because a blunt long-range bias selected noisy
+nonlocal cells before the topology scorer was reliable. The sparse complex
+may need a small guaranteed local scaffold for sequence-neighbor manifold
+continuity, while reserving the remaining neighbor slots for learned/global
+edges.
+
+Mechanism: add `simplex_local_neighbor_k`, a zero-parameter topology selector
+knob. When it is positive, the first slots in each anchor's neighbor list are
+the nearest valid sequence neighbors; the remaining slots are selected by the
+normal learned contact/recycled-geometry score. The new
+`full_msa_to_face_mixed` benchmark variant keeps the E09 face/tetra/MSA path,
+sets `simplex_local_neighbor_k=4`, and sets `simplex_local_bias=0.0` so the
+other 8 slots are not swallowed by the old local bias.
+
+Decision rule: start with an early Runpod check and keep only if it beats
+E11's step-500 regression and approaches or exceeds E09/E12 lDDT without a
+FoldScore collapse. This is a topological selector change, not a loss hack:
+it changes which vertices are allowed to form persistent face/tetra cells.
