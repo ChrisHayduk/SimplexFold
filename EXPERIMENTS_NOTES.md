@@ -383,3 +383,7 @@
   `val_true_ca_rg=15.4034`. The run opened the structure more than E21-E23
   but regressed lDDT/FoldScore, so degree normalization alone is rejected.
 - After E24, pod `0hesaxxfhq8soj` was stopped.
+- E25 live plan: run the best E09/E15 topology-mediated stack with effective
+  batch size 8 (`batch_size=1`, `grad_accum_steps=8`) for a short 500-step
+  Runpod gate. This aligns with the final objective's required optimization
+  regime before spending on a 30,000-step confirmation run.

@@ -688,3 +688,24 @@ Result: reject. Step 500 reached `val_lddt_ca=0.2724`, FoldScore `0.2383`,
 `7.2673 / 15.4034`. Degree normalization opened the structure more than the
 message-scale failures, but the lDDT/FoldScore regression relative to E09 and
 E22 does not justify continuation.
+
+### E25: Effective-Batch-8 Optimization Pilot
+
+Status: ready for Runpod.
+
+Hypothesis: the current best topology-mediated stack was developed with
+effective batch size 1, while the target confirmation run should use effective
+batch size 8 for 30,000 optimizer steps. Some of the observed lDDT volatility
+and late-run collapse may be optimizer noise rather than a purely architectural
+failure. A small effective-batch-8 pilot should test whether the E09/E15 stack
+has a better early trajectory under the intended optimization regime.
+
+Mechanism: run `full_msa_to_face` with the E09 selected coordinate and
+boundary-distance weights, `batch_size=1`, and `grad_accum_steps=8`. This does
+not change parameters or losses; it tests whether the existing simplicial
+architecture benefits from the larger effective batch required for the final
+30k-step confirmation.
+
+Decision rule: first run a small 500-step gate. Continue to longer effective
+batch-8 training only if the validation point improves over the E09/E15 early
+band or substantially improves global geometry without losing FoldScore.
