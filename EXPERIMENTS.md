@@ -661,7 +661,7 @@ damping single updates does not preserve global scale.
 
 ### E24: Degree-Normalized Simplex Boundary Realization
 
-Status: ready for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E19-E23 suggest the problem is not simply too little lDDT pressure
 or too weak simplex-to-trunk messages. The selected boundary losses currently
@@ -682,3 +682,9 @@ Decision rule: run the E09/E15 stack with selected coordinate and boundary
 distance weights, plus degree normalization. Continue past step 500 only if
 the run improves on the E09/E22 early band or materially improves predicted
 C-alpha radius of gyration without sacrificing FoldScore.
+
+Result: reject. Step 500 reached `val_lddt_ca=0.2724`, FoldScore `0.2383`,
+`val_ca_drmsd=14.1528`, and predicted/true C-alpha radius of gyration
+`7.2673 / 15.4034`. Degree normalization opened the structure more than the
+message-scale failures, but the lDDT/FoldScore regression relative to E09 and
+E22 does not justify continuation.

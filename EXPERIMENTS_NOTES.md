@@ -375,3 +375,11 @@
   incidence so the selected cell complex supervises its 1-skeleton evenly
   instead of over-weighting high-degree local edges. This is a simplicial
   boundary-normalization change, not a dense all-pairs metric loss.
+- E24 ran on owned pod `0hesaxxfhq8soj` at commit `8fe6c75`, using
+  `full_msa_to_face`, the E09/E15 selected coordinate and boundary-distance
+  weights, and `--simplex-boundary-degree-normalize`. It was stopped after the
+  step-500 validation: `val_lddt_ca=0.2724`, FoldScore `0.2383`,
+  `val_ca_drmsd=14.1528`, `val_pred_ca_rg=7.2673`, and
+  `val_true_ca_rg=15.4034`. The run opened the structure more than E21-E23
+  but regressed lDDT/FoldScore, so degree normalization alone is rejected.
+- After E24, pod `0hesaxxfhq8soj` was stopped.

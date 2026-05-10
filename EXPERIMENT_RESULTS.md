@@ -37,3 +37,4 @@ recorded in the running notes for that run.
 | E21 strong simplex messages | stopped early | 500 | 0.2315 | 0.2315 | 0.2328 | 15.1343 | 6.3715 / 15.4034 | rejected |
 | E22 damped simplex messages | stopped early | 500 | 0.2917 | 0.2917 | 0.2458 | 14.4541 | 6.6487 / 15.4034 | rejected |
 | E23 edge-biased simplex messages | stopped early | 500 | 0.2509 | 0.2509 | 0.2355 | 15.0561 | 6.2181 / 15.4034 | rejected |
+| E24 degree-normalized boundary realization | stopped early | 500 | 0.2724 | 0.2724 | 0.2383 | 14.1528 | 7.2673 / 15.4034 | rejected |
