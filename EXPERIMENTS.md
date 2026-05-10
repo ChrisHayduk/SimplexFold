@@ -247,7 +247,7 @@ budget.
 
 ### E08: Strong Selected Boundary Coordinate Realization
 
-Status: launched on Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E07 improves the whole curve, especially dRMSD and radius of
 gyration, so the selected-boundary distance pressure may still be slightly
@@ -260,3 +260,29 @@ to the boundary edges induced by selected face/tetra cells.
 Decision rule: keep only if it improves E07 best/final `val_lddt_ca` or
 retains similar lDDT while further improving dRMSD and predicted/true radius
 of gyration.
+
+Result: reject. The step-500 validation point regressed to
+`val_lddt_ca=0.2636`, with predicted C-alpha radius of gyration back down to
+`6.0681`. The doubled boundary-distance weight appears to overconstrain or
+slow the useful structure expansion.
+
+### E09: Full Simplex With MSA-to-Face Moment
+
+Status: implemented locally; queued for Runpod.
+
+Hypothesis: the explicit face states should be able to receive third-order
+evolutionary signals from the MSA, not only pair/single and recycled geometry
+signals. This is the `MSA <-> sparse face tensor` part of the SimplexFold
+README diagram.
+
+Mechanism: add a `full_msa_to_face` benchmark variant that keeps faces and
+tetras enabled while turning on the existing low-rank MSA-to-face moment.
+This adds no parameters because the MSA-to-face projections are already in
+the SimplexFold adapter; it changes only whether that topological pathway is
+active.
+
+Initial Runpod test: use the E07 loss weights, but run
+`--variants full_msa_to_face`.
+
+Decision rule: keep only if it improves E07 best/final `val_lddt_ca` or
+improves early dRMSD/Rg without destabilizing FoldScore.

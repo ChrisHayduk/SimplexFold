@@ -480,6 +480,14 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_tetra=True,
             simplex_use_msa_to_face=False,
         )
+    if variant == "full_msa_to_face":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+        )
     if variant == "msa_to_face":
         return replace(
             base_config,
@@ -973,7 +981,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--variants",
         nargs="+",
         default=["no_simplex", "faces", "full"],
-        choices=["no_simplex", "faces", "full", "msa_to_face"],
+        choices=["no_simplex", "faces", "full", "full_msa_to_face", "msa_to_face"],
     )
     parser.add_argument("--output-dir", type=Path, default=ROOT / "artifacts" / "nanofold_public_benchmarks")
     parser.add_argument(

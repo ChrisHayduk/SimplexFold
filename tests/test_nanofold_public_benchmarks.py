@@ -1,0 +1,11 @@
+from minalphafold.trainer import load_model_config
+from scripts.run_nanofold_public_benchmarks import _variant_config
+
+
+def test_full_msa_to_face_variant_keeps_tetra_and_enables_msa_faces():
+    cfg = _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face")
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True

@@ -174,3 +174,11 @@
 - E08 launched on pod `sytp4e4kjs7e61` at commit `e77f141` with the same
   scaled protocol as E07 and selected boundary coordinate-distance weights
   raised from `0.5` to `1.0`.
+- E08 was stopped early after the step-500 validation point regressed to
+  `val_lddt_ca=0.2636`, FoldScore `0.2386`, `val_ca_drmsd=15.1396`, and
+  `val_pred_ca_rg=6.0681`. Doubling selected-boundary distance pressure is
+  worse than E07's `0.5` setting.
+- E09 adds a `full_msa_to_face` benchmark variant so selected face states can
+  receive low-rank third-order MSA moments while keeping tetra message passing
+  active. This is a zero-parameter activation of the existing MSA-to-face
+  path and directly tests the README's `MSA <-> sparse face tensor` claim.
