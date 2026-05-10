@@ -650,6 +650,145 @@ def face_outer_edge_delta(
     return (face_outer_mean - face_state) * has_neighbor * face_mask[..., None]
 
 
+FACE_EDGE_FRAME_DIM = 10
+TETRA_EDGE_FRAME_DIM = 18
+
+
+def _fallback_axis(direction: torch.Tensor) -> torch.Tensor:
+    axis = torch.argmin(torch.abs(direction), dim=-1)
+    return torch.nn.functional.one_hot(axis, num_classes=3).to(dtype=direction.dtype, device=direction.device)
+
+
+def _edge_frame_axes(
+    edge_indices: torch.Tensor,
+    recycled_ca_coords: torch.Tensor,
+    recycled_frames: Optional[torch.Tensor],
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    a, b = edge_indices.unbind(dim=-1)
+    x_a = gather_single(recycled_ca_coords, a)
+    x_b = gather_single(recycled_ca_coords, b)
+    edge = x_b - x_a
+    edge_len = _safe_norm(edge)
+    e1 = edge / edge_len[..., None].clamp_min(1e-8)
+    if recycled_frames is not None:
+        frame_a = gather_single(recycled_frames, a)
+        reference = frame_a[..., :, 1]
+    else:
+        reference = _fallback_axis(e1)
+    reference_perp = reference - torch.sum(reference * e1, dim=-1, keepdim=True) * e1
+    fallback = _fallback_axis(e1)
+    fallback_perp = fallback - torch.sum(fallback * e1, dim=-1, keepdim=True) * e1
+    use_fallback = _safe_norm(reference_perp) < 1e-4
+    e2_source = torch.where(use_fallback[..., None], fallback_perp, reference_perp)
+    e2 = e2_source / _safe_norm(e2_source)[..., None].clamp_min(1e-8)
+    e3 = torch.cross(e1, e2, dim=-1)
+    return x_a, e1, e2, e3, edge_len
+
+
+def _project_to_edge_frame(
+    vector: torch.Tensor,
+    e1: torch.Tensor,
+    e2: torch.Tensor,
+    e3: torch.Tensor,
+) -> torch.Tensor:
+    direction = vector / _safe_norm(vector)[..., None].clamp_min(1e-8)
+    return torch.stack(
+        [
+            torch.sum(direction * e1, dim=-1),
+            torch.sum(direction * e2, dim=-1),
+            torch.sum(direction * e3, dim=-1),
+        ],
+        dim=-1,
+    )
+
+
+def _other_vertex_edge_features(
+    vector: torch.Tensor,
+    e1: torch.Tensor,
+    e2: torch.Tensor,
+    e3: torch.Tensor,
+    *,
+    distance_max: float,
+) -> torch.Tensor:
+    scale = max(float(distance_max), 1.0)
+    axial = torch.sum(vector * e1, dim=-1)
+    radial_vector = vector - axial[..., None] * e1
+    return torch.cat(
+        [
+            (_safe_norm(vector) / scale)[..., None],
+            (axial / scale)[..., None],
+            (_safe_norm(radial_vector) / scale)[..., None],
+            _project_to_edge_frame(vector, e1, e2, e3),
+        ],
+        dim=-1,
+    )
+
+
+def face_edge_frame_features(
+    edge_indices: torch.Tensor,
+    opposite_indices: torch.Tensor,
+    *,
+    recycled_ca_coords: Optional[torch.Tensor],
+    recycled_frames: Optional[torch.Tensor],
+    distance_max: float,
+) -> torch.Tensor:
+    """Scalarize selected face geometry in each directed boundary-edge frame."""
+
+    if recycled_ca_coords is None:
+        return torch.zeros(*edge_indices.shape[:-1], FACE_EDGE_FRAME_DIM, device=edge_indices.device)
+    x_a, e1, e2, e3, edge_len = _edge_frame_axes(edge_indices, recycled_ca_coords, recycled_frames)
+    x_b = gather_single(recycled_ca_coords, edge_indices[..., 1])
+    x_c = gather_single(recycled_ca_coords, opposite_indices)
+    vc = x_c - x_a
+    normal = torch.cross(x_b - x_a, vc, dim=-1)
+    scale = max(float(distance_max), 1.0)
+    return torch.cat(
+        [
+            (edge_len / scale)[..., None],
+            _other_vertex_edge_features(vc, e1, e2, e3, distance_max=distance_max),
+            _project_to_edge_frame(normal, e1, e2, e3),
+        ],
+        dim=-1,
+    )
+
+
+def tetra_edge_frame_features(
+    edge_indices: torch.Tensor,
+    opposite_indices: torch.Tensor,
+    *,
+    recycled_ca_coords: Optional[torch.Tensor],
+    recycled_frames: Optional[torch.Tensor],
+    distance_max: float,
+    volume_scale: float,
+) -> torch.Tensor:
+    """Scalarize selected tetra geometry in each directed boundary-edge frame."""
+
+    if recycled_ca_coords is None:
+        return torch.zeros(*edge_indices.shape[:-1], TETRA_EDGE_FRAME_DIM, device=edge_indices.device)
+    x_a, e1, e2, e3, edge_len = _edge_frame_axes(edge_indices, recycled_ca_coords, recycled_frames)
+    x_b = gather_single(recycled_ca_coords, edge_indices[..., 1])
+    x_c = gather_single(recycled_ca_coords, opposite_indices[..., 0])
+    x_d = gather_single(recycled_ca_coords, opposite_indices[..., 1])
+    vc = x_c - x_a
+    vd = x_d - x_a
+    plane_normal = torch.cross(vc, vd, dim=-1)
+    signed_volume = torch.sum(torch.cross(x_b - x_a, vc, dim=-1) * vd, dim=-1) / 6.0
+    volume_denom = torch.log1p(torch.as_tensor(volume_scale, device=edge_indices.device, dtype=edge_len.dtype))
+    signed_log_volume = torch.sign(signed_volume) * torch.log1p(torch.abs(signed_volume)) / volume_denom.clamp_min(1.0)
+    scale = max(float(distance_max), 1.0)
+    return torch.cat(
+        [
+            (edge_len / scale)[..., None],
+            _other_vertex_edge_features(vc, e1, e2, e3, distance_max=distance_max),
+            _other_vertex_edge_features(vd, e1, e2, e3, distance_max=distance_max),
+            _project_to_edge_frame(plane_normal, e1, e2, e3),
+            _cosine(vc, vd)[..., None],
+            signed_log_volume[..., None],
+        ],
+        dim=-1,
+    )
+
+
 class SimplexMLP(torch.nn.Module):
     """LayerNorm-ReLU MLP with AF2-style final initialisation."""
 
@@ -753,6 +892,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.single_update_scale = float(getattr(config, "simplex_single_update_scale", 1.0))
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
+        self.edge_frame_message_scale = float(getattr(config, "simplex_edge_frame_message_scale", 0.0))
 
         self.pair_score_norm = torch.nn.LayerNorm(config.c_z)
         self.topology_score = torch.nn.Linear(config.c_z, 1)
@@ -787,6 +927,18 @@ class SimplicialAdapter(torch.nn.Module):
         init_gate_linear(self.single_gate)
         self.single_norm = torch.nn.LayerNorm(config.c_s)
         self.auxiliary_heads = SimplexAuxiliaryHeads(config)
+        if self.edge_frame_message_scale > 0.0:
+            self.face_edge_frame_to_edge = SimplexMLP(
+                self.c_face + FACE_EDGE_FRAME_DIM,
+                self.hidden_dim,
+                self.c_z,
+            )
+            if self.use_tetra:
+                self.tetra_edge_frame_to_edge = SimplexMLP(
+                    self.c_tetra + TETRA_EDGE_FRAME_DIM,
+                    self.hidden_dim,
+                    self.c_z,
+                )
 
     def _empty_outputs(
         self,
@@ -971,6 +1123,19 @@ class SimplicialAdapter(torch.nn.Module):
             dim=-2,
         )
         face_edge_mask = topology.face_mask[..., None].expand(-1, -1, -1, 3)
+        if self.edge_frame_message_scale > 0.0:
+            face_opposite_indices = torch.stack([k, j, i], dim=-1)
+            face_frame_features = face_edge_frame_features(
+                face_edge_indices,
+                face_opposite_indices,
+                recycled_ca_coords=coords_for_geometry,
+                recycled_frames=frames_for_geometry,
+                distance_max=self.distance_max,
+            ).to(pair.dtype)
+            face_edge_state = face_state[..., None, :].expand(*face_edge_indices.shape[:-1], self.c_face)
+            face_edge_update = face_edge_update + self.edge_frame_message_scale * self.face_edge_frame_to_edge(
+                torch.cat([face_edge_state, face_frame_features], dim=-1)
+            )
         pair_delta, pair_counts = scatter_to_pair(
             face_edge_update,
             face_edge_indices,
@@ -994,6 +1159,30 @@ class SimplicialAdapter(torch.nn.Module):
             )
             tet_edge_update = self.tetra_to_edge(tetra_state).reshape(*tetra_state.shape[:-1], 6, self.c_z)
             tet_edge_mask = topology.tetra_mask[..., None].expand(-1, -1, -1, 6)
+            if self.edge_frame_message_scale > 0.0:
+                tet_opposite_indices = torch.stack(
+                    [
+                        torch.stack([tet_k, tet_l], dim=-1),
+                        torch.stack([tet_j, tet_l], dim=-1),
+                        torch.stack([tet_j, tet_k], dim=-1),
+                        torch.stack([tet_i, tet_l], dim=-1),
+                        torch.stack([tet_i, tet_k], dim=-1),
+                        torch.stack([tet_i, tet_j], dim=-1),
+                    ],
+                    dim=-2,
+                )
+                tet_frame_features = tetra_edge_frame_features(
+                    tet_edge_indices,
+                    tet_opposite_indices,
+                    recycled_ca_coords=coords_for_geometry,
+                    recycled_frames=frames_for_geometry,
+                    distance_max=self.distance_max,
+                    volume_scale=self.volume_scale,
+                ).to(pair.dtype)
+                tetra_edge_state = tetra_state[..., None, :].expand(*tet_edge_indices.shape[:-1], self.c_tetra)
+                tet_edge_update = tet_edge_update + self.edge_frame_message_scale * self.tetra_edge_frame_to_edge(
+                    torch.cat([tetra_edge_state, tet_frame_features], dim=-1)
+                )
             tet_pair_delta, tet_pair_counts = scatter_to_pair(
                 tet_edge_update,
                 tet_edge_indices,

@@ -7,10 +7,12 @@ make the messages more geometrically usable: scalarize selected face/tetra
 orientation and packing signals in local frames attached to their boundary
 edges before writing back to the AF2 pair stream.
 
-Run the next short gate with `simplexfold_medium_param_matched` and an
-edge-frame simplex-message variant. Keep the construction inside the official
-NanoFold data contract: frames may come from recycled C-alpha coordinates or
-current selected-cell geometry, but not from templates, DSSP labels, external
+Run the next short gate with `simplexfold_medium_param_matched` and
+`full_msa_to_face_edge_frame_messages`. The variant adds learned face/tetra
+pair-writeback messages conditioned on scalar projections in directed
+boundary-edge frames. Keep the construction inside the official NanoFold data
+contract: frames may come from recycled C-alpha coordinates or current
+selected-cell geometry, but not from templates, DSSP labels, external
 structures, pretrained weights, or hidden labels. Keep `EXPERIMENT_RESULTS.md`
 only for returned run results.
 

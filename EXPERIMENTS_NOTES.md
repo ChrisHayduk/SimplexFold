@@ -888,3 +888,27 @@
   validation result stayed in the weak E33-E38 band. E39 is rejected; E40
   should try edge-frame scalarized simplex messages if we continue the
   Topotein-inspired branch.
+- E40 local implementation: add `simplex_edge_frame_message_scale` and
+  `full_msa_to_face_edge_frame_messages`. The adapter now optionally builds
+  directed local frames on selected boundary edges from recycled C-alpha
+  coordinates and residue frames. Face-to-pair messages receive scalarized
+  opposite-vertex and face-normal features in the boundary-edge frame; tetra
+  messages receive scalarized opposite-vertex, plane-normal, angle, and signed
+  volume features in each tetra boundary-edge frame. This is a topological
+  architecture change because it changes how cochains on selected 2-/3-cells
+  write to the pair-stream 1-skeleton.
+- E40 local checks so far: `python -m py_compile minalphafold/simplex.py
+  minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+  passed. Focused tests for edge-frame rigid-transform invariance, adapter
+  pair-readout changes, parser acceptance, and budget passed (`5 passed`).
+  Parameter audit gives AF2-medium `3,106,642`, SimplexFold `3,106,690`, and
+  E40 edge-frame `3,154,242`, within the 5% budget.
+- E40 broader local checks: affected tests passed (`45 passed`), full
+  `python -m pytest -q` passed, and `git diff --check` passed.
+  `python -m ruff check .` is unavailable locally (`No module named ruff`).
+  `python -m mypy minalphafold scripts/run_nanofold_public_benchmarks.py`
+  still fails on the pre-existing structure-module typing, missing
+  `nanofold.metrics`, EMA model typing, and runner row typing issues.
+  `python -m pyright --warnings` still fails broadly because this local
+  interpreter does not resolve Torch/NumPy/Modal/OpenMM and reports existing
+  optional/type issues.

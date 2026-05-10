@@ -6,8 +6,10 @@ from minalphafold.simplex import (
     SimplicialAdapter,
     _boundary_degree_weights,
     build_simplex_topology,
+    face_edge_frame_features,
     face_outer_edge_delta,
     face_geometry_features,
+    tetra_edge_frame_features,
     tetra_geometry_features,
 )
 
@@ -56,6 +58,7 @@ class SimplexConfig:
     simplex_single_transition_n = 2
     simplex_structure_readout_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
+    simplex_edge_frame_message_scale = 0.0
     n_dist_bins = 16
 
 
@@ -233,6 +236,106 @@ def test_outer_edge_adapter_scale_changes_outputs_without_new_parameters():
     assert on_params == off_params
     assert not torch.allclose(on_pair, off_pair)
     assert not torch.allclose(on_single, off_single)
+
+
+def test_edge_frame_features_are_rigid_transform_invariant():
+    face_edge_indices = torch.tensor([[[[[0, 1], [0, 2], [1, 2]]]]], dtype=torch.long)
+    face_opposite_indices = torch.tensor([[[[2, 1, 0]]]], dtype=torch.long)
+    tet_edge_indices = torch.tensor(
+        [[[[[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]]]]],
+        dtype=torch.long,
+    )
+    tet_opposite_indices = torch.tensor(
+        [[[[[2, 3], [1, 3], [1, 2], [0, 3], [0, 2], [0, 1]]]]],
+        dtype=torch.long,
+    )
+    coords = torch.tensor(
+        [
+            [
+                [0.0, 0.0, 0.0],
+                [3.0, 0.5, 0.0],
+                [0.5, 2.0, 0.75],
+                [0.25, 0.75, 2.5],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    frames = torch.eye(3).reshape(1, 1, 3, 3).expand(1, 4, 3, 3).clone()
+    theta = torch.tensor(0.7)
+    rotation = torch.tensor(
+        [
+            [torch.cos(theta), -torch.sin(theta), 0.0],
+            [torch.sin(theta), torch.cos(theta), 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    rotated_coords = torch.einsum("ij,bnj->bni", rotation, coords) + torch.tensor([2.0, -1.0, 0.5])
+    rotated_frames = torch.einsum("ij,bnjk->bnik", rotation, frames)
+
+    face_features = face_edge_frame_features(
+        face_edge_indices,
+        face_opposite_indices,
+        recycled_ca_coords=coords,
+        recycled_frames=frames,
+        distance_max=32.0,
+    )
+    rotated_face_features = face_edge_frame_features(
+        face_edge_indices,
+        face_opposite_indices,
+        recycled_ca_coords=rotated_coords,
+        recycled_frames=rotated_frames,
+        distance_max=32.0,
+    )
+    tetra_features = tetra_edge_frame_features(
+        tet_edge_indices,
+        tet_opposite_indices,
+        recycled_ca_coords=coords,
+        recycled_frames=frames,
+        distance_max=32.0,
+        volume_scale=1000.0,
+    )
+    rotated_tetra_features = tetra_edge_frame_features(
+        tet_edge_indices,
+        tet_opposite_indices,
+        recycled_ca_coords=rotated_coords,
+        recycled_frames=rotated_frames,
+        distance_max=32.0,
+        volume_scale=1000.0,
+    )
+
+    assert face_features.shape[-1] == 10
+    assert tetra_features.shape[-1] == 18
+    assert torch.allclose(face_features, rotated_face_features, atol=1e-5)
+    assert torch.allclose(tetra_features, rotated_tetra_features, atol=1e-5)
+
+
+def test_edge_frame_message_scale_changes_pair_readout_within_adapter():
+    class EdgeFrameConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class EdgeFrameEnabledConfig(EdgeFrameConfig):
+        simplex_edge_frame_message_scale = 0.25
+
+    torch.manual_seed(5)
+    off_adapter = SimplicialAdapter(EdgeFrameConfig())
+    torch.manual_seed(5)
+    on_adapter = SimplicialAdapter(EdgeFrameEnabledConfig())
+    pair = torch.randn(1, 5, 5, EdgeFrameConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, EdgeFrameConfig.c_s)
+    coords = torch.randn(1, 5, 3)
+    frames = torch.eye(3).reshape(1, 1, 3, 3).expand(1, 5, 3, 3).clone()
+
+    off_pair, off_single, _ = off_adapter(pair, single, recycled_ca_coords=coords, recycled_frames=frames)
+    on_pair, on_single, _ = on_adapter(pair, single, recycled_ca_coords=coords, recycled_frames=frames)
+
+    assert sum(p.numel() for p in on_adapter.parameters()) > sum(p.numel() for p in off_adapter.parameters())
+    assert not torch.allclose(on_pair, off_pair)
+    assert torch.allclose(on_single, off_single)
 
 
 def test_simplex_geometry_features_are_rigid_transform_invariant():

@@ -1175,7 +1175,7 @@ not enough to justify continuing this branch.
 
 ### E40: Edge-Frame Scalarized Simplex Messages
 
-Status: next candidate, not implemented.
+Status: implemented locally; Runpod gate queued.
 
 Hypothesis: Topotein's TCP module gets mileage from edge-centric local frames:
 vector information from higher-rank cells is scalarized in frames associated
@@ -1185,11 +1185,21 @@ raw geometric features. Projecting face/tetra orientation signals into boundary
 edge frames may make higher-order messages more usable by the AF2-style pair
 stream.
 
-Mechanism: construct local frames from selected boundary edges using recycled
-C-alpha coordinates and add frame-projected face/tetra orientation features to
-the simplex geometry inputs or simplex-to-pair messages. This remains a
-topological architecture change because the frames live on the selected
-1-skeleton boundaries of the explicit cells.
+Mechanism: add `simplex_edge_frame_message_scale` and a
+`full_msa_to_face_edge_frame_messages` benchmark variant. For each selected
+face boundary edge, construct a directed edge frame from recycled C-alpha
+coordinates and the recycled residue frame, scalarize the opposite vertex and
+face normal in that frame, and feed those scalars plus the face state to a
+learned edge-specific pair update. For each selected tetra boundary edge,
+scalarize the two opposite vertices, their local plane normal, inter-opposite
+angle, and signed volume in the same edge frame before a learned tetra-to-pair
+update. This remains a topological architecture change because the frames and
+messages live on the selected 1-skeleton boundaries of explicit 2-/3-cells.
+
+Local validation: focused tests pass for rigid-transform invariance of the
+edge-frame features, pair-readout changes, CLI variant parsing, and budget.
+Parameter audit gives AF2-medium `3,106,642`, SimplexFold `3,106,690`, and
+E40 edge-frame `3,154,242`, within the 5% AF2-medium budget.
 
 Decision rule: keep the parameter change near zero. Continue only if the
 frame-scalarized cell messages beat the E33-E38 weak band and preserve
