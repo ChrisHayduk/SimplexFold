@@ -425,7 +425,7 @@ useful than the default local-biased selector plus learned contact scoring.
 
 ### E15: E12 Continuation With Simplex Auxiliary Anneal
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E12 improved global geometry and FoldScore through step 6000, but
 lDDT peaked earlier at step 5000. The selected simplex realization losses may
@@ -441,3 +441,27 @@ face/tetra/contact topology terms.
 
 Decision rule: keep if it improves E12 best `val_lddt_ca=0.3472` or improves
 final lDDT while preserving the E12 FoldScore/dRMSD gains.
+
+Result: keep as the new reference. The run reached best and final
+`val_lddt_ca=0.3556` at step 9000, final FoldScore `0.3025`,
+final `val_ca_drmsd=12.3527`, and predicted/true C-alpha radius of gyration
+`9.0217 / 15.7622`. This is the strongest result so far and supports the
+idea that selected simplex realization is valuable as a scaffold, but should
+be relaxed after the face/tetra states have learned useful geometry.
+
+### E16: Deeper Simplex Auxiliary Anneal
+
+Status: planned for Runpod.
+
+Hypothesis: E15 improved after reducing `simplex_aux_weight` from `1.0` to
+`0.5`, and its best point was the final checkpoint. A further conservative
+anneal may continue to help the structure module optimize lDDT while keeping
+the selected simplex losses active enough to preserve the topological
+inductive bias.
+
+Mechanism: resume E15 at step 9000 and continue to step 12000, ramping
+`simplex_aux_weight` from `0.5` to `0.25` over steps 9000-10000. Keep the
+selected face/tetra coordinate and boundary-distance weights unchanged.
+
+Decision rule: keep if it improves E15 final `val_lddt_ca=0.3556` or preserves
+lDDT while improving FoldScore/dRMSD.

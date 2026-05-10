@@ -92,6 +92,7 @@
 | E09 full MSA-to-face d=0.5 scaled | 3000 | 0.3429 | 0.3429 | 0.2689 |
 | E12 E09 continuation to 6000 | 5000 | 0.3472 | 0.3449 | 0.2856 |
 | E14 mixed soft selector | 2000 | 0.3264 | 0.3015 | 0.2589 |
+| E15 simplex aux anneal to 0.5 | 9000 | 0.3556 | 0.3556 | 0.3025 |
 
 ## Scaled E03 Pilot
 
@@ -268,3 +269,13 @@
 - E15 launched on pod `sytp4e4kjs7e61`, resuming the E12 checkpoint from
   step 6000 and writing separate outputs under
   `/workspace/codex-simplexfold-e15-runpod-20260510`.
+- E15 completed on pod `sytp4e4kjs7e61`: best and final
+  `val_lddt_ca=0.3556` at step 9000, final FoldScore `0.3025`,
+  final `val_ca_drmsd=12.3527`, `val_pred_ca_rg=9.0217`, and
+  `val_true_ca_rg=15.7622`. This is the strongest result so far. The
+  `simplex_aux_weight` anneal from `1.0` to `0.5` improved both lDDT and
+  FoldScore over E12, supporting a curriculum where selected simplex
+  realization acts as a scaffold before relaxing.
+- E16 plan: resume E15 at step 9000 and continue to step 12000 while ramping
+  `simplex_aux_weight` from `0.5` to `0.25` over steps 9000-10000. Keep the
+  selected face/tetra coordinate and boundary-distance weights unchanged.
