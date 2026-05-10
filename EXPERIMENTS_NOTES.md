@@ -630,3 +630,21 @@
   tests/test_trainer.py::test_simplicial_structure_readout_adds_no_parameters`
   passed (`13 passed`); parameter audit remains AF2-medium `3,106,642`,
   E34 readout-only `3,106,690`, within 5% budget.
+- E34 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 08:54 EDT.
+  The restarted workspace was empty before provisioning, then cloned
+  SimplexFold commit `b171666` and received only public NanoFold package/data.
+  Remote audit before launch: train/val/all counts `10000/1000/11000`,
+  feature/label file counts `11000/11000`, no hidden or sidecar data paths,
+  no AppleDouble files, H100 CUDA available, FoldScore import works,
+  AF2-medium baseline `3,106,642`, E34 readout-only `3,106,690`,
+  `simplex_pair_update_scale=0.0`, `simplex_single_update_scale=0.0`,
+  `simplex_structure_readout_scale=0.5`, within the 5% AF2-medium budget.
+- E34 was stopped early on owned Runpod pod `p2roc93zgk4ho9`, and the pod was
+  stopped. Step 250 reached `val_lddt_ca=0.2426`, FoldScore `0.2103`,
+  `val_ca_drmsd=14.9311`, `val_pred_ca_rg=6.5743`, and
+  `val_true_ca_rg=15.4034`. Readout-only sidecar mode did not recover the
+  E22/E25 early band, so E34 is rejected.
+- E35 direction: try a face-only structure sidecar. E33/E34 still fed both
+  face and tetra summaries to the structure input; disable tetra construction
+  and test whether the learned 2-skeleton alone is a less noisy local patch
+  signal.

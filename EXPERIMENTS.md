@@ -976,7 +976,7 @@ the trunk more than it helps coordinate realization.
 
 ### E34: Readout-Only Simplicial Sidecar
 
-Status: design candidate.
+Status: stopped early on Runpod.
 
 Hypothesis: E33 did not isolate the new readout path because the simplex
 adapter still wrote its usual boundary residuals into the pair and single
@@ -997,3 +997,31 @@ the topology explicit while separating "learn higher-order cells" from
 Decision rule: run a short Runpod gate. Continue only if readout-only
 recovers at least the E22/E25 early lDDT band or materially improves
 FoldScore/global scale without a further local-accuracy drop.
+
+Result: reject. Step 250 reached only `val_lddt_ca=0.2426`, FoldScore
+`0.2103`, `val_ca_drmsd=14.9311`, and predicted/true C-alpha radius of
+gyration `6.5743 / 15.4034`. Removing the repeated simplex residual writes
+did not recover local accuracy, so the face+tetra readout itself is not yet a
+useful structure-conditioning signal.
+
+### E35: Face-Only Structure Sidecar
+
+Status: design candidate.
+
+Hypothesis: E33/E34 both used face and tetra summaries in the structure
+readout. The tetra summaries may still be too noisy early in training and may
+inject four-body packing signals before the model has learned reliable
+two-simplex patches. A face-only sidecar would ask whether the learned
+2-skeleton can provide a gentler local patch signal to the structure module.
+
+Mechanism: reuse the readout-only sidecar but disable tetra construction:
+`simplex_use_tetra=false`, `simplex_pair_update_scale=0.0`,
+`simplex_single_update_scale=0.0`, and nonzero
+`simplex_structure_readout_scale`. Keep selected face coordinate and
+boundary-distance supervision active. This remains simplicial because the
+structure module sees boundary summaries from selected learned faces, not a
+dense all-pairs metric loss.
+
+Decision rule: run a short Runpod gate. Continue only if the face-only
+readout recovers above the E33/E34 band and approaches the E22/E25 early
+range without worsening FoldScore.

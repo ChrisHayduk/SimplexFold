@@ -47,3 +47,4 @@ recorded in the running notes for that run.
 | E31 damped simplex coupling warmup 0.0->0.5 | completed | 500 | 0.2578 | 0.2578 | 0.2332 | 14.7889 | 8.9024 / 16.3091 | rejected |
 | E32 topology-plus aux anneal | stopped early | 250 | 0.2545 | 0.2545 | 0.2059 | 14.2821 | 7.2877 / 15.4034 | rejected |
 | E33 simplicial structure readout | stopped early | 250 | 0.2405 | 0.2405 | 0.2108 | 14.8467 | 6.9826 / 15.4034 | rejected |
+| E34 readout-only simplicial sidecar | stopped early | 250 | 0.2426 | 0.2426 | 0.2103 | 14.9311 | 6.5743 / 15.4034 | rejected |
