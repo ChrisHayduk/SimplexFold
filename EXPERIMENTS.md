@@ -1017,10 +1017,12 @@ two-simplex patches. A face-only sidecar would ask whether the learned
 Mechanism: reuse the readout-only sidecar but disable tetra construction:
 `simplex_use_tetra=false`, `simplex_pair_update_scale=0.0`,
 `simplex_single_update_scale=0.0`, and nonzero
-`simplex_structure_readout_scale`. Keep selected face coordinate and
-boundary-distance supervision active. This remains simplicial because the
-structure module sees boundary summaries from selected learned faces, not a
-dense all-pairs metric loss.
+`simplex_structure_readout_scale`. The benchmark variant
+`face_structure_readout_only` keeps MSA-to-face active, uses
+`simplex_structure_readout_scale=0.5`, and adds no parameters. Keep selected
+face coordinate and boundary-distance supervision active. This remains
+simplicial because the structure module sees boundary summaries from selected
+learned faces, not a dense all-pairs metric loss.
 
 Decision rule: run a short Runpod gate. Continue only if the face-only
 readout recovers above the E33/E34 band and approaches the E22/E25 early

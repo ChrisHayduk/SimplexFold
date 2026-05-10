@@ -648,3 +648,13 @@
   face and tetra summaries to the structure input; disable tetra construction
   and test whether the learned 2-skeleton alone is a less noisy local patch
   signal.
+- E35 implemented locally as the zero-parameter benchmark variant
+  `face_structure_readout_only`: MSA-to-face enabled, tetra disabled,
+  `simplex_pair_update_scale=0.0`, `simplex_single_update_scale=0.0`, and
+  `simplex_structure_readout_scale=0.5`.
+- E35 local checks: `python -m py_compile
+  scripts/run_nanofold_public_benchmarks.py` passed; `pytest
+  tests/test_nanofold_public_benchmarks.py
+  tests/test_trainer.py::test_simplicial_structure_readout_adds_no_parameters`
+  passed (`15 passed`); parameter audit remains AF2-medium `3,106,642`,
+  E35 face-only readout `3,106,690`, within 5% budget.
