@@ -217,7 +217,7 @@ gyration `7.1388 / 15.7622`.
 
 ### E07: Selected Simplex Boundary Coordinate Realization
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E04-E06 show that selected face/tetra realization helps, but the
 model is still under-expanding the realized structure. Area, volume, and
@@ -238,3 +238,25 @@ and `--simplex-tetra-coordinate-weight 1.0`, and add
 
 Decision rule: keep only if final `val_lddt_ca`, dRMSD, or predicted/true
 radius-of-gyration ratio improves over E05/E06 without collapsing FoldScore.
+
+Result: keep. The `0.5` selected-boundary coordinate-distance weights reached
+best `val_lddt_ca=0.3247` at step 2000 and final `val_lddt_ca=0.3187`.
+This improves over E06 on best lDDT, final FoldScore, dRMSD, and
+predicted/true radius-of-gyration, while staying within the same parameter
+budget.
+
+### E08: Strong Selected Boundary Coordinate Realization
+
+Status: launched on Runpod.
+
+Hypothesis: E07 improves the whole curve, especially dRMSD and radius of
+gyration, so the selected-boundary distance pressure may still be slightly
+underweighted.
+
+Mechanism: keep the E07 protocol and raise only the selected-boundary
+coordinate-distance weights from `0.5` to `1.0`. The signal remains limited
+to the boundary edges induced by selected face/tetra cells.
+
+Decision rule: keep only if it improves E07 best/final `val_lddt_ca` or
+retains similar lDDT while further improving dRMSD and predicted/true radius
+of gyration.

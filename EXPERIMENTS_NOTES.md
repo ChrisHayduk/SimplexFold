@@ -88,6 +88,7 @@
 | E04 coordinate cells scaled | 1500 | 0.2394 | 0.1985 | 0.2399 |
 | E05 coordinate weights 0.5 scaled | 3000 | 0.2948 | 0.2948 | 0.2647 |
 | E06 coordinate weights 1.0 scaled | 3000 | 0.3127 | 0.3127 | 0.2511 |
+| E07 boundary coordinate d=0.5 scaled | 2000 | 0.3247 | 0.3187 | 0.2617 |
 
 ## Scaled E03 Pilot
 
@@ -162,3 +163,14 @@
 - E07 launched on pod `sytp4e4kjs7e61` at commit `b880e43` with the same
   scaled protocol as E06, selected face/tetra coordinate weights set to
   `1.0`, and selected boundary coordinate-distance weights set to `0.5`.
+- E07 completed on pod `sytp4e4kjs7e61`: best `val_lddt_ca=0.3247` at step
+  2000, final `val_lddt_ca=0.3187`, final FoldScore `0.2617`,
+  final `val_ca_rmsd=16.0872`, final `val_ca_drmsd=12.9483`,
+  `val_pred_ca_rg=9.1383`, and `val_true_ca_rg=15.7622`.
+- E07 interpretation: selected boundary coordinate distances improve the best
+  lDDT and materially improve realized local geometry over E06. This is the
+  strongest topology-mediated direction so far, but still far from the `0.7`
+  target.
+- E08 launched on pod `sytp4e4kjs7e61` at commit `e77f141` with the same
+  scaled protocol as E07 and selected boundary coordinate-distance weights
+  raised from `0.5` to `1.0`.
