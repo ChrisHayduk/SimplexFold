@@ -1394,3 +1394,30 @@
   readouts into the structure module with `simplex_structure_readout_scale=0.25`.
   The point is to test whether expanded selected-boundary geometry needs to
   be on the atom-placement path, not merely attached as an auxiliary loss.
+- E51 launch notes: the stopped H100 pod `mttz64sa9mhut2` could not be
+  resumed because its host had no free GPU. A fresh owned H100 pod
+  `txeom1sd4r00o9` and then owned A100 pod `8egrtbcrp1n8di` both stayed at
+  `uptimeSeconds=0`/SSH not ready and were stopped/deleted. A replacement
+  owned A100 SXM pod `ty7dscglwdg847` with explicit `22/tcp` port exposed
+  came up cleanly. Clean launch audit after restaging public data: public
+  train/val/all manifest counts `10000/1000/11000`, feature/label `.npz`
+  counts `11000/11000`, encoded-chain `bad_paths=0`, A100 CUDA available,
+  FoldScore import works, AF2-medium pair-only `3,106,642`, SimplexFold
+  medium `3,106,690`, E51 `3,106,690`, and
+  `simplex_structure_readout_scale=0.25`.
+- E51 completed on Runpod and the owned E51 pod was stopped/deleted. Local
+  returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e51_expansion_structure_readout_s500_c256_m64/`.
+  Step 250 reached `val_lddt_ca=0.23751059919595718`, FoldScore
+  `0.20890024863183498`, `val_ca_drmsd=14.775567382574081`, and
+  predicted/true C-alpha radius of gyration `7.081045240163803 /
+  15.40340667963028`. Step 500 ended at
+  `val_lddt_ca=0.2272480195388198`, FoldScore `0.22329253144562244`,
+  `val_ca_drmsd=15.716134786605835`, and radius of gyration
+  `5.762171119451523 / 15.40340667963028`.
+- E51 interpretation: broad simplicial structure readout does not rescue the
+  selected-boundary expansion hinge. It removes E50's step-250 radius benefit
+  and finishes below E50/E49. The next branch should probably stop adding
+  auxiliary/readout paths and return to the E15 full-MSA-to-face family with
+  an optimization or curriculum change around the existing selected-boundary
+  coordinate losses.

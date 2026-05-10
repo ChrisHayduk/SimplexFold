@@ -68,3 +68,4 @@ recorded in the running notes for that run.
 | E48 adaptive local-to-global topology curriculum | completed | 500 | 0.2274 | 0.2274 | 0.2191 | 15.7749 | 5.5326 / 15.4034 | rejected |
 | E49 directed outer-edge context | completed | 500 | 0.2695 | 0.2695 | 0.2429 | 14.5377 | 6.7858 / 15.4034 | rejected |
 | E50 selected boundary expansion hinge | completed | 500 | 0.2731 | 0.2731 | 0.2334 | 14.7809 | 6.6087 / 15.4034 | rejected |
+| E51 expansion hinge + structure readout | completed | 250 | 0.2375 | 0.2272 | 0.2233 | 15.7161 | 5.7622 / 15.4034 | rejected |

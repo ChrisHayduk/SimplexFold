@@ -1603,7 +1603,7 @@ boundary geometry feed back into the learned topology/readout path.
 
 ### E51: Expansion Hinge With Structure Readout
 
-Status: planned for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E50 failed because the expansion objective supervised selected
 simplex boundaries without putting that expanded boundary information on the
@@ -1623,3 +1623,12 @@ the E50 expansion weights `0.5/0.5`, E15 auxiliary annealing, and
 `simplex_structure_readout_scale=0.25`. Continue only if the final lDDT and
 radius both improve over E50 and the run approaches or beats the E49/E22
 pilot band.
+
+Result: reject. The step-250 checkpoint reached `val_lddt_ca=0.2375`,
+FoldScore `0.2089`, `val_ca_drmsd=14.7756`, and predicted/true C-alpha
+radius of gyration `7.0810 / 15.4034`. The final step-500 checkpoint fell to
+`val_lddt_ca=0.2272`, FoldScore `0.2233`, `val_ca_drmsd=15.7161`, and radius
+`5.7622 / 15.4034`. Adding structure readout erased E50's early expansion
+effect and underperformed E50, E49, and the stronger E22/E25/E30 pilots.
+Do not pursue this combination without a more selective gate or a different
+readout mechanism.

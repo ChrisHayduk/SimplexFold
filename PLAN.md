@@ -1333,3 +1333,11 @@ readouts are injected into the representation consumed by the structure
 module. This tests whether the topological realization signal must be on the
 same path that places atoms, rather than only an auxiliary loss attached
 after the fact.
+
+E51 result update: reject. Structure readout plus the E50 hinge reached only
+`val_lddt_ca=0.2375` at step 250 and ended at `0.2272`, with predicted/true
+C-alpha radius `5.7622 / 15.4034`. It neither preserved E50's early expansion
+effect nor recovered E49's final lDDT. Avoid broad structure-readout
+reinjection for now; the next useful branch should likely return to the
+best E15 family and change optimization/curriculum around the existing
+selected-boundary losses rather than adding another auxiliary/readout path.
