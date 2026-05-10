@@ -1335,3 +1335,33 @@
   checkpoints but remains below E22/E25/E30 and far below E15. It is not the
   next main branch by itself. Prefer a topology-grounded expansion/readout
   change that directly counteracts the repeated radius-of-gyration collapse.
+- E50 live plan: add a selected-boundary expansion hinge as a zero-parameter
+  realization loss. For each selected face/tetra, penalize only contraction
+  of predicted C-alpha boundary edges below their true selected boundary
+  lengths. This stays in the simplicial/topological motivation because it
+  operates on the boundary 1-skeleton induced by selected 2-/3-cells rather
+  than on all residue pairs or global radius of gyration.
+- E50 implementation in progress: add loss knobs
+  `simplex_face_coordinate_expansion_weight`,
+  `simplex_tetra_coordinate_expansion_weight`, and
+  `simplex_coordinate_expansion_tolerance`; wire them through the trainer and
+  NanoFold runner; add `full_msa_to_face_expansion_hinge` as an architecture
+  copy of `full_msa_to_face`, leaving the static parameter budget unchanged.
+  Planned gate uses expansion weights `0.5/0.5`, the E15 selected coordinate
+  and boundary-distance terms, and the usual `simplex_aux_weight 1.0 -> 0.5`
+  anneal over steps 250-500.
+- E50 local checks: `python -m py_compile minalphafold/simplex.py
+  minalphafold/losses.py minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py` passed; focused tests for the
+  contraction-only loss, loss override plumbing, runner variant/CLI flags,
+  and budget passed; affected suites `tests/test_simplex.py
+  tests/test_nanofold_public_benchmarks.py tests/test_trainer.py -q`
+  passed; full `python -m pytest -q` passed; `git diff --check` passed.
+  `python -m ruff check .` cannot run because ruff is not installed.
+  `python -m mypy minalphafold scripts` and `python -m pyright --warnings`
+  still fail on the same pre-existing typing/import environment issues noted
+  after E49.
+- E50 parameter audit: AF2-medium pair-only baseline `3,106,642`,
+  SimplexFold medium `3,106,690`, and
+  `full_msa_to_face_expansion_hinge` `3,106,690`, only `0.0015%` above
+  AF2-medium and within the 5% budget.

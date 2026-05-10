@@ -446,6 +446,17 @@ def test_simplicial_structure_readout_adds_no_parameters():
     assert readout_params == simplex_params
 
 
+def test_simplicial_expansion_hinge_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    expansion_medium = replace(simplex_medium, simplex_use_msa_to_face=True)
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    expansion_params = sum(parameter.numel() for parameter in AlphaFold2(expansion_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert expansion_params == simplex_params
+
+
 def test_simplicial_outer_edge_update_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     outer_edge_medium = replace(simplex_medium, simplex_outer_edge_update_scale=0.25)
@@ -751,11 +762,13 @@ def test_alphafold_loss_overrides_simplex_coordinate_weights():
     loss_fn = AlphaFoldLoss(
         simplex_face_coordinate_weight=0.4,
         simplex_face_coordinate_distance_weight=0.45,
+        simplex_face_coordinate_expansion_weight=0.46,
         simplex_face_shape_weight=0.48,
         simplex_face_normal_weight=0.5,
         simplex_face_boundary_lddt_weight=0.55,
         simplex_tetra_coordinate_weight=0.6,
         simplex_tetra_coordinate_distance_weight=0.65,
+        simplex_tetra_coordinate_expansion_weight=0.66,
         simplex_tetra_shape_weight=0.68,
         simplex_tetra_boundary_lddt_weight=0.7,
         simplex_topology_margin_weight=0.8,
@@ -765,15 +778,18 @@ def test_alphafold_loss_overrides_simplex_coordinate_weights():
         simplex_cell_closure_weight=0.25,
         simplex_cell_closure_cutoff=12.0,
         simplex_cell_closure_temperature=1.5,
+        simplex_coordinate_expansion_tolerance=0.05,
     )
 
     assert loss_fn.simplex_geometry_loss.face_coordinate_weight == pytest.approx(0.4)
     assert loss_fn.simplex_geometry_loss.face_coordinate_distance_weight == pytest.approx(0.45)
+    assert loss_fn.simplex_geometry_loss.face_coordinate_expansion_weight == pytest.approx(0.46)
     assert loss_fn.simplex_geometry_loss.face_shape_weight == pytest.approx(0.48)
     assert loss_fn.simplex_geometry_loss.face_normal_weight == pytest.approx(0.5)
     assert loss_fn.simplex_geometry_loss.face_boundary_lddt_weight == pytest.approx(0.55)
     assert loss_fn.simplex_geometry_loss.tetra_coordinate_weight == pytest.approx(0.6)
     assert loss_fn.simplex_geometry_loss.tetra_coordinate_distance_weight == pytest.approx(0.65)
+    assert loss_fn.simplex_geometry_loss.tetra_coordinate_expansion_weight == pytest.approx(0.66)
     assert loss_fn.simplex_geometry_loss.tetra_shape_weight == pytest.approx(0.68)
     assert loss_fn.simplex_geometry_loss.tetra_boundary_lddt_weight == pytest.approx(0.7)
     assert loss_fn.simplex_geometry_loss.topology_margin_weight == pytest.approx(0.8)
@@ -783,6 +799,7 @@ def test_alphafold_loss_overrides_simplex_coordinate_weights():
     assert loss_fn.simplex_geometry_loss.cell_closure_weight == pytest.approx(0.25)
     assert loss_fn.simplex_geometry_loss.cell_closure_cutoff == pytest.approx(12.0)
     assert loss_fn.simplex_geometry_loss.cell_closure_temperature == pytest.approx(1.5)
+    assert loss_fn.simplex_geometry_loss.coordinate_expansion_tolerance == pytest.approx(0.05)
 
 
 def test_build_dataloader_can_fix_training_features(tmp_path):

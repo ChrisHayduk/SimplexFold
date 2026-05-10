@@ -189,11 +189,13 @@ class TrainingConfig:
     simplex_aux_weight: float = 1.0
     simplex_face_coordinate_weight: float | None = None
     simplex_face_coordinate_distance_weight: float | None = None
+    simplex_face_coordinate_expansion_weight: float | None = None
     simplex_face_shape_weight: float | None = None
     simplex_face_normal_weight: float | None = None
     simplex_face_boundary_lddt_weight: float | None = None
     simplex_tetra_coordinate_weight: float | None = None
     simplex_tetra_coordinate_distance_weight: float | None = None
+    simplex_tetra_coordinate_expansion_weight: float | None = None
     simplex_tetra_shape_weight: float | None = None
     simplex_tetra_boundary_lddt_weight: float | None = None
     simplex_topology_margin_weight: float | None = None
@@ -206,6 +208,7 @@ class TrainingConfig:
     simplex_cell_closure_ramp_steps: int = 1
     simplex_cell_closure_cutoff: float = 15.0
     simplex_cell_closure_temperature: float = 2.0
+    simplex_coordinate_expansion_tolerance: float | None = None
     simplex_topology_teacher_forcing_weight: float = 0.0
     simplex_topology_teacher_forcing_weight_final: float | None = None
     simplex_topology_teacher_forcing_ramp_start_step: int | None = None
@@ -1136,11 +1139,13 @@ def fit(
         simplex_aux_weight=training_config.simplex_aux_weight,
         simplex_face_coordinate_weight=training_config.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=training_config.simplex_face_coordinate_distance_weight,
+        simplex_face_coordinate_expansion_weight=training_config.simplex_face_coordinate_expansion_weight,
         simplex_face_shape_weight=training_config.simplex_face_shape_weight,
         simplex_face_normal_weight=training_config.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=training_config.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=training_config.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=training_config.simplex_tetra_coordinate_distance_weight,
+        simplex_tetra_coordinate_expansion_weight=training_config.simplex_tetra_coordinate_expansion_weight,
         simplex_tetra_shape_weight=training_config.simplex_tetra_shape_weight,
         simplex_tetra_boundary_lddt_weight=training_config.simplex_tetra_boundary_lddt_weight,
         simplex_topology_margin_weight=training_config.simplex_topology_margin_weight,
@@ -1150,6 +1155,7 @@ def fit(
         simplex_cell_closure_weight=training_config.simplex_cell_closure_weight,
         simplex_cell_closure_cutoff=training_config.simplex_cell_closure_cutoff,
         simplex_cell_closure_temperature=training_config.simplex_cell_closure_temperature,
+        simplex_coordinate_expansion_tolerance=training_config.simplex_coordinate_expansion_tolerance,
         backbone_loss_weight=training_config.backbone_loss_weight,
         sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
         torsion_loss_weight=training_config.torsion_loss_weight,
@@ -1160,11 +1166,13 @@ def fit(
         simplex_aux_weight=training_config.simplex_aux_weight,
         simplex_face_coordinate_weight=training_config.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=training_config.simplex_face_coordinate_distance_weight,
+        simplex_face_coordinate_expansion_weight=training_config.simplex_face_coordinate_expansion_weight,
         simplex_face_shape_weight=training_config.simplex_face_shape_weight,
         simplex_face_normal_weight=training_config.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=training_config.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=training_config.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=training_config.simplex_tetra_coordinate_distance_weight,
+        simplex_tetra_coordinate_expansion_weight=training_config.simplex_tetra_coordinate_expansion_weight,
         simplex_tetra_shape_weight=training_config.simplex_tetra_shape_weight,
         simplex_tetra_boundary_lddt_weight=training_config.simplex_tetra_boundary_lddt_weight,
         simplex_topology_margin_weight=training_config.simplex_topology_margin_weight,
@@ -1174,6 +1182,7 @@ def fit(
         simplex_cell_closure_weight=training_config.simplex_cell_closure_weight,
         simplex_cell_closure_cutoff=training_config.simplex_cell_closure_cutoff,
         simplex_cell_closure_temperature=training_config.simplex_cell_closure_temperature,
+        simplex_coordinate_expansion_tolerance=training_config.simplex_coordinate_expansion_tolerance,
         backbone_loss_weight=training_config.backbone_loss_weight,
         sidechain_fape_loss_weight=training_config.sidechain_fape_loss_weight,
         torsion_loss_weight=training_config.torsion_loss_weight,
@@ -1504,6 +1513,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the selected-face boundary-edge coordinate-distance realization loss weight.",
     )
     parser.add_argument(
+        "--simplex-face-coordinate-expansion-weight",
+        type=float,
+        default=None,
+        help="Override the selected-face one-sided boundary-edge expansion realization loss weight.",
+    )
+    parser.add_argument(
         "--simplex-face-shape-weight",
         type=float,
         default=None,
@@ -1532,6 +1547,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the selected-tetra boundary-edge coordinate-distance realization loss weight.",
+    )
+    parser.add_argument(
+        "--simplex-tetra-coordinate-expansion-weight",
+        type=float,
+        default=None,
+        help="Override the selected-tetra one-sided boundary-edge expansion realization loss weight.",
     )
     parser.add_argument(
         "--simplex-tetra-shape-weight",
@@ -1579,6 +1600,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-cell-closure-ramp-steps", type=int, default=1)
     parser.add_argument("--simplex-cell-closure-cutoff", type=float, default=15.0)
     parser.add_argument("--simplex-cell-closure-temperature", type=float, default=2.0)
+    parser.add_argument(
+        "--simplex-coordinate-expansion-tolerance",
+        type=float,
+        default=None,
+        help="Allowed log-distance contraction margin for selected simplex boundary expansion losses.",
+    )
     parser.add_argument(
         "--simplex-topology-teacher-forcing-weight",
         type=float,
@@ -1681,11 +1708,13 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_aux_weight=args.simplex_aux_weight,
         simplex_face_coordinate_weight=args.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=args.simplex_face_coordinate_distance_weight,
+        simplex_face_coordinate_expansion_weight=args.simplex_face_coordinate_expansion_weight,
         simplex_face_shape_weight=args.simplex_face_shape_weight,
         simplex_face_normal_weight=args.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=args.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=args.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=args.simplex_tetra_coordinate_distance_weight,
+        simplex_tetra_coordinate_expansion_weight=args.simplex_tetra_coordinate_expansion_weight,
         simplex_tetra_shape_weight=args.simplex_tetra_shape_weight,
         simplex_tetra_boundary_lddt_weight=args.simplex_tetra_boundary_lddt_weight,
         simplex_topology_margin_weight=args.simplex_topology_margin_weight,
@@ -1698,6 +1727,7 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_cell_closure_ramp_steps=args.simplex_cell_closure_ramp_steps,
         simplex_cell_closure_cutoff=args.simplex_cell_closure_cutoff,
         simplex_cell_closure_temperature=args.simplex_cell_closure_temperature,
+        simplex_coordinate_expansion_tolerance=args.simplex_coordinate_expansion_tolerance,
         simplex_topology_teacher_forcing_weight=args.simplex_topology_teacher_forcing_weight,
         simplex_topology_teacher_forcing_weight_final=args.simplex_topology_teacher_forcing_weight_final,
         simplex_topology_teacher_forcing_ramp_start_step=args.simplex_topology_teacher_forcing_ramp_start_step,

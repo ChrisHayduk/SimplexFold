@@ -1306,3 +1306,13 @@ improvement over E47/E48 but remains below the stronger E22/E25/E30 pilot
 band and far below E15. The next branch should probably address global
 coordinate expansion directly inside the topological readout, not add another
 same-rank or edge-context side pass.
+
+Immediate E50 branch: add a selected-boundary expansion hinge to the
+coordinate realization losses. This should remain inside the simplicial view:
+for each selected face or tetra, act only on the boundary edges induced by
+that selected higher-rank cell, and penalize only contraction of the predicted
+edge length below the true selected boundary length. It is not a generic
+radius-of-gyration or all-pairs distance objective; it asks whether the
+learned 2-/3-cell complex can realize its own boundary 1-skeleton without
+collapsing. Keep the architecture identical to `full_msa_to_face`, so the
+parameter count remains `3,106,690`.

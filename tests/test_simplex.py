@@ -1083,6 +1083,8 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
     matching_atom14[:, :, 1, :] = true_ca
     collapsed_atom14 = matching_atom14.clone()
     collapsed_atom14[:, :, 1, :] = 0.0
+    expanded_atom14 = matching_atom14.clone()
+    expanded_atom14[:, :, 1, :] = true_ca * 2.0
     base_prediction = {
         "simplex_contact_logits": torch.zeros(1, 5, 5),
         "simplex_face_indices": torch.tensor([[[[0, 1, 2]], [[1, 2, 3]], [[2, 3, 4]], [[3, 4, 0]], [[4, 0, 1]]]]),
@@ -1098,11 +1100,13 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
         face_area_weight=0.0,
         face_coordinate_weight=1.0,
         face_coordinate_distance_weight=1.0,
+        face_coordinate_expansion_weight=1.0,
         face_boundary_lddt_weight=1.0,
         face_distance_weight=0.0,
         tetra_geometry_weight=0.0,
         tetra_coordinate_weight=1.0,
         tetra_coordinate_distance_weight=1.0,
+        tetra_coordinate_expansion_weight=1.0,
         tetra_boundary_lddt_weight=1.0,
         tetra_distance_weight=0.0,
         pair_face_consistency_weight=0.0,
@@ -1111,23 +1115,34 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
 
     matching_terms = loss_fn({**base_prediction, "atom14_coords": matching_atom14}, true_ca, ca_mask)
     collapsed_terms = loss_fn({**base_prediction, "atom14_coords": collapsed_atom14}, true_ca, ca_mask)
+    expanded_terms = loss_fn({**base_prediction, "atom14_coords": expanded_atom14}, true_ca, ca_mask)
 
     assert matching_terms["simplex_face_coordinate_area_loss"].item() < 1e-6
     assert matching_terms["simplex_face_coordinate_distance_loss"].item() < 1e-6
+    assert matching_terms["simplex_face_coordinate_expansion_loss"].item() < 1e-6
     assert matching_terms["simplex_face_boundary_lddt_loss"].item() < 1e-6
     assert matching_terms["simplex_tetra_coordinate_geometry_loss"].item() < 1e-6
     assert matching_terms["simplex_tetra_coordinate_distance_loss"].item() < 1e-6
+    assert matching_terms["simplex_tetra_coordinate_expansion_loss"].item() < 1e-6
     assert matching_terms["simplex_tetra_boundary_lddt_loss"].item() < 1e-6
+    assert expanded_terms["simplex_face_coordinate_expansion_loss"].item() < 1e-6
+    assert expanded_terms["simplex_tetra_coordinate_expansion_loss"].item() < 1e-6
     assert collapsed_terms["simplex_aux_loss"] > matching_terms["simplex_aux_loss"]
     assert collapsed_terms["simplex_face_coordinate_area_loss"] > matching_terms["simplex_face_coordinate_area_loss"]
     assert collapsed_terms["simplex_face_coordinate_distance_loss"] > matching_terms[
         "simplex_face_coordinate_distance_loss"
+    ]
+    assert collapsed_terms["simplex_face_coordinate_expansion_loss"] > matching_terms[
+        "simplex_face_coordinate_expansion_loss"
     ]
     assert collapsed_terms["simplex_tetra_coordinate_geometry_loss"] > matching_terms[
         "simplex_tetra_coordinate_geometry_loss"
     ]
     assert collapsed_terms["simplex_tetra_coordinate_distance_loss"] > matching_terms[
         "simplex_tetra_coordinate_distance_loss"
+    ]
+    assert collapsed_terms["simplex_tetra_coordinate_expansion_loss"] > matching_terms[
+        "simplex_tetra_coordinate_expansion_loss"
     ]
     assert collapsed_terms["simplex_face_boundary_lddt_loss"] > matching_terms["simplex_face_boundary_lddt_loss"]
     assert collapsed_terms["simplex_tetra_boundary_lddt_loss"] > matching_terms["simplex_tetra_boundary_lddt_loss"]

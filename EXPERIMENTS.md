@@ -1547,3 +1547,46 @@ to `val_lddt_ca=0.2695`, FoldScore `0.2429`, `val_ca_drmsd=14.5377`, and
 radius of gyration `6.7858 / 15.4034`. Directed outer-edge context is better
 than E47/E48 final and roughly comparable to several weak pilots, but it does
 not recover the E22/E25/E30 early band or approach E15.
+
+### E50: Selected Boundary Expansion Hinge
+
+Status: implemented locally; planned for Runpod.
+
+Hypothesis: the repeated low-radius checkpoints are a failure to realize the
+selected simplicial complex, not just a bad global coordinate scale. The
+model selects faces and tetrahedra, predicts coordinates, and already tries
+to match selected boundary distances symmetrically. A one-sided realization
+constraint may help the complex avoid degenerate contractions while leaving
+over-expanded early structures free to be corrected by FAPE, lDDT-style
+terms, and selected distance losses.
+
+Mechanism: add zero-parameter face and tetra expansion losses. For every
+selected face/tetra boundary edge, compute the log-scaled true and predicted
+C-alpha edge lengths and apply a smooth one-sided hinge only when the
+predicted boundary edge is shorter than the true edge. The loss acts only on
+edges induced by selected higher-rank cells, so it is a boundary-realization
+objective for the learned 2-/3-complex rather than a generic all-pairs
+radius or lDDT hack.
+
+Implementation: add `simplex_face_coordinate_expansion_weight`,
+`simplex_tetra_coordinate_expansion_weight`, and
+`simplex_coordinate_expansion_tolerance`, plus the runner variant
+`full_msa_to_face_expansion_hinge`. The variant is architecturally identical
+to `full_msa_to_face`, so it should remain at the SimplexFold medium budget
+of `3,106,690` parameters.
+
+Local validation: py_compile passed for the changed model/trainer/runner
+files. Focused tests passed for the one-sided loss, AlphaFoldLoss override
+plumbing, runner variant parsing, CLI flags, loss builder forwarding, and
+zero-parameter budget. Affected suites `tests/test_simplex.py`,
+`tests/test_nanofold_public_benchmarks.py`, and `tests/test_trainer.py`
+passed, and full `python -m pytest -q` passed. Parameter audit: AF2-medium
+pair-only `3,106,642`, SimplexFold medium `3,106,690`, and E50
+`3,106,690` parameters.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with
+the E15 selected coordinate and boundary-distance losses, expansion weights
+`0.5/0.5`, and `simplex_aux_weight` annealed from `1.0` to `0.5`. Continue
+only if the run improves over E49 while increasing predicted C-alpha radius
+toward the validation target geometry instead of producing the usual
+late-collapse signature.

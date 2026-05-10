@@ -199,6 +199,26 @@ def _selected_boundary_lddt_loss(
     return (edge_loss * local_mask).sum(dim=reduce_dims) / local_mask.sum(dim=reduce_dims).clamp_min(1.0)
 
 
+def _selected_boundary_contraction_loss(
+    pred_distances: torch.Tensor,
+    true_distances: torch.Tensor,
+    mask: torch.Tensor,
+    *,
+    distance_scale: float,
+    tolerance: float,
+) -> torch.Tensor:
+    """One-sided loss for collapsed selected simplex boundary edges."""
+
+    denom = torch.log1p(torch.as_tensor(distance_scale, device=pred_distances.device, dtype=pred_distances.dtype))
+    denom = denom.clamp_min(1.0)
+    pred_log = torch.log1p(pred_distances) / denom
+    true_log = torch.log1p(true_distances) / denom
+    contraction = torch.clamp(true_log - pred_log - float(tolerance), min=0.0)
+    loss = torch.nn.functional.smooth_l1_loss(contraction, torch.zeros_like(contraction), reduction="none") * mask
+    reduce_dims = tuple(range(1, loss.ndim))
+    return loss.sum(dim=reduce_dims) / mask.sum(dim=reduce_dims).clamp_min(1.0)
+
+
 def _cell_closure_weighted_mask(
     cell_mask: torch.Tensor,
     true_distances: torch.Tensor,
@@ -1662,6 +1682,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         face_area_weight: float = 0.05,
         face_coordinate_weight: float = 0.1,
         face_coordinate_distance_weight: float = 0.0,
+        face_coordinate_expansion_weight: float = 0.0,
         face_shape_weight: float = 0.0,
         face_normal_weight: float = 0.0,
         face_boundary_lddt_weight: float = 0.0,
@@ -1669,6 +1690,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         tetra_geometry_weight: float = 0.02,
         tetra_coordinate_weight: float = 0.1,
         tetra_coordinate_distance_weight: float = 0.0,
+        tetra_coordinate_expansion_weight: float = 0.0,
         tetra_shape_weight: float = 0.0,
         tetra_boundary_lddt_weight: float = 0.0,
         tetra_distance_weight: float = 0.05,
@@ -1678,6 +1700,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         cell_closure_weight: float = 0.0,
         cell_closure_cutoff: float = 15.0,
         cell_closure_temperature: float = 2.0,
+        coordinate_expansion_tolerance: float = 0.0,
         distance_scale: float = 32.0,
         volume_scale: float = 1000.0,
         area_scale: float = 300.0,
@@ -1692,6 +1715,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         self.face_area_weight = face_area_weight
         self.face_coordinate_weight = face_coordinate_weight
         self.face_coordinate_distance_weight = face_coordinate_distance_weight
+        self.face_coordinate_expansion_weight = face_coordinate_expansion_weight
         self.face_shape_weight = face_shape_weight
         self.face_normal_weight = face_normal_weight
         self.face_boundary_lddt_weight = face_boundary_lddt_weight
@@ -1699,6 +1723,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         self.tetra_geometry_weight = tetra_geometry_weight
         self.tetra_coordinate_weight = tetra_coordinate_weight
         self.tetra_coordinate_distance_weight = tetra_coordinate_distance_weight
+        self.tetra_coordinate_expansion_weight = tetra_coordinate_expansion_weight
         self.tetra_shape_weight = tetra_shape_weight
         self.tetra_boundary_lddt_weight = tetra_boundary_lddt_weight
         self.tetra_distance_weight = tetra_distance_weight
@@ -1708,6 +1733,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         self.cell_closure_weight = cell_closure_weight
         self.cell_closure_cutoff = cell_closure_cutoff
         self.cell_closure_temperature = cell_closure_temperature
+        self.coordinate_expansion_tolerance = coordinate_expansion_tolerance
         self.distance_scale = distance_scale
         self.volume_scale = volume_scale
         self.area_scale = area_scale
@@ -1893,6 +1919,18 @@ class SimplexGeometryLoss(torch.nn.Module):
                 loss_terms["simplex_face_coordinate_distance_loss"] = face_coordinate_distance_loss
                 weighted = self.face_coordinate_distance_weight * face_coordinate_distance_loss
                 loss_terms["weighted_simplex_face_coordinate_distance_loss"] = weighted
+                total = total + weighted
+
+                face_coordinate_expansion_loss = _selected_boundary_contraction_loss(
+                    pred_face_distances_raw,
+                    true_face_distances,
+                    face_distance_valid,
+                    distance_scale=self.distance_scale,
+                    tolerance=self.coordinate_expansion_tolerance,
+                )
+                loss_terms["simplex_face_coordinate_expansion_loss"] = face_coordinate_expansion_loss
+                weighted = self.face_coordinate_expansion_weight * face_coordinate_expansion_loss
+                loss_terms["weighted_simplex_face_coordinate_expansion_loss"] = weighted
                 total = total + weighted
 
                 if self.face_shape_weight > 0.0:
@@ -2167,6 +2205,18 @@ class SimplexGeometryLoss(torch.nn.Module):
                 loss_terms["simplex_tetra_coordinate_distance_loss"] = tetra_coordinate_distance_loss
                 weighted = self.tetra_coordinate_distance_weight * tetra_coordinate_distance_loss
                 loss_terms["weighted_simplex_tetra_coordinate_distance_loss"] = weighted
+                total = total + weighted
+
+                tetra_coordinate_expansion_loss = _selected_boundary_contraction_loss(
+                    pred_tetra_distances_raw,
+                    true_tetra_distances,
+                    tetra_distance_valid,
+                    distance_scale=self.distance_scale,
+                    tolerance=self.coordinate_expansion_tolerance,
+                )
+                loss_terms["simplex_tetra_coordinate_expansion_loss"] = tetra_coordinate_expansion_loss
+                weighted = self.tetra_coordinate_expansion_weight * tetra_coordinate_expansion_loss
+                loss_terms["weighted_simplex_tetra_coordinate_expansion_loss"] = weighted
                 total = total + weighted
 
                 if self.tetra_shape_weight > 0.0:

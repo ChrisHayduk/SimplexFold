@@ -170,11 +170,13 @@ class AlphaFoldLoss(torch.nn.Module):
         simplex_aux_weight: float = 1.0,
         simplex_face_coordinate_weight: Optional[float] = None,
         simplex_face_coordinate_distance_weight: Optional[float] = None,
+        simplex_face_coordinate_expansion_weight: Optional[float] = None,
         simplex_face_shape_weight: Optional[float] = None,
         simplex_face_normal_weight: Optional[float] = None,
         simplex_face_boundary_lddt_weight: Optional[float] = None,
         simplex_tetra_coordinate_weight: Optional[float] = None,
         simplex_tetra_coordinate_distance_weight: Optional[float] = None,
+        simplex_tetra_coordinate_expansion_weight: Optional[float] = None,
         simplex_tetra_shape_weight: Optional[float] = None,
         simplex_tetra_boundary_lddt_weight: Optional[float] = None,
         simplex_topology_margin_weight: Optional[float] = None,
@@ -184,6 +186,7 @@ class AlphaFoldLoss(torch.nn.Module):
         simplex_cell_closure_weight: Optional[float] = None,
         simplex_cell_closure_cutoff: float = 15.0,
         simplex_cell_closure_temperature: float = 2.0,
+        simplex_coordinate_expansion_tolerance: Optional[float] = None,
         backbone_loss_weight: float = 1.0,
         sidechain_fape_loss_weight: float = 1.0,
         torsion_loss_weight: float = 1.0,
@@ -213,6 +216,10 @@ class AlphaFoldLoss(torch.nn.Module):
             self.simplex_geometry_loss.face_coordinate_weight = float(simplex_face_coordinate_weight)
         if simplex_face_coordinate_distance_weight is not None:
             self.simplex_geometry_loss.face_coordinate_distance_weight = float(simplex_face_coordinate_distance_weight)
+        if simplex_face_coordinate_expansion_weight is not None:
+            self.simplex_geometry_loss.face_coordinate_expansion_weight = float(
+                simplex_face_coordinate_expansion_weight
+            )
         if simplex_face_shape_weight is not None:
             self.simplex_geometry_loss.face_shape_weight = float(simplex_face_shape_weight)
         if simplex_face_normal_weight is not None:
@@ -224,6 +231,10 @@ class AlphaFoldLoss(torch.nn.Module):
         if simplex_tetra_coordinate_distance_weight is not None:
             self.simplex_geometry_loss.tetra_coordinate_distance_weight = float(
                 simplex_tetra_coordinate_distance_weight
+            )
+        if simplex_tetra_coordinate_expansion_weight is not None:
+            self.simplex_geometry_loss.tetra_coordinate_expansion_weight = float(
+                simplex_tetra_coordinate_expansion_weight
             )
         if simplex_tetra_shape_weight is not None:
             self.simplex_geometry_loss.tetra_shape_weight = float(simplex_tetra_shape_weight)
@@ -240,6 +251,10 @@ class AlphaFoldLoss(torch.nn.Module):
             self.simplex_geometry_loss.cell_closure_weight = float(simplex_cell_closure_weight)
         self.simplex_geometry_loss.cell_closure_cutoff = float(simplex_cell_closure_cutoff)
         self.simplex_geometry_loss.cell_closure_temperature = float(simplex_cell_closure_temperature)
+        if simplex_coordinate_expansion_tolerance is not None:
+            self.simplex_geometry_loss.coordinate_expansion_tolerance = float(
+                simplex_coordinate_expansion_tolerance
+            )
         self.backbone_loss = BackboneTrajectoryLoss()
         self.sidechain_fape_loss = AllAtomFAPE()
 
