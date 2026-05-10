@@ -422,3 +422,17 @@
   the full selected face/tetra complex and MSA-to-face path but setting
   `simplex_use_recycled_geometry=false`. This tests whether collapsed recycled
   coordinates are contaminating the learned sparse simplex selector.
+- E27 completed on owned pod `0hesaxxfhq8soj` at commit `a6a896a`. Step 250
+  reached `val_lddt_ca=0.2317`, FoldScore `0.2169`,
+  `val_ca_drmsd=15.5788`, `val_pred_ca_rg=5.7226`, and
+  `val_true_ca_rg=15.4034`. Final step 500 reached
+  `val_lddt_ca=0.2369`, FoldScore `0.2354`, `val_ca_drmsd=16.3061`,
+  `val_pred_ca_rg=5.7967`, and `val_true_ca_rg=15.7622`. Disabling recycled
+  topology feedback makes the early geometry worse, so E27 is rejected.
+- After E27, pod `0hesaxxfhq8soj` was stopped. Both owned Runpod pods
+  (`sytp4e4kjs7e61` and `0hesaxxfhq8soj`) are stopped.
+- E28 direction: a training-only topology teacher-forcing curriculum. Build
+  the initial selected face/tetra complex from public training-label C-alpha
+  distances for early steps, then anneal to learned MSA/pair topology. Keep
+  validation/inference feature-only and do not add hidden labels, external
+  data, templates, or dense all-pairs metric objectives.

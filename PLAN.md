@@ -1,17 +1,18 @@
-## Current Plan: Recycled Topology Feedback Ablation
+## Current Plan: Topology Teacher-Forcing Curriculum
 
-E21-E26 showed that message scaling, boundary-degree normalization, larger
-effective batch size, and a face-only 2-skeleton do not break the lDDT
-plateau. The next architecture-facing question is whether the model's
-under-expanded recycled coordinates are feeding back into the sparse simplex
-selector and reinforcing bad higher-order cells.
+E21-E27 showed that message scaling, boundary-degree normalization, larger
+effective batch size, face-only 2-skeletons, and removing recycled-coordinate
+topology do not break the lDDT plateau. The common failure mode is still
+under-expanded coordinates, which suggests the learned sparse complex may be
+too noisy early for persistent face/tetra states to become useful.
 
-Run a recycled-topology ablation: keep the full explicit face/tetra complex
-and MSA-to-face path, but disable recycled-coordinate terms in topology and
-simplex geometry construction for a short Runpod pilot. This keeps the sparse
-complex driven by learned MSA/pair topology rather than by collapsed early
-coordinates. Keep the parameter budget under the AF2-medium +5% cap and use
-`EXPERIMENT_RESULTS.md` only for returned run results.
+The next architecture-facing direction is a training-only topology curriculum:
+build the sparse face/tetra complex from public training-label C-alpha
+distances for early steps, then anneal back to the learned MSA/pair selector.
+Validation and inference must still use features only. This tests whether the
+explicit higher-order states help once the model sees a plausible simplex
+complex, without using external data, hidden labels, templates, or extra
+parameters. Keep `EXPERIMENT_RESULTS.md` only for returned run results.
 
 Yes. With templates forbidden, the right construction is:
 

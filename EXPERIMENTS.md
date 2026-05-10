@@ -745,7 +745,7 @@ scale, so the full 3-simplex pathway remains preferable despite its plateau.
 
 ### E27: No Recycled-Coordinate Topology Feedback
 
-Status: implemented and ready for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: SimplexFold's README motivates recycling geometry back into the
 simplex trunk, but the current runs repeatedly show under-expanded predicted
@@ -762,3 +762,32 @@ dense metric loss.
 Decision rule: use a 500-step Runpod gate. Continue only if disabling
 recycled-coordinate topology improves over the E09/E15 early band or improves
 global scale without sacrificing FoldScore.
+
+Result: reject. Step 250 reached only `val_lddt_ca=0.2317`, FoldScore
+`0.2169`, `val_ca_drmsd=15.5788`, and predicted/true C-alpha radius of
+gyration `5.7226 / 15.4034`. Final step 500 was `val_lddt_ca=0.2369`,
+FoldScore `0.2354`, `val_ca_drmsd=16.3061`, and radius of gyration
+`5.7967 / 15.7622`. Removing recycled-coordinate topology worsens both the
+local and global geometry, so the failed plateau is not simply caused by
+coordinate feedback contaminating cell selection.
+
+### E28: Training-Only Simplex Topology Teacher Forcing
+
+Status: design candidate.
+
+Hypothesis: the repeated collapse across E21-E27 suggests the sparse simplex
+selector may be too noisy before the structure module has learned useful
+geometry. If the face/tetra states are initialized on a plausible training
+complex, they may learn the topological patch/packing roles described in the
+README before being asked to select cells from noisy MSA/pair logits.
+
+Mechanism: during training only, construct the early sparse complex from true
+C-alpha distances in public training batches, then anneal from teacher-forced
+topology to the learned MSA/pair selector. Validation and inference remain
+feature-only. This uses train labels only to scaffold the topology
+construction step, not to add a dense all-pairs metric objective, and adds no
+parameters.
+
+Decision rule: first implement a narrow opt-in curriculum and run a 500-step
+Runpod gate. Continue only if the learned selector handoff improves over the
+E09/E15 early band without making FoldScore or global scale worse.
