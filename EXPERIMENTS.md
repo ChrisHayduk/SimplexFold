@@ -578,3 +578,24 @@ Result: reject. Step 500 collapsed to `val_lddt_ca=0.2364`,
 FoldScore `0.2447`, `val_ca_drmsd=15.5881`, and predicted/true C-alpha
 radius of gyration `5.6076 / 15.4034`. The selected-boundary lDDT formulation
 is topologically motivated, but it is empirically harmful in this form.
+
+### E21: Stronger Simplex Boundary Messages
+
+Status: ready for Runpod.
+
+Hypothesis: E15 shows that selected simplex realization helps, but E18 shows
+that simply widening face/tetra states is not enough. The useful signal may be
+losing strength when scattered back into the AF2 pair and single streams,
+especially because each selected edge/residue averages messages over many
+incident cells before the structure module sees them.
+
+Mechanism: add zero-parameter `simplex_pair_update_scale` and
+`simplex_single_update_scale` knobs, defaulting to `1.0`, and a
+`full_msa_to_face_strong_messages` variant that keeps the E09 topology
+(`full_msa_to_face`) but scales both simplex-to-pair and simplex-to-single
+residual updates by `1.5`. This tests the architectural simplex-to-trunk
+coupling directly without changing the AF2 trunk, adding parameters, or
+introducing a new loss.
+
+Decision rule: compare the 3000-step curve against E09. Continue only if the
+scaled messages improve lDDT or match lDDT with better FoldScore/dRMSD.

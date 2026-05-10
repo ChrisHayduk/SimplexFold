@@ -335,3 +335,8 @@
   `val_lddt_ca=0.2364`, FoldScore `0.2447`, `val_ca_drmsd=15.5881`,
   `val_pred_ca_rg=5.6076`, and `val_true_ca_rg=15.4034`. The new pod was then
   stopped.
+- E21 returns to an architecture-mediated change rather than another loss:
+  `simplex_pair_update_scale` and `simplex_single_update_scale` amplify the
+  selected face/tetra boundary messages before they are added back into pair
+  and single streams. This tests whether the explicit higher-order states are
+  under-coupled to the structure module after averaging over incident cells.

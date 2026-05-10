@@ -42,3 +42,14 @@ def test_full_msa_to_face_mixed_soft_variant_keeps_reduced_local_bias():
     assert cfg.simplex_use_msa_to_face is True
     assert cfg.simplex_local_neighbor_k == 4
     assert cfg.simplex_local_bias == 2.0
+
+
+def test_full_msa_to_face_strong_messages_scales_simplex_residuals():
+    cfg = _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face_strong_messages")
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_pair_update_scale == 1.5
+    assert cfg.simplex_single_update_scale == 1.5
