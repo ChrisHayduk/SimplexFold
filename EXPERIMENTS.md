@@ -1328,3 +1328,31 @@ not approach the E22/E25/E30 early range. The result argues that the Hodge
 face residual is not enough on its own; the next iteration should improve
 how the sparse complex is constructed or realized before adding more
 downstream structure conditioning.
+
+### E44: Soft Flag-Complex Closure
+
+Status: implemented locally; planned for Runpod.
+
+Hypothesis: the selected higher-order complex is currently too permissive.
+Each residue selects a top-k neighbor list, then every neighbor pair becomes a
+face and every neighbor triplet becomes a tetra. In a flag-complex view,
+however, a filled triangle or tetrahedron should be trusted only when its
+boundary edges are also plausible. Weighting selected cell masks by their
+boundary-edge topology probabilities may suppress noisy open faces/tetras
+without adding a generic pair-distance loss or widening the AF2 trunk.
+
+Mechanism: add `simplex_boundary_closure_weight` and
+`simplex_boundary_closure_temperature`. During topology construction, gather
+the learned boundary-edge scores for each selected face/tetra, convert them
+to edge probabilities, take the geometric mean over the boundary 1-skeleton,
+and blend that closure score into the selected cell mask. The new
+`full_msa_to_face_flag_closure` variant enables MSA-to-face messages with a
+soft closure weight of `0.5` and temperature `1.0`. This is a zero-parameter
+change to the sparse cell complex itself.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with the
+same selected face/tetra coordinate and boundary-distance weights used by
+E09/E15. Use the E15-style auxiliary anneal from `1.0` to `0.5` over steps
+250-500, because E43 confirmed that annealing improves the final checkpoint
+within a run even when the architecture is weak. Continue only if E44 beats
+E42/E43 and moves back toward the E22/E25/E30 early range.

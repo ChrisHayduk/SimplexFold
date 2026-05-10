@@ -1192,3 +1192,10 @@ should change the selected 2-/3-cell construction or boundary realization
 itself, using topological operators or incidence-aware curricula from the
 reference PDFs, before spending parameter budget on additional structure
 readouts.
+
+Immediate E44 branch: make selected faces and tetras a soft flag complex by
+weighting each cell by the plausibility of its full boundary 1-skeleton. This
+keeps the intervention squarely in the simplicial/topological view: a filled
+2- or 3-simplex should be trusted most when the learned boundary edges are
+also trusted, instead of treating every pair or triplet of anchor neighbors
+as an equally valid higher-order cell.

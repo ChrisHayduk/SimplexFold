@@ -291,6 +291,8 @@ def build_simplex_topology(
     long_min_sep: int = 24,
     long_bias: float = 0.0,
     geometry_distance_weight: float = 0.1,
+    boundary_closure_weight: float = 0.0,
+    boundary_closure_temperature: float = 1.0,
 ) -> SimplexTopology:
     """Select top-k neighbors and expand them into anchored faces/tetrahedra.
 
@@ -355,6 +357,9 @@ def build_simplex_topology(
     tetra_face_slots = _tetra_face_slots(face_combos, tetra_combos)
 
     anchor = residue_ids[None, :, None].expand(b, l, -1)
+    closure_weight = min(max(float(boundary_closure_weight), 0.0), 1.0)
+    closure_temperature = max(float(boundary_closure_temperature), 1e-6)
+
     if face_combos.numel() == 0:
         face_indices = torch.empty((b, l, 0, 3), device=device, dtype=torch.long)
         face_mask = torch.empty((b, l, 0), device=device, dtype=dtype)
@@ -367,6 +372,18 @@ def build_simplex_topology(
         ik = gather_pair(valid_pair.to(dtype), face_i, face_k)
         jk = gather_pair(valid_pair.to(dtype), face_j, face_k)
         face_mask = ij * ik * jk
+        if closure_weight > 0.0:
+            face_edge_scores = torch.stack(
+                [
+                    gather_pair(work_score, face_i, face_j),
+                    gather_pair(work_score, face_i, face_k),
+                    gather_pair(work_score, face_j, face_k),
+                ],
+                dim=-1,
+            )
+            face_edge_probs = torch.sigmoid(face_edge_scores / closure_temperature).clamp_min(1e-6)
+            face_closure = face_edge_probs.log().mean(dim=-1).exp()
+            face_mask = face_mask * ((1.0 - closure_weight) + closure_weight * face_closure)
 
     if tetra_combos.numel() == 0:
         tetra_indices = torch.empty((b, l, 0, 4), device=device, dtype=torch.long)
@@ -381,6 +398,11 @@ def build_simplex_topology(
         tetra_mask = torch.ones_like(tet_i, dtype=dtype)
         for a, c in pairs:
             tetra_mask = tetra_mask * gather_pair(valid_pair.to(dtype), a, c)
+        if closure_weight > 0.0:
+            tetra_edge_scores = torch.stack([gather_pair(work_score, a, c) for a, c in pairs], dim=-1)
+            tetra_edge_probs = torch.sigmoid(tetra_edge_scores / closure_temperature).clamp_min(1e-6)
+            tetra_closure = tetra_edge_probs.log().mean(dim=-1).exp()
+            tetra_mask = tetra_mask * ((1.0 - closure_weight) + closure_weight * tetra_closure)
 
     return SimplexTopology(
         nbr_idx=nbr_idx,
@@ -987,6 +1009,8 @@ class SimplicialAdapter(torch.nn.Module):
         self.long_min_sep = int(getattr(config, "simplex_long_min_sep", 24))
         self.long_bias = float(getattr(config, "simplex_long_bias", 0.0))
         self.geometry_distance_weight = float(getattr(config, "simplex_geometry_distance_weight", 0.1))
+        self.boundary_closure_weight = float(getattr(config, "simplex_boundary_closure_weight", 0.0))
+        self.boundary_closure_temperature = float(getattr(config, "simplex_boundary_closure_temperature", 1.0))
         self.rbf_bins = int(getattr(config, "simplex_rbf_bins", 8))
         self.sequence_max = float(getattr(config, "simplex_sequence_max", 64.0))
         self.distance_max = float(getattr(config, "simplex_distance_max", 32.0))
@@ -1149,6 +1173,8 @@ class SimplicialAdapter(torch.nn.Module):
                 long_min_sep=self.long_min_sep,
                 long_bias=self.long_bias,
                 geometry_distance_weight=self.geometry_distance_weight,
+                boundary_closure_weight=self.boundary_closure_weight,
+                boundary_closure_temperature=self.boundary_closure_temperature,
             )
 
         face_indices = topology.face_indices

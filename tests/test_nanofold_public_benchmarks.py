@@ -202,6 +202,26 @@ def test_full_msa_to_face_hodge_residual_variant_is_accepted_by_cli_parser():
     assert args.variants == ["full_msa_to_face_hodge_residual"]
 
 
+def test_full_msa_to_face_flag_closure_weights_selected_cells_by_boundary_edges():
+    cfg = _variant_config(
+        load_model_config("simplexfold_medium_param_matched"),
+        "full_msa_to_face_flag_closure",
+    )
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_boundary_closure_weight == 0.5
+    assert cfg.simplex_boundary_closure_temperature == 1.0
+
+
+def test_full_msa_to_face_flag_closure_variant_is_accepted_by_cli_parser():
+    args = parse_args(["--variants", "full_msa_to_face_flag_closure"])
+
+    assert args.variants == ["full_msa_to_face_flag_closure"]
+
+
 def test_structure_readout_only_variant_is_accepted_by_cli_parser():
     args = parse_args(["--variants", "full_msa_to_face_structure_readout_only"])
 

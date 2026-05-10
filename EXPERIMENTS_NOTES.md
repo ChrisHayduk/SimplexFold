@@ -1067,3 +1067,13 @@
   `val_pred_ca_rg=6.1772`, and `val_true_ca_rg=15.4034`. The run is rejected:
   the anneal improved the E43 checkpoint internally but still trailed E42 and
   the stronger E22/E25/E30 early range.
+- E44 local implementation at 2026-05-10 14:58 EDT: add a soft
+  flag-complex closure gate through `simplex_boundary_closure_weight`,
+  `simplex_boundary_closure_temperature`, and the
+  `full_msa_to_face_flag_closure` benchmark variant. During topology
+  construction, selected face/tetra masks are blended with the geometric mean
+  of the learned probabilities on their boundary edges. This is a topological
+  construction change, not an lDDT hack: it asks whether filled 2-/3-cells
+  should be trusted only when their learned 1-skeleton is also plausible.
+  Focused checks pass for closure-mask behavior, CLI variant parsing, and
+  zero parameter growth.

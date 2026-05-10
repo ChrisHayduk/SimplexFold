@@ -596,6 +596,16 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_msa_to_face=True,
             simplex_hodge_face_update_scale=0.25,
         )
+    if variant == "full_msa_to_face_flag_closure":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+            simplex_boundary_closure_weight=0.5,
+            simplex_boundary_closure_temperature=1.0,
+        )
     if variant == "full_msa_to_face_edge_frame_messages":
         return replace(
             base_config,
@@ -1091,6 +1101,12 @@ def _train_variant(
         "simplex_local_bias": float(getattr(model_config, "simplex_local_bias", 0.0)) if use_simplicial else 0.0,
         "simplex_long_min_sep": int(getattr(model_config, "simplex_long_min_sep", 0)) if use_simplicial else 0,
         "simplex_long_bias": float(getattr(model_config, "simplex_long_bias", 0.0)) if use_simplicial else 0.0,
+        "simplex_boundary_closure_weight": (
+            float(getattr(model_config, "simplex_boundary_closure_weight", 0.0)) if use_simplicial else 0.0
+        ),
+        "simplex_boundary_closure_temperature": (
+            float(getattr(model_config, "simplex_boundary_closure_temperature", 1.0)) if use_simplicial else 0.0
+        ),
         "simplex_pair_update_scale": (
             float(getattr(model_config, "simplex_pair_update_scale", 1.0)) if use_simplicial else 0.0
         ),
@@ -1209,6 +1225,8 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_local_bias",
         "simplex_long_min_sep",
         "simplex_long_bias",
+        "simplex_boundary_closure_weight",
+        "simplex_boundary_closure_temperature",
         "simplex_pair_update_scale",
         "simplex_single_update_scale",
         "simplex_structure_readout_scale",
@@ -1260,6 +1278,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "full_msa_to_face_structure_readout_only",
             "full_msa_to_face_outer_edge",
             "full_msa_to_face_hodge_residual",
+            "full_msa_to_face_flag_closure",
             "full_msa_to_face_edge_frame_messages",
             "full_msa_to_face_segment_cells",
             "face_structure_readout_only",

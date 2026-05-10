@@ -144,3 +144,5 @@ class ModelConfig:
     simplex_segment_cell_scale: float = 0.0
     simplex_segment_radius: int = 4
     simplex_c_segment: int = 12
+    simplex_boundary_closure_weight: float = 0.0
+    simplex_boundary_closure_temperature: float = 1.0

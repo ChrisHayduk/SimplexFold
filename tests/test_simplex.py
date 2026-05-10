@@ -52,6 +52,8 @@ class SimplexConfig:
     simplex_long_min_sep = 8
     simplex_long_bias = 0.0
     simplex_geometry_distance_weight = 0.1
+    simplex_boundary_closure_weight = 0.0
+    simplex_boundary_closure_temperature = 1.0
     simplex_rbf_bins = 4
     simplex_sequence_max = 16.0
     simplex_distance_max = 32.0
@@ -107,6 +109,33 @@ def test_build_simplex_topology_reserves_local_neighbor_slots():
     assert 5 in topology.nbr_idx[0, 2, 2:].tolist()
     assert topology.face_indices.shape == (1, 6, 6, 3)
     assert topology.tetra_indices.shape == (1, 6, 4, 4)
+
+
+def test_build_simplex_topology_flag_closure_downweights_open_cells():
+    score = torch.full((1, 4, 4), -8.0, dtype=torch.float32)
+    score[:, 0, 1:] = 8.0
+    score[:, 1:, 0] = 8.0
+    score[:, 1, 2] = 8.0
+    score[:, 2, 1] = 8.0
+    score[:, 1, 3] = 8.0
+    score[:, 3, 1] = 8.0
+    score[:, 2, 3] = -8.0
+    score[:, 3, 2] = -8.0
+
+    topology = build_simplex_topology(
+        score,
+        neighbor_k=3,
+        local_radius=-1,
+        local_bias=0.0,
+        long_min_sep=-1,
+        boundary_closure_weight=1.0,
+        boundary_closure_temperature=1.0,
+    )
+
+    anchor_face_masks = topology.face_mask[0, 0]
+    assert anchor_face_masks.max() > 0.99
+    assert anchor_face_masks.min() < 0.08
+    assert topology.tetra_mask[0, 0, 0] < 0.3
 
 
 def test_simplicial_adapter_teacher_forcing_selects_true_nearest_neighbors():
