@@ -287,3 +287,8 @@
 - E17 plan: resume E15 again at step 9000 and continue to step 12000 with
   `simplex_aux_weight=0.5` held constant, isolating more training at the E15
   scaffold strength from E16's deeper anneal.
+- E17 launched on pod `sytp4e4kjs7e61` and was stopped after step 11000.
+  It nearly tied E15 at step 9500 with `val_lddt_ca=0.3554` and improved
+  FoldScore to `0.3041`; step 10000 reached FoldScore `0.3094` but lDDT was
+  `0.3541`. The later checkpoints fell to `0.3454` and `0.3441`, so more
+  training at `simplex_aux_weight=0.5` does not break the lDDT plateau.

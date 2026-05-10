@@ -474,7 +474,7 @@ lDDT.
 
 ### E17: Continue E15 With Constant Simplex Auxiliary Weight
 
-Status: planned for Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: E15's `simplex_aux_weight=0.5` final checkpoint improved lDDT and
 FoldScore together, while E16's deeper anneal hurt lDDT. The best next test is
@@ -485,3 +485,10 @@ Mechanism: resume E15 at step 9000 and continue to step 12000 with
 coordinate and boundary-distance weights unchanged.
 
 Decision rule: keep if it improves E15 final `val_lddt_ca=0.3556`.
+
+Result: reject for the lDDT objective. The run nearly tied E15 at step 9500
+with `val_lddt_ca=0.3554` and improved FoldScore to `0.3041`; step 10000 had
+`val_lddt_ca=0.3541` and FoldScore `0.3094`. Later checkpoints drifted down
+to `0.3454` at step 10500 and `0.3441` at step 11000, so the run was stopped.
+More training at `simplex_aux_weight=0.5` improves aggregate FoldScore, but it
+does not break the C-alpha lDDT plateau.
