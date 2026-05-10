@@ -91,6 +91,7 @@
 | E07 boundary coordinate d=0.5 scaled | 2000 | 0.3247 | 0.3187 | 0.2617 |
 | E09 full MSA-to-face d=0.5 scaled | 3000 | 0.3429 | 0.3429 | 0.2689 |
 | E12 E09 continuation to 6000 | 5000 | 0.3472 | 0.3449 | 0.2856 |
+| E14 mixed soft selector | 2000 | 0.3264 | 0.3015 | 0.2589 |
 
 ## Scaled E03 Pilot
 
@@ -253,3 +254,17 @@
   uses `simplex_local_bias=2.0` for the remaining learned slots. The intent is
   to keep the E13 manifold scaffold while restoring enough local pressure to
   prevent arbitrary early nonlocal cells.
+- E14 launched on pod `sytp4e4kjs7e61` at commit `b90a9b8`.
+- E14 completed on pod `sytp4e4kjs7e61`: best `val_lddt_ca=0.3264` at step
+  2000, final `val_lddt_ca=0.3015`, final FoldScore `0.2589`,
+  final `val_ca_drmsd=12.1838`, `val_pred_ca_rg=10.1755`, and
+  `val_true_ca_rg=15.7622`. The soft selector improved over E13 but remained
+  below E09/E12 on lDDT and FoldScore, so it is rejected.
+- E15 plan: resume the E12/E09 `full_msa_to_face` checkpoint at step 6000,
+  continue to step 9000, and ramp only the overall `simplex_aux_weight` from
+  `1.0` to `0.5` over steps 6000-7000. This tests whether selected
+  face/tetra realization should act as an early scaffold and then relax while
+  the structure module consolidates.
+- E15 launched on pod `sytp4e4kjs7e61`, resuming the E12 checkpoint from
+  step 6000 and writing separate outputs under
+  `/workspace/codex-simplexfold-e15-runpod-20260510`.

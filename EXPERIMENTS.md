@@ -399,7 +399,7 @@ broad local bias makes the learned/global slots too noisy early.
 
 ### E14: Soft Mixed Local/Global Simplex Neighbor Scaffold
 
-Status: implemented locally; pending Runpod launch.
+Status: completed on Runpod.
 
 Hypothesis: E13's hard handoff from 4 local slots to 8 unbiased learned/global
 slots was too abrupt. The sparse complex may still need the same guaranteed
@@ -415,3 +415,29 @@ ablation: it changes how vertices are admitted into selected face/tetra cells.
 Decision rule: launch the same early Runpod check and keep only if the step-500
 point recovers toward E09/E12 while retaining better nonlocal capacity than
 the default local-biased selector.
+
+Result: reject. The run partially recovered from E13 but did not beat E09/E12:
+best `val_lddt_ca=0.3264` at step 2000 and final `val_lddt_ca=0.3015`.
+Final dRMSD and predicted radius of gyration improved relative to some earlier
+runs, but lDDT and FoldScore remained below the E09/E12 stack. The result
+suggests that hand-crafted mixed local/global selector variants are less
+useful than the default local-biased selector plus learned contact scoring.
+
+### E15: E12 Continuation With Simplex Auxiliary Anneal
+
+Status: launched on Runpod.
+
+Hypothesis: E12 improved global geometry and FoldScore through step 6000, but
+lDDT peaked earlier at step 5000. The selected simplex realization losses may
+be useful as an early/mid training scaffold, then slightly overconstrain the
+structure head once the face/tetra states have learned a geometry prior.
+
+Mechanism: resume the best `full_msa_to_face` E12 checkpoint at step 6000 and
+continue to step 9000. Keep the selected face/tetra coordinate and
+boundary-distance weights unchanged, but ramp the overall `simplex_aux_weight`
+from `1.0` to `0.5` over steps 6000-7000. This is still a simplicial objective
+curriculum: the only annealed signal is the auxiliary pressure on selected
+face/tetra/contact topology terms.
+
+Decision rule: keep if it improves E12 best `val_lddt_ca=0.3472` or improves
+final lDDT while preserving the E12 FoldScore/dRMSD gains.
