@@ -673,3 +673,8 @@
   `val_ca_drmsd=13.0352`, `val_pred_ca_rg=9.1316`, and
   `val_true_ca_rg=15.4034`. Face-only structure sidecar readout did not
   improve over E33/E34 and misses the E22/E25 early band, so E35 is rejected.
+- E36 direction: move upstream of the failed structure readout path and
+  improve the selector that builds the sparse 1-skeleton. Add an optional
+  hard-negative margin on `simplex_contact_logits` so true contact-neighborhood
+  energy outranks the highest non-contact logits in each anchor row before
+  the top-k face/tetra complex is constructed.

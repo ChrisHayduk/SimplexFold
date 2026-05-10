@@ -1035,3 +1035,28 @@ can pass some expansion signal, but local lDDT and FoldScore remained in the
 same weak band as E33/E34. The readout family is therefore not the next
 scaling path until the selected 2-simplex states themselves become more
 reliable.
+
+### E36: Topology Margin Selector
+
+Status: implementation candidate.
+
+Hypothesis: E33-E35 suggest that pooling selected face/tetra states into the
+structure module is not useful until the sparse complex itself is more
+reliable. The topology selector currently gets balanced contact BCE and a
+row-wise positive-neighborhood cross entropy, but the top-k neighbor star can
+still be polluted by high-scoring hard non-contacts. A margin term on the
+simplex contact logits should make the 1-skeleton cleaner before faces and
+tetras are built.
+
+Mechanism: add an optional hard-negative margin loss to
+`SimplexGeometryLoss`. For each anchor residue with at least one true contact,
+compare the positive contact-neighborhood logit energy against the highest
+non-contact logits in that row. Penalize hard non-contacts that sit within a
+configurable margin. This is not an lDDT-shaped or all-pairs coordinate loss:
+it only trains the logits that construct the sparse 1-skeleton used by the
+explicit 2-/3-simplex states.
+
+Decision rule: run a 500-step Runpod gate on the E09 selected-coordinate stack
+with MSA-to-face enabled. Continue only if the margin selector recovers above
+the weak E33-E35 readout band and approaches the E22/E25 early range without
+damaging FoldScore.

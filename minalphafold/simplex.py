@@ -1044,6 +1044,9 @@ class SimplexGeometryLoss(torch.nn.Module):
         contact_distance_threshold: float = 8.0,
         contact_weight: float = 0.05,
         topology_neighborhood_weight: float = 0.05,
+        topology_margin_weight: float = 0.0,
+        topology_margin: float = 1.0,
+        topology_margin_hard_negatives: int = 8,
         face_area_weight: float = 0.05,
         face_coordinate_weight: float = 0.1,
         face_coordinate_distance_weight: float = 0.0,
@@ -1065,6 +1068,9 @@ class SimplexGeometryLoss(torch.nn.Module):
         self.contact_distance_threshold = contact_distance_threshold
         self.contact_weight = contact_weight
         self.topology_neighborhood_weight = topology_neighborhood_weight
+        self.topology_margin_weight = topology_margin_weight
+        self.topology_margin = topology_margin
+        self.topology_margin_hard_negatives = topology_margin_hard_negatives
         self.face_area_weight = face_area_weight
         self.face_coordinate_weight = face_coordinate_weight
         self.face_coordinate_distance_weight = face_coordinate_distance_weight
@@ -1116,6 +1122,7 @@ class SimplexGeometryLoss(torch.nn.Module):
             positive_mask = pair_valid * contact_true
             negative_mask = pair_valid * (1.0 - contact_true)
             positive_count_by_row = positive_mask.sum(dim=-1)
+            negative_count_by_row = negative_mask.sum(dim=-1)
             positive_count = positive_count_by_row.sum(dim=1)
             negative_count = negative_mask.sum(dim=(1, 2))
             positive_loss = (bce * positive_mask).sum(dim=(1, 2)) / positive_count.clamp_min(1.0)
@@ -1142,6 +1149,29 @@ class SimplexGeometryLoss(torch.nn.Module):
             loss_terms["simplex_topology_neighborhood_loss"] = topology_neighborhood_loss
             weighted = self.topology_neighborhood_weight * topology_neighborhood_loss
             loss_terms["weighted_simplex_topology_neighborhood_loss"] = weighted
+            total = total + weighted
+
+            hard_negative_count = min(max(int(self.topology_margin_hard_negatives), 1), max(l - 1, 1))
+            positive_logits = contact_logits.masked_fill(positive_mask <= 0, very_negative)
+            positive_energy = torch.logsumexp(positive_logits, dim=-1) - torch.log(
+                positive_count_by_row.clamp_min(1.0)
+            )
+            negative_logits = contact_logits.masked_fill(negative_mask <= 0, very_negative)
+            hard_negative_logits = torch.topk(negative_logits, k=hard_negative_count, dim=-1).values
+            hard_negative_slots = torch.arange(hard_negative_count, device=device)
+            hard_negative_valid = hard_negative_slots[None, None, :] < negative_count_by_row[:, :, None]
+            margin_losses = torch.nn.functional.softplus(
+                float(self.topology_margin) + hard_negative_logits - positive_energy[..., None]
+            )
+            margin_losses = margin_losses * hard_negative_valid.to(dtype)
+            row_margin_loss = margin_losses.sum(dim=-1) / hard_negative_valid.to(dtype).sum(dim=-1).clamp_min(1.0)
+            row_has_margin = ((positive_count_by_row > 0) & (negative_count_by_row > 0)).to(dtype)
+            topology_margin_loss = (row_margin_loss * row_has_margin).sum(dim=1) / row_has_margin.sum(
+                dim=1
+            ).clamp_min(1.0)
+            loss_terms["simplex_topology_margin_loss"] = topology_margin_loss
+            weighted = self.topology_margin_weight * topology_margin_loss
+            loss_terms["weighted_simplex_topology_margin_loss"] = weighted
             total = total + weighted
 
         if (

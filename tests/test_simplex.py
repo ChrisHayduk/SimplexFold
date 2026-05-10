@@ -449,6 +449,47 @@ def test_simplex_topology_neighborhood_loss_targets_anchor_neighbors():
     assert torch.allclose(terms["simplex_aux_loss"], expected)
 
 
+def test_simplex_topology_margin_loss_ranks_contacts_above_hard_non_contacts():
+    true_ca = torch.tensor(
+        [
+            [
+                [0.0, 0.0, 0.0],
+                [4.0, 0.0, 0.0],
+                [20.0, 0.0, 0.0],
+                [40.0, 0.0, 0.0],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    ca_mask = torch.ones(1, 4)
+    contact_logits = torch.tensor(
+        [
+            [
+                [0.0, -2.0, 3.0, 1.0],
+                [-2.0, 0.0, 3.0, 1.0],
+                [1.0, 2.0, 0.0, 3.0],
+                [1.0, 2.0, 3.0, 0.0],
+            ]
+        ],
+        dtype=torch.float32,
+    )
+    prediction = {"simplex_contact_logits": contact_logits}
+
+    terms = SimplexGeometryLoss(
+        contact_weight=0.0,
+        topology_neighborhood_weight=0.0,
+        topology_margin_weight=1.0,
+        topology_margin=1.0,
+        topology_margin_hard_negatives=1,
+    )(prediction, true_ca, ca_mask)
+
+    expected = torch.nn.functional.softplus(torch.tensor([6.0]))
+
+    assert torch.allclose(terms["simplex_topology_margin_loss"], expected)
+    assert torch.allclose(terms["weighted_simplex_topology_margin_loss"], expected)
+    assert torch.allclose(terms["simplex_aux_loss"], expected)
+
+
 def test_simplex_geometry_loss_adds_distance_and_consistency_terms():
     cfg = SimplexConfig()
     true_ca = torch.randn(1, 5, 3)

@@ -848,6 +848,11 @@ def _train_variant(
                 "simplex_tetra_boundary_lddt_weight": float(
                     loss_fn.simplex_geometry_loss.tetra_boundary_lddt_weight
                 ),
+                "simplex_topology_margin_weight": float(loss_fn.simplex_geometry_loss.topology_margin_weight),
+                "simplex_topology_margin": float(loss_fn.simplex_geometry_loss.topology_margin),
+                "simplex_topology_margin_hard_negatives": int(
+                    loss_fn.simplex_geometry_loss.topology_margin_hard_negatives
+                ),
                 "simplex_boundary_degree_normalize": int(
                     loss_fn.simplex_geometry_loss.boundary_degree_normalize
                 ),
@@ -1076,6 +1081,9 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_tetra_coordinate_weight",
         "simplex_tetra_coordinate_distance_weight",
         "simplex_tetra_boundary_lddt_weight",
+        "simplex_topology_margin_weight",
+        "simplex_topology_margin",
+        "simplex_topology_margin_hard_negatives",
         "simplex_boundary_degree_normalize",
         "simplex_topology_teacher_forcing_weight",
         "simplex_topology_teacher_forcing_weight_final",
@@ -1285,6 +1293,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the selected-tetra boundary-edge lDDT-style realization loss weight.",
     )
     parser.add_argument(
+        "--simplex-topology-margin-weight",
+        type=float,
+        default=None,
+        help="Override the hard-negative margin loss weight for simplex topology logits.",
+    )
+    parser.add_argument(
+        "--simplex-topology-margin",
+        type=float,
+        default=None,
+        help="Override the logit margin between true topology neighbors and hard non-neighbors.",
+    )
+    parser.add_argument(
+        "--simplex-topology-margin-hard-negatives",
+        type=int,
+        default=None,
+        help="Override the number of hard non-contact neighbors used by the topology margin.",
+    )
+    parser.add_argument(
         "--simplex-boundary-degree-normalize",
         action="store_true",
         help="Normalize selected simplex boundary-edge losses by undirected edge incidence degree.",
@@ -1409,6 +1435,9 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_tetra_coordinate_weight=args.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=args.simplex_tetra_coordinate_distance_weight,
         simplex_tetra_boundary_lddt_weight=args.simplex_tetra_boundary_lddt_weight,
+        simplex_topology_margin_weight=args.simplex_topology_margin_weight,
+        simplex_topology_margin=args.simplex_topology_margin,
+        simplex_topology_margin_hard_negatives=args.simplex_topology_margin_hard_negatives,
         simplex_boundary_degree_normalize=args.simplex_boundary_degree_normalize,
         simplex_topology_teacher_forcing_weight=args.simplex_topology_teacher_forcing_weight,
         simplex_topology_teacher_forcing_weight_final=args.simplex_topology_teacher_forcing_weight_final,
@@ -1489,6 +1518,9 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_tetra_coordinate_weight": args.simplex_tetra_coordinate_weight,
         "simplex_tetra_coordinate_distance_weight": args.simplex_tetra_coordinate_distance_weight,
         "simplex_tetra_boundary_lddt_weight": args.simplex_tetra_boundary_lddt_weight,
+        "simplex_topology_margin_weight": args.simplex_topology_margin_weight,
+        "simplex_topology_margin": args.simplex_topology_margin,
+        "simplex_topology_margin_hard_negatives": args.simplex_topology_margin_hard_negatives,
         "simplex_boundary_degree_normalize": args.simplex_boundary_degree_normalize,
         "simplex_topology_teacher_forcing_weight": args.simplex_topology_teacher_forcing_weight,
         "simplex_topology_teacher_forcing_weight_final": args.simplex_topology_teacher_forcing_weight_final,

@@ -149,3 +149,20 @@ def test_face_structure_readout_only_variant_is_accepted_by_cli_parser():
     args = parse_args(["--variants", "face_structure_readout_only"])
 
     assert args.variants == ["face_structure_readout_only"]
+
+
+def test_topology_margin_args_are_accepted_by_cli_parser():
+    args = parse_args(
+        [
+            "--simplex-topology-margin-weight",
+            "0.05",
+            "--simplex-topology-margin",
+            "1.25",
+            "--simplex-topology-margin-hard-negatives",
+            "4",
+        ]
+    )
+
+    assert args.simplex_topology_margin_weight == 0.05
+    assert args.simplex_topology_margin == 1.25
+    assert args.simplex_topology_margin_hard_negatives == 4
