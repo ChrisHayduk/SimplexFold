@@ -200,6 +200,9 @@ class AlphaFold2(torch.nn.Module):
             n_cycles: int = 3,
             n_ensemble: int = 1,
             detach_rotations: bool = True,
+            simplex_teacher_ca_coords: torch.Tensor | None = None,
+            simplex_teacher_ca_mask: torch.Tensor | None = None,
+            simplex_teacher_forcing_weight: torch.Tensor | None = None,
         ):
         """Algorithm 2 forward pass. See the class docstring for the full map."""
         # seq_mask: (batch, N_res) — 1 for valid residues, 0 for padding
@@ -373,6 +376,9 @@ class AlphaFold2(torch.nn.Module):
                                         seq_mask=seq_mask,
                                         recycled_ca_coords=ca_prev,
                                         recycled_frames=rotations_prev,
+                                        simplex_teacher_ca_coords=simplex_teacher_ca_coords,
+                                        simplex_teacher_ca_mask=simplex_teacher_ca_mask,
+                                        simplex_teacher_forcing_weight=simplex_teacher_forcing_weight,
                                         use_reentrant=False,
                                     ),
                                 )
@@ -386,6 +392,9 @@ class AlphaFold2(torch.nn.Module):
                                     seq_mask=seq_mask,
                                     recycled_ca_coords=ca_prev,
                                     recycled_frames=rotations_prev,
+                                    simplex_teacher_ca_coords=simplex_teacher_ca_coords,
+                                    simplex_teacher_ca_mask=simplex_teacher_ca_mask,
+                                    simplex_teacher_forcing_weight=simplex_teacher_forcing_weight,
                                 )
                             if simplex_aux:
                                 simplex_aux_last = simplex_aux

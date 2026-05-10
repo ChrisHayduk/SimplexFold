@@ -436,3 +436,13 @@
   distances for early steps, then anneal to learned MSA/pair topology. Keep
   validation/inference feature-only and do not add hidden labels, external
   data, templates, or dense all-pairs metric objectives.
+- E28 implemented locally. The model accepts optional
+  `simplex_teacher_ca_coords`, `simplex_teacher_ca_mask`, and
+  `simplex_teacher_forcing_weight`; training code passes these only when the
+  opt-in `TrainingConfig.simplex_topology_teacher_forcing_*` schedule is
+  positive. The adapter uses true C-alpha distances only for sparse neighbor
+  selection, not as simplex geometry features. Validation and inference calls
+  keep the teacher fields absent.
+- E28 Runpod gate plan: use `full_msa_to_face` with E09 selected coordinate
+  and boundary-distance weights, teacher weight `1.0`, final teacher weight
+  `0.0`, ramp start step `250`, and ramp length `250`, for a 500-step gate.

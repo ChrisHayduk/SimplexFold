@@ -64,6 +64,7 @@ from minalphafold.trainer import (  # noqa: E402
     resolve_device,
     set_optimizer_learning_rate,
     set_seed,
+    simplex_topology_teacher_forcing_weight_at_step,
     zero_dropout_model_config,
 )
 
@@ -721,6 +722,7 @@ def _train_variant(
             ramp_progress = (step - int(finetune_start_step or step)) / ramp_steps
             loss_fn.structural_violation_weight = min(target_violation_weight, ramp_progress * target_violation_weight)
         apply_loss_weight_schedule(loss_fn, training_config, step)
+        teacher_forcing_weight = simplex_topology_teacher_forcing_weight_at_step(training_config, step)
         optimizer.zero_grad(set_to_none=True)
         loss_accum = 0.0
         term_accum: dict[str, list[float]] = {}
@@ -735,7 +737,14 @@ def _train_variant(
 
             batch = move_to_device(batch, device)
             with _autocast_context(device, mixed_precision):
-                outputs = model(**model_inputs_from_batch(batch, training_config))
+                outputs = model(
+                    **model_inputs_from_batch(
+                        batch,
+                        training_config,
+                        use_simplex_teacher_forcing=True,
+                        step=step,
+                    )
+                )
             per_example_loss, terms = _loss_with_terms(loss_fn, batch, outputs)
             micro_loss = per_example_loss.float().mean()
             (micro_loss / grad_accum_steps).backward()
@@ -808,6 +817,7 @@ def _train_variant(
                 "simplex_boundary_degree_normalize": int(
                     loss_fn.simplex_geometry_loss.boundary_degree_normalize
                 ),
+                "simplex_topology_teacher_forcing_weight": teacher_forcing_weight,
                 "backbone_loss_weight": float(loss_fn.backbone_loss_weight),
                 "sidechain_fape_loss_weight": float(loss_fn.sidechain_fape_loss_weight),
                 "torsion_loss_weight": float(loss_fn.torsion_loss_weight),
@@ -945,6 +955,16 @@ def _train_variant(
         "simplex_tetra_coordinate_distance_weight": training_config.simplex_tetra_coordinate_distance_weight,
         "simplex_tetra_boundary_lddt_weight": training_config.simplex_tetra_boundary_lddt_weight,
         "simplex_boundary_degree_normalize": training_config.simplex_boundary_degree_normalize,
+        "simplex_topology_teacher_forcing_weight": training_config.simplex_topology_teacher_forcing_weight,
+        "simplex_topology_teacher_forcing_weight_final": (
+            training_config.simplex_topology_teacher_forcing_weight_final
+        ),
+        "simplex_topology_teacher_forcing_ramp_start_step": (
+            training_config.simplex_topology_teacher_forcing_ramp_start_step
+        ),
+        "simplex_topology_teacher_forcing_ramp_steps": (
+            training_config.simplex_topology_teacher_forcing_ramp_steps
+        ),
         "backbone_loss_weight": training_config.backbone_loss_weight,
         "sidechain_fape_loss_weight": training_config.sidechain_fape_loss_weight,
         "torsion_loss_weight": training_config.torsion_loss_weight,
@@ -1015,6 +1035,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_tetra_coordinate_distance_weight",
         "simplex_tetra_boundary_lddt_weight",
         "simplex_boundary_degree_normalize",
+        "simplex_topology_teacher_forcing_weight",
+        "simplex_topology_teacher_forcing_weight_final",
+        "simplex_topology_teacher_forcing_ramp_start_step",
+        "simplex_topology_teacher_forcing_ramp_steps",
         "elapsed_seconds",
         "examples_per_second",
         "train_loss_final",
@@ -1215,6 +1239,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Normalize selected simplex boundary-edge losses by undirected edge incidence degree.",
     )
+    parser.add_argument(
+        "--simplex-topology-teacher-forcing-weight",
+        type=float,
+        default=0.0,
+        help="Training-only weight for selecting simplex cells from true C-alpha distances.",
+    )
+    parser.add_argument("--simplex-topology-teacher-forcing-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-topology-teacher-forcing-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-topology-teacher-forcing-ramp-steps", type=int, default=1)
     parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
     parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
     parser.add_argument("--torsion-loss-weight", type=float, default=1.0)
@@ -1318,6 +1351,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_tetra_coordinate_distance_weight=args.simplex_tetra_coordinate_distance_weight,
         simplex_tetra_boundary_lddt_weight=args.simplex_tetra_boundary_lddt_weight,
         simplex_boundary_degree_normalize=args.simplex_boundary_degree_normalize,
+        simplex_topology_teacher_forcing_weight=args.simplex_topology_teacher_forcing_weight,
+        simplex_topology_teacher_forcing_weight_final=args.simplex_topology_teacher_forcing_weight_final,
+        simplex_topology_teacher_forcing_ramp_start_step=args.simplex_topology_teacher_forcing_ramp_start_step,
+        simplex_topology_teacher_forcing_ramp_steps=args.simplex_topology_teacher_forcing_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,
@@ -1390,6 +1427,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_tetra_coordinate_distance_weight": args.simplex_tetra_coordinate_distance_weight,
         "simplex_tetra_boundary_lddt_weight": args.simplex_tetra_boundary_lddt_weight,
         "simplex_boundary_degree_normalize": args.simplex_boundary_degree_normalize,
+        "simplex_topology_teacher_forcing_weight": args.simplex_topology_teacher_forcing_weight,
+        "simplex_topology_teacher_forcing_weight_final": args.simplex_topology_teacher_forcing_weight_final,
+        "simplex_topology_teacher_forcing_ramp_start_step": args.simplex_topology_teacher_forcing_ramp_start_step,
+        "simplex_topology_teacher_forcing_ramp_steps": args.simplex_topology_teacher_forcing_ramp_steps,
         "backbone_loss_weight": args.backbone_loss_weight,
         "sidechain_fape_loss_weight": args.sidechain_fape_loss_weight,
         "torsion_loss_weight": args.torsion_loss_weight,

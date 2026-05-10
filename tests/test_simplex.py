@@ -96,6 +96,34 @@ def test_build_simplex_topology_reserves_local_neighbor_slots():
     assert topology.tetra_indices.shape == (1, 6, 4, 4)
 
 
+def test_simplicial_adapter_teacher_forcing_selects_true_nearest_neighbors():
+    class TeacherConfig(SimplexConfig):
+        simplex_neighbor_k = 2
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_geometry_distance_weight = 0.0
+
+    adapter = SimplicialAdapter(TeacherConfig())
+    pair = torch.randn(1, 5, 5, TeacherConfig.c_z)
+    single = torch.randn(1, 5, TeacherConfig.c_s)
+    teacher_ca = torch.tensor(
+        [[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [2.0, 0.0, 0.0], [9.0, 0.0, 0.0], [12.0, 0.0, 0.0]]],
+        dtype=torch.float32,
+    )
+
+    _, _, aux = adapter(
+        pair,
+        single,
+        seq_mask=torch.ones(1, 5),
+        simplex_teacher_ca_coords=teacher_ca,
+        simplex_teacher_ca_mask=torch.ones(1, 5),
+        simplex_teacher_forcing_weight=torch.tensor(1.0),
+    )
+
+    assert set(aux["simplex_face_indices"][0, 0, 0, 1:].tolist()) == {1, 2}
+
+
 def test_simplex_geometry_features_are_rigid_transform_invariant():
     face_indices = torch.tensor([[[[0, 1, 2], [1, 2, 3]]]], dtype=torch.long)
     tetra_indices = torch.tensor([[[[0, 1, 2, 3]]]], dtype=torch.long)

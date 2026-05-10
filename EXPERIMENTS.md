@@ -773,7 +773,7 @@ coordinate feedback contaminating cell selection.
 
 ### E28: Training-Only Simplex Topology Teacher Forcing
 
-Status: design candidate.
+Status: implemented and ready for Runpod.
 
 Hypothesis: the repeated collapse across E21-E27 suggests the sparse simplex
 selector may be too noisy before the structure module has learned useful
@@ -781,13 +781,22 @@ geometry. If the face/tetra states are initialized on a plausible training
 complex, they may learn the topological patch/packing roles described in the
 README before being asked to select cells from noisy MSA/pair logits.
 
-Mechanism: during training only, construct the early sparse complex from true
-C-alpha distances in public training batches, then anneal from teacher-forced
-topology to the learned MSA/pair selector. Validation and inference remain
-feature-only. This uses train labels only to scaffold the topology
+Mechanism: add opt-in `simplex_topology_teacher_forcing_*` training knobs.
+During training batches only, `model_inputs_from_batch` can pass true C-alpha
+coordinates and masks into the model. The simplex adapter linearly blends the
+learned topology logits with `-d_true_ca(i,j)` for neighbor selection, then
+anneals that teacher weight back to the learned selector. True coordinates are
+not used as face/tetra geometry features, and validation/inference do not pass
+teacher coordinates. This uses train labels only to scaffold the topology
 construction step, not to add a dense all-pairs metric objective, and adds no
 parameters.
 
-Decision rule: first implement a narrow opt-in curriculum and run a 500-step
-Runpod gate. Continue only if the learned selector handoff improves over the
-E09/E15 early band without making FoldScore or global scale worse.
+Initial Runpod gate: `full_msa_to_face` with the E09 selected coordinate and
+boundary-distance weights, `--simplex-topology-teacher-forcing-weight 1.0`,
+`--simplex-topology-teacher-forcing-weight-final 0.0`,
+`--simplex-topology-teacher-forcing-ramp-start-step 250`, and
+`--simplex-topology-teacher-forcing-ramp-steps 250`.
+
+Decision rule: run a 500-step Runpod gate. Continue only if the learned
+selector handoff improves over the E09/E15 early band without making
+FoldScore or global scale worse.

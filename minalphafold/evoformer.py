@@ -236,6 +236,9 @@ class SimplicialEvoformer(torch.nn.Module):
         seq_mask: Optional[torch.Tensor] = None,
         recycled_ca_coords: Optional[torch.Tensor] = None,
         recycled_frames: Optional[torch.Tensor] = None,
+        simplex_teacher_ca_coords: Optional[torch.Tensor] = None,
+        simplex_teacher_ca_mask: Optional[torch.Tensor] = None,
+        simplex_teacher_forcing_weight: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
         assert msa_representation.ndim == 4, \
             f"msa_representation must be (batch, N_seq, N_res, c_m), got {msa_representation.shape}"
@@ -282,6 +285,9 @@ class SimplicialEvoformer(torch.nn.Module):
                 pair_mask=pair_mask,
                 recycled_ca_coords=recycled_ca_coords,
                 recycled_frames=recycled_frames,
+                simplex_teacher_ca_coords=simplex_teacher_ca_coords,
+                simplex_teacher_ca_mask=simplex_teacher_ca_mask,
+                simplex_teacher_forcing_weight=simplex_teacher_forcing_weight,
             )
 
         pair_representation = pair_representation + self.pair_transition(pair_representation)

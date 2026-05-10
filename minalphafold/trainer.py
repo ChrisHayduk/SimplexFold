@@ -194,6 +194,10 @@ class TrainingConfig:
     simplex_tetra_coordinate_distance_weight: float | None = None
     simplex_tetra_boundary_lddt_weight: float | None = None
     simplex_boundary_degree_normalize: bool = False
+    simplex_topology_teacher_forcing_weight: float = 0.0
+    simplex_topology_teacher_forcing_weight_final: float | None = None
+    simplex_topology_teacher_forcing_ramp_start_step: int | None = None
+    simplex_topology_teacher_forcing_ramp_steps: int = 1
     backbone_loss_weight: float = 1.0
     sidechain_fape_loss_weight: float = 1.0
     torsion_loss_weight: float = 1.0
@@ -736,9 +740,27 @@ def apply_loss_weight_schedule(loss_fn: AlphaFoldLoss, training_config: Training
     )
 
 
-def model_inputs_from_batch(batch: dict[str, Any], training_config: TrainingConfig) -> dict[str, torch.Tensor | int]:
+def simplex_topology_teacher_forcing_weight_at_step(training_config: TrainingConfig, step: int | None) -> float:
+    if step is None:
+        return float(training_config.simplex_topology_teacher_forcing_weight)
+    return _ramped_value(
+        training_config.simplex_topology_teacher_forcing_weight,
+        training_config.simplex_topology_teacher_forcing_weight_final,
+        step=step,
+        start_step=training_config.simplex_topology_teacher_forcing_ramp_start_step,
+        ramp_steps=training_config.simplex_topology_teacher_forcing_ramp_steps,
+    )
+
+
+def model_inputs_from_batch(
+    batch: dict[str, Any],
+    training_config: TrainingConfig,
+    *,
+    use_simplex_teacher_forcing: bool = False,
+    step: int | None = None,
+) -> dict[str, torch.Tensor | int]:
     """Unpack a collated batch into the kwargs ``AlphaFold2.forward`` expects."""
-    return {
+    inputs: dict[str, torch.Tensor | int] = {
         "target_feat": batch["target_feat"],
         "residue_index": batch["residue_index"],
         "msa_feat": batch["msa_feat"],
@@ -755,6 +777,19 @@ def model_inputs_from_batch(batch: dict[str, Any], training_config: TrainingConf
         "n_ensemble": training_config.n_ensemble,
         "detach_rotations": training_config.detach_rotations,
     }
+    teacher_weight = simplex_topology_teacher_forcing_weight_at_step(training_config, step)
+    if use_simplex_teacher_forcing and teacher_weight > 0.0:
+        true_atom_positions = batch.get("true_atom_positions")
+        true_atom_mask = batch.get("true_atom_mask")
+        if torch.is_tensor(true_atom_positions) and true_atom_positions.ndim >= 4:
+            inputs["simplex_teacher_ca_coords"] = true_atom_positions[:, :, 1, :]
+            if torch.is_tensor(true_atom_mask) and true_atom_mask.ndim >= 3:
+                teacher_mask = true_atom_mask[:, :, 1]
+                if torch.is_tensor(batch.get("seq_mask")):
+                    teacher_mask = teacher_mask * batch["seq_mask"]
+                inputs["simplex_teacher_ca_mask"] = teacher_mask
+            inputs["simplex_teacher_forcing_weight"] = true_atom_positions.new_tensor(float(teacher_weight))
+    return inputs
 
 
 def collapse_sampled_batch_tensor(
@@ -847,7 +882,14 @@ def train_step(
     optimizer.zero_grad(set_to_none=True)
 
     batch = move_to_device(batch, device)
-    outputs = model(**model_inputs_from_batch(batch, training_config))
+    outputs = model(
+        **model_inputs_from_batch(
+            batch,
+            training_config,
+            use_simplex_teacher_forcing=True,
+            step=1,
+        )
+    )
     per_example_loss = loss_fn(**loss_inputs_from_batch(batch, outputs))
     loss = per_example_loss.mean()
     loss.backward()
@@ -1142,7 +1184,14 @@ def fit(
 
             model.train()
             batch = move_to_device(batch, device)
-            outputs = model(**model_inputs_from_batch(batch, training_config))
+            outputs = model(
+                **model_inputs_from_batch(
+                    batch,
+                    training_config,
+                    use_simplex_teacher_forcing=True,
+                    step=global_step + 1,
+                )
+            )
             per_example_loss = loss_fn(**loss_inputs_from_batch(batch, outputs))
             micro_batch_loss = per_example_loss.mean()
             (micro_batch_loss / grad_accum_steps).backward()
@@ -1396,6 +1445,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Normalize selected simplex boundary-edge losses by undirected edge incidence degree.",
     )
+    parser.add_argument(
+        "--simplex-topology-teacher-forcing-weight",
+        type=float,
+        default=0.0,
+        help="Training-only weight for selecting simplex cells from true C-alpha distances.",
+    )
+    parser.add_argument("--simplex-topology-teacher-forcing-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-topology-teacher-forcing-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-topology-teacher-forcing-ramp-steps", type=int, default=1)
     parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
     parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
     parser.add_argument("--torsion-loss-weight", type=float, default=1.0)
@@ -1476,6 +1534,10 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_tetra_coordinate_distance_weight=args.simplex_tetra_coordinate_distance_weight,
         simplex_tetra_boundary_lddt_weight=args.simplex_tetra_boundary_lddt_weight,
         simplex_boundary_degree_normalize=args.simplex_boundary_degree_normalize,
+        simplex_topology_teacher_forcing_weight=args.simplex_topology_teacher_forcing_weight,
+        simplex_topology_teacher_forcing_weight_final=args.simplex_topology_teacher_forcing_weight_final,
+        simplex_topology_teacher_forcing_ramp_start_step=args.simplex_topology_teacher_forcing_ramp_start_step,
+        simplex_topology_teacher_forcing_ramp_steps=args.simplex_topology_teacher_forcing_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,

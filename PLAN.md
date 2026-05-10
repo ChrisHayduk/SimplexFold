@@ -6,13 +6,15 @@ topology do not break the lDDT plateau. The common failure mode is still
 under-expanded coordinates, which suggests the learned sparse complex may be
 too noisy early for persistent face/tetra states to become useful.
 
-The next architecture-facing direction is a training-only topology curriculum:
-build the sparse face/tetra complex from public training-label C-alpha
-distances for early steps, then anneal back to the learned MSA/pair selector.
-Validation and inference must still use features only. This tests whether the
-explicit higher-order states help once the model sees a plausible simplex
-complex, without using external data, hidden labels, templates, or extra
-parameters. Keep `EXPERIMENT_RESULTS.md` only for returned run results.
+The current architecture-facing experiment is a training-only topology
+curriculum. The implementation adds opt-in teacher forcing of the sparse
+face/tetra selector from public training-label C-alpha distances, with a
+linear schedule back to the learned MSA/pair selector. Validation and
+inference still use features only. This tests whether the explicit
+higher-order states help once the model sees a plausible simplex complex,
+without using external data, hidden labels, templates, dense all-pairs metric
+losses, or extra parameters. Keep `EXPERIMENT_RESULTS.md` only for returned
+run results.
 
 Yes. With templates forbidden, the right construction is:
 

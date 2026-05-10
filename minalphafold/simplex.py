@@ -719,6 +719,9 @@ class SimplicialAdapter(torch.nn.Module):
         pair_mask: Optional[torch.Tensor] = None,
         recycled_ca_coords: Optional[torch.Tensor] = None,
         recycled_frames: Optional[torch.Tensor] = None,
+        simplex_teacher_ca_coords: Optional[torch.Tensor] = None,
+        simplex_teacher_ca_mask: Optional[torch.Tensor] = None,
+        simplex_teacher_forcing_weight: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
         if pair.ndim != 4 or single.ndim != 3:
             raise ValueError("pair must be [B, L, L, Cz] and single must be [B, L, Cs]")
@@ -731,12 +734,32 @@ class SimplicialAdapter(torch.nn.Module):
         coords_for_topology = recycled_ca_coords if self.use_recycled_geometry else None
         frames_for_geometry = recycled_frames if self.use_recycled_geometry else None
         coords_for_geometry = recycled_ca_coords if self.use_recycled_geometry else None
+        topology_score = contact_logits.detach()
+        topology_pair_mask = pair_mask
+        teacher_weight = 0.0
+        if simplex_teacher_forcing_weight is not None:
+            teacher_weight = float(simplex_teacher_forcing_weight.detach().float().cpu().item())
+        if simplex_teacher_ca_coords is not None and teacher_weight > 0.0:
+            teacher_weight = min(max(teacher_weight, 0.0), 1.0)
+            teacher_distances = torch.cdist(
+                simplex_teacher_ca_coords.detach().to(dtype=pair.dtype),
+                simplex_teacher_ca_coords.detach().to(dtype=pair.dtype),
+            )
+            teacher_score = -teacher_distances.to(dtype=pair.dtype)
+            topology_score = (1.0 - teacher_weight) * topology_score + teacher_weight * teacher_score
+            if simplex_teacher_ca_mask is not None:
+                teacher_valid = simplex_teacher_ca_mask > 0
+                teacher_pair_mask = teacher_valid[:, :, None] & teacher_valid[:, None, :]
+                if topology_pair_mask is None:
+                    topology_pair_mask = teacher_pair_mask.to(dtype=pair.dtype)
+                else:
+                    topology_pair_mask = topology_pair_mask * teacher_pair_mask.to(dtype=topology_pair_mask.dtype)
         with torch.no_grad():
             topology = build_simplex_topology(
-                contact_logits.detach(),
+                topology_score.detach(),
                 neighbor_k=self.neighbor_k,
                 seq_mask=seq_mask,
-                pair_mask=pair_mask,
+                pair_mask=topology_pair_mask,
                 recycled_ca_coords=coords_for_topology,
                 local_neighbor_k=self.local_neighbor_k,
                 local_radius=self.local_radius,

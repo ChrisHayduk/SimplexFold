@@ -46,7 +46,9 @@ from minalphafold.trainer import (
     load_model_config,
     load_training_protocol,
     main,
+    model_inputs_from_batch,
     save_checkpoint,
+    simplex_topology_teacher_forcing_weight_at_step,
     train_step,
     use_finetune_loss,
     zero_dropout_model_config,
@@ -81,6 +83,7 @@ def test_train_step_updates_model_parameters(tmp_path):
         seed=0,
         n_cycles=1,
         n_ensemble=1,
+        simplex_topology_teacher_forcing_weight=1.0,
     )
 
     dataloader = build_dataloader(
@@ -106,6 +109,46 @@ def test_train_step_updates_model_parameters(tmp_path):
         not torch.allclose(previous, current.detach())
         for previous, current in zip(before, model.parameters())
     )
+
+
+def test_model_inputs_add_training_only_simplex_teacher_forcing():
+    batch = {
+        "target_feat": torch.zeros(1, 4, 22),
+        "residue_index": torch.arange(4).reshape(1, 4),
+        "msa_feat": torch.zeros(1, 2, 4, 49),
+        "extra_msa_feat": torch.zeros(1, 1, 4, 25),
+        "template_pair_feat": torch.zeros(1, 0, 4, 4, 88),
+        "aatype": torch.zeros(1, 4, dtype=torch.long),
+        "template_angle_feat": torch.zeros(1, 0, 4, 57),
+        "template_mask": torch.zeros(1, 0),
+        "template_residue_mask": torch.zeros(1, 0, 4),
+        "seq_mask": torch.tensor([[1.0, 1.0, 1.0, 0.0]]),
+        "msa_mask": torch.ones(1, 2, 4),
+        "extra_msa_mask": torch.ones(1, 1, 4),
+        "true_atom_positions": torch.zeros(1, 4, 14, 3),
+        "true_atom_mask": torch.ones(1, 4, 14),
+    }
+    training_config = TrainingConfig(
+        simplex_topology_teacher_forcing_weight=1.0,
+        simplex_topology_teacher_forcing_weight_final=0.0,
+        simplex_topology_teacher_forcing_ramp_start_step=10,
+        simplex_topology_teacher_forcing_ramp_steps=10,
+    )
+
+    assert simplex_topology_teacher_forcing_weight_at_step(training_config, 15) == 0.5
+
+    eval_inputs = model_inputs_from_batch(batch, training_config)
+    assert "simplex_teacher_ca_coords" not in eval_inputs
+
+    train_inputs = model_inputs_from_batch(
+        batch,
+        training_config,
+        use_simplex_teacher_forcing=True,
+        step=15,
+    )
+    assert torch.allclose(train_inputs["simplex_teacher_ca_coords"], batch["true_atom_positions"][:, :, 1, :])
+    assert torch.allclose(train_inputs["simplex_teacher_ca_mask"], batch["seq_mask"])
+    assert torch.allclose(train_inputs["simplex_teacher_forcing_weight"], torch.tensor(0.5))
 
 
 def test_alphafold2_uses_canonical_constructor_initialization():
