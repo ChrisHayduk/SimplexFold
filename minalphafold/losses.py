@@ -169,7 +169,9 @@ class AlphaFoldLoss(torch.nn.Module):
         use_clamped_fape: Optional[float] = None,
         simplex_aux_weight: float = 1.0,
         simplex_face_coordinate_weight: Optional[float] = None,
+        simplex_face_coordinate_distance_weight: Optional[float] = None,
         simplex_tetra_coordinate_weight: Optional[float] = None,
+        simplex_tetra_coordinate_distance_weight: Optional[float] = None,
         backbone_loss_weight: float = 1.0,
         sidechain_fape_loss_weight: float = 1.0,
         torsion_loss_weight: float = 1.0,
@@ -197,8 +199,14 @@ class AlphaFoldLoss(torch.nn.Module):
         self.simplex_geometry_loss = SimplexGeometryLoss()
         if simplex_face_coordinate_weight is not None:
             self.simplex_geometry_loss.face_coordinate_weight = float(simplex_face_coordinate_weight)
+        if simplex_face_coordinate_distance_weight is not None:
+            self.simplex_geometry_loss.face_coordinate_distance_weight = float(simplex_face_coordinate_distance_weight)
         if simplex_tetra_coordinate_weight is not None:
             self.simplex_geometry_loss.tetra_coordinate_weight = float(simplex_tetra_coordinate_weight)
+        if simplex_tetra_coordinate_distance_weight is not None:
+            self.simplex_geometry_loss.tetra_coordinate_distance_weight = float(
+                simplex_tetra_coordinate_distance_weight
+            )
         self.backbone_loss = BackboneTrajectoryLoss()
         self.sidechain_fape_loss = AllAtomFAPE()
 

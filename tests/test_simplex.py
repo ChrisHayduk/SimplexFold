@@ -390,9 +390,11 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
         topology_neighborhood_weight=0.0,
         face_area_weight=0.0,
         face_coordinate_weight=1.0,
+        face_coordinate_distance_weight=1.0,
         face_distance_weight=0.0,
         tetra_geometry_weight=0.0,
         tetra_coordinate_weight=1.0,
+        tetra_coordinate_distance_weight=1.0,
         tetra_distance_weight=0.0,
         pair_face_consistency_weight=0.0,
         face_tetra_consistency_weight=0.0,
@@ -402,11 +404,19 @@ def test_simplex_coordinate_realization_loss_penalizes_collapsed_cells():
     collapsed_terms = loss_fn({**base_prediction, "atom14_coords": collapsed_atom14}, true_ca, ca_mask)
 
     assert matching_terms["simplex_face_coordinate_area_loss"].item() < 1e-6
+    assert matching_terms["simplex_face_coordinate_distance_loss"].item() < 1e-6
     assert matching_terms["simplex_tetra_coordinate_geometry_loss"].item() < 1e-6
+    assert matching_terms["simplex_tetra_coordinate_distance_loss"].item() < 1e-6
     assert collapsed_terms["simplex_aux_loss"] > matching_terms["simplex_aux_loss"]
     assert collapsed_terms["simplex_face_coordinate_area_loss"] > matching_terms["simplex_face_coordinate_area_loss"]
+    assert collapsed_terms["simplex_face_coordinate_distance_loss"] > matching_terms[
+        "simplex_face_coordinate_distance_loss"
+    ]
     assert collapsed_terms["simplex_tetra_coordinate_geometry_loss"] > matching_terms[
         "simplex_tetra_coordinate_geometry_loss"
+    ]
+    assert collapsed_terms["simplex_tetra_coordinate_distance_loss"] > matching_terms[
+        "simplex_tetra_coordinate_distance_loss"
     ]
 
 

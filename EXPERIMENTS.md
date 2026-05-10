@@ -209,3 +209,27 @@ the selected sparse face/tetra cells.
 Decision rule: keep only if it improves over E05 on final `val_lddt_ca` or
 materially improves predicted C-alpha radius of gyration without a large
 FoldScore regression.
+
+### E07: Selected Simplex Boundary Coordinate Realization
+
+Status: implemented locally; queued for Runpod after E06 finishes.
+
+Hypothesis: E04-E06 show that selected face/tetra realization helps, but the
+model is still under-expanding the realized structure. Area, volume, and
+radius-of-gyration constraints can leave boundary edge lengths too loose.
+
+Mechanism: add coordinate-distance realization losses only on the boundary
+edges of the selected sparse face/tetra cells. For selected faces, compare
+predicted C-alpha lengths for `(i,j)`, `(i,k)`, and `(j,k)` to the true
+lengths. For selected tetras, compare the six boundary edges. This is the
+metric 1-skeleton induced by `simplex_face_indices` and
+`simplex_tetra_indices`; it is not a generic all-pairs C-alpha loss.
+
+Initial Runpod test: use the same scaled protocol as E05/E06, keep
+`--simplex-face-coordinate-weight 0.5` and
+`--simplex-tetra-coordinate-weight 0.5`, and add
+`--simplex-face-coordinate-distance-weight 0.5` plus
+`--simplex-tetra-coordinate-distance-weight 0.5`.
+
+Decision rule: keep only if final `val_lddt_ca`, dRMSD, or predicted/true
+radius-of-gyration ratio improves over E05/E06 without collapsing FoldScore.

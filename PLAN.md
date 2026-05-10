@@ -1108,5 +1108,10 @@ Iteration ladder:
 5. If selected face/tetra coordinate realization improves collapse but remains
    too weak, tune those selected-cell realization weights directly rather than
    adding a generic all-pairs C-alpha loss.
-6. Promote only changes that pass parameter-budget tests and at least a
+6. If area/volume realization still under-expands structures, add coordinate
+   losses on the boundary edges of the selected face/tetra cells. This stays
+   inside the simplicial chain view: the model realizes the metric 1-skeleton
+   induced by its own sparse 2-/3-simplex complex, not a dense all-pairs
+   distance matrix.
+7. Promote only changes that pass parameter-budget tests and at least a
    NanoFold smoke/short-run comparison.

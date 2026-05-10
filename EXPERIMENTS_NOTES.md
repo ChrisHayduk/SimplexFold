@@ -143,3 +143,10 @@
   radius of gyration. The run still remains far below the `0.7` target.
 - E06 launched on pod `sytp4e4kjs7e61` at commit `1b5fae3` with the same
   scaled protocol and both selected coordinate weights set to `1.0`.
+- E07 implemented selected simplex boundary-coordinate realization losses.
+  The new losses supervise predicted C-alpha edge lengths only on boundary
+  edges of the model-selected face/tetra cells, so the signal is mediated by
+  the sparse simplicial complex instead of a dense all-pairs distance matrix.
+  Defaults are off unless the runner passes
+  `--simplex-face-coordinate-distance-weight` or
+  `--simplex-tetra-coordinate-distance-weight`.
