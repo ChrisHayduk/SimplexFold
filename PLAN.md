@@ -1316,3 +1316,11 @@ radius-of-gyration or all-pairs distance objective; it asks whether the
 learned 2-/3-cell complex can realize its own boundary 1-skeleton without
 collapsing. Keep the architecture identical to `full_msa_to_face`, so the
 parameter count remains `3,106,690`.
+
+E50 result update: reject. The hinge produced the intended early expansion
+signal at step 250, with predicted/true C-alpha radius of gyration
+`10.6522 / 15.4034`, but validation lDDT was only `0.1593`. By step 500,
+`val_lddt_ca` recovered to `0.2731` while radius collapsed back to
+`6.6087 / 15.4034`, below E49 and well below E15. The next branch should
+avoid simply increasing auxiliary expansion weight; it should make realized
+selected-boundary geometry influence the topology/readout stream directly.

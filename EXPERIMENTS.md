@@ -1550,7 +1550,7 @@ not recover the E22/E25/E30 early band or approach E15.
 
 ### E50: Selected Boundary Expansion Hinge
 
-Status: implemented locally; planned for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: the repeated low-radius checkpoints are a failure to realize the
 selected simplicial complex, not just a bad global coordinate scale. The
@@ -1590,3 +1590,13 @@ the E15 selected coordinate and boundary-distance losses, expansion weights
 only if the run improves over E49 while increasing predicted C-alpha radius
 toward the validation target geometry instead of producing the usual
 late-collapse signature.
+
+Result: reject. The step-250 checkpoint had the desired expansion-side
+effect but weak validation accuracy: `val_lddt_ca=0.1593`, FoldScore
+`0.1988`, `val_ca_drmsd=14.2261`, and predicted/true C-alpha radius of
+gyration `10.6522 / 15.4034`. By step 500, lDDT recovered to
+`val_lddt_ca=0.2731`, FoldScore `0.2334`, `val_ca_drmsd=14.7809`, and
+radius `6.6087 / 15.4034`. The hinge helped early expansion but did not
+prevent final collapse or beat E49. This suggests the next branch should not
+just strengthen coordinate expansion; it needs to make the expanded selected
+boundary geometry feed back into the learned topology/readout path.

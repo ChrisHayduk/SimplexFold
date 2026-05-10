@@ -1365,3 +1365,26 @@
   SimplexFold medium `3,106,690`, and
   `full_msa_to_face_expansion_hinge` `3,106,690`, only `0.0015%` above
   AF2-medium and within the 5% budget.
+- E50 launched on owned Runpod pod `mttz64sa9mhut2` after restart at
+  2026-05-10 18:37 EDT from commit `8a126d4`. Clean launch audit after
+  restaging public data: public train/val/all manifest counts
+  `10000/1000/11000`, feature/label `.npz` counts `11000/11000`,
+  encoded-chain `bad_paths=0`, H100 CUDA available, FoldScore import works,
+  AF2-medium pair-only `3,106,642`, SimplexFold medium `3,106,690`, E50
+  `3,106,690`, and topology flags `(simplicial, faces, tetra, MSA-to-face)`
+  all true.
+- E50 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e50_selected_boundary_expansion_s500_c256_m64/`.
+  Step 250 reached `val_lddt_ca=0.1592852883040905`, FoldScore
+  `0.19877275824546814`, `val_ca_drmsd=14.226054191589355`, and
+  predicted/true C-alpha radius of gyration `10.652208685874939 /
+  15.403406739234924`. Step 500 ended at
+  `val_lddt_ca=0.27311410568654537`, FoldScore `0.2333886418491602`,
+  `val_ca_drmsd=14.780930042266846`, and radius of gyration
+  `6.60868564248085 / 15.403406739234924`.
+- E50 interpretation: the selected-boundary expansion hinge successfully
+  pushed early predicted radius toward the true scale, but it did not improve
+  early lDDT and the final model still collapsed back near the weak-pilot
+  radius band. Reject as a standalone loss. The next idea should use
+  expanded boundary geometry inside the selected topology/readout pathway
+  rather than applying a stronger auxiliary coordinate-only penalty.
