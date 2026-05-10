@@ -489,6 +489,15 @@ def _variant_config(base_config: Any, variant: str) -> Any:
             simplex_use_tetra=True,
             simplex_use_msa_to_face=True,
         )
+    if variant == "full_msa_to_face_expanded_complex":
+        return replace(
+            base_config,
+            use_simplicial_evoformer=True,
+            simplex_use_faces=True,
+            simplex_use_tetra=True,
+            simplex_use_msa_to_face=True,
+            simplex_neighbor_k=14,
+        )
     if variant == "full_msa_to_face_long":
         return replace(
             base_config,
@@ -1277,6 +1286,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "faces",
             "full",
             "full_msa_to_face",
+            "full_msa_to_face_expanded_complex",
             "full_msa_to_face_long",
             "full_msa_to_face_mixed",
             "full_msa_to_face_mixed_soft",

@@ -1214,3 +1214,9 @@ E45 result update: lighter fixed closure is still not competitive. The next
 architecture branch should leave selected cell masks intact and instead make
 the face/tetra states more useful to the structure module, or revisit closure
 only as a scheduled auxiliary weighting rather than a message mask.
+
+Immediate E46 branch: increase selected complex coverage without changing
+parameters by raising `simplex_neighbor_k` from 12 to 14. This expands the
+available faces and tetra cofaces while preserving the same AF2 trunk and
+learned simplex channels, testing whether recent failures were caused by
+under-covering the sparse packing complex rather than by weak state updates.

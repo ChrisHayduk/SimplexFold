@@ -1394,3 +1394,24 @@ E44's first checkpoint but still below E42. Step 500 reached
 radius of gyration `7.3539 / 15.4034`. The lighter gate avoided E44's severe
 late radius collapse but still degraded final structure quality, so closure
 should not remain a fixed mask in the main path.
+
+### E46: Expanded Selected Complex
+
+Status: implemented locally; planned for Runpod.
+
+Hypothesis: the default selected complex may under-cover local packing
+constraints. With `simplex_neighbor_k=12`, each anchor can form 66 selected
+faces and 220 selected tetras before masking. Increasing to 14 expands that
+to 91 faces and 364 tetras, giving the same learned face/tetra channels more
+candidate 2-/3-cells without adding parameters or changing the AF2 trunk.
+
+Mechanism: add `full_msa_to_face_expanded_complex`, identical to the strong
+E09/E15 MSA-to-face stack except `simplex_neighbor_k=14`. This is a
+topological architecture ablation: it changes the sparsity and coface
+coverage of the learned complex, not the scalar loss target.
+
+Decision rule: run a 500-step Runpod gate at crop 256 / MSA depth 64 with the
+same selected face/tetra coordinate and boundary-distance weights as E15 and
+the same auxiliary anneal from `1.0` to `0.5` over steps 250-500. Continue
+only if expanded coverage recovers the E22/E25/E30 early range or improves
+FoldScore/radius behavior without a compute or stability penalty.

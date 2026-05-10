@@ -1139,3 +1139,16 @@
   `simplex_aux_weight=0.5`. The run is rejected: lower closure strength was
   slightly better than E44 early and less collapsed late, but still below E42
   and still degraded by the final checkpoint.
+- E46 local implementation at 2026-05-10 15:51 EDT: add
+  `full_msa_to_face_expanded_complex`, a zero-parameter variant that enables
+  MSA-to-face messages and raises `simplex_neighbor_k` from 12 to 14. This
+  expands selected candidate faces from 66 to 91 and selected candidate tetras
+  from 220 to 364 per anchor before masking. The intent is topological:
+  increase sparse 2-/3-cell coverage without widening the AF2 trunk or adding
+  a generic dense coordinate loss.
+- E46 local checks: `python -m py_compile scripts/run_nanofold_public_benchmarks.py`
+  passed; focused runner/budget tests passed (`3 passed`); affected
+  runner/trainer tests passed (`85 passed`); full `python -m pytest -q`
+  passed; `git diff --check` passed. Parameter audit gives AF2-medium
+  `3,106,642`, SimplexFold `3,106,690`, and E46 expanded complex
+  `3,106,690` with `simplex_neighbor_k=14`.
