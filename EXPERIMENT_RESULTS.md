@@ -50,3 +50,4 @@ recorded in the running notes for that run.
 | E34 readout-only simplicial sidecar | stopped early | 250 | 0.2426 | 0.2426 | 0.2103 | 14.9311 | 6.5743 / 15.4034 | rejected |
 | E35 face-only structure sidecar | stopped early | 250 | 0.2406 | 0.2406 | 0.2062 | 13.0352 | 9.1316 / 15.4034 | rejected |
 | E36 topology margin selector | stopped early | 250 | 0.1286 | 0.1286 | 0.1857 | 13.5268 | 13.1096 / 15.4034 | rejected |
+| E37 selected face normal orientation | stopped early | 250 | 0.2464 | 0.2464 | 0.2109 | 14.9943 | 6.4679 / 15.4034 | rejected |

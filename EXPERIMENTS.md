@@ -1073,7 +1073,7 @@ quality. Do not continue hard topology-margin weighting in this form.
 
 ### E37: Selected Face Normal Orientation
 
-Status: implementation candidate.
+Status: stopped early on Runpod.
 
 Hypothesis: the strongest SimplexFold runs came from selected face/tetra
 coordinate realization, but the face realization terms only supervise edge
@@ -1094,3 +1094,11 @@ Decision rule: run a 500-step Runpod gate on the E09 selected-coordinate stack
 with MSA-to-face enabled and a small face-normal weight. Continue only if the
 oriented-face signal improves over the E33-E36 weak band and approaches the
 E22/E25 early range without losing FoldScore.
+
+Result: reject. Step 250 reached `val_lddt_ca=0.2464`, FoldScore `0.2109`,
+`val_ca_drmsd=14.9943`, and predicted/true C-alpha radius of gyration
+`6.4679 / 15.4034`. The face-normal term was active
+(`val_weighted_simplex_face_normal_loss=0.0501`), but it did not recover
+above the E33-E35 readout band or approach the E22/E25 early range. The
+selected-face orientation signal is not useful at this weight on the current
+E09 coordinate stack.

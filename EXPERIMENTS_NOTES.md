@@ -735,3 +735,19 @@
   tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights
   tests/test_nanofold_public_benchmarks.py` passed (`36 passed`); parameter
   audit remains AF2-medium `3,106,642`, E37 `3,106,690`, within 5% budget.
+- E37 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10 10:33 EDT
+  from SimplexFold commit `4059b48`. Remote audit before launch: branch
+  `codex/simplexfold-topology-e07-boundary-coordinate`, train/val/all counts
+  `10000/1000/11000`, feature/label file counts `11000/11000`, no hidden or
+  sidecar data paths, no AppleDouble files, H100 CUDA available, FoldScore
+  import works, AF2-medium baseline `3,106,642`, E37 face-normal model
+  `3,106,690`, `simplex_use_faces=True`, `simplex_use_tetra=True`,
+  `simplex_use_msa_to_face=True`, `simplex_face_normal_weight=0.1`, within
+  the 5% AF2-medium budget. Run name: `e37_face_normal_s500_c256_m64`.
+- E37 was stopped early on owned Runpod pod `p2roc93zgk4ho9`, and the pod was
+  stopped. Step 250 reached `val_lddt_ca=0.2464`, FoldScore `0.2109`,
+  `val_ca_drmsd=14.9943`, `val_pred_ca_rg=6.4679`, and
+  `val_true_ca_rg=15.4034`. The face-normal term was active
+  (`simplex_face_normal_weight=0.1`,
+  `val_weighted_simplex_face_normal_loss=0.0501`) but did not improve beyond
+  the weak E33-E35 band, so E37 is rejected.
