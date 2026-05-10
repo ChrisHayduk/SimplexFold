@@ -1238,3 +1238,11 @@ only the selected-cell coordinate realization losses. This tests whether
 filled 2-/3-cells should be trusted most when their boundary 1-skeleton is a
 plausible local complex, without starving early message passing through
 potentially useful open cells.
+
+E47 result update: auxiliary-only flag closure is also not competitive. It
+peaked at `val_lddt_ca=0.2466` before the closure ramp and ended at `0.2262`
+after the ramp, with predicted C-alpha radius falling to `5.5581 / 15.4034`.
+Closure appears harmful whether used as a message mask or as realization-loss
+weighting. The next branch should avoid closure heuristics and instead test
+an adaptive local-to-global topology curriculum or a longer confirmation run
+only for the still-best E15/E12 family.

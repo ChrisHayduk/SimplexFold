@@ -1427,7 +1427,7 @@ should not remain in the main path.
 
 ### E47: Auxiliary Flag-Closure Curriculum
 
-Status: implemented locally; planned for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E44/E45 may have failed because closure was applied directly to
 the selected cell masks, suppressing face/tetra message passing before the
@@ -1450,3 +1450,12 @@ annealed from `1.0` to `0.5`, and `simplex_cell_closure_weight` ramped from
 `0.0` to `0.5` over steps 250-500. Continue only if the run recovers above
 the weak E43-E46 band and approaches the E22/E25/E30 early range without
 late radius collapse.
+
+Result: reject. E47's pre-ramp step-250 checkpoint reached
+`val_lddt_ca=0.2466`, FoldScore `0.2070`, `val_ca_drmsd=14.5113`, and
+predicted/true C-alpha radius of gyration `7.1693 / 15.4034`. After the
+closure ramp reached `0.5`, the final step-500 checkpoint fell to
+`val_lddt_ca=0.2262`, FoldScore `0.2182`, `val_ca_drmsd=15.7332`, and radius
+of gyration `5.5581 / 15.4034`. Auxiliary-only flag closure avoids directly
+suppressing messages, but it still weakens the same early band and does not
+prevent late collapse.

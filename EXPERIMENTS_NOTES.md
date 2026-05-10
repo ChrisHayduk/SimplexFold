@@ -1197,3 +1197,27 @@
   SimplexFold medium `3,106,690`, and `full_msa_to_face_aux_closure`
   `3,106,690`. The variant leaves `simplex_boundary_closure_weight=0.0`, so
   it does not apply the E44/E45 message-mask closure.
+- E47 launched on newly owned Runpod pod `lx0mqtjofo36wd`
+  (`codex-simplexfold-e47-runpod-20260510`) at 2026-05-10 16:28 EDT from
+  commit `ce35f94`. The first remote audit caught `hidden_val.txt` in the
+  copied manifests and missing `nanofold.metrics`; I removed the hidden
+  manifest from `/workspace` and synced only the public NanoFold package code.
+  Clean launch audit after correction: public train/val/all manifest counts
+  `10000/1000/11000`, feature/label `.npz` counts `11000/11000`,
+  `bad_paths=0`, H100 CUDA available, FoldScore import works, AF2-medium
+  pair-only `3,106,642`, E47 `3,106,690`, and
+  `simplex_boundary_closure_weight=0.0`.
+- E47 completed and the owned Runpod pod was stopped at 2026-05-10
+  16:44 EDT. Step 250 was best:
+  `val_lddt_ca=0.2466127322986722`, FoldScore `0.2070165267214179`,
+  `val_ca_drmsd=14.511326014995575`, `val_pred_ca_rg=7.16933998465538`,
+  `val_true_ca_rg=15.403406739234924`, `simplex_aux_weight=1.0`, and
+  `simplex_cell_closure_weight=0.0`. Step 500 ended at
+  `val_lddt_ca=0.22621477395296097`, FoldScore `0.2182228360325098`,
+  `val_ca_drmsd=15.733196377754211`, `val_pred_ca_rg=5.558059215545654`,
+  `val_true_ca_rg=15.403406739234924`, `simplex_aux_weight=0.5`, and
+  `simplex_cell_closure_weight=0.5`.
+- E47 interpretation: the auxiliary-only closure curriculum avoids the
+  message-mask suppression of E44/E45 but still does not recover the stronger
+  early-validation band and still collapses by the final checkpoint. Treat
+  closure heuristics as a rejected family for now.
