@@ -1120,3 +1120,22 @@
   tests passed (`82 passed`); full `python -m pytest -q` passed; `git diff
   --check` passed. Parameter audit gives AF2-medium `3,106,642`,
   SimplexFold `3,106,690`, and E45 soft flag closure `3,106,690`.
+- E45 launched on owned Runpod pod `p2roc93zgk4ho9` at 2026-05-10
+  15:33 EDT from SimplexFold commit `daa5e59`. The stopped pod's
+  `/workspace` was empty, so I recloned the pushed SimplexFold branch and
+  copied only public NanoFold assets with `COPYFILE_DISABLE=1`. Remote audit:
+  public train/val/all counts `10000/1000/11000`, feature/label `.npz`
+  counts `11000/11000`, no hidden or sidecar data paths, H100 CUDA
+  available, FoldScore import works, AF2-medium `3,106,642`, E45 soft flag
+  closure `3,106,690`, `simplex_boundary_closure_weight=0.1`,
+  `simplex_boundary_closure_temperature=1.0`, within the 5% AF2-medium
+  budget. Run name: `e45_flag_closure_soft_s500_c256_m64`.
+- E45 completed and the owned Runpod pod was stopped at 2026-05-10
+  19:43 UTC. Step 250 reached `val_lddt_ca=0.2477`, FoldScore `0.2112`,
+  `val_ca_drmsd=14.8438`, `val_pred_ca_rg=6.4528`, and
+  `val_true_ca_rg=15.4034` with `simplex_aux_weight=1.0`. Step 500 reached
+  `val_lddt_ca=0.2273`, FoldScore `0.1992`, `val_ca_drmsd=14.9228`,
+  `val_pred_ca_rg=7.3539`, and `val_true_ca_rg=15.4034` with
+  `simplex_aux_weight=0.5`. The run is rejected: lower closure strength was
+  slightly better than E44 early and less collapsed late, but still below E42
+  and still degraded by the final checkpoint.

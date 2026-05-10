@@ -1209,3 +1209,8 @@ Immediate E45 branch: run the same flag-complex idea at a much lighter mask
 blend (`0.1` instead of `0.5`). This tests whether the failure was the
 topological closure prior itself or simply too much early suppression of
 selected 2-/3-cells.
+
+E45 result update: lighter fixed closure is still not competitive. The next
+architecture branch should leave selected cell masks intact and instead make
+the face/tetra states more useful to the structure module, or revisit closure
+only as a scheduled auxiliary weighting rather than a message mask.
