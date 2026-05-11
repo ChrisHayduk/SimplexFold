@@ -1729,3 +1729,17 @@
   `python -m py_compile scripts/run_nanofold_public_benchmarks.py`,
   `python -m pytest tests/test_nanofold_public_benchmarks.py::test_simplex_boundary_geometry_metrics_report_selected_edge_errors tests/test_nanofold_public_benchmarks.py::test_simplex_topology_metrics_report_boundary_reuse`,
   and `python -m pytest tests/test_nanofold_public_benchmarks.py`.
+- E60 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e60_outer_edge_context_ramp005_from_e55_s3500_c256_m64/`.
+  Step 3500 reached `val_lddt_ca=0.3461837060749531`, FoldScore
+  `0.34306286089122295`, `val_ca_drmsd=10.923531711101532`, and
+  predicted/true C-alpha radius of gyration `10.852194011211395 /
+  15.403406739234924`.
+- E60 owned Runpod pod `yzy3zi29gzbfj4` was stopped and deleted after
+  artifacts were copied. A post-delete lookup returned 404, as expected. No
+  other Runpod instances were managed.
+- E60 interpretation: reject. The scheduled `0.0 -> 0.05` directed
+  outer-edge context ramp did not preserve E55's `0.3604` lDDT and also lost
+  the E59 FoldScore advantage. Pivot to the prepared E61 edge-frame
+  boundary-message probe rather than continuing the cell-level outer-edge
+  context family.

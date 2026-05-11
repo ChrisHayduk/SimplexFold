@@ -77,3 +77,4 @@ recorded in the running notes for that run.
 | E57 aux-0.75 rewarm from E55 | completed | 4000 | 0.3465 | 0.3465 | 0.3495 | 10.7091 | 10.8574 / 15.4034 | rejected; best FoldScore but worse lDDT |
 | E58 outer-edge context from E55 weights | stopped early | 3500 | 0.3419 | 0.3419 | 0.3507 | 10.9020 | 11.1250 / 15.4034 | rejected; best FoldScore but worse lDDT |
 | E59 damped outer-edge context from E55 | completed | 3500 | 0.3500 | 0.3500 | 0.3516 | 10.9502 | 11.1978 / 15.4034 | rejected; best FoldScore but still below E55 lDDT |
+| E60 scheduled damped outer-edge context | completed | 3500 | 0.3462 | 0.3462 | 0.3431 | 10.9235 | 10.8522 / 15.4034 | rejected; scheduling did not preserve E55 lDDT |

@@ -1,4 +1,4 @@
-## Current Plan: E60 Scheduled Topology Context Probe
+## Current Plan: E61 Scheduled Edge-Frame Boundary Message Probe
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -26,34 +26,32 @@ back to the core topological claim: the model should improve by changing the
 cell complex and its multi-rank message routes, not by attaching generic
 metric pressure to the output coordinates.
 
-The immediate lesson is that the selected topology paths are helping global
-geometry but are too disruptive to local C-alpha agreement when applied
-strongly or abruptly. The next branch should stay architectural and
-topology-grounded, but schedule the new cell-to-edge context so the E55
-checkpoint can adapt to the freshly initialized cochain route.
+E60 tested that idea by scheduling the damped directed outer-edge context from
+`0.0` to `0.05` over steps 3000-3500. It completed at
+`val_lddt_ca=0.3462`, FoldScore `0.3431`, `val_ca_drmsd=10.9235`, and
+predicted/true C-alpha radius `10.8522 / 15.4034`. Reject it: the schedule did
+not preserve the E55/E56 lDDT band and also gave up E59's FoldScore gain.
 
-E60 should run a 3500-step gate from E55 weights with
-`--simplex-outer-edge-context-scale 0.05`, plus a training-time
-`--simplex-outer-edge-context-runtime-scale 0.0 -> 0.05` ramp over steps
-3000-3500. Keep effective batch 8 and the E55 selected-coordinate/boundary
-losses. This tests whether delayed directed outer-edge communication can
-preserve E55-level lDDT while retaining E58/E59's global FoldScore gain. Keep
-the branch only if it beats or stays very close to E55's `val_lddt_ca=0.3604`
-while improving FoldScore/dRMSD; reject if lDDT remains below the E55/E56
-band.
+The next branch should stay in the topological architecture lane, but shift
+from cell-level outer-edge summaries to boundary-edge scalarization. E61 should
+resume E55 with a weak scheduled edge-frame message path:
+`--simplex-edge-frame-message-scale 0.05`,
+`--simplex-edge-frame-message-runtime-scale 0.0`,
+`--simplex-edge-frame-message-runtime-scale-final 0.05`,
+`--simplex-edge-frame-message-runtime-scale-ramp-start-step 3000`, and
+`--simplex-edge-frame-message-runtime-scale-ramp-steps 500`. This tests
+whether selected face/tetra cochains can write geometry-sensitive messages
+through their own directed boundary-edge frames without the disruptive
+cell-level context that hurt E58-E60.
 
 The runner should keep `EXPERIMENT_RESULTS.md` only for returned Runpod
 results. Do not launch a 30,000-step confirmation until a branch clears the
 lDDT target direction under effective batch 8.
 
-If E60 misses the E55/E56 lDDT band, the prepared E61 fallback is a scheduled
-edge-frame scalarization probe from the E55 checkpoint. This stays inside the
-Topotein/reference-paper view: selected face/tetra cochains write messages to
-their own boundary edges after projecting local geometry into directed
-boundary-edge frames. The new runtime schedule lets training ramp that
-selected boundary-edge route from `0.0` to a weak endpoint, instead of turning
-fresh edge-frame modules on abruptly. Treat it as an architecture/curriculum
-test, not a new coordinate loss.
+The runner should also keep reporting selected-boundary diagnostics for future
+runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
+lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
+the learned sparse complex, not training objectives.
 
 Yes. With templates forbidden, the right construction is:
 
