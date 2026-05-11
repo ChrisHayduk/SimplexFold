@@ -1603,3 +1603,10 @@
   `/workspace/SimplexFold/logs/e58_outer_edge_context_from_e55.log`, artifacts
   `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e58_outer_edge_context_from_e55_s4000_c256_m64/`.
   The initial log confirms the E55 weights-only load and fresh optimizer.
+- E58 step-3500 live note: `val_lddt_ca=0.3418876174837351`, FoldScore
+  `0.35072777792811394`, `val_ca_drmsd=10.901953607797623`, and
+  predicted/true C-alpha radius of gyration `11.124989807605743 /
+  15.403406739234924`. This improves the global/FoldScore side but is well
+  below E55's `0.3604` lDDT, matching the E57 tradeoff so far. Let it reach
+  step 4000 before final decision because the branch started fresh
+  outer-edge-context tensors and optimizer state.
