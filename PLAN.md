@@ -92,6 +92,12 @@ static `0.05` continuation from E64. If both step 4500 and step 5000 improve,
 continue the relaxed schedule. If both drop, stop the schedule family and
 return to architecture changes in selected-cell communication.
 
+Prepared follow-up: E66 is a coface-balanced selected-boundary lDDT ablation
+using `--simplex-boundary-degree-normalize`. Launch it only after the E65
+static-versus-relaxed question is resolved. The justification is topological:
+selected faces and tetras define the boundary 1-skeleton, but each undirected
+edge should not dominate just because it appears in many cofaces.
+
 Yes. With templates forbidden, the right construction is:
 
 [

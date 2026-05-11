@@ -2026,3 +2026,16 @@
   started a fresh optimizer. CUDA was active under PID `922` with GPU memory
   allocated. Do not add E65 to `EXPERIMENT_RESULTS.md` until this Runpod run
   returns.
+- E65 status check: Runpod still reports owned pod `21pml3y3hbbbpb` running.
+  Python PID `922` is active with CUDA memory allocated. The E65 artifact
+  directory currently contains `run_metadata.json` and
+  `history_full_msa_to_face.json`; no `results.json`, `results.csv`,
+  checkpoint, or step-4500/5000 row has returned yet. The history contains the
+  inherited lineage through E64 step 4000.
+- E66 idea recorded while E65 runs: coface-balanced selected-boundary lDDT
+  using the existing `--simplex-boundary-degree-normalize` flag. This is a
+  topological loss-weighting ablation, not a generic metric hack: selected
+  faces/tetras still define the boundary 1-skeleton, but inverse incidence
+  degree prevents a repeated undirected edge from dominating just because it
+  appears in many selected cofaces. Do not launch E66 until E65 returns and
+  the static-versus-relaxed boundary-lDDT question is resolved.

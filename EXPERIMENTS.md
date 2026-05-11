@@ -2194,3 +2194,34 @@ Validation:
 
 - `python -m py_compile minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_trainer.py::test_apply_loss_weight_schedule_ramps_research_weights tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights`
+
+### E66: Coface-Balanced Selected-Boundary lDDT
+
+Status: planned; do not launch until E65 returns.
+
+Hypothesis: E63/E64 show that selected-boundary lDDT improves the learned
+boundary 1-skeleton, but the same undirected residue edge can appear many
+times across selected faces and tetra cofaces. Without coface balancing, the
+loss is partly a cell-multiplicity-weighted objective rather than a clean
+1-cochain objective on selected boundary edges. Normalizing by undirected
+boundary-edge incidence degree should ask each selected edge to contribute
+once to realization, while still letting face/tetra cells define which edges
+exist.
+
+Mechanism: use the existing `--simplex-boundary-degree-normalize` flag with
+the E64/E65 selected-boundary lDDT protocol. This applies inverse incidence
+weights through `_boundary_degree_weights` to selected face/tetra boundary
+edge losses, including the selected-boundary lDDT terms. It adds no
+parameters and remains topological because the weights are computed from the
+selected sparse cell complex.
+
+Planned launch: choose after E65 returns. If E65 shows the relaxed
+`0.05 -> 0.025` schedule is worse than the static step-4500 point, first run
+the static `0.05` continuation from E64 as the direct ablation. If static
+`0.05` still saturates or overweights repeated local edges, run E66 from the
+best E64/E65 checkpoint with `--simplex-boundary-degree-normalize`.
+
+Decision rule: keep only if coface balancing improves or preserves
+`val_lddt_ca` while reducing selected-boundary contraction and avoiding a
+FoldScore/dRMSD regression. Reject if it repeats E24's early-run behavior and
+weakens the selected-boundary signal.
