@@ -57,12 +57,17 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
-The next prepared branch is E62: a scheduled Hodge-style face residual from
-E55. This stays within the topological view by ramping lower adjacency through
-shared boundary edges and upper adjacency through selected tetra cofaces,
-rather than adding another coordinate loss. It adds no parameters; use a static
+The active branch is E62: a scheduled Hodge-style face residual from E55. It
+is running on the owned Runpod H100 NVL pod `39s6arzja95amz` from commit
+`4517f98`. This stays within the topological view by ramping lower adjacency
+through shared boundary edges and upper adjacency through selected tetra
+cofaces, rather than adding another coordinate loss. It adds no parameters;
+use a static
 `--simplex-hodge-face-update-scale 0.05` with a training-time runtime ramp
-from `0.0` to `0.05` over steps 3000-3500.
+from `0.0` to `0.05` over steps 3000-3500. The launch audit passed with public
+train/val/all counts `10000/1000/11000`, hidden manifest absent, feature/label
+NPZ counts `11000/11000`, encoded missing paths `0`, FoldScore import working,
+and `3,106,690` parameters (`+0.0015%` versus AF2-medium).
 
 Yes. With templates forbidden, the right construction is:
 

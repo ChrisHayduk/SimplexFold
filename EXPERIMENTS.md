@@ -2005,8 +2005,7 @@ Validation:
 
 ### E62: Scheduled Hodge Face Residual From E55
 
-Status: implemented locally and queued as the next Runpod candidate after E61
-rejection; not yet launched.
+Status: launched on owned Runpod pod `39s6arzja95amz`; result pending.
 
 Hypothesis: the reference material emphasizes that topological networks should
 move information through incidence maps across ranks. E42 tested the static
@@ -2031,6 +2030,20 @@ E61 is rejected.
 Decision rule: keep only if the step-3500 lDDT beats or stays very close to
 E55's `0.3604`; otherwise reject and use selected-boundary diagnostics to
 decide whether adjacency mixing is over-smoothing the sparse complex.
+
+Launch: E62 is running on owned Runpod H100 NVL pod `39s6arzja95amz` from
+commit `4517f98`. A first replacement pod, `f3j3v4qd4f6w8w`, never exposed
+SSH and was stopped/deleted before any data staging or training. Final launch
+audit on `39s6arzja95amz` passed: public train/val/all counts are
+`10000/1000/11000`, no hidden manifest/path is staged, feature/label cache
+counts are `11000/11000`, encoded missing paths are `0`, the E55 checkpoint
+is present, FoldScore import works, CUDA reports `NVIDIA H100 NVL`, and the
+Hodge model has `3,106,690` parameters (+0.0015% versus AF2-medium pair-only
+`3,106,642`). The runtime scale audit confirmed `0.0` at step 3000, `0.025`
+at step 3250, and `0.05` at step 3500. The run resumed E55 at step 3000 with
+weights-only loading and initialized `0` new/missing tensors, as expected for
+a zero-parameter Hodge residual. Do not write E62 to `EXPERIMENT_RESULTS.md`
+until the Runpod run returns.
 
 Validation:
 

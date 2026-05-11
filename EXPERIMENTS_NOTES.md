@@ -1803,3 +1803,26 @@
   final dRMSD and global expansion relative to E55 but reduced the primary
   C-alpha lDDT back into the E57/E60 band. Move to the prepared E62 scheduled
   Hodge face residual rather than adding more output-coordinate losses.
+- E62 launch attempt 1: owned Runpod pod `f3j3v4qd4f6w8w`
+  (`codex-simplexfold-e62-runpod-20260511`) was created but never exposed SSH.
+  It was stopped and deleted before any data staging or training. A post-delete
+  lookup returned 404. No other Runpod instances were managed.
+- E62 launch attempt 2: owned Runpod pod `39s6arzja95amz`
+  (`codex-simplexfold-e62-runpod-20260511b`) is running from commit `4517f98`.
+  Clean launch audit after copying only public data/code: public train/val/all
+  manifest counts `10000/1000/11000`, remote manifest files exactly
+  `all.txt`, `train.txt`, and `val.txt`, hidden manifest/path absent,
+  feature/label `.npz` counts `11000/11000`, encoded-chain missing paths `0`,
+  E55 checkpoint present, H100 NVL CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E62 Hodge model `3,106,690` parameters (`+0.0015%`). Runtime Hodge scale
+  audit: step 3000 `0.0`, step 3250 `0.025`, step 3500 `0.05`.
+- E62 remote process: Python PID `2419`, data-worker Python PIDs observed
+  under the same command, log
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e62_hodge_face_ramp005_from_e55_s3500_c256_m64/run.log`,
+  artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e62_hodge_face_ramp005_from_e55_s3500_c256_m64/`.
+  The log shows it resumed E55 at step 3000/examples 24000, loaded 1196
+  matching model tensors, initialized 0 new/missing tensors, and started a
+  fresh optimizer. Do not add E62 to `EXPERIMENT_RESULTS.md` until the Runpod
+  run returns.
