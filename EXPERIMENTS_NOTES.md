@@ -1503,3 +1503,20 @@
   The continuation runs to step 3000 with effective batch 8 and constant
   `simplex_aux_weight=0.5`. Do not write E55 to `EXPERIMENT_RESULTS.md` until
   the Runpod run returns.
+- E55 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e55_effective_batch8_aux05_s3000_c256_m64/`.
+  Step 2500 reached `val_lddt_ca=0.3423902466893196`, FoldScore
+  `0.3378663770854473`, `val_ca_drmsd=11.098472356796265`, and predicted/true
+  C-alpha radius of gyration `10.338989078998566 / 15.403406739234924`.
+  Step 3000 recovered to `val_lddt_ca=0.36041587218642235`, FoldScore
+  `0.34508529864251614`, `val_ca_drmsd=11.327985882759094`, and radius
+  `10.050656735897064 / 15.403406739234924`.
+- E55 interpretation: this is the new current best and the first returned
+  effective-batch-8 run to beat E15's `val_lddt_ca=0.3556`. The target
+  `>0.7` is still far away, but the optimizer-regime branch is now clearly
+  better than more auxiliary/readout variants.
+- E56 launched on the same owned H100 pod `egsopc48v9fjz8`, resuming E55 from
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e55_effective_batch8_aux05_s3000_c256_m64/checkpoints/full_msa_to_face_latest.pt`.
+  The continuation runs to step 4000 with effective batch 8 and constant
+  `simplex_aux_weight=0.5`. Do not write E56 to `EXPERIMENT_RESULTS.md` until
+  the Runpod run returns.

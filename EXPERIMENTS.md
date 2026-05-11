@@ -1701,7 +1701,7 @@ E15-style auxiliary anneal continuation.
 
 ### E54: Effective-Batch-8 Auxiliary Anneal Continuation
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E53 shows that effective-batch-8 training catches up after 1000
 optimizer steps, while E15 showed that reducing selected-simplex auxiliary
@@ -1746,3 +1746,29 @@ and constant `simplex_aux_weight=0.5`.
 Decision rule: keep and extend only if step 2500 or 3000 beats E15's
 `val_lddt_ca=0.3556` or preserves comparable lDDT with clearly better
 FoldScore/dRMSD. If lDDT drifts down as in E17, stop the continuation branch.
+
+Result: keep as the new current best. Step 2500 dipped to
+`val_lddt_ca=0.3424`, but FoldScore improved to `0.3379`, dRMSD to
+`11.0985`, and predicted/true C-alpha radius of gyration to
+`10.3390 / 15.4034`. Step 3000 recovered to `val_lddt_ca=0.3604`, beating
+E15's best `0.3556`, with FoldScore `0.3451`, `val_ca_drmsd=11.3280`, and
+radius `10.0507 / 15.4034`. This makes the effective-batch-8 aux-0.5
+continuation the leading branch.
+
+### E56: Effective-Batch-8 Aux-0.5 To 4000
+
+Status: launched on Runpod.
+
+Hypothesis: E55 beat E15 at step 3000 while preserving the improved
+FoldScore/global-geometry trend. Continuing one more 1000-step block should
+test whether the branch is still climbing or beginning the E17-style lDDT
+drift.
+
+Mechanism: resume E55 at step 3000 and continue to step 4000 with the same
+`full_msa_to_face` architecture, effective batch 8, selected coordinate and
+boundary-distance losses, and constant `simplex_aux_weight=0.5`.
+
+Decision rule: keep only if step 3500 or 4000 improves over E55's
+`val_lddt_ca=0.3604` or preserves lDDT within noise while continuing to
+improve FoldScore/dRMSD. If lDDT falls back toward E54/E17 behavior, stop and
+analyze the E55 checkpoint before longer training.

@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-11.
 
-Best validation C-alpha lDDT so far: **E15**, `val_lddt_ca=0.3556` at step
-9000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E55**, `val_lddt_ca=0.3604` at step
+3000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -72,3 +72,4 @@ recorded in the running notes for that run.
 | E52 selected cell dropout | completed | 500 | 0.2630 | 0.2630 | 0.2301 | 14.2399 | 7.2057 / 15.4034 | rejected |
 | E53 longer effective-batch-8 scaffold | completed | 1000 | 0.3480 | 0.3480 | 0.2729 | 12.6378 | 8.5184 / 15.4034 | kept for E54 continuation |
 | E54 effective-batch-8 aux anneal | completed | 2000 | 0.3539 | 0.3539 | 0.3241 | 11.9339 | 9.2409 / 15.4034 | kept for E55 continuation |
+| E55 effective-batch-8 aux 0.5 continuation | completed | 3000 | 0.3604 | 0.3604 | 0.3451 | 11.3280 | 10.0507 / 15.4034 | current best; kept for E56 continuation |

@@ -1,4 +1,4 @@
-## Current Plan: E55 Effective-Batch Aux-0.5 Continuation
+## Current Plan: E56 Effective-Batch Aux-0.5 To 4000
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -7,17 +7,17 @@ simplex realization scaffold, can catch up under effective batch 8 if it is
 allowed to run past the first 500 optimizer steps.
 
 The active goal calls for a final 30,000-step effective-batch-8 confirmation.
-E53 reached `val_lddt_ca=0.3480` at step 1000, and E54's auxiliary anneal
-recovered to `val_lddt_ca=0.3539` at step 2000 while improving FoldScore to
-`0.3241`. That nearly ties the current E15 lDDT best and beats its aggregate
-geometry metrics.
+E53 reached `val_lddt_ca=0.3480` at step 1000, E54 recovered to
+`val_lddt_ca=0.3539` at step 2000 after the auxiliary anneal, and E55 reached
+the new best `val_lddt_ca=0.3604` at step 3000 while improving FoldScore to
+`0.3451`. This is the first effective-batch-8 branch to beat E15.
 
-E55 should now continue with `simplex_aux_weight=0.5` held constant. This is
-the direct effective-batch-8 analogue of the E15/E17 question, but earlier in
-training and with better FoldScore/dRMSD headroom. Keep the architecture and
-selected face/tetra boundary-realization losses unchanged; the only question
-is whether the target optimizer regime can pass E15 before a larger 30k-step
-confirmation. Keep `EXPERIMENT_RESULTS.md` only for returned Runpod results.
+E56 should now continue the same checkpoint lineage to step 4000 with
+`simplex_aux_weight=0.5` held constant. Keep the architecture and selected
+face/tetra boundary-realization losses unchanged. The goal is to distinguish
+a real climb under the target optimizer regime from a transient E17-style
+lDDT peak before committing to a much longer 30k-step confirmation. Keep
+`EXPERIMENT_RESULTS.md` only for returned Runpod results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired
