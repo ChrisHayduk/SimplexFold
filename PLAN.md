@@ -79,6 +79,14 @@ pressure eases. Do not raise the weight blindly: E19/E20 showed that
 selected-boundary lDDT can be harmful when introduced too early, while E63/E64
 show it is useful after the E55 scaffold is already learned.
 
+E65 is running on the owned Runpod B200 pod `21pml3y3hbbbpb` from commit
+`d766050`. Launch audit passed with public train/val/all counts
+`10000/1000/11000`, hidden manifest absent, feature/label NPZ counts
+`11000/11000`, encoded missing paths `0`, the E64 checkpoint present,
+FoldScore import working, CUDA reporting `NVIDIA B200`, and `3,106,690`
+parameters (`+0.0015%` versus AF2-medium). Do not add E65 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+
 Decision rule for E65: if step 4500 improves but step 5000 drops, next test a
 static `0.05` continuation from E64. If both step 4500 and step 5000 improve,
 continue the relaxed schedule. If both drop, stop the schedule family and

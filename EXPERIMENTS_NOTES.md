@@ -2003,3 +2003,26 @@
   improves but step 5000 drops, next test static `0.05`; if both improve,
   continue the relaxed schedule; if both drop, return to architecture changes
   in selected-cell communication.
+- E65 launched on owned Runpod B200 pod `21pml3y3hbbbpb`
+  (`codex-simplexfold-e65-runpod-20260511`) from commit `d766050`. It uses
+  `volumeInGb=0` and a 160 GB container disk so `/workspace` is local overlay
+  storage. Only this owned pod should be managed for E65.
+- E65 clean launch audit after copying only public data/code: public
+  train/val/all manifest counts `10000/1000/11000`, remote manifest files
+  exactly `all.txt`, `train.txt`, and `val.txt`, hidden manifest/path absent,
+  feature/label `.npz` counts `11000/11000`, encoded-chain missing paths `0`,
+  E64 checkpoint present, B200 CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E65 model `3,106,690` parameters (`+0.0015%`). Schedule audit: face/tetra
+  selected-boundary lDDT weights are `0.05` at steps 4000 and 4500,
+  `0.0375` at step 4750, and `0.025` at step 5000.
+- E65 remote process: wrapper PID `920`, Python PID `922`, data-worker Python
+  PIDs `1085` and `1086`, launch log
+  `/workspace/SimplexFold/logs/e65_boundary_lddt005_to0025_from_e64.log`,
+  artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e65_boundary_lddt005_to0025_from_e64_s5000_c256_m64/`.
+  Initial log shows the runner resumed E64 at step 4000/examples 32000,
+  loaded 1196 matching model tensors, initialized 0 new/missing tensors, and
+  started a fresh optimizer. CUDA was active under PID `922` with GPU memory
+  allocated. Do not add E65 to `EXPERIMENT_RESULTS.md` until this Runpod run
+  returns.

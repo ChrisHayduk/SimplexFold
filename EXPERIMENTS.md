@@ -2143,7 +2143,7 @@ stopped and deleted after the returned result was recorded.
 
 ### E65: Scheduled Selected-Boundary lDDT Weight
 
-Status: implemented locally; ready for Runpod launch.
+Status: running on owned Runpod pod `21pml3y3hbbbpb`.
 
 Hypothesis: E63 is the first branch where selected-boundary realization and
 primary C-alpha lDDT improve together. A static `0.05` selected-boundary lDDT
@@ -2169,6 +2169,21 @@ and `simplex_aux_weight=0.5`. Start the selected-boundary lDDT weights at
 `--simplex-tetra-boundary-lddt-weight-final 0.025`,
 `--simplex-boundary-lddt-ramp-start-step 4500`, and
 `--simplex-boundary-lddt-ramp-steps 500`.
+
+Launch: E65 is running on owned Runpod B200 pod `21pml3y3hbbbpb` from commit
+`d766050`. The pod uses `volumeInGb=0` and a 160 GB container disk so
+`/workspace` is local overlay storage. Clean launch audit after copying only
+public data/code: public train/val/all manifest counts are `10000/1000/11000`,
+remote manifest files are exactly `all.txt`, `train.txt`, and `val.txt`,
+hidden manifest/path absent, feature/label `.npz` counts `11000/11000`,
+encoded missing paths `0`, E64 checkpoint present, B200 CUDA available,
+NanoFold `foldscore_components` import works, AF2-medium pair-only
+`3,106,642`, and E65 model `3,106,690` parameters (`+0.0015%`). Schedule
+audit confirmed face/tetra selected-boundary lDDT weights of `0.05` at steps
+4000 and 4500, `0.0375` at step 4750, and `0.025` at step 5000. The run
+resumed E64 at step 4000 with weights-only loading, loaded 1196 matching model
+tensors, initialized 0 new/missing tensors, and started a fresh optimizer. Do
+not add E65 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
 
 Decision rule: if step 4500 improves but step 5000 drops, next test a static
 `0.05` continuation from E64. If both step 4500 and step 5000 improve,
