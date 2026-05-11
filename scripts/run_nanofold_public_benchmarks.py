@@ -65,6 +65,7 @@ from minalphafold.trainer import (  # noqa: E402
     set_optimizer_learning_rate,
     set_seed,
     simplex_local_neighbor_k_at_step,
+    simplex_outer_edge_context_runtime_scale_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     simplex_update_scale_at_step,
     zero_dropout_model_config,
@@ -939,6 +940,10 @@ def _train_variant(
         apply_loss_weight_schedule(loss_fn, training_config, step)
         teacher_forcing_weight = simplex_topology_teacher_forcing_weight_at_step(training_config, step)
         simplex_update_scale = simplex_update_scale_at_step(training_config, step)
+        simplex_outer_edge_context_runtime_scale = simplex_outer_edge_context_runtime_scale_at_step(
+            training_config,
+            step,
+        )
         simplex_local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
         optimizer.zero_grad(set_to_none=True)
         loss_accum = 0.0
@@ -960,6 +965,7 @@ def _train_variant(
                         training_config,
                         use_simplex_teacher_forcing=True,
                         use_simplex_update_scale=True,
+                        use_simplex_outer_edge_context_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
                         step=step,
                     )
@@ -1060,6 +1066,11 @@ def _train_variant(
                 ),
                 "simplex_topology_teacher_forcing_weight": teacher_forcing_weight,
                 "simplex_update_scale": float("nan") if simplex_update_scale is None else simplex_update_scale,
+                "simplex_outer_edge_context_runtime_scale": (
+                    float("nan")
+                    if simplex_outer_edge_context_runtime_scale is None
+                    else simplex_outer_edge_context_runtime_scale
+                ),
                 "simplex_local_neighbor_k": (
                     float("nan") if simplex_local_neighbor_k is None else simplex_local_neighbor_k
                 ),
@@ -1225,6 +1236,16 @@ def _train_variant(
         "simplex_update_scale_final": training_config.simplex_update_scale_final,
         "simplex_update_scale_ramp_start_step": training_config.simplex_update_scale_ramp_start_step,
         "simplex_update_scale_ramp_steps": training_config.simplex_update_scale_ramp_steps,
+        "simplex_outer_edge_context_runtime_scale": training_config.simplex_outer_edge_context_runtime_scale,
+        "simplex_outer_edge_context_runtime_scale_final": (
+            training_config.simplex_outer_edge_context_runtime_scale_final
+        ),
+        "simplex_outer_edge_context_runtime_scale_ramp_start_step": (
+            training_config.simplex_outer_edge_context_runtime_scale_ramp_start_step
+        ),
+        "simplex_outer_edge_context_runtime_scale_ramp_steps": (
+            training_config.simplex_outer_edge_context_runtime_scale_ramp_steps
+        ),
         "simplex_local_neighbor_k": training_config.simplex_local_neighbor_k,
         "simplex_local_neighbor_k_final": training_config.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": training_config.simplex_local_neighbor_k_ramp_start_step,
@@ -1352,6 +1373,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_update_scale_final",
         "simplex_update_scale_ramp_start_step",
         "simplex_update_scale_ramp_steps",
+        "simplex_outer_edge_context_runtime_scale",
+        "simplex_outer_edge_context_runtime_scale_final",
+        "simplex_outer_edge_context_runtime_scale_ramp_start_step",
+        "simplex_outer_edge_context_runtime_scale_ramp_steps",
         "simplex_local_neighbor_k",
         "simplex_local_neighbor_k_final",
         "simplex_local_neighbor_k_ramp_start_step",
@@ -1697,6 +1722,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the model config scale for directed outer-edge context updates.",
     )
     parser.add_argument(
+        "--simplex-outer-edge-context-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for the directed outer-edge context update scale.",
+    )
+    parser.add_argument("--simplex-outer-edge-context-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-outer-edge-context-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-outer-edge-context-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-hodge-face-update-scale",
         type=float,
         default=None,
@@ -1861,6 +1895,12 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_update_scale_final=args.simplex_update_scale_final,
         simplex_update_scale_ramp_start_step=args.simplex_update_scale_ramp_start_step,
         simplex_update_scale_ramp_steps=args.simplex_update_scale_ramp_steps,
+        simplex_outer_edge_context_runtime_scale=args.simplex_outer_edge_context_runtime_scale,
+        simplex_outer_edge_context_runtime_scale_final=args.simplex_outer_edge_context_runtime_scale_final,
+        simplex_outer_edge_context_runtime_scale_ramp_start_step=(
+            args.simplex_outer_edge_context_runtime_scale_ramp_start_step
+        ),
+        simplex_outer_edge_context_runtime_scale_ramp_steps=args.simplex_outer_edge_context_runtime_scale_ramp_steps,
         simplex_local_neighbor_k=args.simplex_local_neighbor_k,
         simplex_local_neighbor_k_final=args.simplex_local_neighbor_k_final,
         simplex_local_neighbor_k_ramp_start_step=args.simplex_local_neighbor_k_ramp_start_step,
@@ -1960,6 +2000,14 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_update_scale_final": args.simplex_update_scale_final,
         "simplex_update_scale_ramp_start_step": args.simplex_update_scale_ramp_start_step,
         "simplex_update_scale_ramp_steps": args.simplex_update_scale_ramp_steps,
+        "simplex_outer_edge_context_runtime_scale": args.simplex_outer_edge_context_runtime_scale,
+        "simplex_outer_edge_context_runtime_scale_final": args.simplex_outer_edge_context_runtime_scale_final,
+        "simplex_outer_edge_context_runtime_scale_ramp_start_step": (
+            args.simplex_outer_edge_context_runtime_scale_ramp_start_step
+        ),
+        "simplex_outer_edge_context_runtime_scale_ramp_steps": (
+            args.simplex_outer_edge_context_runtime_scale_ramp_steps
+        ),
         "simplex_structure_readout_scale": args.simplex_structure_readout_scale,
         "simplex_outer_edge_update_scale": args.simplex_outer_edge_update_scale,
         "simplex_outer_edge_context_scale": args.simplex_outer_edge_context_scale,

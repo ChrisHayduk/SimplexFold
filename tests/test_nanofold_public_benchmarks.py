@@ -1,4 +1,11 @@
-from minalphafold.trainer import TrainingConfig, load_model_config
+import torch
+
+from minalphafold.trainer import (
+    TrainingConfig,
+    load_model_config,
+    model_inputs_from_batch,
+    simplex_outer_edge_context_runtime_scale_at_step,
+)
 from scripts.run_nanofold_public_benchmarks import (
     _apply_model_config_overrides,
     _build_loss_fn,
@@ -282,6 +289,14 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "full_msa_to_face",
             "--simplex-outer-edge-context-scale",
             "0.25",
+            "--simplex-outer-edge-context-runtime-scale",
+            "0.0",
+            "--simplex-outer-edge-context-runtime-scale-final",
+            "0.05",
+            "--simplex-outer-edge-context-runtime-scale-ramp-start-step",
+            "3000",
+            "--simplex-outer-edge-context-runtime-scale-ramp-steps",
+            "500",
             "--simplex-segment-radius",
             "5",
             "--resume-model-weights-only",
@@ -290,8 +305,47 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
 
     assert args.variants == ["full_msa_to_face"]
     assert args.simplex_outer_edge_context_scale == 0.25
+    assert args.simplex_outer_edge_context_runtime_scale == 0.0
+    assert args.simplex_outer_edge_context_runtime_scale_final == 0.05
+    assert args.simplex_outer_edge_context_runtime_scale_ramp_start_step == 3000
+    assert args.simplex_outer_edge_context_runtime_scale_ramp_steps == 500
     assert args.simplex_segment_radius == 5
     assert args.resume_model_weights_only is True
+
+
+def test_outer_edge_context_runtime_scale_ramps_and_enters_model_inputs():
+    cfg = TrainingConfig(
+        simplex_outer_edge_context_runtime_scale=0.0,
+        simplex_outer_edge_context_runtime_scale_final=0.05,
+        simplex_outer_edge_context_runtime_scale_ramp_start_step=3000,
+        simplex_outer_edge_context_runtime_scale_ramp_steps=500,
+    )
+    batch = {
+        "target_feat": torch.zeros(1, 4, 22),
+        "residue_index": torch.arange(4).unsqueeze(0),
+        "msa_feat": torch.zeros(1, 2, 4, 49),
+        "extra_msa_feat": torch.zeros(1, 0, 4, 25),
+        "template_pair_feat": torch.zeros(1, 0, 4, 4, 88),
+        "aatype": torch.zeros(1, 4, dtype=torch.long),
+        "template_angle_feat": torch.zeros(1, 0, 4, 57),
+        "template_mask": torch.zeros(1, 0),
+        "template_residue_mask": torch.zeros(1, 0, 4),
+        "seq_mask": torch.ones(1, 4),
+        "msa_mask": torch.ones(1, 2, 4),
+        "extra_msa_mask": torch.ones(1, 0, 4),
+    }
+
+    assert simplex_outer_edge_context_runtime_scale_at_step(cfg, 3000) == 0.0
+    assert simplex_outer_edge_context_runtime_scale_at_step(cfg, 3250) == 0.025
+    assert simplex_outer_edge_context_runtime_scale_at_step(cfg, 3500) == 0.05
+    inputs = model_inputs_from_batch(
+        batch,
+        cfg,
+        use_simplex_outer_edge_context_runtime_scale=True,
+        step=3250,
+    )
+
+    assert torch.isclose(inputs["simplex_outer_edge_context_scale_override"], torch.tensor(0.025))
 
 
 def test_model_config_overrides_preserve_resume_compatible_variant_name():

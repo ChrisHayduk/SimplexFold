@@ -525,6 +525,41 @@ def test_edge_frame_message_scale_changes_pair_readout_within_adapter():
     assert torch.allclose(on_single, off_single)
 
 
+def test_outer_edge_context_runtime_scale_gates_context_path():
+    class OuterContextConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_outer_edge_context_scale = 0.25
+
+    torch.manual_seed(8)
+    adapter = SimplicialAdapter(OuterContextConfig()).eval()
+    pair = torch.randn(1, 5, 5, OuterContextConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, OuterContextConfig.c_s)
+    coords = torch.randn(1, 5, 3)
+    zero = pair.new_tensor(0.0)
+    active = pair.new_tensor(0.25)
+
+    with torch.no_grad():
+        off_pair, off_single, _ = adapter(
+            pair,
+            single,
+            recycled_ca_coords=coords,
+            simplex_outer_edge_context_scale_override=zero,
+        )
+        on_pair, on_single, _ = adapter(
+            pair,
+            single,
+            recycled_ca_coords=coords,
+            simplex_outer_edge_context_scale_override=active,
+        )
+
+    assert not torch.allclose(on_pair, off_pair)
+    assert not torch.allclose(on_single, off_single)
+
+
 def test_segment_cell_indices_are_contiguous_and_respect_sequence_mask():
     seq_mask = torch.tensor([[1.0, 1.0, 1.0, 0.0, 1.0]])
 

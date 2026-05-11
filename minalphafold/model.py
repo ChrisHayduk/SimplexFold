@@ -206,6 +206,7 @@ class AlphaFold2(torch.nn.Module):
             simplex_teacher_forcing_weight: torch.Tensor | None = None,
             simplex_pair_update_scale_override: torch.Tensor | None = None,
             simplex_single_update_scale_override: torch.Tensor | None = None,
+            simplex_outer_edge_context_scale_override: torch.Tensor | None = None,
             simplex_local_neighbor_k_override: torch.Tensor | None = None,
         ):
         """Algorithm 2 forward pass. See the class docstring for the full map."""
@@ -391,6 +392,9 @@ class AlphaFold2(torch.nn.Module):
                                         simplex_teacher_forcing_weight=simplex_teacher_forcing_weight,
                                         simplex_pair_update_scale_override=simplex_pair_update_scale_override,
                                         simplex_single_update_scale_override=simplex_single_update_scale_override,
+                                        simplex_outer_edge_context_scale_override=(
+                                            simplex_outer_edge_context_scale_override
+                                        ),
                                         simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
                                         use_reentrant=False,
                                     ),
@@ -410,6 +414,9 @@ class AlphaFold2(torch.nn.Module):
                                     simplex_teacher_forcing_weight=simplex_teacher_forcing_weight,
                                     simplex_pair_update_scale_override=simplex_pair_update_scale_override,
                                     simplex_single_update_scale_override=simplex_single_update_scale_override,
+                                    simplex_outer_edge_context_scale_override=(
+                                        simplex_outer_edge_context_scale_override
+                                    ),
                                     simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
                             )
                             if simplex_aux:

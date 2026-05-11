@@ -1862,7 +1862,7 @@ was stopped early at the step-3500 checkpoint and the owned pod was deleted.
 
 ### E59: Damped Outer-Edge Context From E55
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E58 shows directed outer-edge context has useful global-geometry
 signal, but a scale of `0.25` is too disruptive when the context modules are
@@ -1881,10 +1881,48 @@ Decision rule: keep only if the step-3500 lDDT beats or stays very close to
 E55's `0.3604` while preserving E58's FoldScore/dRMSD improvement. Reject if
 it remains in the E57/E58 lDDT band.
 
-Launch: E59 is running on owned Runpod H100 pod `n5dtdxgjgk81de` from commit
-`6f9750c`. Launch audit passed: public train/val/all counts are
+Launch: E59 ran on owned Runpod H100 pod `n5dtdxgjgk81de` from commit
+`6f9750c`. Launch audit passed: public train/val/all counts were
 `10000/1000/11000`, no hidden manifest was staged, feature/label cache counts
-are `11000/11000`, encoded missing paths are `0`, FoldScore import works,
-CUDA reports `NVIDIA H100 80GB HBM3`, and parameters are `3,183,282`
-(+2.47% versus AF2-medium pair-only `3,106,642`). Do not write E59 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+were `11000/11000`, encoded missing paths were `0`, FoldScore import worked,
+CUDA reported `NVIDIA H100 80GB HBM3`, and parameters were `3,183,282`
+(+2.47% versus AF2-medium pair-only `3,106,642`).
+
+Result: reject for the primary objective. E59 completed at step 3500 with
+`val_lddt_ca=0.3500`, FoldScore `0.3516`, `val_ca_drmsd=10.9502`, and
+predicted/true C-alpha radius of gyration `11.1978 / 15.4034`. The weaker
+outer-edge context path improves substantially over E58's lDDT and sets the
+best FoldScore so far, but it still remains below E55's `0.3604` lDDT.
+This suggests the context path is useful but still needs a less abrupt
+integration into the selected cell complex.
+
+### E60: Scheduled Damped Outer-Edge Context From E55
+
+Status: implemented locally and queued for Runpod.
+
+Hypothesis: E58 and E59 show that Topotein-style outer-edge context improves
+global FoldScore, but switching freshly initialized context modules on at a
+fixed scale still disrupts local C-alpha agreement. A runtime scale ramp from
+zero to the same damped `0.05` endpoint should let the resumed E55 checkpoint
+adapt to the new cochain communication route over the 3000-3500 gate.
+
+Mechanism: add a training-time
+`simplex_outer_edge_context_runtime_scale` schedule. The model config
+`simplex_outer_edge_context_scale` still allocates the face/tetra outer-edge
+context modules and controls validation-time scale, while the runtime
+override gates the contribution during training. E60 should use
+`--simplex-outer-edge-context-scale 0.05`,
+`--simplex-outer-edge-context-runtime-scale 0.0`,
+`--simplex-outer-edge-context-runtime-scale-final 0.05`,
+`--simplex-outer-edge-context-runtime-scale-ramp-start-step 3000`, and
+`--simplex-outer-edge-context-runtime-scale-ramp-steps 500`.
+
+Decision rule: keep only if the step-3500 lDDT beats or stays very close to
+E55's `0.3604` while preserving E59's FoldScore/dRMSD improvement. Reject if
+it remains below the E55/E56 lDDT band.
+
+Validation:
+
+- `python -m py_compile minalphafold/trainer.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_outer_edge_context_runtime_scale_ramps_and_enters_model_inputs tests/test_simplex.py::test_outer_edge_context_runtime_scale_gates_context_path`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_simplex.py::test_outer_edge_context_runtime_scale_gates_context_path tests/test_simplex.py::test_edge_frame_message_scale_changes_pair_readout_within_adapter tests/test_trainer.py::test_simplexfold_medium_param_matched_matches_af2_medium_budget`

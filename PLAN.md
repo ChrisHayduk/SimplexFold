@@ -1,4 +1,4 @@
-## Current Plan: E59 Damped Topology Context Probe
+## Current Plan: E60 Scheduled Topology Context Probe
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -14,7 +14,10 @@ FoldScore/dRMSD further, but its best `val_lddt_ca=0.3575` stayed below E55.
 E57 then tried a selected-simplex auxiliary rewarm at `0.75`; it improved the
 global/FoldScore side but reduced lDDT to `0.3465`. E58 initialized
 Topotein-style directed outer-edge context from E55 weights and set the best
-FoldScore so far (`0.3507`) at step 3500, but again reduced lDDT to `0.3419`.
+FoldScore at that point (`0.3507`) at step 3500, but again reduced lDDT to
+`0.3419`. E59 damped the same context path to `0.05`; this recovered lDDT to
+`0.3500` and set the new best FoldScore (`0.3516`), but still stayed below
+E55's lDDT peak.
 
 Treat E55 as the current lDDT peak checkpoint. Do not spend on a blind
 30,000-step continuation yet, and do not keep turning the scalar auxiliary
@@ -26,17 +29,18 @@ metric pressure to the output coordinates.
 The immediate lesson is that the selected topology paths are helping global
 geometry but are too disruptive to local C-alpha agreement when applied
 strongly or abruptly. The next branch should stay architectural and
-topology-grounded, but damp or schedule the new cell-to-edge context instead
-of adding another output loss.
+topology-grounded, but schedule the new cell-to-edge context so the E55
+checkpoint can adapt to the freshly initialized cochain route.
 
-E59 should run a smaller 3500-step gate from E55 weights with
-`--simplex-outer-edge-context-scale 0.05` and
-`--resume-model-weights-only`, keeping effective batch 8 and the E55
-selected-coordinate/boundary losses. This tests whether directed outer-edge
-communication can preserve E55-level lDDT when its messages are a weak
-topological correction instead of a strong new cochain pathway. Keep the
-branch only if it beats or stays very close to E55's `val_lddt_ca=0.3604`
-while improving FoldScore/dRMSD; reject if lDDT remains in the E57/E58 band.
+E60 should run a 3500-step gate from E55 weights with
+`--simplex-outer-edge-context-scale 0.05`, plus a training-time
+`--simplex-outer-edge-context-runtime-scale 0.0 -> 0.05` ramp over steps
+3000-3500. Keep effective batch 8 and the E55 selected-coordinate/boundary
+losses. This tests whether delayed directed outer-edge communication can
+preserve E55-level lDDT while retaining E58/E59's global FoldScore gain. Keep
+the branch only if it beats or stays very close to E55's `val_lddt_ca=0.3604`
+while improving FoldScore/dRMSD; reject if lDDT remains below the E55/E56
+band.
 
 The runner should keep `EXPERIMENT_RESULTS.md` only for returned Runpod
 results. Do not launch a 30,000-step confirmation until a branch clears the

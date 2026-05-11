@@ -1636,3 +1636,40 @@
   artifacts
   `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e59_outer_edge_context005_from_e55_s3500_c256_m64/`.
   Do not write E59 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+- E59 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e59_outer_edge_context005_from_e55_s3500_c256_m64/`.
+  Step 3500 reached `val_lddt_ca=0.34999977238476276`, FoldScore
+  `0.35156833939254284`, `val_ca_drmsd=10.950208216905594`, and
+  predicted/true C-alpha radius of gyration `11.197810173034668 /
+  15.403406739234924`.
+- E59 owned Runpod pod `n5dtdxgjgk81de` was stopped and deleted after
+  artifacts were copied. A post-delete lookup returned 404, as expected. No
+  other Runpod instances were managed.
+- E59 interpretation: scale `0.05` recovers much of the lDDT lost by E58 and
+  sets the best FoldScore so far, but it still misses E55's `0.3604` lDDT.
+  The right next test is not another output loss; it is a scheduled activation
+  of the same Topotein-style outer-edge context route so the resumed E55
+  checkpoint can adapt to freshly initialized cell-context modules.
+- E60 local implementation: added a training-time
+  `simplex_outer_edge_context_runtime_scale` ramp that threads through
+  `TrainingConfig`, `model_inputs_from_batch`, `AlphaFold2`,
+  `SimplicialEvoformer`, and `SimplicialAdapter`. The model-config
+  `simplex_outer_edge_context_scale` still allocates the context modules and
+  sets validation-time scale; the runtime override gates the training-time
+  contribution.
+- E60 local checks passed: `python -m py_compile minalphafold/trainer.py
+  minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py
+  scripts/run_nanofold_public_benchmarks.py`; targeted pytest for the new CLI,
+  schedule, and adapter gate; and the 46-test slice covering
+  `tests/test_nanofold_public_benchmarks.py`, the new adapter gate, the
+  existing edge-frame gate, and the AF2-medium budget test. `git diff --check`
+  passed. `python -m ruff ...` and `.venv/bin/ruff ...` could not run because
+  `ruff` is not installed in the available Python environment or repo
+  virtualenv.
+- E60 live plan: resume E55 with weights-only initialization, set
+  `simplex_outer_edge_context_scale=0.05`, and ramp
+  `simplex_outer_edge_context_runtime_scale` from `0.0` to `0.05` across
+  steps 3000-3500. Keep effective batch 8, crop 256, MSA depth 64, selected
+  coordinate weights `1.0/1.0`, selected boundary-distance weights
+  `0.5/0.5`, and `simplex_aux_weight=0.5`. Do not write E60 to
+  `EXPERIMENT_RESULTS.md` until the Runpod run returns.

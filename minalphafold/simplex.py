@@ -1224,6 +1224,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_teacher_forcing_weight: Optional[torch.Tensor] = None,
         simplex_pair_update_scale_override: Optional[torch.Tensor] = None,
         simplex_single_update_scale_override: Optional[torch.Tensor] = None,
+        simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
         if pair.ndim != 4 or single.ndim != 3:
@@ -1235,6 +1236,12 @@ class SimplicialAdapter(torch.nn.Module):
         single_update_scale = self.single_update_scale
         if simplex_single_update_scale_override is not None:
             single_update_scale = max(float(simplex_single_update_scale_override.detach().float().cpu().item()), 0.0)
+        outer_edge_context_scale = self.outer_edge_context_scale
+        if simplex_outer_edge_context_scale_override is not None:
+            outer_edge_context_scale = max(
+                float(simplex_outer_edge_context_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
         local_neighbor_k = self.local_neighbor_k
         if simplex_local_neighbor_k_override is not None:
             local_neighbor_k = int(
@@ -1343,11 +1350,11 @@ class SimplicialAdapter(torch.nn.Module):
         face_state = face_state + self.dropout(
             torch.sigmoid(self.face_gate(face_state)) * edge_msg * topology.face_mask[..., None]
         )
-        if self.outer_edge_context_scale > 0.0:
+        if outer_edge_context_scale > 0.0:
             outer_context = cell_outer_edge_context(pair, face_indices, topology.face_mask, topology.nbr_idx)
             outer_msg = self.face_outer_edge_context(torch.cat([face_state, outer_context], dim=-1))
             face_state = face_state + self.dropout(
-                self.outer_edge_context_scale
+                outer_edge_context_scale
                 * torch.sigmoid(self.face_gate(face_state))
                 * outer_msg
                 * topology.face_mask[..., None]
@@ -1399,6 +1406,7 @@ class SimplicialAdapter(torch.nn.Module):
                 face_state,
                 topology,
                 coords_for_geometry,
+                outer_edge_context_scale=outer_edge_context_scale,
             )
 
             face_delta = self.tetra_to_face(tetra_state).reshape(*tetra_state.shape[:-1], 3, self.c_face)
@@ -1627,6 +1635,8 @@ class SimplicialAdapter(torch.nn.Module):
         face_state: torch.Tensor,
         topology: SimplexTopology,
         recycled_ca_coords: Optional[torch.Tensor],
+        *,
+        outer_edge_context_scale: float,
     ) -> torch.Tensor:
         tet_i, tet_j, tet_k, tet_l = topology.tetra_indices.unbind(dim=-1)
         z_ij = gather_pair(pair, tet_i, tet_j)
@@ -1679,11 +1689,11 @@ class SimplicialAdapter(torch.nn.Module):
         tetra_state = tetra_state + self.dropout(
             torch.sigmoid(self.tetra_gate(tetra_state)) * tetra_msg * topology.tetra_mask[..., None]
         )
-        if self.outer_edge_context_scale > 0.0:
+        if outer_edge_context_scale > 0.0:
             outer_context = cell_outer_edge_context(pair, topology.tetra_indices, topology.tetra_mask, topology.nbr_idx)
             outer_msg = self.tetra_outer_edge_context(torch.cat([tetra_state, outer_context], dim=-1))
             tetra_state = tetra_state + self.dropout(
-                self.outer_edge_context_scale
+                outer_edge_context_scale
                 * torch.sigmoid(self.tetra_gate(tetra_state))
                 * outer_msg
                 * topology.tetra_mask[..., None]
