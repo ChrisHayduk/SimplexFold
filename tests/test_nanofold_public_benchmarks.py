@@ -4,6 +4,7 @@ from minalphafold.trainer import (
     TrainingConfig,
     load_model_config,
     model_inputs_from_batch,
+    simplex_edge_frame_message_runtime_scale_at_step,
     simplex_outer_edge_context_runtime_scale_at_step,
 )
 from scripts.run_nanofold_public_benchmarks import (
@@ -298,6 +299,14 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "3000",
             "--simplex-outer-edge-context-runtime-scale-ramp-steps",
             "500",
+            "--simplex-edge-frame-message-runtime-scale",
+            "0.0",
+            "--simplex-edge-frame-message-runtime-scale-final",
+            "0.05",
+            "--simplex-edge-frame-message-runtime-scale-ramp-start-step",
+            "3000",
+            "--simplex-edge-frame-message-runtime-scale-ramp-steps",
+            "500",
             "--simplex-segment-radius",
             "5",
             "--resume-model-weights-only",
@@ -310,16 +319,24 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_outer_edge_context_runtime_scale_final == 0.05
     assert args.simplex_outer_edge_context_runtime_scale_ramp_start_step == 3000
     assert args.simplex_outer_edge_context_runtime_scale_ramp_steps == 500
+    assert args.simplex_edge_frame_message_runtime_scale == 0.0
+    assert args.simplex_edge_frame_message_runtime_scale_final == 0.05
+    assert args.simplex_edge_frame_message_runtime_scale_ramp_start_step == 3000
+    assert args.simplex_edge_frame_message_runtime_scale_ramp_steps == 500
     assert args.simplex_segment_radius == 5
     assert args.resume_model_weights_only is True
 
 
-def test_outer_edge_context_runtime_scale_ramps_and_enters_model_inputs():
+def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     cfg = TrainingConfig(
         simplex_outer_edge_context_runtime_scale=0.0,
         simplex_outer_edge_context_runtime_scale_final=0.05,
         simplex_outer_edge_context_runtime_scale_ramp_start_step=3000,
         simplex_outer_edge_context_runtime_scale_ramp_steps=500,
+        simplex_edge_frame_message_runtime_scale=0.0,
+        simplex_edge_frame_message_runtime_scale_final=0.05,
+        simplex_edge_frame_message_runtime_scale_ramp_start_step=3000,
+        simplex_edge_frame_message_runtime_scale_ramp_steps=500,
     )
     batch = {
         "target_feat": torch.zeros(1, 4, 22),
@@ -339,14 +356,19 @@ def test_outer_edge_context_runtime_scale_ramps_and_enters_model_inputs():
     assert simplex_outer_edge_context_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_outer_edge_context_runtime_scale_at_step(cfg, 3250) == 0.025
     assert simplex_outer_edge_context_runtime_scale_at_step(cfg, 3500) == 0.05
+    assert simplex_edge_frame_message_runtime_scale_at_step(cfg, 3000) == 0.0
+    assert simplex_edge_frame_message_runtime_scale_at_step(cfg, 3250) == 0.025
+    assert simplex_edge_frame_message_runtime_scale_at_step(cfg, 3500) == 0.05
     inputs = model_inputs_from_batch(
         batch,
         cfg,
         use_simplex_outer_edge_context_runtime_scale=True,
+        use_simplex_edge_frame_message_runtime_scale=True,
         step=3250,
     )
 
     assert torch.isclose(inputs["simplex_outer_edge_context_scale_override"], torch.tensor(0.025))
+    assert torch.isclose(inputs["simplex_edge_frame_message_scale_override"], torch.tensor(0.025))
 
 
 def test_simplex_topology_metrics_report_boundary_reuse():

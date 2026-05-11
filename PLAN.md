@@ -46,6 +46,15 @@ The runner should keep `EXPERIMENT_RESULTS.md` only for returned Runpod
 results. Do not launch a 30,000-step confirmation until a branch clears the
 lDDT target direction under effective batch 8.
 
+If E60 misses the E55/E56 lDDT band, the prepared E61 fallback is a scheduled
+edge-frame scalarization probe from the E55 checkpoint. This stays inside the
+Topotein/reference-paper view: selected face/tetra cochains write messages to
+their own boundary edges after projecting local geometry into directed
+boundary-edge frames. The new runtime schedule lets training ramp that
+selected boundary-edge route from `0.0` to a weak endpoint, instead of turning
+fresh edge-frame modules on abruptly. Treat it as an architecture/curriculum
+test, not a new coordinate loss.
+
 Yes. With templates forbidden, the right construction is:
 
 [

@@ -1935,3 +1935,38 @@ Validation:
 - `python -m py_compile minalphafold/trainer.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_outer_edge_context_runtime_scale_ramps_and_enters_model_inputs tests/test_simplex.py::test_outer_edge_context_runtime_scale_gates_context_path`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_simplex.py::test_outer_edge_context_runtime_scale_gates_context_path tests/test_simplex.py::test_edge_frame_message_scale_changes_pair_readout_within_adapter tests/test_trainer.py::test_simplexfold_medium_param_matched_matches_af2_medium_budget`
+
+### E61: Scheduled Edge-Frame Boundary Messages From E55
+
+Status: implemented locally as a fallback candidate; not launched while E60 is
+still running.
+
+Hypothesis: the reference PDFs and Topotein both point to edge-centric frames
+as the clean way to keep higher-rank cell geometry useful without collapsing
+everything into a coarse cell summary. E40 tested this path from scratch and
+too early, where it was weak. A more relevant test is resume-compatible:
+start from E55, allocate the edge-frame message modules at a small endpoint,
+and ramp their contribution during the 3000-3500 continuation so the pair
+stream can adapt gradually.
+
+Mechanism: add a training-time
+`simplex_edge_frame_message_runtime_scale` schedule. The model-config
+`simplex_edge_frame_message_scale` still allocates the face/tetra
+boundary-edge frame MLPs and controls validation-time scale; the runtime
+override gates the training-time contribution. A planned E61 gate should use
+`full_msa_to_face`, `--simplex-edge-frame-message-scale 0.05`,
+`--simplex-edge-frame-message-runtime-scale 0.0`,
+`--simplex-edge-frame-message-runtime-scale-final 0.05`,
+`--simplex-edge-frame-message-runtime-scale-ramp-start-step 3000`, and
+`--simplex-edge-frame-message-runtime-scale-ramp-steps 500` from the E55
+checkpoint if E60 is rejected.
+
+Decision rule: keep only if the step-3500 lDDT beats or stays very close to
+E55's `0.3604`; otherwise reject and use the diagnostics to decide whether
+the selected complex is under-realized or over-coupled.
+
+Validation:
+
+- `python -m py_compile minalphafold/trainer.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_simplex.py::test_edge_frame_message_runtime_scale_gates_pair_readout tests/test_simplex.py::test_edge_frame_message_scale_changes_pair_readout_within_adapter`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_simplex.py::test_edge_frame_message_runtime_scale_gates_pair_readout tests/test_simplex.py::test_edge_frame_message_scale_changes_pair_readout_within_adapter tests/test_simplex.py::test_outer_edge_context_runtime_scale_gates_context_path tests/test_trainer.py::test_simplicial_edge_frame_messages_stay_within_medium_budget`

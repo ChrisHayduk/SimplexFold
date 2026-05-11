@@ -1225,6 +1225,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_pair_update_scale_override: Optional[torch.Tensor] = None,
         simplex_single_update_scale_override: Optional[torch.Tensor] = None,
         simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
+        simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
         if pair.ndim != 4 or single.ndim != 3:
@@ -1240,6 +1241,12 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_outer_edge_context_scale_override is not None:
             outer_edge_context_scale = max(
                 float(simplex_outer_edge_context_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
+        edge_frame_message_scale = self.edge_frame_message_scale
+        if simplex_edge_frame_message_scale_override is not None:
+            edge_frame_message_scale = max(
+                float(simplex_edge_frame_message_scale_override.detach().float().cpu().item()),
                 0.0,
             )
         local_neighbor_k = self.local_neighbor_k
@@ -1443,7 +1450,7 @@ class SimplicialAdapter(torch.nn.Module):
             dim=-2,
         )
         face_edge_mask = topology.face_mask[..., None].expand(-1, -1, -1, 3)
-        if self.edge_frame_message_scale > 0.0:
+        if edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0:
             face_opposite_indices = torch.stack([k, j, i], dim=-1)
             face_frame_features = face_edge_frame_features(
                 face_edge_indices,
@@ -1453,7 +1460,7 @@ class SimplicialAdapter(torch.nn.Module):
                 distance_max=self.distance_max,
             ).to(pair.dtype)
             face_edge_state = face_state[..., None, :].expand(*face_edge_indices.shape[:-1], self.c_face)
-            face_edge_update = face_edge_update + self.edge_frame_message_scale * self.face_edge_frame_to_edge(
+            face_edge_update = face_edge_update + edge_frame_message_scale * self.face_edge_frame_to_edge(
                 torch.cat([face_edge_state, face_frame_features], dim=-1)
             )
         pair_delta, pair_counts = scatter_to_pair(
@@ -1479,7 +1486,7 @@ class SimplicialAdapter(torch.nn.Module):
             )
             tet_edge_update = self.tetra_to_edge(tetra_state).reshape(*tetra_state.shape[:-1], 6, self.c_z)
             tet_edge_mask = topology.tetra_mask[..., None].expand(-1, -1, -1, 6)
-            if self.edge_frame_message_scale > 0.0:
+            if edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0:
                 tet_opposite_indices = torch.stack(
                     [
                         torch.stack([tet_k, tet_l], dim=-1),
@@ -1500,7 +1507,7 @@ class SimplicialAdapter(torch.nn.Module):
                     volume_scale=self.volume_scale,
                 ).to(pair.dtype)
                 tetra_edge_state = tetra_state[..., None, :].expand(*tet_edge_indices.shape[:-1], self.c_tetra)
-                tet_edge_update = tet_edge_update + self.edge_frame_message_scale * self.tetra_edge_frame_to_edge(
+                tet_edge_update = tet_edge_update + edge_frame_message_scale * self.tetra_edge_frame_to_edge(
                     torch.cat([tetra_edge_state, tet_frame_features], dim=-1)
                 )
             tet_pair_delta, tet_pair_counts = scatter_to_pair(

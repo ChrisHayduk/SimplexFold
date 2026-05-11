@@ -1705,3 +1705,19 @@
   detached all-pairs or direct lDDT-targeting losses unless the supervision is
   restricted to edges/faces/tetras selected by the learned sparse complex.
   Added the concrete experiment rules to `references/papers/READING_NOTES.md`.
+- E61 fallback implementation while E60 is still running: added
+  `simplex_edge_frame_message_runtime_scale`, an opt-in training-time ramp for
+  the existing edge-frame scalarized selected-boundary message path. The static
+  `simplex_edge_frame_message_scale` still allocates the edge-frame MLPs and
+  sets validation-time scale; the runtime override gates only training. This
+  is a topology/curriculum change, not a new loss: selected face/tetra
+  cochains write through their directed boundary-edge frames, following the
+  reference-paper edge-centric scalarization idea.
+- E61 local checks passed: `python -m py_compile minalphafold/trainer.py
+  minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py
+  scripts/run_nanofold_public_benchmarks.py`; focused runtime/parser/adapter
+  tests (`4 passed`); and the affected 48-test slice covering
+  `tests/test_nanofold_public_benchmarks.py`, edge-frame runtime gating,
+  edge-frame adapter behavior, outer-edge runtime gating, and the edge-frame
+  budget test. Do not add E61 to `EXPERIMENT_RESULTS.md` unless a Runpod run
+  returns.
