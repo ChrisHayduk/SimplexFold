@@ -1996,3 +1996,37 @@ Validation:
 - `python -m py_compile scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py::test_simplex_boundary_geometry_metrics_report_selected_edge_errors tests/test_nanofold_public_benchmarks.py::test_simplex_topology_metrics_report_boundary_reuse`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py`
+
+### E62: Scheduled Hodge Face Residual From E55
+
+Status: implemented locally as a fallback if E61 is rejected; not launched.
+
+Hypothesis: the reference material emphasizes that topological networks should
+move information through incidence maps across ranks. E42 tested the static
+Hodge face residual too early from scratch and failed. A resume-compatible
+version should test the same lower/upper face adjacency after E55 has already
+learned the selected complex: ramp lower adjacency through shared boundary
+edges plus upper adjacency through selected tetra cofaces over steps
+3000-3500.
+
+Mechanism: add a training-time `simplex_hodge_face_runtime_scale` schedule.
+The model config `simplex_hodge_face_update_scale` controls validation-time
+scale, while the runtime override gates the contribution during training. The
+path adds no parameters because it reuses selected face states, shared
+boundary-edge averaging, and tetra co-boundary averaging. A planned E62 gate
+should use `full_msa_to_face`, `--simplex-hodge-face-update-scale 0.05`,
+`--simplex-hodge-face-runtime-scale 0.0`,
+`--simplex-hodge-face-runtime-scale-final 0.05`,
+`--simplex-hodge-face-runtime-scale-ramp-start-step 3000`, and
+`--simplex-hodge-face-runtime-scale-ramp-steps 500` from the E55 checkpoint if
+E61 is rejected.
+
+Decision rule: keep only if the step-3500 lDDT beats or stays very close to
+E55's `0.3604`; otherwise reject and use selected-boundary diagnostics to
+decide whether adjacency mixing is over-smoothing the sparse complex.
+
+Validation:
+
+- `python -m py_compile minalphafold/trainer.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_simplex.py::test_hodge_face_adapter_scale_changes_outputs_without_new_parameters tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_simplex.py::test_hodge_face_adapter_scale_changes_outputs_without_new_parameters tests/test_simplex.py::test_edge_frame_message_runtime_scale_gates_pair_readout tests/test_simplex.py::test_outer_edge_context_runtime_scale_gates_context_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_hodge_face_update_adds_no_parameters`

@@ -57,6 +57,14 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
+If E61 returns below the E55/E56 lDDT band, the next prepared fallback is E62:
+a scheduled Hodge-style face residual from E55. This stays within the
+topological view by ramping lower adjacency through shared boundary edges and
+upper adjacency through selected tetra cofaces, rather than adding another
+coordinate loss. It adds no parameters; use a static
+`--simplex-hodge-face-update-scale 0.05` with a training-time runtime ramp
+from `0.0` to `0.05` over steps 3000-3500.
+
 Yes. With templates forbidden, the right construction is:
 
 [

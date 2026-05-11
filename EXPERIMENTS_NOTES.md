@@ -1771,3 +1771,20 @@
   matching model tensors, initialized 48 new/missing edge-frame tensors, and
   started a fresh optimizer. Do not add E61 to `EXPERIMENT_RESULTS.md` until
   the Runpod run returns.
+- E61 status check while preparing the next fallback: the owned pod is still
+  running with active GPU utilization. The remote history currently contains
+  the inherited E55 rows through step 3000 and no E61-owned step-3500 row yet.
+- E62 fallback implementation: added `simplex_hodge_face_runtime_scale`, a
+  training-time ramp for the existing Hodge-style selected-face residual. The
+  static `simplex_hodge_face_update_scale` controls validation-time scale; the
+  runtime override gates training. This is a zero-parameter topology change:
+  selected face states mix through lower shared-boundary-edge adjacency and
+  upper selected-tetra co-boundary adjacency.
+- E62 local checks passed: `python -m py_compile minalphafold/trainer.py
+  minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py
+  scripts/run_nanofold_public_benchmarks.py`; focused parser/schedule/adapter
+  tests (`4 passed`); and the affected 50-test slice covering
+  `tests/test_nanofold_public_benchmarks.py`, the Hodge runtime gate, the
+  edge-frame and outer-edge runtime gates, the trainer model-input curriculum
+  test, and the Hodge zero-parameter budget test. Do not launch E62 unless E61
+  returns below the E55/E56 lDDT band.

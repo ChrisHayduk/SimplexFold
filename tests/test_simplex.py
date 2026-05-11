@@ -340,9 +340,20 @@ def test_outer_edge_adapter_scale_changes_outputs_without_new_parameters():
     off_params = sum(p.numel() for p in off_adapter.parameters())
     on_params = sum(p.numel() for p in on_adapter.parameters())
     off_pair, off_single, _ = off_adapter(pair, single)
-    on_pair, on_single, _ = on_adapter(pair, single)
+    gated_pair, gated_single, _ = on_adapter(
+        pair,
+        single,
+        simplex_hodge_face_update_scale_override=pair.new_tensor(0.0),
+    )
+    on_pair, on_single, _ = on_adapter(
+        pair,
+        single,
+        simplex_hodge_face_update_scale_override=pair.new_tensor(0.25),
+    )
 
     assert on_params == off_params
+    assert torch.allclose(gated_pair, off_pair)
+    assert torch.allclose(gated_single, off_single)
     assert not torch.allclose(on_pair, off_pair)
     assert not torch.allclose(on_single, off_single)
 

@@ -242,6 +242,7 @@ class SimplicialEvoformer(torch.nn.Module):
         simplex_pair_update_scale_override: Optional[torch.Tensor] = None,
         simplex_single_update_scale_override: Optional[torch.Tensor] = None,
         simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
+        simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
@@ -296,6 +297,7 @@ class SimplicialEvoformer(torch.nn.Module):
                 simplex_pair_update_scale_override=simplex_pair_update_scale_override,
                 simplex_single_update_scale_override=simplex_single_update_scale_override,
                 simplex_outer_edge_context_scale_override=simplex_outer_edge_context_scale_override,
+                simplex_hodge_face_update_scale_override=simplex_hodge_face_update_scale_override,
                 simplex_edge_frame_message_scale_override=simplex_edge_frame_message_scale_override,
                 simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
             )

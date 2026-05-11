@@ -1225,6 +1225,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_pair_update_scale_override: Optional[torch.Tensor] = None,
         simplex_single_update_scale_override: Optional[torch.Tensor] = None,
         simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
+        simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
@@ -1241,6 +1242,12 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_outer_edge_context_scale_override is not None:
             outer_edge_context_scale = max(
                 float(simplex_outer_edge_context_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
+        hodge_face_update_scale = self.hodge_face_update_scale
+        if simplex_hodge_face_update_scale_override is not None:
+            hodge_face_update_scale = max(
+                float(simplex_hodge_face_update_scale_override.detach().float().cpu().item()),
                 0.0,
             )
         edge_frame_message_scale = self.edge_frame_message_scale
@@ -1378,7 +1385,7 @@ class SimplicialAdapter(torch.nn.Module):
                 self.outer_edge_update_scale * torch.sigmoid(self.face_gate(face_state)) * outer_msg
             )
             face_state = face_state * topology.face_mask[..., None]
-        if self.hodge_face_update_scale > 0.0:
+        if hodge_face_update_scale > 0.0:
             hodge_parts = [
                 face_outer_edge_delta(
                     face_state,
@@ -1398,7 +1405,7 @@ class SimplicialAdapter(torch.nn.Module):
                 )
             hodge_msg = sum(hodge_parts) / float(len(hodge_parts))
             face_state = face_state + self.dropout(
-                self.hodge_face_update_scale
+                hodge_face_update_scale
                 * torch.sigmoid(self.face_gate(face_state))
                 * hodge_msg
                 * topology.face_mask[..., None]
