@@ -1,4 +1,4 @@
-## Current Plan: E62 Scheduled Hodge Face Residual Probe
+## Current Plan: E64 Selected-Boundary lDDT Confirmation
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -12,19 +12,25 @@ the new best `val_lddt_ca=0.3604` at step 3000 while improving FoldScore to
 `0.3451`. E56 continued the same checkpoint lineage to step 4000 and improved
 FoldScore/dRMSD further, but its best `val_lddt_ca=0.3575` stayed below E55.
 E57 then tried a selected-simplex auxiliary rewarm at `0.75`; it improved the
-global/FoldScore side but reduced lDDT to `0.3465`. E58 initialized
-Topotein-style directed outer-edge context from E55 weights and set the best
-FoldScore at that point (`0.3507`) at step 3500, but again reduced lDDT to
-`0.3419`. E59 damped the same context path to `0.05`; this recovered lDDT to
-`0.3500` and set the new best FoldScore (`0.3516`), but still stayed below
-E55's lDDT peak.
+global/FoldScore side but reduced lDDT to `0.3465`. E58-E62 tested directed
+outer-edge, boundary-frame, and Hodge-style incidence routes from the E55
+checkpoint. These runs improved pieces of global or selected-complex geometry
+but did not preserve E55's lDDT peak.
 
-Treat E55 as the current lDDT peak checkpoint. Do not spend on a blind
-30,000-step continuation yet, and do not keep turning the scalar auxiliary
-knob. The full reread of the reference PDFs in `references/papers/` points
-back to the core topological claim: the model should improve by changing the
-cell complex and its multi-rank message routes, not by attaching generic
-metric pressure to the output coordinates.
+E63 is now the current lDDT leader. It resumed E55 and added a conservative
+selected-boundary lDDT objective only on boundary edges induced by the
+model-selected face/tetra cells. It reached `val_lddt_ca=0.3611`, FoldScore
+`0.3576`, `val_ca_drmsd=10.6815`, and predicted/true C-alpha radius
+`11.4310 / 15.4034`. The topological diagnostics moved in the intended
+direction too: selected face/tetra boundary lDDT rose to
+`0.5208` / `0.5065`, and contraction fractions fell to roughly `0.69`.
+
+Do not spend on a blind 30,000-step continuation yet, and do not keep turning
+the scalar auxiliary knob. The full reread of the reference PDFs in
+`references/papers/` points back to the core topological claim: the model
+should improve by changing the cell complex and its multi-rank message routes,
+or by supervising realization of the selected sparse complex, not by attaching
+generic metric pressure to the output coordinates.
 
 E60 tested that idea by scheduling the damped directed outer-edge context from
 `0.0` to `0.05` over steps 3000-3500. It completed at
@@ -57,17 +63,16 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
-The active branch is E62: a scheduled Hodge-style face residual from E55. It
-is running on the owned Runpod H100 NVL pod `39s6arzja95amz` from commit
-`4517f98`. This stays within the topological view by ramping lower adjacency
-through shared boundary edges and upper adjacency through selected tetra
-cofaces, rather than adding another coordinate loss. It adds no parameters;
-use a static
-`--simplex-hodge-face-update-scale 0.05` with a training-time runtime ramp
-from `0.0` to `0.05` over steps 3000-3500. The launch audit passed with public
-train/val/all counts `10000/1000/11000`, hidden manifest absent, feature/label
-NPZ counts `11000/11000`, encoded missing paths `0`, FoldScore import working,
-and `3,106,690` parameters (`+0.0015%` versus AF2-medium).
+The active branch is E64: continue E63 from step 3500 to step 4000
+(`32,000` effective examples at batch 8) with the same selected-boundary lDDT
+weights. It is running on the owned Runpod B300 pod `ow3ex8z84jypbs` from
+commit `b12093d`. Earlier E64 attempts failed before returning results because
+of Runpod `/workspace` I/O failures or a local-storage A100 stall; all failed
+owned pods were stopped/deleted. The active B300 launch audit passed with
+public train/val/all counts `10000/1000/11000`, hidden manifest absent,
+feature/label NPZ counts `11000/11000`, encoded missing paths `0`, FoldScore
+import working, and `3,106,690` parameters (`+0.0015%` versus AF2-medium).
+Do not add E64 to `EXPERIMENT_RESULTS.md` until the run returns.
 
 Yes. With templates forbidden, the right construction is:
 

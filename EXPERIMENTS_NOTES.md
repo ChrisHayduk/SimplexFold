@@ -1917,3 +1917,34 @@
   fresh optimizer. Heartbeat `check-simplexfold-e57-runpod` has been
   retargeted to this E64 pod and must not touch any other Runpod instance.
   Do not add E64 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+- E64 launch attempt 3 was treated as stalled before result. After more than
+  80 minutes, the process held GPU memory but showed no useful GPU
+  utilization, high CPU activity, and no step-4000 history row or
+  `results.json`. A separate CUDA matrix-multiply smoke on the same pod
+  succeeded, so the B300/A100 class CUDA runtime itself was not the blocker.
+  The owned A100 pod `76h4drrq0mhbxp` was stopped/deleted and a post-delete
+  lookup returned 404. No artifacts or results were copied, and no E64 result
+  was recorded.
+- E64 launch attempt 4: owned Runpod B300 pod `ow3ex8z84jypbs`
+  (`codex-simplexfold-e64-runpod-20260511d`) is the active confirmation run.
+  It uses `volumeInGb=0` with a 160 GB container disk so `/workspace` is local
+  overlay storage. Clean launch audit after copying only public data/code:
+  public train/val/all manifest counts `10000/1000/11000`, remote manifest
+  files exactly `all.txt`, `train.txt`, and `val.txt`, hidden manifest/path
+  absent, feature/label `.npz` counts `11000/11000`, encoded-chain missing
+  paths `0`, E63 checkpoint present, B300 CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E64 model `3,106,690` parameters (`+0.0015%`).
+- Active E64 B300 remote process: wrapper PID `962`, launch log
+  `/workspace/SimplexFold/logs/e64_boundary_lddt005_from_e63.log`, artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e64_boundary_lddt005_from_e63_s4000_c256_m64/`.
+  The log shows it resumed E63 at step 3500/examples 28000, loaded 1196
+  matching model tensors, initialized 0 new/missing tensors, and started a
+  fresh optimizer. Heartbeat `check-simplexfold-e57-runpod` has been
+  retargeted to the B300 pod `ow3ex8z84jypbs` only and must not touch any
+  other Runpod instance. Do not add E64 to `EXPERIMENT_RESULTS.md` until this
+  Runpod run returns.
+- E64 B300 first status check: wrapper PID `962` and child Python processes
+  are live, GPU utilization is active, and GPU memory is allocated. The run
+  metadata and inherited E63/E55 history rows are present through step 3500,
+  but there is not yet a step-4000 validation row or `results.json`.

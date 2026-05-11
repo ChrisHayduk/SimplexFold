@@ -2102,7 +2102,7 @@ stopped and deleted after the returned result was recorded.
 
 ### E64: E63 Confirmation To 32k Examples
 
-Status: launched on owned Runpod pod `76h4drrq0mhbxp`; result pending.
+Status: launched on owned Runpod pod `ow3ex8z84jypbs`; result pending.
 
 Hypothesis: E63 is the first tested branch to improve the primary C-alpha
 lDDT while also improving selected-boundary realization. Because the margin is
@@ -2118,17 +2118,18 @@ gate to step 4000.
 Decision rule: keep only if the step-4000 lDDT stays above E55/E63's band or
 improves selected-boundary realization without the E56-style lDDT regression.
 
-Launch: E64 is running on owned Runpod A100 SXM pod `76h4drrq0mhbxp` from
-commit `54f49f7`. Two prior owned E64 staging pods failed before any training:
-H200 NVL pod `4g78gy2fbgl5o7` and A100 SXM pod `r64q7czrpsaax4` both hit
-remote `/workspace` network-volume I/O errors while copying public feature
-NPZs and were stopped/deleted. The successful pod was launched with
-`volumeInGb=0` and a 160 GB container disk so `/workspace` is local overlay
-storage. Launch audit passed: public train/val/all counts are
-`10000/1000/11000`, remote manifest files are exactly `all.txt`, `train.txt`,
-and `val.txt`, no hidden manifest/path is present, feature/label cache counts
-are `11000/11000`, encoded missing paths are `0`, the E63 checkpoint is
-present, FoldScore import works, CUDA reports `NVIDIA A100-SXM4-80GB`, and
-the model has `3,106,690` parameters (+0.0015% versus AF2-medium pair-only
-`3,106,642`). Do not write E64 to `EXPERIMENT_RESULTS.md` until the Runpod
-run returns.
+Launch: E64 is running on owned Runpod B300 pod `ow3ex8z84jypbs` from commit
+`b12093d`. Earlier owned E64 attempts failed before returning a result:
+H200 NVL pod `4g78gy2fbgl5o7` and A100 SXM pod `r64q7czrpsaax4` hit remote
+`/workspace` network-volume I/O errors while copying public feature NPZs, and
+A100 SXM pod `76h4drrq0mhbxp` used local storage but became CPU-bound with no
+step-4000 artifact after more than an hour. All three were stopped/deleted.
+The active B300 pod uses `volumeInGb=0` and a 160 GB container disk so
+`/workspace` is local overlay storage. Launch audit passed: public
+train/val/all counts are `10000/1000/11000`, remote manifest files are exactly
+`all.txt`, `train.txt`, and `val.txt`, no hidden manifest/path is present,
+feature/label cache counts are `11000/11000`, encoded missing paths are `0`,
+the E63 checkpoint is present, FoldScore import works, CUDA reports
+`NVIDIA B300 SXM6 AC`, and the model has `3,106,690` parameters (+0.0015%
+versus AF2-medium pair-only `3,106,642`). Do not write E64 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.
