@@ -109,3 +109,28 @@ Full-read details to carry forward:
   or orientation content from selected cells should be projected onto boundary
   or outer-edge frames before scalar MLP updates, preserving geometric
   sensitivity while staying in the selected complex.
+
+## 2026-05-11 Experiment Rules From Full Reread
+
+I re-extracted both PDFs with `pdftotext -layout` and reread the full texts.
+The rules I will carry into the next SimplexFold experiments are:
+
+- Treat topology construction as part of the model, not as a reporting detail.
+  The selected neighbor graph, face/tetra cells, incidence relations, and
+  outer-edge neighborhoods are experimental variables.
+- Prefer interventions that change cochain communication: residue-to-edge,
+  edge-to-face, face/tetra-to-boundary-edge, and outer-edge exchange between
+  selected cells. A loss is justified only when it supervises realization of
+  the selected sparse complex.
+- Avoid strict flag-closure as the default prior. Topotein's combinatorial
+  complex framing supports irregular/open higher-rank cells, and our E44-E47
+  closure family already looked empirically brittle.
+- Do not borrow Topotein's DSSP/SSE labels in official NanoFold paths. Any
+  secondary-structure-like hierarchy must be latent and derived from official
+  sequence/MSA features plus recycled model predictions.
+- Add topology-aware diagnostics alongside lDDT/FoldScore when a run changes
+  the complex: selected face/tetra coverage, boundary-edge reuse, outer-edge
+  degree, and eventually boundary-edge length error.
+- Keep the near-term architecture path on scheduled or gated outer-edge
+  communication, followed by edge-centric scalarization/readout if the gated
+  context preserves local C-alpha lDDT.

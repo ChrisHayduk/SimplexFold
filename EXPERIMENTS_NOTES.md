@@ -1696,3 +1696,12 @@
   `python -m py_compile scripts/run_nanofold_public_benchmarks.py`,
   `python -m pytest tests/test_nanofold_public_benchmarks.py`, and
   `git diff --check` passed.
+- 2026-05-11 PDF reread for current planning: the two user-provided PDFs are
+  saved locally in `references/papers/` and hash-match the Downloads copies.
+  I re-extracted both with `pdftotext -layout` and reread the complete text.
+  The next experiments should continue to be justified by the topology view:
+  alter selected-complex construction, incidence/adjacency message routes,
+  outer-edge communication, or selected-cell geometric realization. Avoid
+  detached all-pairs or direct lDDT-targeting losses unless the supervision is
+  restricted to edges/faces/tetras selected by the learned sparse complex.
+  Added the concrete experiment rules to `references/papers/READING_NOTES.md`.
