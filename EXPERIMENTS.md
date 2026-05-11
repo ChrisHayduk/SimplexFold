@@ -2206,7 +2206,7 @@ Validation:
 
 ### E66: Coface-Balanced Selected-Boundary lDDT
 
-Status: ready to launch from E64.
+Status: running on owned Runpod pod `xlvkre8ww4utac`.
 
 Hypothesis: E63/E64 show that selected-boundary lDDT improves the learned
 boundary 1-skeleton, but the same undirected residue edge can appear many
@@ -2231,6 +2231,20 @@ weights `0.5`, `simplex_aux_weight=0.5`, and
 `--simplex-boundary-degree-normalize`. This directly compares coface-balanced
 boundary realization against E65's unbalanced static step-4500 point before
 spending on a longer continuation.
+
+Launch: E66 is running on owned Runpod B200 pod `xlvkre8ww4utac`
+(`codex-simplexfold-e66-runpod-20260511`) from commit `c2dce57`. Clean launch
+audit after copying only public data/code: public train/val/all manifest
+counts are `10000/1000/11000`, remote manifest files are exactly `all.txt`,
+`train.txt`, and `val.txt`, hidden manifest/features/labels are absent,
+feature/label `.npz` counts are `11000/11000`, E64 checkpoint present, B200
+CUDA available, NanoFold `foldscore_components` import works, AF2-medium
+pair-only has `3,106,642` parameters, and E66 model has `3,106,690`
+parameters (`+0.0015%`). `run_metadata.json` records
+`simplex_boundary_degree_normalize=true`, static face/tetra
+selected-boundary lDDT weights `0.05` / `0.05`, weights-only resume from E64,
+crop 256, MSA depth 64, and no templates. Do not add E66 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.
 
 Decision rule: keep only if coface balancing improves or preserves
 `val_lddt_ca` while reducing selected-boundary contraction and avoiding a

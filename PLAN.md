@@ -94,6 +94,16 @@ step-4500 point while avoiding another rejected relaxation schedule. Keep only
 if it preserves or improves E64/E65 C-alpha lDDT while reducing boundary-edge
 over-reuse, contraction, or boundary length error.
 
+E66 is running on the owned Runpod B200 pod `xlvkre8ww4utac` from commit
+`c2dce57`. Launch audit passed with public train/val/all counts
+`10000/1000/11000`, remote manifest files exactly `all.txt`, `train.txt`, and
+`val.txt`, hidden manifest/features/labels absent, feature/label NPZ counts
+`11000/11000`, the E64 checkpoint present, FoldScore import working, CUDA
+reporting `NVIDIA B200`, `--simplex-boundary-degree-normalize` recorded in
+`run_metadata.json`, and `3,106,690` parameters (`+0.0015%` versus
+AF2-medium pair-only). Do not add E66 to `EXPERIMENT_RESULTS.md` until the
+Runpod run returns.
+
 Yes. With templates forbidden, the right construction is:
 
 [

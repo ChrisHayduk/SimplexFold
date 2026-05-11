@@ -2081,3 +2081,28 @@
   even though FoldScore slightly improves. Next launch E66 from E64 for a
   500-step coface-balanced selected-boundary lDDT gate with static `0.05`
   weights and `--simplex-boundary-degree-normalize`.
+- E66 launched on owned Runpod B200 pod `xlvkre8ww4utac`
+  (`codex-simplexfold-e66-runpod-20260511`) from commit `c2dce57`, SSH
+  `root@38.80.152.146 -p 31156` with
+  `/Users/christopherhayduk/.runpod/ssh/RunPod-Key-Go`. The run name is
+  `e66_coface_balanced_boundary_lddt005_from_e64_s4500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e66_coface_balanced_boundary_lddt005_from_e64.log`,
+  and artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e66_coface_balanced_boundary_lddt005_from_e64_s4500_c256_m64/`.
+  Only this owned E66 pod should be managed.
+- E66 clean launch audit after copying only public data/code: public
+  train/val/all manifest counts `10000/1000/11000`, remote manifest files
+  exactly `all.txt`, `train.txt`, and `val.txt`, hidden
+  manifest/features/labels absent, feature/label `.npz` counts
+  `11000/11000`, E64 checkpoint present, B200 CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E66 model `3,106,690` parameters (`+0.0015%`). `run_metadata.json` records
+  `simplex_boundary_degree_normalize=true`, static selected-boundary lDDT
+  weights `0.05` / `0.05`, weights-only resume from E64, crop 256, MSA depth
+  64, and no templates.
+- E66 remote process after launch: wrapper PID `10344`, Python PID `10346`,
+  data-worker Python PIDs `13275` and `13276`. Initial log shows the runner
+  resumed E64 at step 4000/examples 32000, loaded 1196 matching model tensors,
+  initialized 0 new/missing tensors, and started a fresh optimizer. CUDA is
+  active with B200 memory allocated. Heartbeat `check-simplexfold-e57-runpod`
+  has been retargeted to E66 pod `xlvkre8ww4utac` only.
