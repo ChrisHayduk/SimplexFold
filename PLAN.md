@@ -110,6 +110,16 @@ while retaining E67's improved dRMSD and selected-boundary length signal. Keep
 only if it improves the step-4500 lDDT relative to E67 and E65 without losing
 E67's geometry improvements; continue only if it approaches or exceeds E64.
 
+E68 is running on the owned Runpod B200 pod `qx6oa0jgchz8j8` from commit
+`11fc14a`. Launch audit passed with public train/val/all counts
+`10000/1000/11000`, remote manifest files exactly `all.txt`, `train.txt`, and
+`val.txt`, hidden manifest/features/labels absent, feature/label NPZ counts
+`11000/11000`, the E64 checkpoint present, FoldScore import working, CUDA
+reporting `NVIDIA B200`, `--simplex-structure-readout-scale 0.025` recorded
+in `run_metadata.json`, and `3,106,690` parameters (`+0.0015%` versus
+AF2-medium pair-only). Do not add E68 to `EXPERIMENT_RESULTS.md` until the
+Runpod run returns.
+
 Yes. With templates forbidden, the right construction is:
 
 [

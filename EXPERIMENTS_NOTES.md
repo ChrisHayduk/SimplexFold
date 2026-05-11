@@ -2175,3 +2175,28 @@
   below E64 and loses FoldScore, but keep the geometry lesson. The readout
   path improved dRMSD and selected-boundary length MAE, so next test E68 with
   a damped selected-complex structure readout scale `0.025` from E64.
+- E68 launched on owned Runpod B200 pod `qx6oa0jgchz8j8`
+  (`codex-simplexfold-e68-runpod-20260511`) from commit `11fc14a`, SSH
+  `root@198.13.252.84 -p 35716` with
+  `/Users/christopherhayduk/.runpod/ssh/RunPod-Key-Go`. The run name is
+  `e68_structure_readout0025_from_e64_s4500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e68_structure_readout0025_from_e64.log`, and
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e68_structure_readout0025_from_e64_s4500_c256_m64/`.
+  Only this owned E68 pod should be managed.
+- E68 clean launch audit after copying only public data/code: public
+  train/val/all manifest counts `10000/1000/11000`, remote manifest files
+  exactly `all.txt`, `train.txt`, and `val.txt`, hidden
+  manifest/features/labels absent, feature/label `.npz` counts
+  `11000/11000`, E64 checkpoint present, B200 CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E68 model `3,106,690` parameters (`+0.0015%`). `run_metadata.json` records
+  `simplex_structure_readout_scale=0.025`, static selected-boundary lDDT
+  weights `0.05` / `0.05`, weights-only resume from E64, crop 256, MSA depth
+  64, and no templates.
+- E68 remote process after launch: Python PID `479`, data-worker Python PIDs
+  `640` and `641`. Initial log shows the runner resumed E64 at step
+  4000/examples 32000, loaded 1196 matching model tensors, initialized 0
+  new/missing tensors, and started a fresh optimizer. CUDA is active with B200
+  memory allocated. Heartbeat `check-simplexfold-e57-runpod` has been
+  retargeted to E68 pod `qx6oa0jgchz8j8` only.
