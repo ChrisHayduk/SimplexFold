@@ -1578,10 +1578,15 @@
   interactions, outer-edge neighborhoods, edge-centric frames, and deep
   integration of higher-rank cell updates outperform superficial topological
   feature additions.
-- E58 live plan: resume the E55 checkpoint with variant name
+- E58 live plan: initialize from the E55 checkpoint with variant name
   `full_msa_to_face` but activate `simplex_outer_edge_context_scale=0.25` via
   a model-config CLI override. This keeps checkpoint metadata compatible while
   testing the Topotein-style directed outer-edge context path from the lDDT
   peak checkpoint. Keep selected coordinate weights `1.0/1.0`, selected
   boundary-distance weights `0.5/0.5`, effective batch 8, crop 256, MSA depth
   64, and `simplex_aux_weight=0.5`.
+- E58 checkpoint note: directed outer-edge context adds new parameters, so a
+  strict model+optimizer resume from E55 would fail. Use
+  `--resume-model-weights-only` to load matching E55 tensors, initialize the
+  new topology-context tensors fresh, and restart optimizer state while
+  preserving the E55 step/history context.

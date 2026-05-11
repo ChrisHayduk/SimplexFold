@@ -1827,7 +1827,7 @@ context should let selected face/tetra cochains exchange information through
 boundary/interior pair edges, preserving edge-level geometry rather than
 collapsing higher-rank communication into another scalar loss.
 
-Mechanism: resume the E55 checkpoint at step 3000 using the checkpoint
+Mechanism: initialize from the E55 checkpoint at step 3000 using the checkpoint
 variant name `full_msa_to_face`, effective batch 8, selected coordinate
 weights `1.0/1.0`, selected boundary-distance weights `0.5/0.5`, and constant
 `simplex_aux_weight=0.5`. Activate the existing directed outer-edge context
@@ -1835,6 +1835,10 @@ architecture with a model-config override,
 `--simplex-outer-edge-context-scale 0.25`, so the checkpoint remains
 resume-compatible with E55 while the next forward passes use Topotein-style
 outer-edge communication.
+Because this architecture adds context-path parameters relative to E55, use
+`--resume-model-weights-only`: matching E55 tensors are loaded, new tensors are
+initialized fresh, and optimizer state is restarted while training continues
+from the E55 step count.
 
 Decision rule: keep only if step 3500 or 4000 beats E55's
 `val_lddt_ca=0.3604`, or preserves lDDT while materially improving FoldScore

@@ -21,7 +21,7 @@ back to the core topological claim: the model should improve by changing the
 cell complex and its multi-rank message routes, not by attaching generic
 metric pressure to the output coordinates.
 
-E58 should resume the E55 checkpoint with the checkpoint-compatible
+E58 should initialize from the E55 checkpoint with the checkpoint-compatible
 `full_msa_to_face` variant name, but activate the existing directed
 outer-edge context path via a model-config override:
 `--simplex-outer-edge-context-scale 0.25`. This is a Topotein-inspired
@@ -29,6 +29,9 @@ architecture test. Higher-rank selected face/tetra cochains receive context
 through directed boundary/interior edges that leave one selected cell and
 enter another, while preserving the E55 selected-coordinate and
 boundary-distance losses at the lDDT-preserving `simplex_aux_weight=0.5`.
+Because the outer-edge context path adds parameters, E58 must load only
+matching model tensors from E55 with `--resume-model-weights-only`; the new
+topology-context parameters and optimizer state start fresh.
 
 The runner should keep `EXPERIMENT_RESULTS.md` only for returned Runpod
 results. E58 is worth keeping only if it beats E55's `val_lddt_ca=0.3604`, or

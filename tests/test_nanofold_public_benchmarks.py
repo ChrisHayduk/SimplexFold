@@ -284,12 +284,14 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.25",
             "--simplex-segment-radius",
             "5",
+            "--resume-model-weights-only",
         ]
     )
 
     assert args.variants == ["full_msa_to_face"]
     assert args.simplex_outer_edge_context_scale == 0.25
     assert args.simplex_segment_radius == 5
+    assert args.resume_model_weights_only is True
 
 
 def test_model_config_overrides_preserve_resume_compatible_variant_name():

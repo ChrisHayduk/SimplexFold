@@ -373,8 +373,38 @@ def _load_training_checkpoint(
     optimizer: torch.optim.Optimizer,
     ema_model: torch.optim.swa_utils.AveragedModel | None,
     device: torch.device,
+    model_weights_only: bool = False,
 ) -> dict[str, Any]:
     checkpoint = torch.load(path, map_location=device, weights_only=False)
+    if model_weights_only:
+        current_state = model.state_dict()
+        checkpoint_state = checkpoint["model_state_dict"]
+        compatible_state = {
+            key: value
+            for key, value in checkpoint_state.items()
+            if key in current_state and current_state[key].shape == value.shape
+        }
+        load_result = model.load_state_dict(compatible_state, strict=False)
+        checkpoint["partial_model_load"] = {
+            "loaded_tensors": len(compatible_state),
+            "missing_tensors": sorted(load_result.missing_keys),
+            "unexpected_tensors": sorted(load_result.unexpected_keys),
+            "shape_mismatch_tensors": sorted(
+                key
+                for key, value in checkpoint_state.items()
+                if key in current_state and current_state[key].shape != value.shape
+            ),
+        }
+        if ema_model is not None and checkpoint.get("ema_state_dict") is not None:
+            ema_state = checkpoint["ema_state_dict"]
+            current_ema_state = ema_model.state_dict()
+            compatible_ema_state = {
+                key: value
+                for key, value in ema_state.items()
+                if key in current_ema_state and current_ema_state[key].shape == value.shape
+            }
+            ema_model.load_state_dict(compatible_ema_state, strict=False)
+        return checkpoint
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     if ema_model is not None and checkpoint.get("ema_state_dict") is not None:
@@ -771,6 +801,7 @@ def _train_variant(
     checkpoint_every: int,
     checkpoint_dir: Path,
     resume_from_checkpoint: Path | None,
+    resume_model_weights_only: bool,
     auto_resume: bool,
     stop_after_seconds: int | None,
     foldscore_components_fn: Any | None,
@@ -840,6 +871,7 @@ def _train_variant(
             optimizer=optimizer,
             ema_model=ema_model,
             device=device,
+            model_weights_only=resume_model_weights_only,
         )
         if checkpoint.get("variant") not in {None, variant}:
             raise ValueError(
@@ -856,6 +888,14 @@ def _train_variant(
             f"[{variant}] resumed from {resume_checkpoint_path} "
             f"at step={start_step - 1} examples={total_examples}"
         )
+        if resume_model_weights_only:
+            partial = checkpoint.get("partial_model_load", {})
+            print(
+                f"[{variant}] loaded {partial.get('loaded_tensors', 0)} matching model tensors; "
+                f"initialized {len(partial.get('missing_tensors', []))} new/missing tensors "
+                "and started a fresh optimizer",
+                flush=True,
+            )
 
     start_time = time.perf_counter()
     stopped_early = False
@@ -1255,6 +1295,7 @@ def _train_variant(
         "simplex_c_segment": int(getattr(model_config, "simplex_c_segment", 0)) if use_simplicial else 0,
         "latest_checkpoint": str(latest_checkpoint_path),
         "resume_from_checkpoint": str(resume_checkpoint_path) if resume_checkpoint_path is not None else "",
+        "resume_model_weights_only": bool(resume_model_weights_only),
         "eval_every": eval_every,
         "eval_max_val_batches": eval_max_val_batches or 0,
         "final_max_val_batches": final_max_val_batches or 0,
@@ -1315,6 +1356,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_local_neighbor_k_final",
         "simplex_local_neighbor_k_ramp_start_step",
         "simplex_local_neighbor_k_ramp_steps",
+        "resume_model_weights_only",
         "elapsed_seconds",
         "examples_per_second",
         "train_loss_final",
@@ -1469,6 +1511,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--checkpoint-dir", type=Path, default=None)
     parser.add_argument("--resume-from-checkpoint", type=Path, default=None)
+    parser.add_argument(
+        "--resume-model-weights-only",
+        action="store_true",
+        help=(
+            "Load matching model tensors from --resume-from-checkpoint but initialize new tensors "
+            "and optimizer state fresh. Use for checkpoint-compatible architecture probes."
+        ),
+    )
     parser.add_argument("--auto-resume", action="store_true", help="Resume from <checkpoint-dir>/<variant>_latest.pt when present.")
     parser.add_argument(
         "--stop-after-seconds",
@@ -1950,6 +2000,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "checkpoint_every": args.checkpoint_every,
         "checkpoint_dir": str(checkpoint_dir),
         "resume_from_checkpoint": str(args.resume_from_checkpoint) if args.resume_from_checkpoint else "",
+        "resume_model_weights_only": bool(args.resume_model_weights_only),
         "auto_resume": bool(args.auto_resume),
         "stop_after_seconds": args.stop_after_seconds,
         "run_name": args.run_name or "",
@@ -1982,6 +2033,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
                 resume_from_checkpoint=args.resume_from_checkpoint.resolve()
                 if args.resume_from_checkpoint is not None
                 else None,
+                resume_model_weights_only=bool(args.resume_model_weights_only),
                 auto_resume=bool(args.auto_resume),
                 stop_after_seconds=args.stop_after_seconds if args.stop_after_seconds > 0 else None,
                 foldscore_components_fn=foldscore_components_fn,
