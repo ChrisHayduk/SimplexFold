@@ -1970,3 +1970,36 @@
   been written yet. Treat as active slow training for now rather than the
   previous A100 stall. Heartbeat `check-simplexfold-e57-runpod` is active and
   scoped only to pod `ow3ex8z84jypbs`.
+- E64 B300 completed on owned Runpod pod `ow3ex8z84jypbs`. Local returned
+  artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e64_boundary_lddt005_from_e63_s4000_c256_m64/`,
+  including checkpoints, `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, and the launch
+  log. Step 4000 reached `val_lddt_ca=0.37385757453739643`, FoldScore
+  `0.36337414756417274`, `val_ca_drmsd=10.548106044530869`, and
+  predicted/true C-alpha radius of gyration `11.334399700164795 /
+  15.403406739234924`.
+- E64 selected-boundary diagnostics continued in the intended direction:
+  face/tetra boundary lDDT `0.5358305890113115` / `0.5205421168357134`,
+  contraction fractions `0.6698742806911469` / `0.6711904853582382`, and
+  boundary length MAE `2.758177824318409` / `2.8986342176795006`.
+- E64 owned Runpod pod `ow3ex8z84jypbs` was stopped and deleted after
+  artifacts were copied. A post-delete lookup returned 404, as expected. No
+  other Runpod instances were managed.
+- E64 interpretation: keep and continue. The selected-boundary lDDT branch is
+  now clearly above the E55/E63 band and improves FoldScore/dRMSD while
+  preserving the selected-complex diagnostics. The next run should not raise
+  the lDDT pressure blindly; instead, continue from E64 to step 5000, hold the
+  selected-boundary lDDT weights at `0.05` through step 4500, then relax them
+  to `0.025` over steps 4500-5000.
+- E65 launch plan: resume
+  `artifacts/nanofold_public_benchmarks/e64_boundary_lddt005_from_e63_s4000_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  continue `full_msa_to_face` to step 5000 with effective batch 8, keep
+  selected face/tetra coordinate weights `1.0`, selected boundary
+  coordinate-distance weights `0.5`, `simplex_aux_weight=0.5`, and schedule
+  selected-boundary lDDT weights from `0.05` to `0.025` with
+  `--simplex-boundary-lddt-ramp-start-step 4500` and
+  `--simplex-boundary-lddt-ramp-steps 500`. Decision rule: if step 4500
+  improves but step 5000 drops, next test static `0.05`; if both improve,
+  continue the relaxed schedule; if both drop, return to architecture changes
+  in selected-cell communication.

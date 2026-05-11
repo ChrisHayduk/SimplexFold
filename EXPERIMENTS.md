@@ -2102,7 +2102,7 @@ stopped and deleted after the returned result was recorded.
 
 ### E64: E63 Confirmation To 32k Examples
 
-Status: launched on owned Runpod pod `ow3ex8z84jypbs`; result pending.
+Status: completed on Runpod.
 
 Hypothesis: E63 is the first tested branch to improve the primary C-alpha
 lDDT while also improving selected-boundary realization. Because the margin is
@@ -2118,25 +2118,32 @@ gate to step 4000.
 Decision rule: keep only if the step-4000 lDDT stays above E55/E63's band or
 improves selected-boundary realization without the E56-style lDDT regression.
 
-Launch: E64 is running on owned Runpod B300 pod `ow3ex8z84jypbs` from commit
+Launch: E64 ran on owned Runpod B300 pod `ow3ex8z84jypbs` from commit
 `b12093d`. Earlier owned E64 attempts failed before returning a result:
 H200 NVL pod `4g78gy2fbgl5o7` and A100 SXM pod `r64q7czrpsaax4` hit remote
 `/workspace` network-volume I/O errors while copying public feature NPZs, and
 A100 SXM pod `76h4drrq0mhbxp` used local storage but became CPU-bound with no
 step-4000 artifact after more than an hour. All three were stopped/deleted.
-The active B300 pod uses `volumeInGb=0` and a 160 GB container disk so
-`/workspace` is local overlay storage. Launch audit passed: public
-train/val/all counts are `10000/1000/11000`, remote manifest files are exactly
-`all.txt`, `train.txt`, and `val.txt`, no hidden manifest/path is present,
-feature/label cache counts are `11000/11000`, encoded missing paths are `0`,
-the E63 checkpoint is present, FoldScore import works, CUDA reports
-`NVIDIA B300 SXM6 AC`, and the model has `3,106,690` parameters (+0.0015%
-versus AF2-medium pair-only `3,106,642`). Do not write E64 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+The successful B300 pod used `volumeInGb=0` and a 160 GB container disk so
+`/workspace` was local overlay storage. Launch audit passed: public
+train/val/all counts were `10000/1000/11000`, remote manifest files were
+exactly `all.txt`, `train.txt`, and `val.txt`, no hidden manifest/path was
+present, feature/label cache counts were `11000/11000`, encoded missing paths
+were `0`, the E63 checkpoint was present, FoldScore import worked, CUDA
+reported `NVIDIA B300 SXM6 AC`, and the model had `3,106,690` parameters
+(+0.0015% versus AF2-medium pair-only `3,106,642`).
+
+Result: keep and continue. E64 completed at step 4000 with
+`val_lddt_ca=0.3739`, FoldScore `0.3634`, `val_ca_drmsd=10.5481`, and
+predicted/true C-alpha radius of gyration `11.3344 / 15.4034`. Selected
+face/tetra boundary lDDT was `0.5358` / `0.5205`, contraction fractions were
+`0.6699` / `0.6712`, and boundary length MAE was
+`2.7582` / `2.8986`. Artifacts were copied locally, and the owned E64 pod was
+stopped and deleted after the returned result was recorded.
 
 ### E65: Scheduled Selected-Boundary lDDT Weight
 
-Status: implemented locally; not launched.
+Status: implemented locally; ready for Runpod launch.
 
 Hypothesis: E63 is the first branch where selected-boundary realization and
 primary C-alpha lDDT improve together. A static `0.05` selected-boundary lDDT
@@ -2153,10 +2160,20 @@ Mechanism: add optional
 the selected face/tetra boundary 1-skeleton; they add no parameters and do not
 turn the objective into a dense all-pairs lDDT loss.
 
-Decision rule: choose the concrete E65 launch after E64 returns. If E64
-regresses like E56, test an anneal from `0.05` to `0.025` over steps
-3500-4000 from the E63 checkpoint. If E64 improves or holds, use the schedule
-for a longer confirmation ramp rather than immediately raising the weight.
+Planned launch: resume E64 from its step-4000 checkpoint and continue
+`full_msa_to_face` to step 5000. Keep the selected face/tetra coordinate
+weights at `1.0`, selected boundary coordinate-distance weights at `0.5`,
+and `simplex_aux_weight=0.5`. Start the selected-boundary lDDT weights at
+`0.05`, hold through step 4500, then ramp to `0.025` by step 5000:
+`--simplex-face-boundary-lddt-weight-final 0.025`,
+`--simplex-tetra-boundary-lddt-weight-final 0.025`,
+`--simplex-boundary-lddt-ramp-start-step 4500`, and
+`--simplex-boundary-lddt-ramp-steps 500`.
+
+Decision rule: if step 4500 improves but step 5000 drops, next test a static
+`0.05` continuation from E64. If both step 4500 and step 5000 improve,
+continue the relaxed schedule. If both drop, reject this scheduling family and
+return to architecture changes in selected-cell communication.
 
 Validation:
 

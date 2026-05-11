@@ -1,4 +1,4 @@
-## Current Plan: E64 Selected-Boundary lDDT Confirmation
+## Current Plan: E65 Selected-Boundary lDDT Stability Ramp
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -17,13 +17,20 @@ outer-edge, boundary-frame, and Hodge-style incidence routes from the E55
 checkpoint. These runs improved pieces of global or selected-complex geometry
 but did not preserve E55's lDDT peak.
 
-E63 is now the current lDDT leader. It resumed E55 and added a conservative
-selected-boundary lDDT objective only on boundary edges induced by the
-model-selected face/tetra cells. It reached `val_lddt_ca=0.3611`, FoldScore
-`0.3576`, `val_ca_drmsd=10.6815`, and predicted/true C-alpha radius
-`11.4310 / 15.4034`. The topological diagnostics moved in the intended
-direction too: selected face/tetra boundary lDDT rose to
-`0.5208` / `0.5065`, and contraction fractions fell to roughly `0.69`.
+E63 resumed E55 and added a conservative selected-boundary lDDT objective
+only on boundary edges induced by the model-selected face/tetra cells. It
+reached `val_lddt_ca=0.3611`, FoldScore `0.3576`, `val_ca_drmsd=10.6815`,
+and predicted/true C-alpha radius `11.4310 / 15.4034`. The topological
+diagnostics moved in the intended direction too: selected face/tetra boundary
+lDDT rose to `0.5208` / `0.5065`, and contraction fractions fell to roughly
+`0.69`.
+
+E64 is now the current lDDT leader. It continued E63 to step 4000 with the
+same selected-boundary lDDT weights and reached `val_lddt_ca=0.3739`,
+FoldScore `0.3634`, `val_ca_drmsd=10.5481`, and predicted/true C-alpha
+radius `11.3344 / 15.4034`. This confirms that the selected-boundary lDDT
+direction is not just a one-checkpoint fluctuation, though the target remains
+far away.
 
 Do not spend on a blind 30,000-step continuation yet, and do not keep turning
 the scalar auxiliary knob. The full reread of the reference PDFs in
@@ -63,24 +70,19 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
-The active branch is E64: continue E63 from step 3500 to step 4000
-(`32,000` effective examples at batch 8) with the same selected-boundary lDDT
-weights. It is running on the owned Runpod B300 pod `ow3ex8z84jypbs` from
-commit `b12093d`. Earlier E64 attempts failed before returning results because
-of Runpod `/workspace` I/O failures or a local-storage A100 stall; all failed
-owned pods were stopped/deleted. The active B300 launch audit passed with
-public train/val/all counts `10000/1000/11000`, hidden manifest absent,
-feature/label NPZ counts `11000/11000`, encoded missing paths `0`, FoldScore
-import working, and `3,106,690` parameters (`+0.0015%` versus AF2-medium).
-Do not add E64 to `EXPERIMENT_RESULTS.md` until the run returns.
+The active branch is E65: continue E64 from step 4000 to step 5000
+(`40,000` effective examples at batch 8), hold the selected-boundary lDDT
+weights at `0.05` through step 4500, then relax them to `0.025` over steps
+4500-5000. This tests whether the selected face/tetra boundary 1-skeleton can
+keep its improved local realization after the topology-native auxiliary
+pressure eases. Do not raise the weight blindly: E19/E20 showed that
+selected-boundary lDDT can be harmful when introduced too early, while E63/E64
+show it is useful after the E55 scaffold is already learned.
 
-The next prepared branch is E65, but do not launch it until E64 returns.
-E65 makes the selected-boundary lDDT face/tetra weights schedulable. If E64
-shows an E56-style lDDT regression, use that hook to anneal the selected
-boundary-lDDT weight down after step 3500 while keeping the objective attached
-only to the model-selected face/tetra boundary 1-skeleton. If E64 improves or
-holds, use the same hook for a longer stability ramp rather than raising the
-weight blindly.
+Decision rule for E65: if step 4500 improves but step 5000 drops, next test a
+static `0.05` continuation from E64. If both step 4500 and step 5000 improve,
+continue the relaxed schedule. If both drop, stop the schedule family and
+return to architecture changes in selected-cell communication.
 
 Yes. With templates forbidden, the right construction is:
 
