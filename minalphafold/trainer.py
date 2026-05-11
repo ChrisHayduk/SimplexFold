@@ -193,11 +193,15 @@ class TrainingConfig:
     simplex_face_shape_weight: float | None = None
     simplex_face_normal_weight: float | None = None
     simplex_face_boundary_lddt_weight: float | None = None
+    simplex_face_boundary_lddt_weight_final: float | None = None
     simplex_tetra_coordinate_weight: float | None = None
     simplex_tetra_coordinate_distance_weight: float | None = None
     simplex_tetra_coordinate_expansion_weight: float | None = None
     simplex_tetra_shape_weight: float | None = None
     simplex_tetra_boundary_lddt_weight: float | None = None
+    simplex_tetra_boundary_lddt_weight_final: float | None = None
+    simplex_boundary_lddt_ramp_start_step: int | None = None
+    simplex_boundary_lddt_ramp_steps: int = 1
     simplex_topology_margin_weight: float | None = None
     simplex_topology_margin: float | None = None
     simplex_topology_margin_hard_negatives: int | None = None
@@ -752,6 +756,28 @@ def apply_loss_weight_schedule(loss_fn: AlphaFoldLoss, training_config: Training
         start_step=start_step,
         ramp_steps=ramp_steps,
     )
+    if (
+        training_config.simplex_face_boundary_lddt_weight is not None
+        or training_config.simplex_face_boundary_lddt_weight_final is not None
+    ):
+        loss_fn.simplex_geometry_loss.face_boundary_lddt_weight = _ramped_value(
+            training_config.simplex_face_boundary_lddt_weight or 0.0,
+            training_config.simplex_face_boundary_lddt_weight_final,
+            step=step,
+            start_step=training_config.simplex_boundary_lddt_ramp_start_step,
+            ramp_steps=training_config.simplex_boundary_lddt_ramp_steps,
+        )
+    if (
+        training_config.simplex_tetra_boundary_lddt_weight is not None
+        or training_config.simplex_tetra_boundary_lddt_weight_final is not None
+    ):
+        loss_fn.simplex_geometry_loss.tetra_boundary_lddt_weight = _ramped_value(
+            training_config.simplex_tetra_boundary_lddt_weight or 0.0,
+            training_config.simplex_tetra_boundary_lddt_weight_final,
+            step=step,
+            start_step=training_config.simplex_boundary_lddt_ramp_start_step,
+            ramp_steps=training_config.simplex_boundary_lddt_ramp_steps,
+        )
     loss_fn.simplex_geometry_loss.cell_closure_weight = _ramped_value(
         training_config.simplex_cell_closure_weight,
         training_config.simplex_cell_closure_weight_final,
@@ -1623,6 +1649,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Override the selected-face boundary-edge lDDT-style realization loss weight.",
     )
+    parser.add_argument("--simplex-face-boundary-lddt-weight-final", type=float, default=None)
     parser.add_argument(
         "--simplex-tetra-coordinate-weight",
         type=float,
@@ -1653,6 +1680,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Override the selected-tetra boundary-edge lDDT-style realization loss weight.",
     )
+    parser.add_argument("--simplex-tetra-boundary-lddt-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-boundary-lddt-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-boundary-lddt-ramp-steps", type=int, default=1)
     parser.add_argument(
         "--simplex-topology-margin-weight",
         type=float,
@@ -1826,11 +1856,15 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_face_shape_weight=args.simplex_face_shape_weight,
         simplex_face_normal_weight=args.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=args.simplex_face_boundary_lddt_weight,
+        simplex_face_boundary_lddt_weight_final=args.simplex_face_boundary_lddt_weight_final,
         simplex_tetra_coordinate_weight=args.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=args.simplex_tetra_coordinate_distance_weight,
         simplex_tetra_coordinate_expansion_weight=args.simplex_tetra_coordinate_expansion_weight,
         simplex_tetra_shape_weight=args.simplex_tetra_shape_weight,
         simplex_tetra_boundary_lddt_weight=args.simplex_tetra_boundary_lddt_weight,
+        simplex_tetra_boundary_lddt_weight_final=args.simplex_tetra_boundary_lddt_weight_final,
+        simplex_boundary_lddt_ramp_start_step=args.simplex_boundary_lddt_ramp_start_step,
+        simplex_boundary_lddt_ramp_steps=args.simplex_boundary_lddt_ramp_steps,
         simplex_topology_margin_weight=args.simplex_topology_margin_weight,
         simplex_topology_margin=args.simplex_topology_margin,
         simplex_topology_margin_hard_negatives=args.simplex_topology_margin_hard_negatives,

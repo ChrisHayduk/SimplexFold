@@ -748,6 +748,12 @@ def test_apply_loss_weight_schedule_ramps_research_weights():
         simplex_cell_closure_weight_final=0.5,
         simplex_cell_closure_ramp_start_step=10,
         simplex_cell_closure_ramp_steps=10,
+        simplex_face_boundary_lddt_weight=0.05,
+        simplex_face_boundary_lddt_weight_final=0.025,
+        simplex_tetra_boundary_lddt_weight=0.04,
+        simplex_tetra_boundary_lddt_weight_final=0.02,
+        simplex_boundary_lddt_ramp_start_step=10,
+        simplex_boundary_lddt_ramp_steps=10,
         backbone_loss_weight=1.0,
         sidechain_fape_loss_weight=1.0,
         torsion_loss_weight=1.0,
@@ -766,12 +772,16 @@ def test_apply_loss_weight_schedule_ramps_research_weights():
     assert loss_fn.msa_weight == pytest.approx(2.0)
     assert loss_fn.backbone_loss_weight == pytest.approx(1.0)
     assert loss_fn.simplex_geometry_loss.cell_closure_weight == pytest.approx(0.0)
+    assert loss_fn.simplex_geometry_loss.face_boundary_lddt_weight == pytest.approx(0.05)
+    assert loss_fn.simplex_geometry_loss.tetra_boundary_lddt_weight == pytest.approx(0.04)
 
     apply_loss_weight_schedule(loss_fn, cfg, step=15)
     assert loss_fn.msa_weight == pytest.approx(1.25)
     assert loss_fn.distogram_weight == pytest.approx(0.2)
     assert loss_fn.simplex_aux_weight == pytest.approx(0.5)
     assert loss_fn.simplex_geometry_loss.cell_closure_weight == pytest.approx(0.25)
+    assert loss_fn.simplex_geometry_loss.face_boundary_lddt_weight == pytest.approx(0.0375)
+    assert loss_fn.simplex_geometry_loss.tetra_boundary_lddt_weight == pytest.approx(0.03)
     assert loss_fn.backbone_loss_weight == pytest.approx(3.5)
     assert loss_fn.sidechain_fape_loss_weight == pytest.approx(1.5)
     assert loss_fn.torsion_loss_weight == pytest.approx(0.625)
@@ -779,6 +789,8 @@ def test_apply_loss_weight_schedule_ramps_research_weights():
     apply_loss_weight_schedule(loss_fn, cfg, step=20)
     assert loss_fn.msa_weight == pytest.approx(0.5)
     assert loss_fn.simplex_geometry_loss.cell_closure_weight == pytest.approx(0.5)
+    assert loss_fn.simplex_geometry_loss.face_boundary_lddt_weight == pytest.approx(0.025)
+    assert loss_fn.simplex_geometry_loss.tetra_boundary_lddt_weight == pytest.approx(0.02)
     assert loss_fn.backbone_loss_weight == pytest.approx(6.0)
 
 

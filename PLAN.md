@@ -74,6 +74,14 @@ feature/label NPZ counts `11000/11000`, encoded missing paths `0`, FoldScore
 import working, and `3,106,690` parameters (`+0.0015%` versus AF2-medium).
 Do not add E64 to `EXPERIMENT_RESULTS.md` until the run returns.
 
+The next prepared branch is E65, but do not launch it until E64 returns.
+E65 makes the selected-boundary lDDT face/tetra weights schedulable. If E64
+shows an E56-style lDDT regression, use that hook to anneal the selected
+boundary-lDDT weight down after step 3500 while keeping the objective attached
+only to the model-selected face/tetra boundary 1-skeleton. If E64 improves or
+holds, use the same hook for a longer stability ramp rather than raising the
+weight blindly.
+
 Yes. With templates forbidden, the right construction is:
 
 [

@@ -2133,3 +2133,32 @@ the E63 checkpoint is present, FoldScore import works, CUDA reports
 `NVIDIA B300 SXM6 AC`, and the model has `3,106,690` parameters (+0.0015%
 versus AF2-medium pair-only `3,106,642`). Do not write E64 to
 `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+
+### E65: Scheduled Selected-Boundary lDDT Weight
+
+Status: implemented locally; not launched.
+
+Hypothesis: E63 is the first branch where selected-boundary realization and
+primary C-alpha lDDT improve together. A static `0.05` selected-boundary lDDT
+weight may either need to persist for confirmation or relax after the selected
+complex has crossed the `0.5` boundary-lDDT diagnostic threshold. Making the
+face/tetra boundary-lDDT weights schedulable lets us test that topology-native
+curriculum directly instead of changing unrelated coordinate losses.
+
+Mechanism: add optional
+`--simplex-face-boundary-lddt-weight-final`,
+`--simplex-tetra-boundary-lddt-weight-final`,
+`--simplex-boundary-lddt-ramp-start-step`, and
+`--simplex-boundary-lddt-ramp-steps`. These only schedule the loss weights for
+the selected face/tetra boundary 1-skeleton; they add no parameters and do not
+turn the objective into a dense all-pairs lDDT loss.
+
+Decision rule: choose the concrete E65 launch after E64 returns. If E64
+regresses like E56, test an anneal from `0.05` to `0.025` over steps
+3500-4000 from the E63 checkpoint. If E64 improves or holds, use the schedule
+for a longer confirmation ramp rather than immediately raising the weight.
+
+Validation:
+
+- `python -m py_compile minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_trainer.py::test_apply_loss_weight_schedule_ramps_research_weights tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights`

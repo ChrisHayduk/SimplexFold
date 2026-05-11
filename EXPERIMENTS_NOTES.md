@@ -1948,3 +1948,18 @@
   are live, GPU utilization is active, and GPU memory is allocated. The run
   metadata and inherited E63/E55 history rows are present through step 3500,
   but there is not yet a step-4000 validation row or `results.json`.
+- E65 local implementation while E64 is running: added schedulable
+  selected-boundary lDDT weights for face/tetra boundary 1-skeleton
+  realization. New runner/trainer flags:
+  `--simplex-face-boundary-lddt-weight-final`,
+  `--simplex-tetra-boundary-lddt-weight-final`,
+  `--simplex-boundary-lddt-ramp-start-step`, and
+  `--simplex-boundary-lddt-ramp-steps`. This is still topology-native because
+  it only changes supervision on boundary edges induced by model-selected
+  faces/tetras and adds no parameters.
+- E65 local checks passed:
+  `python -m py_compile minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+  and
+  `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_trainer.py::test_apply_loss_weight_schedule_ramps_research_weights tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights`.
+  Do not launch E65 until E64 returns and the concrete direction is selected
+  from the step-4000 result.
