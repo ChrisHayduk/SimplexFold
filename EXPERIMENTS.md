@@ -1730,7 +1730,7 @@ continue with `simplex_aux_weight=0.5`.
 
 ### E55: Effective-Batch-8 Aux-0.5 Continuation
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E54 shows the E15-style auxiliary anneal initially disrupts lDDT
 but then recovers to near-best validation while improving FoldScore and
@@ -1772,3 +1772,12 @@ Decision rule: keep only if step 3500 or 4000 improves over E55's
 `val_lddt_ca=0.3604` or preserves lDDT within noise while continuing to
 improve FoldScore/dRMSD. If lDDT falls back toward E54/E17 behavior, stop and
 analyze the E55 checkpoint before longer training.
+
+Result: stop for the lDDT objective. Step 3500 reached `val_lddt_ca=0.3562`,
+FoldScore `0.3464`, `val_ca_drmsd=10.7120`, and radius
+`10.9217 / 15.4034`. Step 4000 reached `val_lddt_ca=0.3575`, FoldScore
+`0.3478`, `val_ca_drmsd=10.9804`, and radius `10.3192 / 15.4034`. This
+continues improving aggregate/global geometry but does not beat E55's
+`val_lddt_ca=0.3604`, so longer constant-aux-0.5 continuation should pause.
+The next branch should analyze or resume from the E55 checkpoint rather than
+spending immediately on a 30k confirmation.

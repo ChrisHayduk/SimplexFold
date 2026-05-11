@@ -1520,3 +1520,16 @@
   The continuation runs to step 4000 with effective batch 8 and constant
   `simplex_aux_weight=0.5`. Do not write E56 to `EXPERIMENT_RESULTS.md` until
   the Runpod run returns.
+- E56 completed on Runpod and the owned H100 pod `egsopc48v9fjz8` was
+  stopped/deleted. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e56_effective_batch8_aux05_s4000_c256_m64/`.
+  Step 3500 reached `val_lddt_ca=0.3561620619148016`, FoldScore
+  `0.3464267496019602`, `val_ca_drmsd=10.71201303601265`, and predicted/true
+  C-alpha radius of gyration `10.921668142080307 / 15.403406739234924`.
+  Step 4000 ended at `val_lddt_ca=0.35753354616463184`, FoldScore
+  `0.3477634973824024`, `val_ca_drmsd=10.98043116927147`, and radius
+  `10.319191247224808 / 15.403406739234924`.
+- E56 interpretation: constant aux-0.5 continuation after E55 improves
+  FoldScore and dRMSD but does not beat E55's lDDT. Do not keep extending
+  this exact branch for the lDDT objective without analyzing why E55 is the
+  local lDDT peak.
