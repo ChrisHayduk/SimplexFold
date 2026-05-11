@@ -1623,3 +1623,16 @@
   weights-only initialization, but set `simplex_outer_edge_context_scale=0.05`.
   This remains a Topotein-style architecture test while asking whether a weak
   outer-edge context correction can preserve E55's local lDDT.
+- E59 launched on owned H100 Runpod pod `n5dtdxgjgk81de`
+  (`codex-simplexfold-e59-runpod-20260511`) from commit `6f9750c`. Clean
+  launch audit: public train/val/all manifest counts `10000/1000/11000`,
+  hidden manifest absent, feature/label `.npz` counts `11000/11000`,
+  encoded missing paths `0`, H100 CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E59 `3,183,282` parameters (`+2.47%`) with
+  `simplex_outer_edge_context_scale=0.05`.
+- E59 remote process: wrapper PID `431`, Python PID `432`, log
+  `/workspace/SimplexFold/logs/e59_outer_edge_context005_from_e55.log`,
+  artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e59_outer_edge_context005_from_e55_s3500_c256_m64/`.
+  Do not write E59 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.

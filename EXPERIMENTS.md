@@ -1862,7 +1862,7 @@ was stopped early at the step-3500 checkpoint and the owned pod was deleted.
 
 ### E59: Damped Outer-Edge Context From E55
 
-Status: planned.
+Status: launched on Runpod.
 
 Hypothesis: E58 shows directed outer-edge context has useful global-geometry
 signal, but a scale of `0.25` is too disruptive when the context modules are
@@ -1880,3 +1880,11 @@ weights `1.0/1.0`, selected boundary-distance weights `0.5/0.5`, and
 Decision rule: keep only if the step-3500 lDDT beats or stays very close to
 E55's `0.3604` while preserving E58's FoldScore/dRMSD improvement. Reject if
 it remains in the E57/E58 lDDT band.
+
+Launch: E59 is running on owned Runpod H100 pod `n5dtdxgjgk81de` from commit
+`6f9750c`. Launch audit passed: public train/val/all counts are
+`10000/1000/11000`, no hidden manifest was staged, feature/label cache counts
+are `11000/11000`, encoded missing paths are `0`, FoldScore import works,
+CUDA reports `NVIDIA H100 80GB HBM3`, and parameters are `3,183,282`
+(+2.47% versus AF2-medium pair-only `3,106,642`). Do not write E59 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.
