@@ -1868,3 +1868,22 @@
   Initial log shows the runner loaded `train=10000 val=1000 crop=256 msa=64`.
   Heartbeat `check-simplexfold-e57-runpod` has been retargeted to this E63
   pod and must not touch any other Runpod instance.
+- E63 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e63_boundary_lddt005_from_e55_s3500_c256_m64/`,
+  including the launch log. Step 3500 reached
+  `val_lddt_ca=0.3610654976218939`, FoldScore `0.3576338365674019`,
+  `val_ca_drmsd=10.68150195479393`, and predicted/true C-alpha radius of
+  gyration `11.430959939956665 / 15.40340667963028`.
+- E63 selected-boundary diagnostics improved in the intended direction:
+  face/tetra boundary lDDT `0.5208317879587412` / `0.5065008029341698`,
+  contraction fractions `0.6897053830325603` / `0.691283892840147`, and
+  boundary length MAE `2.784909226000309` / `2.9228954538702965`.
+- E63 owned Runpod pod `0hm1lpiaqqx21a` was stopped and deleted after
+  artifacts were copied. A post-delete lookup returned 404, as expected. No
+  other Runpod instances were managed.
+- E63 interpretation: keep for confirmation. The gain over E55 is small
+  (`0.3611` versus `0.3604`), but it is the first recent branch to improve
+  primary lDDT, FoldScore, dRMSD, radius expansion, and selected-boundary
+  realization together. Next run should continue the E63 checkpoint to step
+  4000 (`32,000` effective examples at batch 8) before calling the direction
+  stable.

@@ -1403,3 +1403,16 @@ lDDT objective only on the boundary 1-skeleton induced by model-selected
 faces and tetras. This remains inside the SimplexFold motivation: it asks the
 explicit sparse complex to realize its own edges, rather than optimizing a
 generic all-pairs or full-structure lDDT surrogate.
+
+E63 result: keep for confirmation. The selected-boundary lDDT objective reached
+`val_lddt_ca=0.3611` at step 3500, a small but real improvement over E55's
+`0.3604`, with FoldScore `0.3576`, `val_ca_drmsd=10.6815`, and
+predicted/true C-alpha radius `11.4310 / 15.4034`. The important topological
+signal also moved in the right direction: selected face/tetra boundary lDDT
+rose to `0.5208` / `0.5065`, and contraction fractions fell to roughly `0.69`.
+
+Immediate E64 branch: confirm E63 beyond the 30k-example mark by continuing
+the selected-boundary lDDT objective from the E63 checkpoint to step 4000
+(`32,000` effective examples at batch 8). This is a necessary stability check
+because E56 showed that continuing E55 without this topology-mediated loss
+regressed C-alpha lDDT despite improving some global geometry metrics.

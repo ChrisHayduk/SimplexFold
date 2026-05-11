@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-11.
 
-Best validation C-alpha lDDT so far: **E55**, `val_lddt_ca=0.3604` at step
-3000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E63**, `val_lddt_ca=0.3611` at step
+3500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -80,3 +80,4 @@ recorded in the running notes for that run.
 | E60 scheduled damped outer-edge context | completed | 3500 | 0.3462 | 0.3462 | 0.3431 | 10.9235 | 10.8522 / 15.4034 | rejected; scheduling did not preserve E55 lDDT |
 | E61 scheduled edge-frame messages | completed | 3500 | 0.3456 | 0.3456 | 0.3471 | 10.7730 | 11.1613 / 15.4034 | rejected; better dRMSD/expansion but worse lDDT |
 | E62 scheduled Hodge face residual | completed | 3500 | 0.3468 | 0.3468 | 0.3450 | 10.9016 | 10.7278 / 15.4034 | rejected; boundary lDDT slightly improves but main lDDT remains below E55 |
+| E63 selected-boundary lDDT 0.05 | completed | 3500 | 0.3611 | 0.3611 | 0.3576 | 10.6815 | 11.4310 / 15.4034 | kept; new best and improves selected-boundary diagnostics |

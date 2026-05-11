@@ -2060,7 +2060,7 @@ Validation:
 
 ### E63: Selected-Boundary lDDT Curriculum From E55
 
-Status: launched on owned Runpod pod `0hm1lpiaqqx21a`; result pending.
+Status: completed on Runpod.
 
 Hypothesis: E61 and E62 both improve aspects of global geometry while leaving
 the learned selected complex with weak boundary distance preservation: selected
@@ -2082,12 +2082,38 @@ close to E55's `0.3604` while improving selected-boundary lDDT and contraction
 diagnostics. Reject if it behaves like E19/E20 and trades local C-alpha lDDT
 for a narrow auxiliary gain.
 
-Launch: E63 is running on owned Runpod H100 NVL pod `0hm1lpiaqqx21a` from
+Launch: E63 ran on owned Runpod H100 NVL pod `0hm1lpiaqqx21a` from
 commit `6bb49f8`. Launch audit passed after staging only public assets:
 public train/val/all counts are `10000/1000/11000`, remote manifest files are
 exactly `all.txt`, `train.txt`, and `val.txt`, no hidden manifest/path is
 present, feature/label cache counts are `11000/11000`, encoded missing paths
 are `0`, the E55 checkpoint is present, FoldScore import works, CUDA reports
 `NVIDIA H100 NVL`, and the model has `3,106,690` parameters (+0.0015% versus
-AF2-medium pair-only `3,106,642`). Do not write E63 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+AF2-medium pair-only `3,106,642`).
+
+Result: keep for confirmation. E63 completed at step 3500 with
+`val_lddt_ca=0.3611`, FoldScore `0.3576`, `val_ca_drmsd=10.6815`, and
+predicted/true C-alpha radius of gyration `11.4310 / 15.4034`. It is only a
+small lDDT gain over E55's `0.3604`, but it also improves FoldScore and the
+selected-boundary diagnostics: face/tetra boundary lDDT rose to
+`0.5208` / `0.5065`, while contraction fractions fell to
+`0.6897` / `0.6913`. Artifacts were copied locally, and the owned E63 pod was
+stopped and deleted after the returned result was recorded.
+
+### E64: E63 Confirmation To 32k Examples
+
+Status: planned.
+
+Hypothesis: E63 is the first tested branch to improve the primary C-alpha
+lDDT while also improving selected-boundary realization. Because the margin is
+small and E56 showed that plain E55 continuation to 4000 steps regresses
+lDDT, the next test should continue E63's selected-boundary lDDT objective to
+step 4000, i.e. 32,000 effective training examples at batch 8.
+
+Mechanism: resume E63 from its step-3500 checkpoint, keep
+`simplex_face_boundary_lddt_weight=0.05` and
+`simplex_tetra_boundary_lddt_weight=0.05`, and run the same public validation
+gate to step 4000.
+
+Decision rule: keep only if the step-4000 lDDT stays above E55/E63's band or
+improves selected-boundary realization without the E56-style lDDT regression.
