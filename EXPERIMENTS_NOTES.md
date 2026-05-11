@@ -2200,3 +2200,30 @@
   new/missing tensors, and started a fresh optimizer. CUDA is active with B200
   memory allocated. Heartbeat `check-simplexfold-e57-runpod` has been
   retargeted to E68 pod `qx6oa0jgchz8j8` only.
+- E68 returned on owned Runpod pod `qx6oa0jgchz8j8` and was rejected. Step
+  4500 reached `val_lddt_ca=0.3617166429758072`, FoldScore
+  `0.36250696517527103`, `val_ca_drmsd=10.211460411548615`, and predicted/true
+  C-alpha radius `11.964475572109222 / 15.403406739234924`. Selected
+  face/tetra boundary lDDT ended at `0.524696733802557` /
+  `0.5102544575929642`, contraction fractions at `0.6823383867740631` /
+  `0.6825277544558048`, boundary length MAE at `2.7149862870573997` /
+  `2.8477588519454002`, mean boundary-edge degree at
+  `12.109066903591156` / `80.72711277008057`, and unique-edge fraction at
+  `0.08305363674494468` / `0.0124580455117417`.
+- E68 artifacts and launch log were copied locally under ignored
+  `artifacts/nanofold_public_benchmarks/e68_structure_readout0025_from_e64_s4500_c256_m64/`,
+  including `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, checkpoint, and
+  `runpod_launch.log`. The owned E68 pod was stopped and deleted after copying;
+  a post-delete lookup returned 404. No other Runpod instances were managed.
+  Heartbeat `check-simplexfold-e57-runpod` was paused because no Runpod job is
+  currently active.
+- E68 interpretation: reject the damped selected-complex structure readout.
+  Lowering readout scale from `0.05` to `0.025` improved dRMSD to the best
+  value in the E64 continuation family but further reduced C-alpha lDDT. Next
+  test E69 from the E64 checkpoint with selected face normal orientation:
+  `--simplex-face-normal-weight 0.05` plus the E64 selected-boundary
+  lDDT/coordinate-loss recipe. This is justified by the README's oriented
+  patch claim for faces and the PDF reread rule that losses should supervise
+  realization of the selected sparse complex rather than generic dense output
+  geometry.

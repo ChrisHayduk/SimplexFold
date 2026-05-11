@@ -2311,7 +2311,7 @@ pod was stopped and deleted; a post-delete lookup returned 404.
 
 ### E68: Damped Selected-Complex Structure Readout
 
-Status: running on owned Runpod pod `qx6oa0jgchz8j8`.
+Status: completed on Runpod and rejected.
 
 Hypothesis: E67 shows the selected-complex structure readout carries useful
 geometry signal but couples too strongly into the structure module at scale
@@ -2328,7 +2328,7 @@ face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
 weights `0.5`, `simplex_aux_weight=0.5`, and
 `--simplex-structure-readout-scale 0.025`.
 
-Launch: E68 is running on owned Runpod B200 pod `qx6oa0jgchz8j8`
+Launch: E68 ran on owned Runpod B200 pod `qx6oa0jgchz8j8`
 (`codex-simplexfold-e68-runpod-20260511`) from commit `11fc14a`. Clean launch
 audit after copying only public data/code: public train/val/all manifest
 counts are `10000/1000/11000`, remote manifest files are exactly `all.txt`,
@@ -2339,10 +2339,46 @@ pair-only has `3,106,642` parameters, and E68 model has `3,106,690`
 parameters (`+0.0015%`). `run_metadata.json` records
 `simplex_structure_readout_scale=0.025`, static face/tetra selected-boundary
 lDDT weights `0.05` / `0.05`, weights-only resume from E64, crop 256, MSA
-depth 64, and no templates. Do not add E68 to `EXPERIMENT_RESULTS.md` until
-the Runpod run returns.
+depth 64, and no templates.
 
 Decision rule: keep only if step-4500 lDDT improves over E67 and E65 while
 preserving E67's dRMSD or selected-boundary length improvements. Continue only
 if it approaches or exceeds E64; otherwise reject the structure-readout scale
 family and move to a different selected-cell communication mechanism.
+
+Result: reject. E68 completed at step 4500 with
+`val_lddt_ca=0.3617`, FoldScore `0.3625`, `val_ca_drmsd=10.2115`, and
+predicted/true C-alpha radius `11.9645 / 15.4034`. Selected face/tetra
+boundary lDDT was `0.5247` / `0.5103`, contraction fractions were
+`0.6823` / `0.6825`, and boundary length MAE was
+`2.7150` / `2.8478`. The damped readout improved dRMSD relative to E67 but
+lost more local C-alpha lDDT, so the structure-readout scale family is not the
+next continuation branch. Artifacts were copied locally, and the owned E68 pod
+was stopped and deleted; a post-delete lookup returned 404.
+
+### E69: Selected Face Normal Orientation
+
+Status: planned for Runpod.
+
+Hypothesis: the README's face interpretation includes oriented local patches
+with area, angles, and normal direction. E64's selected-boundary lDDT improves
+the selected complex's 1-skeleton, but face orientation may still be too weak
+for the structure module to realize coherent 2-simplex patches. Supervising
+normal orientation only on model-selected faces should strengthen the learned
+2-skeleton without becoming a generic dense output metric.
+
+Mechanism: add `--simplex-face-normal-weight 0.05` to the E64 selected-boundary
+recipe. The existing loss compares predicted and true selected-face normals in
+residue-local frames, is global-rotation invariant, adds no parameters, and is
+attached only to `simplex_face_indices`.
+
+Planned launch: resume E64 from its step-4000 checkpoint and run a 500-step
+gate to step 4500 with static selected-boundary lDDT weights `0.05`, selected
+face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
+weights `0.5`, `simplex_aux_weight=0.5`, and
+`--simplex-face-normal-weight 0.05`.
+
+Decision rule: keep only if step-4500 lDDT improves over E65/E67 and does not
+badly regress FoldScore, dRMSD, or selected-boundary diagnostics. Continue only
+if it approaches or exceeds E64; reject if it repeats the early E37 behavior
+at this stronger E64 checkpoint.

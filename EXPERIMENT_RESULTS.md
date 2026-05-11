@@ -85,3 +85,4 @@ recorded in the running notes for that run.
 | E65 boundary lDDT 0.05->0.025 | completed | 5000 | 0.3684 | 0.3684 | 0.3666 | 10.8445 | 11.7879 / 15.4034 | rejected; relaxed continuation improved FoldScore but lost E64 lDDT |
 | E66 coface-balanced boundary lDDT | completed | 4500 | 0.3505 | 0.3505 | 0.3602 | 10.6237 | 11.8892 / 15.4034 | rejected; coface balancing weakened lDDT and boundary diagnostics |
 | E67 structure readout 0.05 | completed | 4500 | 0.3647 | 0.3647 | 0.3619 | 10.3503 | 11.6688 / 15.4034 | rejected; dRMSD improved but lDDT stayed below E64 and FoldScore regressed |
+| E68 structure readout 0.025 | completed | 4500 | 0.3617 | 0.3617 | 0.3625 | 10.2115 | 11.9645 / 15.4034 | rejected; weaker readout further reduced lDDT despite best dRMSD |
