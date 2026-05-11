@@ -1898,7 +1898,7 @@ integration into the selected cell complex.
 
 ### E60: Scheduled Damped Outer-Edge Context From E55
 
-Status: implemented locally and queued for Runpod.
+Status: launched on Runpod.
 
 Hypothesis: E58 and E59 show that Topotein-style outer-edge context improves
 global FoldScore, but switching freshly initialized context modules on at a
@@ -1920,6 +1920,15 @@ override gates the contribution during training. E60 should use
 Decision rule: keep only if the step-3500 lDDT beats or stays very close to
 E55's `0.3604` while preserving E59's FoldScore/dRMSD improvement. Reject if
 it remains below the E55/E56 lDDT band.
+
+Launch: E60 is running on owned Runpod H100 pod `yzy3zi29gzbfj4` from commit
+`ede843b`. Launch audit passed: public train/val/all counts are
+`10000/1000/11000`, no hidden manifest/path was staged, feature/label cache
+counts are `11000/11000`, encoded missing paths are `0`, FoldScore import
+works, CUDA reports `NVIDIA H100 80GB HBM3`, and parameters are `3,183,282`
+(+2.47% versus AF2-medium pair-only `3,106,642`). The runtime scale audit
+confirmed `0.0` at step 3000, `0.025` at step 3250, and `0.05` at step 3500.
+Do not write E60 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
 
 Validation:
 

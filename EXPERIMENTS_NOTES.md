@@ -1673,3 +1673,18 @@
   coordinate weights `1.0/1.0`, selected boundary-distance weights
   `0.5/0.5`, and `simplex_aux_weight=0.5`. Do not write E60 to
   `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+- E60 launched on owned H100 Runpod pod `yzy3zi29gzbfj4`
+  (`codex-simplexfold-e60-runpod-20260511`) from commit `ede843b`. Clean
+  launch audit after copying only public data/code: public train/val/all
+  manifest counts `10000/1000/11000`, hidden manifest/path absent, feature and
+  label `.npz` counts `11000/11000`, encoded-chain missing paths `0`, E55
+  checkpoint present, H100 CUDA available, NanoFold `foldscore_components`
+  import works, AF2-medium pair-only `3,106,642`, and E60 `3,183,282`
+  parameters (`+2.47%`). Runtime outer-edge context scale audit:
+  step 3000 `0.0`, step 3250 `0.025`, step 3500 `0.05`.
+- E60 remote process: launch wrapper PID `1214`, Python PID `1215`, log
+  `/workspace/SimplexFold/logs/e60_outer_edge_context_ramp005_from_e55.log`,
+  artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e60_outer_edge_context_ramp005_from_e55_s3500_c256_m64/`.
+  Heartbeat `check-simplexfold-e57-runpod` has been retargeted to this E60
+  pod and must not touch any other Runpod instance.
