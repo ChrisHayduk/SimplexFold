@@ -1850,3 +1850,21 @@
   so it directly tests whether the explicit simplicial complex can realize
   its own selected 1-skeleton without contraction. Do not add E63 to
   `EXPERIMENT_RESULTS.md` until a Runpod run returns.
+- E63 launched on owned Runpod H100 NVL pod `0hm1lpiaqqx21a`
+  (`codex-simplexfold-e63-runpod-20260511`) from commit `6bb49f8`. Clean
+  launch audit after copying only public data/code: public train/val/all
+  manifest counts `10000/1000/11000`, remote manifest files exactly
+  `all.txt`, `train.txt`, and `val.txt`, hidden manifest/path absent,
+  feature/label `.npz` counts `11000/11000`, encoded-chain missing paths `0`,
+  E55 checkpoint present, H100 NVL CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E63 model `3,106,690` parameters (`+0.0015%`). E63 uses
+  `simplex_face_boundary_lddt_weight=0.05` and
+  `simplex_tetra_boundary_lddt_weight=0.05` with the E55 selected coordinate
+  and selected boundary-distance weights.
+- E63 remote process: Python PID `2389`, launch log
+  `/workspace/SimplexFold/logs/e63_boundary_lddt005_from_e55.log`, artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e63_boundary_lddt005_from_e55_s3500_c256_m64/`.
+  Initial log shows the runner loaded `train=10000 val=1000 crop=256 msa=64`.
+  Heartbeat `check-simplexfold-e57-runpod` has been retargeted to this E63
+  pod and must not touch any other Runpod instance.

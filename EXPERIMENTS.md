@@ -2060,7 +2060,7 @@ Validation:
 
 ### E63: Selected-Boundary lDDT Curriculum From E55
 
-Status: planned.
+Status: launched on owned Runpod pod `0hm1lpiaqqx21a`; result pending.
 
 Hypothesis: E61 and E62 both improve aspects of global geometry while leaving
 the learned selected complex with weak boundary distance preservation: selected
@@ -2081,3 +2081,13 @@ Decision rule: keep only if the step-3500 validation lDDT beats or stays very
 close to E55's `0.3604` while improving selected-boundary lDDT and contraction
 diagnostics. Reject if it behaves like E19/E20 and trades local C-alpha lDDT
 for a narrow auxiliary gain.
+
+Launch: E63 is running on owned Runpod H100 NVL pod `0hm1lpiaqqx21a` from
+commit `6bb49f8`. Launch audit passed after staging only public assets:
+public train/val/all counts are `10000/1000/11000`, remote manifest files are
+exactly `all.txt`, `train.txt`, and `val.txt`, no hidden manifest/path is
+present, feature/label cache counts are `11000/11000`, encoded missing paths
+are `0`, the E55 checkpoint is present, FoldScore import works, CUDA reports
+`NVIDIA H100 NVL`, and the model has `3,106,690` parameters (+0.0015% versus
+AF2-medium pair-only `3,106,642`). Do not write E63 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.
