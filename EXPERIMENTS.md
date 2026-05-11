@@ -140,7 +140,7 @@ direction is useful but not sufficient for the 0.7 target.
 
 ### E04: Selected-Simplex Coordinate Realization Loss
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: the pilots show persistent under-expansion of predicted C-alpha
 geometry. The model may learn useful face/tetra latent geometry while the
@@ -1719,3 +1719,30 @@ Decision rule: keep and extend toward 3000+ effective-batch-8 steps only if
 the continuation beats E53's `val_lddt_ca=0.3480` or materially improves
 FoldScore/dRMSD without losing lDDT. If it falls below the E53 plateau, do
 not spend on a 30k confirmation yet.
+
+Result: keep for continuation. Step 1500 fell to `val_lddt_ca=0.3331` while
+the auxiliary weight reached `0.5`, but FoldScore improved to `0.2891`.
+Holding the annealed scaffold to step 2000 recovered lDDT to `0.3539`,
+FoldScore to `0.3241`, `val_ca_drmsd` to `11.9339`, and predicted/true
+C-alpha radius of gyration to `9.2409 / 15.4034`. This nearly ties E15's best
+lDDT and exceeds E15's FoldScore, so the effective-batch-8 path should
+continue with `simplex_aux_weight=0.5`.
+
+### E55: Effective-Batch-8 Aux-0.5 Continuation
+
+Status: launched on Runpod.
+
+Hypothesis: E54 shows the E15-style auxiliary anneal initially disrupts lDDT
+but then recovers to near-best validation while improving FoldScore and
+dRMSD. Continuing with `simplex_aux_weight=0.5` may now let the structure
+module consolidate the selected higher-order scaffold under the target
+effective-batch-8 optimizer regime.
+
+Mechanism: resume E54 at step 2000 and continue to step 3000 with
+`full_msa_to_face`, `batch_size=1`, `grad_accum_steps=8`, selected
+coordinate weights `1.0/1.0`, selected boundary-distance weights `0.5/0.5`,
+and constant `simplex_aux_weight=0.5`.
+
+Decision rule: keep and extend only if step 2500 or 3000 beats E15's
+`val_lddt_ca=0.3556` or preserves comparable lDDT with clearly better
+FoldScore/dRMSD. If lDDT drifts down as in E17, stop the continuation branch.

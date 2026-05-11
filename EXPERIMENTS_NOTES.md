@@ -1485,3 +1485,21 @@
   coordinate weights `1.0/1.0`, selected boundary-distance weights `0.5/0.5`,
   and `simplex_aux_weight` ramped from `1.0` to `0.5` over steps 1000-1500.
   Do not write E54 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+- E54 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e54_effective_batch8_aux_anneal_s2000_c256_m64/`.
+  Step 1500 reached `val_lddt_ca=0.333083800971508`, FoldScore
+  `0.2890670131891966`, `val_ca_drmsd=13.365413516759872`, and
+  predicted/true C-alpha radius of gyration `7.538277685642242 /
+  15.403406739234924` with `simplex_aux_weight=0.5`. Step 2000 recovered to
+  `val_lddt_ca=0.35393444262444973`, FoldScore `0.32407183200120926`,
+  `val_ca_drmsd=11.933855026960373`, and radius
+  `9.240868210792542 / 15.403406739234924`.
+- E54 interpretation: the E15-style auxiliary anneal works under effective
+  batch 8 after a transient dip. Step 2000 nearly ties E15 lDDT while beating
+  E15 FoldScore and dRMSD. Continue one more gate with
+  `simplex_aux_weight=0.5` held constant.
+- E55 launched on the same owned H100 pod `egsopc48v9fjz8`, resuming E54 from
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e54_effective_batch8_aux_anneal_s2000_c256_m64/checkpoints/full_msa_to_face_latest.pt`.
+  The continuation runs to step 3000 with effective batch 8 and constant
+  `simplex_aux_weight=0.5`. Do not write E55 to `EXPERIMENT_RESULTS.md` until
+  the Runpod run returns.
