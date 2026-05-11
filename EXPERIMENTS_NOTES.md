@@ -1743,3 +1743,31 @@
   the E59 FoldScore advantage. Pivot to the prepared E61 edge-frame
   boundary-message probe rather than continuing the cell-level outer-edge
   context family.
+- E61 owned Runpod pod `h2dvec04rxyoxe`
+  (`codex-simplexfold-e61-runpod-20260511`) is running from commit `7823038`.
+  A first H100 SXM allocation (`il9j0uq3n7byx0`) never exposed SSH and was
+  stopped/deleted; post-delete lookup returned 404. Only these owned pods were
+  managed.
+- E61 staging note: an initial transfer command began copying the whole local
+  `data/manifests` directory, including `hidden_val.txt`; I interrupted that
+  transfer, deleted the remote staging tree on the owned pod, and restaged
+  only `train.txt`, `val.txt`, `all.txt`, public feature/label NPZ caches, the
+  `nanofold` scoring package, and the E55 checkpoint. Final launch audit
+  confirmed remote manifest files were exactly `all.txt`, `train.txt`, and
+  `val.txt`; `hidden_val.txt` was absent.
+- E61 launch audit passed: public train/val/all manifest counts
+  `10000/1000/11000`, feature/label `.npz` counts `11000/11000`,
+  encoded-chain missing paths `0`, E55 checkpoint present, H100 NVL CUDA
+  available, NanoFold `foldscore_components` import works, AF2-medium
+  pair-only `3,106,642`, and E61 edge-frame model `3,154,242` parameters
+  (`+1.53%`). Runtime edge-frame scale audit: step 3000 `0.0`, step 3250
+  `0.025`, step 3500 `0.05`.
+- E61 remote process: wrapper PID `2401`, Python PID `2403`, data-worker
+  Python PIDs observed under the same command, log
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e61_edge_frame_ramp005_from_e55_s3500_c256_m64/run.log`,
+  artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e61_edge_frame_ramp005_from_e55_s3500_c256_m64/`.
+  The log shows it resumed E55 at step 3000/examples 24000, loaded 1196
+  matching model tensors, initialized 48 new/missing edge-frame tensors, and
+  started a fresh optimizer. Do not add E61 to `EXPERIMENT_RESULTS.md` until
+  the Runpod run returns.

@@ -1944,8 +1944,7 @@ Validation:
 
 ### E61: Scheduled Edge-Frame Boundary Messages From E55
 
-Status: implemented locally as the next candidate after E60 rejection; not yet
-launched.
+Status: launched on owned Runpod pod `h2dvec04rxyoxe`; result pending.
 
 Hypothesis: the reference PDFs and Topotein both point to edge-centric frames
 as the clean way to keep higher-rank cell geometry useful without collapsing
@@ -1976,6 +1975,18 @@ change training loss or official scoring.
 Decision rule: keep only if the step-3500 lDDT beats or stays very close to
 E55's `0.3604`; otherwise reject and use the diagnostics to decide whether
 the selected complex is under-realized or over-coupled.
+
+Launch: E61 is running on owned Runpod H100 NVL pod `h2dvec04rxyoxe` from
+commit `7823038`. Launch audit passed after restaging only public assets:
+public train/val/all counts are `10000/1000/11000`, no hidden manifest/path is
+staged, feature/label cache counts are `11000/11000`, encoded missing paths
+are `0`, the E55 checkpoint is present, FoldScore import works, CUDA reports
+`NVIDIA H100 NVL`, and the edge-frame model has `3,154,242` parameters
+(+1.53% versus AF2-medium pair-only `3,106,642`). The runtime scale audit
+confirmed `0.0` at step 3000, `0.025` at step 3250, and `0.05` at step 3500.
+The run resumed E55 at step 3000 with weights-only loading; the newly added
+edge-frame tensors were initialized fresh as expected. Do not write E61 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.
 
 Validation:
 

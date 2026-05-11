@@ -32,9 +32,10 @@ E60 tested that idea by scheduling the damped directed outer-edge context from
 predicted/true C-alpha radius `10.8522 / 15.4034`. Reject it: the schedule did
 not preserve the E55/E56 lDDT band and also gave up E59's FoldScore gain.
 
-The next branch should stay in the topological architecture lane, but shift
-from cell-level outer-edge summaries to boundary-edge scalarization. E61 should
-resume E55 with a weak scheduled edge-frame message path:
+The active branch stays in the topological architecture lane, but shifts from
+cell-level outer-edge summaries to boundary-edge scalarization. E61 is running
+on the owned Runpod H100 NVL pod `h2dvec04rxyoxe` from commit `7823038` with a
+weak scheduled edge-frame message path:
 `--simplex-edge-frame-message-scale 0.05`,
 `--simplex-edge-frame-message-runtime-scale 0.0`,
 `--simplex-edge-frame-message-runtime-scale-final 0.05`,
@@ -42,7 +43,10 @@ resume E55 with a weak scheduled edge-frame message path:
 `--simplex-edge-frame-message-runtime-scale-ramp-steps 500`. This tests
 whether selected face/tetra cochains can write geometry-sensitive messages
 through their own directed boundary-edge frames without the disruptive
-cell-level context that hurt E58-E60.
+cell-level context that hurt E58-E60. The launch audit passed with public
+train/val/all counts `10000/1000/11000`, hidden manifest absent, feature/label
+NPZ counts `11000/11000`, encoded missing paths `0`, FoldScore import working,
+and `3,154,242` parameters (`+1.53%` versus AF2-medium).
 
 The runner should keep `EXPERIMENT_RESULTS.md` only for returned Runpod
 results. Do not launch a 30,000-step confirmation until a branch clears the
