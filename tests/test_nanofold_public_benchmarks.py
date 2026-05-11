@@ -1,5 +1,10 @@
 from minalphafold.trainer import TrainingConfig, load_model_config
-from scripts.run_nanofold_public_benchmarks import _build_loss_fn, _variant_config, parse_args
+from scripts.run_nanofold_public_benchmarks import (
+    _apply_model_config_overrides,
+    _build_loss_fn,
+    _variant_config,
+    parse_args,
+)
 
 
 def test_full_msa_to_face_variant_keeps_tetra_and_enables_msa_faces():
@@ -268,6 +273,47 @@ def test_full_msa_to_face_outer_edge_context_variant_is_accepted_by_cli_parser()
     args = parse_args(["--variants", "full_msa_to_face_outer_edge_context"])
 
     assert args.variants == ["full_msa_to_face_outer_edge_context"]
+
+
+def test_model_config_override_flags_are_accepted_by_cli_parser():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face",
+            "--simplex-outer-edge-context-scale",
+            "0.25",
+            "--simplex-segment-radius",
+            "5",
+        ]
+    )
+
+    assert args.variants == ["full_msa_to_face"]
+    assert args.simplex_outer_edge_context_scale == 0.25
+    assert args.simplex_segment_radius == 5
+
+
+def test_model_config_overrides_preserve_resume_compatible_variant_name():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face",
+            "--simplex-outer-edge-context-scale",
+            "0.25",
+            "--simplex-segment-radius",
+            "5",
+        ]
+    )
+    cfg = _apply_model_config_overrides(
+        _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face"),
+        args,
+    )
+
+    assert cfg.use_simplicial_evoformer is True
+    assert cfg.simplex_use_faces is True
+    assert cfg.simplex_use_tetra is True
+    assert cfg.simplex_use_msa_to_face is True
+    assert cfg.simplex_outer_edge_context_scale == 0.25
+    assert cfg.simplex_segment_radius == 5
 
 
 def test_full_msa_to_face_edge_frame_messages_adds_local_frame_readout():

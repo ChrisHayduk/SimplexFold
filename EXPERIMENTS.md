@@ -1757,7 +1757,7 @@ continuation the leading branch.
 
 ### E56: Effective-Batch-8 Aux-0.5 To 4000
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E55 beat E15 at step 3000 while preserving the improved
 FoldScore/global-geometry trend. Continuing one more 1000-step block should
@@ -1784,7 +1784,7 @@ spending immediately on a 30k confirmation.
 
 ### E57: Aux-0.75 Rewarm From E55
 
-Status: launched on Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E56 shows that continuing E55 with constant
 `simplex_aux_weight=0.5` improves FoldScore and dRMSD but does not preserve
@@ -1805,3 +1805,38 @@ Decision rule: keep only if step 3500 or 4000 beats E55's
 within small noise of E55's lDDT. If the rewarm worsens lDDT without a clear
 geometry tradeoff, return to architecture-level topology changes rather than
 more scalar loss tuning.
+
+Result: reject for the lDDT objective. Step 3500 reached
+`val_lddt_ca=0.3395`, FoldScore `0.3504`, `val_ca_drmsd=10.6852`, and
+predicted/true C-alpha radius of gyration `11.5354 / 15.4034`. Step 4000
+recovered only to `val_lddt_ca=0.3465`, with FoldScore `0.3495`,
+`val_ca_drmsd=10.7091`, and radius `10.8574 / 15.4034`. The stronger
+selected-simplex auxiliary pressure improved global/FoldScore behavior but
+damaged local C-alpha lDDT relative to E55. This argues against more scalar
+auxiliary rewarming and points back to architecture-level topology changes.
+
+### E58: Resume-Compatible Outer-Edge Context From E55
+
+Status: planned.
+
+Hypothesis: the reference PDFs, especially Topotein, argue that effective
+protein TDL requires dedicated cross-rank and within-rank communication over
+the constructed complex. E57 shows that simply increasing selected-cell loss
+pressure is not enough. Resuming E55 while activating directed outer-edge
+context should let selected face/tetra cochains exchange information through
+boundary/interior pair edges, preserving edge-level geometry rather than
+collapsing higher-rank communication into another scalar loss.
+
+Mechanism: resume the E55 checkpoint at step 3000 using the checkpoint
+variant name `full_msa_to_face`, effective batch 8, selected coordinate
+weights `1.0/1.0`, selected boundary-distance weights `0.5/0.5`, and constant
+`simplex_aux_weight=0.5`. Activate the existing directed outer-edge context
+architecture with a model-config override,
+`--simplex-outer-edge-context-scale 0.25`, so the checkpoint remains
+resume-compatible with E55 while the next forward passes use Topotein-style
+outer-edge communication.
+
+Decision rule: keep only if step 3500 or 4000 beats E55's
+`val_lddt_ca=0.3604`, or preserves lDDT while materially improving FoldScore
+or dRMSD. Reject if it follows E57's pattern of better global geometry with
+worse local lDDT.

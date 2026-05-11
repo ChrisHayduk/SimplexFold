@@ -74,3 +74,23 @@ Experiment implications:
 - Consider a small global/readout cochain only if it receives and returns
   information through incidence-aware selected-cell summaries, not as a
   generic pooled feature head.
+
+Full-read details to carry forward:
+
+- Topotein's PCC ranks are residues, directed interaction edges, secondary
+  structure cells, and a protein cell. NanoFold cannot require DSSP/SSE labels
+  at official inference time, but the directed-edge and outer-edge machinery
+  can be adapted to SimplexFold's learned selected faces/tetras.
+- The outer-edge equations use incidence through residues and directed edges
+  to collect edges that leave or enter a higher-rank cell while excluding
+  redundant self/internal edges. This is the cleanest justification for E58's
+  directed outer-edge context from the E55 checkpoint.
+- TCPNet's lesson is that topological enhancement must be deeply integrated:
+  cells need their own update paths and geometric frames. The negative result
+  for a shallow ETNN adaptation matches our weak E39-E52 sidecar/readout
+  attempts and argues for resume-compatible architecture changes over more
+  output-only losses.
+- Edge-centric scalarization is a second architecture branch after E58: vector
+  or orientation content from selected cells should be projected onto boundary
+  or outer-edge frames before scalar MLP updates, preserving geometric
+  sensitivity while staying in the selected complex.

@@ -1,4 +1,4 @@
-## Current Plan: E57 Aux-0.75 Rewarm From E55
+## Current Plan: E58 Resume-Compatible Outer-Edge Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -11,30 +11,32 @@ E53 reached `val_lddt_ca=0.3480` at step 1000, E54 recovered to
 the new best `val_lddt_ca=0.3604` at step 3000 while improving FoldScore to
 `0.3451`. E56 continued the same checkpoint lineage to step 4000 and improved
 FoldScore/dRMSD further, but its best `val_lddt_ca=0.3575` stayed below E55.
+E57 then tried a selected-simplex auxiliary rewarm at `0.75`; it produced the
+best FoldScore seen so far but reduced lDDT to `0.3465`.
 
-The next branch should treat E55 as the lDDT peak checkpoint. Do not spend on
-a blind 30,000-step continuation yet. Instead, analyze or resume from E55 with
-a small lDDT-preserving curriculum change, such as holding more selected
-simplex auxiliary pressure (`0.75` instead of `0.5`) or alternating a brief
-auxiliary rewarm, while keeping the architecture and selected face/tetra
-boundary-realization losses unchanged. Keep `EXPERIMENT_RESULTS.md` only for
-returned Runpod results.
+Treat E55 as the current lDDT peak checkpoint. Do not spend on a blind
+30,000-step continuation yet, and do not keep turning the scalar auxiliary
+knob. The full reread of the reference PDFs in `references/papers/` points
+back to the core topological claim: the model should improve by changing the
+cell complex and its multi-rank message routes, not by attaching generic
+metric pressure to the output coordinates.
 
-E57 should resume the E55 checkpoint at step 3000 and continue to step 4000
-with effective batch 8 and `simplex_aux_weight=0.75`. This is a topological
-curriculum test: selected face/tetra coordinate and boundary-distance
-realization remain the same, but the branch asks whether slightly stronger
-selected-cell pressure preserves the lDDT peak better than E56's constant
-`0.5` while retaining the FoldScore/dRMSD gains.
+E58 should resume the E55 checkpoint with the checkpoint-compatible
+`full_msa_to_face` variant name, but activate the existing directed
+outer-edge context path via a model-config override:
+`--simplex-outer-edge-context-scale 0.25`. This is a Topotein-inspired
+architecture test. Higher-rank selected face/tetra cochains receive context
+through directed boundary/interior edges that leave one selected cell and
+enter another, while preserving the E55 selected-coordinate and
+boundary-distance losses at the lDDT-preserving `simplex_aux_weight=0.5`.
 
-The reference PDFs added in `references/papers/` sharpen the next branch of
-the plan. If E38 does not move the validation curve, prefer Topotein-inspired
-architecture changes over more scalar auxiliary losses: outer-edge style
-communication between selected cells, edge-frame scalarization for simplex
-messages, and possibly latent rank-2 segment cells built only from official
-inputs and recycled geometry. These keep the work in the topological view
-because they change how cochains on residues, edges, faces, and tetra-like
-cells exchange information.
+The runner should keep `EXPERIMENT_RESULTS.md` only for returned Runpod
+results. E58 is worth keeping only if it beats E55's `val_lddt_ca=0.3604`, or
+if it preserves lDDT while improving FoldScore/dRMSD enough to justify a
+longer effective-batch-8 confirmation. If it drifts down like E57, reject the
+branch and move to another architecture-level topology change such as
+edge-frame scalarized simplex messages or latent rank-2 segment cells built
+only from official inputs and recycled geometry.
 
 Yes. With templates forbidden, the right construction is:
 

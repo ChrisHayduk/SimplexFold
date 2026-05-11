@@ -710,6 +710,23 @@ def _variant_config(base_config: Any, variant: str) -> Any:
     raise ValueError(f"Unknown variant: {variant}")
 
 
+def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
+    overrides: dict[str, Any] = {}
+    for field, value in (
+        ("simplex_structure_readout_scale", args.simplex_structure_readout_scale),
+        ("simplex_outer_edge_update_scale", args.simplex_outer_edge_update_scale),
+        ("simplex_outer_edge_context_scale", args.simplex_outer_edge_context_scale),
+        ("simplex_hodge_face_update_scale", args.simplex_hodge_face_update_scale),
+        ("simplex_edge_frame_message_scale", args.simplex_edge_frame_message_scale),
+        ("simplex_segment_cell_scale", args.simplex_segment_cell_scale),
+        ("simplex_segment_radius", args.simplex_segment_radius),
+        ("simplex_c_segment", args.simplex_c_segment),
+    ):
+        if value is not None:
+            overrides[field] = value
+    return replace(config, **overrides) if overrides else config
+
+
 def _build_loss_fn(training_config: TrainingConfig) -> AlphaFoldLoss:
     return AlphaFoldLoss(
         finetune=False,
@@ -1612,6 +1629,54 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-update-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-update-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
+        "--simplex-structure-readout-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for simplex readouts into the structure module.",
+    )
+    parser.add_argument(
+        "--simplex-outer-edge-update-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for selected-cell outer-edge updates.",
+    )
+    parser.add_argument(
+        "--simplex-outer-edge-context-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for directed outer-edge context updates.",
+    )
+    parser.add_argument(
+        "--simplex-hodge-face-update-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for Hodge-style face residual updates.",
+    )
+    parser.add_argument(
+        "--simplex-edge-frame-message-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for edge-frame scalarized simplex messages.",
+    )
+    parser.add_argument(
+        "--simplex-segment-cell-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for latent rank-2 segment cells.",
+    )
+    parser.add_argument(
+        "--simplex-segment-radius",
+        type=int,
+        default=None,
+        help="Override the model config radius for latent rank-2 segment cells.",
+    )
+    parser.add_argument(
+        "--simplex-c-segment",
+        type=int,
+        default=None,
+        help="Override the model config channel count for latent rank-2 segment cells.",
+    )
+    parser.add_argument(
         "--simplex-local-neighbor-k",
         type=float,
         default=None,
@@ -1845,6 +1910,14 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_update_scale_final": args.simplex_update_scale_final,
         "simplex_update_scale_ramp_start_step": args.simplex_update_scale_ramp_start_step,
         "simplex_update_scale_ramp_steps": args.simplex_update_scale_ramp_steps,
+        "simplex_structure_readout_scale": args.simplex_structure_readout_scale,
+        "simplex_outer_edge_update_scale": args.simplex_outer_edge_update_scale,
+        "simplex_outer_edge_context_scale": args.simplex_outer_edge_context_scale,
+        "simplex_hodge_face_update_scale": args.simplex_hodge_face_update_scale,
+        "simplex_edge_frame_message_scale": args.simplex_edge_frame_message_scale,
+        "simplex_segment_cell_scale": args.simplex_segment_cell_scale,
+        "simplex_segment_radius": args.simplex_segment_radius,
+        "simplex_c_segment": args.simplex_c_segment,
         "simplex_local_neighbor_k": args.simplex_local_neighbor_k,
         "simplex_local_neighbor_k_final": args.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": args.simplex_local_neighbor_k_ramp_start_step,
@@ -1892,7 +1965,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
 
     rows: list[dict[str, Any]] = []
     for variant in args.variants:
-        config = _variant_config(base_config, variant)
+        config = _apply_model_config_overrides(_variant_config(base_config, variant), args)
         rows.append(
             _train_variant(
                 variant=variant,

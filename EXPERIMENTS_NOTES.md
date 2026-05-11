@@ -1553,3 +1553,35 @@
 - E57 remote process: Python PID `758`, log
   `/workspace/SimplexFold/logs/e57_aux075_rewarm_from_e55.log`, artifacts
   `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e57_aux075_rewarm_from_e55_s4000_c256_m64/`.
+- E57 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e57_aux075_rewarm_from_e55_s4000_c256_m64/`.
+  Step 3500 reached `val_lddt_ca=0.33945486322045326`, FoldScore
+  `0.35038202442228794`, `val_ca_drmsd=10.685163050889969`, and
+  predicted/true C-alpha radius of gyration `11.53536543250084 /
+  15.403406739234924`. Step 4000 ended at
+  `val_lddt_ca=0.3465292062610388`, FoldScore `0.34945190511643887`,
+  `val_ca_drmsd=10.70906126499176`, and radius `10.857420325279236 /
+  15.403406739234924`.
+- E57 owned Runpod pod `2lbuhxawih0vzl` was stopped and deleted after artifacts
+  were copied. A post-delete lookup returned 404, as expected. No other
+  Runpod instances were managed.
+- E57 interpretation: aux-0.75 rewarming improves the global/FoldScore side of
+  the objective, including the best FoldScore observed so far, but it worsens
+  local C-alpha lDDT versus E55 and E56. Reject for the primary objective.
+  More scalar auxiliary tuning is less promising than a Topotein-style
+  architecture change.
+- 2026-05-11 PDF reread: both local reference PDFs in `references/papers/`
+  hash-match the downloads and were read via full text extraction into
+  `tmp/pdfs/`. The TDL guide reinforces that topology construction,
+  incidence/adjacency operators, and intra-/inter-rank aggregation are model
+  choices. Topotein gives the protein-specific path: directed residue
+  interactions, outer-edge neighborhoods, edge-centric frames, and deep
+  integration of higher-rank cell updates outperform superficial topological
+  feature additions.
+- E58 live plan: resume the E55 checkpoint with variant name
+  `full_msa_to_face` but activate `simplex_outer_edge_context_scale=0.25` via
+  a model-config CLI override. This keeps checkpoint metadata compatible while
+  testing the Topotein-style directed outer-edge context path from the lDDT
+  peak checkpoint. Keep selected coordinate weights `1.0/1.0`, selected
+  boundary-distance weights `0.5/0.5`, effective batch 8, crop 256, MSA depth
+  64, and `simplex_aux_weight=0.5`.
