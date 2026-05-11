@@ -70,3 +70,4 @@ recorded in the running notes for that run.
 | E50 selected boundary expansion hinge | completed | 500 | 0.2731 | 0.2731 | 0.2334 | 14.7809 | 6.6087 / 15.4034 | rejected |
 | E51 expansion hinge + structure readout | completed | 250 | 0.2375 | 0.2272 | 0.2233 | 15.7161 | 5.7622 / 15.4034 | rejected |
 | E52 selected cell dropout | completed | 500 | 0.2630 | 0.2630 | 0.2301 | 14.2399 | 7.2057 / 15.4034 | rejected |
+| E53 longer effective-batch-8 scaffold | completed | 1000 | 0.3480 | 0.3480 | 0.2729 | 12.6378 | 8.5184 / 15.4034 | kept for E54 continuation |

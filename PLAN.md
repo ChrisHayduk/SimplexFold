@@ -1,18 +1,18 @@
-## Current Plan: Longer E15 Effective-Batch Gate
+## Current Plan: E54 Effective-Batch Auxiliary Anneal
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
-The next move should stop adding side paths and return to the strongest
-observed branch: E15's `full_msa_to_face` selected simplex realization
-scaffold with the auxiliary weight annealed to `0.5`.
+E53 then showed that the strongest branch, E15's `full_msa_to_face` selected
+simplex realization scaffold, can catch up under effective batch 8 if it is
+allowed to run past the first 500 optimizer steps.
 
 The active goal calls for a final 30,000-step effective-batch-8 confirmation.
-E25 only tested that regime for 500 optimizer steps, where it was viable but
-not improved. The next concrete gate should extend the E15 scaffold under
-effective batch 8 before spending on a full 30k run. This keeps the work in
-the simplicial view because the architecture and losses remain the selected
-face/tetra boundary-realization pathway; the new question is whether the
-intended optimizer regime gives that topology enough stable updates to matter.
+E53 reached `val_lddt_ca=0.3480` at step 1000, close to the current E15 best
+of `0.3556`. E54 should now resume that checkpoint and apply the E15 lesson:
+anneal only the selected-simplex auxiliary weight from `1.0` to `0.5` while
+keeping the architecture and selected boundary realization losses unchanged.
+This keeps the work in the simplicial view because the curriculum relaxes the
+pressure on explicit face/tetra cochains after they have acted as a scaffold.
 Keep `EXPERIMENT_RESULTS.md` only for returned Runpod results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of

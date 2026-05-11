@@ -1671,7 +1671,7 @@ next main branch.
 
 ### E53: Longer Effective-Batch-8 E15 Scaffold
 
-Status: queued for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E25 showed that effective batch 8 is operationally viable but did
 not improve the 500-step point. The final objective, however, requires a
@@ -1690,3 +1690,32 @@ Decision rule: run 1000 optimizer steps at crop 256 / MSA depth 64, evaluating
 at steps 500 and 1000. Continue toward a longer effective-batch-8 run only if
 step 1000 improves clearly over E25 step 500 (`val_lddt_ca=0.2946`) or shows
 substantially better FoldScore/radius without losing lDDT.
+
+Result: keep for continuation. Step 500 reached `val_lddt_ca=0.2807`,
+FoldScore `0.2514`, `val_ca_drmsd=14.9835`, and predicted/true C-alpha
+radius of gyration `6.1825 / 15.4034`, below E25 lDDT but with better
+FoldScore. Step 1000 rebounded to `val_lddt_ca=0.3480`, FoldScore `0.2729`,
+`val_ca_drmsd=12.6378`, and radius `8.5184 / 15.4034`. This is the strongest
+short effective-batch-8 result so far and close enough to E15 to justify an
+E15-style auxiliary anneal continuation.
+
+### E54: Effective-Batch-8 Auxiliary Anneal Continuation
+
+Status: launched on Runpod.
+
+Hypothesis: E53 shows that effective-batch-8 training catches up after 1000
+optimizer steps, while E15 showed that reducing selected-simplex auxiliary
+pressure from `1.0` to `0.5` can improve lDDT once the scaffold has learned a
+useful geometry prior. Applying the E15 anneal to the E53 checkpoint should
+test whether the target optimizer regime can match or beat E15 earlier.
+
+Mechanism: resume E53 at step 1000 and continue to step 2000 with
+`batch_size=1`, `grad_accum_steps=8`, `full_msa_to_face`, and the same
+selected coordinate/boundary-distance losses. Ramp only `simplex_aux_weight`
+from `1.0` to `0.5` over steps 1000-1500. This remains a selected
+simplex-realization curriculum rather than a generic coordinate loss.
+
+Decision rule: keep and extend toward 3000+ effective-batch-8 steps only if
+the continuation beats E53's `val_lddt_ca=0.3480` or materially improves
+FoldScore/dRMSD without losing lDDT. If it falls below the E53 plateau, do
+not spend on a 30k confirmation yet.

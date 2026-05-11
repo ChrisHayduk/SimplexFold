@@ -1459,3 +1459,29 @@
   weights `1.0/1.0`, and selected boundary-distance weights `0.5/0.5`.
   Evaluate at steps 500 and 1000. Do not write E53 to
   `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+- E53 launched on owned temporary Runpod H100 pod `egsopc48v9fjz8`
+  (`codex-simplexfold-e53-runpod-20260510`) from commit `26cc074`. Clean
+  launch audit: public train/val/all manifest counts `10000/1000/11000`,
+  hidden manifest absent, feature/label `.npz` counts `11000/11000`,
+  encoded-chain `bad_paths=0`, H100 CUDA available, FoldScore import works,
+  AF2-medium pair-only `3,106,642`, SimplexFold medium `3,106,690`, E53
+  `3,106,690`, and MSA-to-face enabled.
+- E53 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e53_effective_batch8_s1000_c256_m64/`.
+  Step 500 reached `val_lddt_ca=0.28071699384599924`, FoldScore
+  `0.25139740761369467`, `val_ca_drmsd=14.983468919992447`, and
+  predicted/true C-alpha radius of gyration `6.182499825954437 /
+  15.403406739234924`. Step 1000 ended at
+  `val_lddt_ca=0.3479556031525135`, FoldScore `0.2728881845250726`,
+  `val_ca_drmsd=12.637772142887115`, and radius
+  `8.518412441015244 / 15.403406739234924`.
+- E53 interpretation: effective batch 8 is promising once it runs past the
+  first 500 optimizer steps. It is still below E15's `0.3556` best, but it
+  strongly beats E25 and gets close enough to justify an E15-style auxiliary
+  anneal continuation before deciding whether to spend on 30k steps.
+- E54 launched on the same owned H100 pod `egsopc48v9fjz8`, resuming E53 from
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e53_effective_batch8_s1000_c256_m64/checkpoints/full_msa_to_face_latest.pt`.
+  The continuation runs to step 2000 with effective batch 8, selected
+  coordinate weights `1.0/1.0`, selected boundary-distance weights `0.5/0.5`,
+  and `simplex_aux_weight` ramped from `1.0` to `0.5` over steps 1000-1500.
+  Do not write E54 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
