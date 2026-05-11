@@ -2052,3 +2052,9 @@
   by the benchmark CLI and propagated into the `SimplexGeometryLoss`. Local
   check passed:
   `python -m pytest tests/test_nanofold_public_benchmarks.py::test_topology_margin_args_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_benchmark_loss_builder_applies_topology_margin_config tests/test_nanofold_public_benchmarks.py::test_simplex_topology_metrics_report_boundary_reuse`.
+- E65 2026-05-11 19:47Z status check: owned Runpod pod `21pml3y3hbbbpb`
+  remains healthy with Python PID `922` active, nonzero B200 utilization, and
+  `13244 MiB` CUDA memory allocated. The run still has no `results.json`,
+  `results.csv`, checkpoint, or new validation row; latest history remains the
+  inherited E64 step 4000 with `val_lddt_ca=0.37385757453739643`. Continue to
+  leave `EXPERIMENT_RESULTS.md` unchanged until E65 returns.
