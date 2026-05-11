@@ -2206,7 +2206,7 @@ Validation:
 
 ### E66: Coface-Balanced Selected-Boundary lDDT
 
-Status: running on owned Runpod pod `xlvkre8ww4utac`.
+Status: completed on Runpod and rejected.
 
 Hypothesis: E63/E64 show that selected-boundary lDDT improves the learned
 boundary 1-skeleton, but the same undirected residue edge can appear many
@@ -2232,7 +2232,7 @@ weights `0.5`, `simplex_aux_weight=0.5`, and
 boundary realization against E65's unbalanced static step-4500 point before
 spending on a longer continuation.
 
-Launch: E66 is running on owned Runpod B200 pod `xlvkre8ww4utac`
+Launch: E66 ran on owned Runpod B200 pod `xlvkre8ww4utac`
 (`codex-simplexfold-e66-runpod-20260511`) from commit `c2dce57`. Clean launch
 audit after copying only public data/code: public train/val/all manifest
 counts are `10000/1000/11000`, remote manifest files are exactly `all.txt`,
@@ -2243,10 +2243,46 @@ pair-only has `3,106,642` parameters, and E66 model has `3,106,690`
 parameters (`+0.0015%`). `run_metadata.json` records
 `simplex_boundary_degree_normalize=true`, static face/tetra
 selected-boundary lDDT weights `0.05` / `0.05`, weights-only resume from E64,
-crop 256, MSA depth 64, and no templates. Do not add E66 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+crop 256, MSA depth 64, and no templates.
 
 Decision rule: keep only if coface balancing improves or preserves
 `val_lddt_ca` while reducing selected-boundary contraction and avoiding a
 FoldScore/dRMSD regression. Reject if it repeats E24's early-run behavior and
 weakens the selected-boundary signal.
+
+Result: reject. E66 completed at step 4500 with
+`val_lddt_ca=0.3505`, FoldScore `0.3602`, `val_ca_drmsd=10.6237`, and
+predicted/true C-alpha radius `11.8892 / 15.4034`. Selected face/tetra
+boundary lDDT dropped to `0.5090` / `0.4948`, contraction fractions rose to
+`0.7145` / `0.7136`, and boundary length MAE rose to `2.8951` / `3.0322`.
+Coface balancing reduced repeated-edge weighting but weakened the actual
+selected-boundary realization signal, so it is not the next branch. Artifacts
+were copied locally, and the owned E66 pod was stopped and deleted; a
+post-delete lookup returned 404.
+
+### E67: Weak Selected-Complex Structure Readout
+
+Status: planned from E64.
+
+Hypothesis: E65 and E66 show that changing selected-boundary loss weighting
+does not preserve the E64 lDDT peak. The next topology-native test should
+change communication instead: route a small selected face/tetra cochain summary
+into the structure module so higher-rank cell state participates in coordinate
+realization, rather than only supervising final boundary edges.
+
+Mechanism: use the existing simplicial structure readout path with
+`--simplex-structure-readout-scale 0.05` while keeping the E64 selected-boundary
+lDDT and coordinate-realization losses. This adds no new parameters beyond the
+already budgeted SimplexFold modules and keeps the intervention on selected
+higher-order cells.
+
+Planned launch: resume E64 from its step-4000 checkpoint and run a 500-step
+gate to step 4500 with static selected-boundary lDDT weights `0.05`, selected
+face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
+weights `0.5`, `simplex_aux_weight=0.5`, and
+`--simplex-structure-readout-scale 0.05`.
+
+Decision rule: keep only if the step-4500 lDDT improves over E65's unbalanced
+continuation (`0.3645`) without a large FoldScore/dRMSD or selected-boundary
+diagnostic regression. Continue only if it approaches or exceeds E64's
+`0.3739`; reject if it behaves like the earlier broad readout sidecars.

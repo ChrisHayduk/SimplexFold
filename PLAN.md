@@ -1,4 +1,4 @@
-## Current Plan: E66 Coface-Balanced Boundary lDDT
+## Current Plan: E67 Weak Selected-Complex Structure Readout
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -40,6 +40,13 @@ step 4500 reached `val_lddt_ca=0.3645`, and step 5000 reached
 `0.3666`, but the primary C-alpha lDDT target did not survive the
 continuation.
 
+E66 tested coface-balanced selected-boundary lDDT from E64 by enabling
+`--simplex-boundary-degree-normalize`. Reject it: the step-4500 result dropped
+to `val_lddt_ca=0.3505`, FoldScore `0.3602`, and selected face/tetra boundary
+lDDT `0.5090` / `0.4948`. Boundary contraction also worsened to about `0.714`,
+so inverse coface-degree weighting weakens the selected-boundary signal rather
+than making it cleaner.
+
 Do not spend on a blind 30,000-step continuation yet, and do not keep turning
 the scalar auxiliary knob. The full reread of the reference PDFs in
 `references/papers/` points back to the core topological claim: the model
@@ -78,31 +85,24 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
-The active branch is E66: a coface-balanced selected-boundary lDDT ablation
-using `--simplex-boundary-degree-normalize`. The justification is topological:
-selected faces and tetras define the boundary 1-skeleton, but each undirected
-edge should not dominate just because it appears in many cofaces. This is not
-a dense all-pairs metric loss; it changes how the selected sparse cell complex
-weights its own boundary 1-cochain.
+The active branch is E67: weak selected-complex structure readout from E64.
+This changes the communication path rather than the boundary-loss weighting:
+selected face/tetra cochain summaries are allowed to enter the structure-module
+input through the existing simplicial readout path with
+`--simplex-structure-readout-scale 0.05`. The topological claim is that
+higher-rank cell states should influence coordinate realization through their
+own multi-rank representation, not only through scalar auxiliary losses on
+the final coordinates.
 
-Launch E66 from the E64 step-4000 checkpoint for a 500-step gate to step 4500,
-with the static `0.05` selected-boundary lDDT weights, selected face/tetra
+Launch E67 from the E64 step-4000 checkpoint for a 500-step gate to step 4500,
+with static selected-boundary lDDT weights `0.05`, selected face/tetra
 coordinate weights `1.0`, selected boundary coordinate-distance weights `0.5`,
-`simplex_aux_weight=0.5`, and `--simplex-boundary-degree-normalize`. This
-directly compares coface-balanced boundary realization against E65's unbalanced
-step-4500 point while avoiding another rejected relaxation schedule. Keep only
-if it preserves or improves E64/E65 C-alpha lDDT while reducing boundary-edge
-over-reuse, contraction, or boundary length error.
-
-E66 is running on the owned Runpod B200 pod `xlvkre8ww4utac` from commit
-`c2dce57`. Launch audit passed with public train/val/all counts
-`10000/1000/11000`, remote manifest files exactly `all.txt`, `train.txt`, and
-`val.txt`, hidden manifest/features/labels absent, feature/label NPZ counts
-`11000/11000`, the E64 checkpoint present, FoldScore import working, CUDA
-reporting `NVIDIA B200`, `--simplex-boundary-degree-normalize` recorded in
-`run_metadata.json`, and `3,106,690` parameters (`+0.0015%` versus
-AF2-medium pair-only). Do not add E66 to `EXPERIMENT_RESULTS.md` until the
-Runpod run returns.
+`simplex_aux_weight=0.5`, and `--simplex-structure-readout-scale 0.05`. This
+directly tests whether a small architecture readout can preserve E64's lDDT
+better than E65's unbalanced continuation (`0.3645` at step 4500) and E66's
+coface-balanced loss (`0.3505`). Keep only if it improves the step-4500 lDDT
+relative to E65 and does not badly regress FoldScore, dRMSD, or selected
+boundary diagnostics; continue only if it approaches or exceeds E64.
 
 Yes. With templates forbidden, the right construction is:
 

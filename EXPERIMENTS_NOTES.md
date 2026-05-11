@@ -2106,3 +2106,25 @@
   initialized 0 new/missing tensors, and started a fresh optimizer. CUDA is
   active with B200 memory allocated. Heartbeat `check-simplexfold-e57-runpod`
   has been retargeted to E66 pod `xlvkre8ww4utac` only.
+- E66 returned on owned Runpod pod `xlvkre8ww4utac` and was rejected. Step
+  4500 reached `val_lddt_ca=0.35054648853838444`, FoldScore
+  `0.3602386135607958`, `val_ca_drmsd=10.623665452003479`, and predicted/true
+  C-alpha radius `11.889198303222656 / 15.40340667963028`. Selected
+  face/tetra boundary lDDT ended at `0.5090303029865026` /
+  `0.49476016499102116`, contraction fractions at `0.7145102694630623` /
+  `0.7135652974247932`, boundary length MAE at `2.8950554355978966` /
+  `3.032222591340542`, mean boundary-edge degree at `11.601061284542084` /
+  `77.34040784835815`, and unique-edge fraction at `0.08682302490902588` /
+  `0.013023453736353881`.
+- E66 artifacts and launch log were copied locally under ignored
+  `artifacts/nanofold_public_benchmarks/e66_coface_balanced_boundary_lddt005_from_e64_s4500_c256_m64/`,
+  including `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, checkpoint, and
+  `runpod_launch.log`. The owned E66 pod was stopped and deleted after copying;
+  a post-delete lookup returned 404. No other Runpod instances were managed.
+- E66 interpretation: reject coface-balanced selected-boundary lDDT. It
+  lowered main lDDT below E65's step-4500 unbalanced continuation and also
+  weakened the topology diagnostics it was meant to clean up. Next test E67:
+  weak selected-complex structure readout from the E64 checkpoint using
+  `--simplex-structure-readout-scale 0.05` with the E64 selected-boundary
+  lDDT/coordinate-loss recipe.
