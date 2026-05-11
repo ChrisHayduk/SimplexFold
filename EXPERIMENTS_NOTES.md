@@ -1540,3 +1540,16 @@
   `simplex_aux_weight=0.75`. This is a selected-simplex auxiliary rewarm from
   the lDDT peak, not a dense metric-loss change. Do not write E57 to
   `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+- E57 launched on owned H100 Runpod pod `2lbuhxawih0vzl`
+  (`codex-simplexfold-e57-runpod-20260511`) from commit `f62c180`. Clean
+  launch audit after copying only public data/code: public train/val/all
+  manifest counts `10000/1000/11000`, hidden manifest absent, encoded
+  feature/label `.npz` counts `11000/11000`, encoded-chain `bad_paths=0`,
+  E55 checkpoint present at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e55_effective_batch8_aux05_s3000_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  H100 CUDA available, NanoFold `foldscore_components` import works,
+  AF2-medium pair-only `3,106,642`, and E57 `3,106,690` parameters
+  (`+0.0015%`).
+- E57 remote process: Python PID `758`, log
+  `/workspace/SimplexFold/logs/e57_aux075_rewarm_from_e55.log`, artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e57_aux075_rewarm_from_e55_s4000_c256_m64/`.

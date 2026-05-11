@@ -1784,7 +1784,7 @@ spending immediately on a 30k confirmation.
 
 ### E57: Aux-0.75 Rewarm From E55
 
-Status: planned for Runpod.
+Status: launched on Runpod.
 
 Hypothesis: E56 shows that continuing E55 with constant
 `simplex_aux_weight=0.5` improves FoldScore and dRMSD but does not preserve
