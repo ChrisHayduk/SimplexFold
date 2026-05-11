@@ -2045,3 +2045,10 @@
   `results.csv`, checkpoint, or step-4500/5000 history row; latest history row
   remains the inherited E64 step 4000. Leave the pod running and continue to
   keep `EXPERIMENT_RESULTS.md` unchanged until a returned result exists.
+- E66 readiness check while E65 continues: the runner already reports selected
+  boundary-edge mean/max incidence degree and unique-edge fraction, which is
+  the diagnostic needed for the coface-balanced boundary-lDDT ablation. Added
+  focused test coverage that `--simplex-boundary-degree-normalize` is accepted
+  by the benchmark CLI and propagated into the `SimplexGeometryLoss`. Local
+  check passed:
+  `python -m pytest tests/test_nanofold_public_benchmarks.py::test_topology_margin_args_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_benchmark_loss_builder_applies_topology_margin_config tests/test_nanofold_public_benchmarks.py::test_simplex_topology_metrics_report_boundary_reuse`.

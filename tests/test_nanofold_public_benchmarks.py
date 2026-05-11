@@ -646,6 +646,7 @@ def test_topology_margin_args_are_accepted_by_cli_parser():
             "0.5",
             "--simplex-coordinate-expansion-tolerance",
             "0.05",
+            "--simplex-boundary-degree-normalize",
         ]
     )
 
@@ -664,6 +665,7 @@ def test_topology_margin_args_are_accepted_by_cli_parser():
     assert args.simplex_face_coordinate_expansion_weight == 0.4
     assert args.simplex_tetra_coordinate_expansion_weight == 0.5
     assert args.simplex_coordinate_expansion_tolerance == 0.05
+    assert args.simplex_boundary_degree_normalize is True
 
 
 def test_benchmark_loss_builder_applies_topology_margin_config():
@@ -681,6 +683,7 @@ def test_benchmark_loss_builder_applies_topology_margin_config():
             simplex_face_coordinate_expansion_weight=0.4,
             simplex_tetra_coordinate_expansion_weight=0.5,
             simplex_coordinate_expansion_tolerance=0.05,
+            simplex_boundary_degree_normalize=True,
         )
     )
 
@@ -696,3 +699,4 @@ def test_benchmark_loss_builder_applies_topology_margin_config():
     assert loss_fn.simplex_geometry_loss.face_coordinate_expansion_weight == 0.4
     assert loss_fn.simplex_geometry_loss.tetra_coordinate_expansion_weight == 0.5
     assert loss_fn.simplex_geometry_loss.coordinate_expansion_tolerance == 0.05
+    assert loss_fn.simplex_geometry_loss.boundary_degree_normalize is True
