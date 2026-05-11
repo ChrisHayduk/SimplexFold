@@ -79,3 +79,4 @@ recorded in the running notes for that run.
 | E59 damped outer-edge context from E55 | completed | 3500 | 0.3500 | 0.3500 | 0.3516 | 10.9502 | 11.1978 / 15.4034 | rejected; best FoldScore but still below E55 lDDT |
 | E60 scheduled damped outer-edge context | completed | 3500 | 0.3462 | 0.3462 | 0.3431 | 10.9235 | 10.8522 / 15.4034 | rejected; scheduling did not preserve E55 lDDT |
 | E61 scheduled edge-frame messages | completed | 3500 | 0.3456 | 0.3456 | 0.3471 | 10.7730 | 11.1613 / 15.4034 | rejected; better dRMSD/expansion but worse lDDT |
+| E62 scheduled Hodge face residual | completed | 3500 | 0.3468 | 0.3468 | 0.3450 | 10.9016 | 10.7278 / 15.4034 | rejected; boundary lDDT slightly improves but main lDDT remains below E55 |

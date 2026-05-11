@@ -2005,7 +2005,7 @@ Validation:
 
 ### E62: Scheduled Hodge Face Residual From E55
 
-Status: launched on owned Runpod pod `39s6arzja95amz`; result pending.
+Status: completed on Runpod.
 
 Hypothesis: the reference material emphasizes that topological networks should
 move information through incidence maps across ranks. E42 tested the static
@@ -2031,7 +2031,7 @@ Decision rule: keep only if the step-3500 lDDT beats or stays very close to
 E55's `0.3604`; otherwise reject and use selected-boundary diagnostics to
 decide whether adjacency mixing is over-smoothing the sparse complex.
 
-Launch: E62 is running on owned Runpod H100 NVL pod `39s6arzja95amz` from
+Launch: E62 ran on owned Runpod H100 NVL pod `39s6arzja95amz` from
 commit `4517f98`. A first replacement pod, `f3j3v4qd4f6w8w`, never exposed
 SSH and was stopped/deleted before any data staging or training. Final launch
 audit on `39s6arzja95amz` passed: public train/val/all counts are
@@ -2042,11 +2042,42 @@ Hodge model has `3,106,690` parameters (+0.0015% versus AF2-medium pair-only
 `3,106,642`). The runtime scale audit confirmed `0.0` at step 3000, `0.025`
 at step 3250, and `0.05` at step 3500. The run resumed E55 at step 3000 with
 weights-only loading and initialized `0` new/missing tensors, as expected for
-a zero-parameter Hodge residual. Do not write E62 to `EXPERIMENT_RESULTS.md`
-until the Runpod run returns.
+a zero-parameter Hodge residual.
+
+Result: reject. E62 completed at step 3500 with
+`val_lddt_ca=0.3468`, FoldScore `0.3450`, `val_ca_drmsd=10.9016`, and
+predicted/true C-alpha radius of gyration `10.7278 / 15.4034`. The selected
+face/tetra boundary lDDT diagnostics were `0.4829` / `0.4694`, slightly above
+E61's edge-frame run, but the main validation C-alpha lDDT stayed well below
+E55's `0.3604`. Artifacts were copied locally, and the owned E62 pod was
+stopped and deleted after the returned result was recorded.
 
 Validation:
 
 - `python -m py_compile minalphafold/trainer.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_simplex.py::test_hodge_face_adapter_scale_changes_outputs_without_new_parameters tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_simplex.py::test_hodge_face_adapter_scale_changes_outputs_without_new_parameters tests/test_simplex.py::test_edge_frame_message_runtime_scale_gates_pair_readout tests/test_simplex.py::test_outer_edge_context_runtime_scale_gates_context_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_hodge_face_update_adds_no_parameters`
+
+### E63: Selected-Boundary lDDT Curriculum From E55
+
+Status: planned.
+
+Hypothesis: E61 and E62 both improve aspects of global geometry while leaving
+the learned selected complex with weak boundary distance preservation: selected
+face/tetra boundary lDDT remains below `0.5`, and roughly three quarters of
+selected boundary edges are contracted. The next topology-native objective is
+not a generic all-pairs lDDT loss. It should supervise only the boundary
+1-skeleton induced by the model-selected face and tetra cells, asking the
+explicit simplicial complex to realize its own selected edges more faithfully.
+
+Mechanism: resume E55 with `full_msa_to_face`, keep the selected
+coordinate/selected boundary-distance weights from E55, and add a small
+selected-boundary lDDT loss on both faces and tetras. Start with a conservative
+static weight gate unless a loss-specific ramp is implemented first:
+`--simplex-face-boundary-lddt-weight 0.05` and
+`--simplex-tetra-boundary-lddt-weight 0.05`.
+
+Decision rule: keep only if the step-3500 validation lDDT beats or stays very
+close to E55's `0.3604` while improving selected-boundary lDDT and contraction
+diagnostics. Reject if it behaves like E19/E20 and trades local C-alpha lDDT
+for a narrow auxiliary gain.

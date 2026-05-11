@@ -1826,3 +1826,27 @@
   matching model tensors, initialized 0 new/missing tensors, and started a
   fresh optimizer. Do not add E62 to `EXPERIMENT_RESULTS.md` until the Runpod
   run returns.
+- E62 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e62_hodge_face_ramp005_from_e55_s3500_c256_m64/`.
+  Step 3500 reached `val_lddt_ca=0.34682471491396427`, FoldScore
+  `0.34496236592531204`, `val_ca_drmsd=10.901632159948349`, and
+  predicted/true C-alpha radius of gyration `10.727833718061447 /
+  15.40340667963028`. Selected-boundary diagnostics showed face/tetra
+  boundary lDDT `0.482933746650815` / `0.46936048567295074`, with contraction
+  fractions `0.7394912205636501` / `0.7400957755744457`.
+- E62 owned Runpod pod `39s6arzja95amz` was stopped and deleted after
+  artifacts were copied. A post-delete lookup returned 404, as expected. No
+  other Runpod instances were managed. The first E62 pod
+  `f3j3v4qd4f6w8w` had already been stopped/deleted before data staging.
+- E62 interpretation: reject. Hodge face incidence mixing slightly improves
+  selected-boundary lDDT relative to E61, but it still reduces the main
+  validation C-alpha lDDT below E55's `0.3604`. The next experiment should
+  target the selected boundary 1-skeleton directly rather than adding another
+  face/tetra message route.
+- E63 live plan: resume E55 with `full_msa_to_face` and add small
+  selected-boundary lDDT weights on the model-selected face/tetra boundary
+  edges only (`0.05`/`0.05`). This is not a generic lDDT loss: the supervision
+  is restricted to the boundary edges induced by learned sparse 2-/3-cells,
+  so it directly tests whether the explicit simplicial complex can realize
+  its own selected 1-skeleton without contraction. Do not add E63 to
+  `EXPERIMENT_RESULTS.md` until a Runpod run returns.

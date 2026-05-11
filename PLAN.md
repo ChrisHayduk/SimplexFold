@@ -1386,3 +1386,20 @@ effect nor recovered E49's final lDDT. Avoid broad structure-readout
 reinjection for now; the next useful branch should likely return to the
 best E15 family and change optimization/curriculum around the existing
 selected-boundary losses rather than adding another auxiliary/readout path.
+
+## 2026-05-11 E62 Update
+
+E62 result: reject. The scheduled Hodge face residual from the E55 checkpoint
+completed at step 3500 with `val_lddt_ca=0.3468`, FoldScore `0.3450`,
+`val_ca_drmsd=10.9016`, and predicted/true C-alpha radius of gyration
+`10.7278 / 15.4034`. The Hodge residual is a clean topological incidence
+operation and adds no parameters, but its lower/upper face-adjacency mixing
+still did not preserve E55's `0.3604` C-alpha lDDT.
+
+Immediate E63 branch: use the selected-boundary diagnostics as the next
+topology-native target. E61/E62 leave selected face/tetra boundary lDDT below
+`0.5` with high contraction fractions, so test a conservative selected-boundary
+lDDT objective only on the boundary 1-skeleton induced by model-selected
+faces and tetras. This remains inside the SimplexFold motivation: it asks the
+explicit sparse complex to realize its own edges, rather than optimizing a
+generic all-pairs or full-structure lDDT surrogate.
