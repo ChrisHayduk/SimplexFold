@@ -1817,7 +1817,7 @@ auxiliary rewarming and points back to architecture-level topology changes.
 
 ### E58: Resume-Compatible Outer-Edge Context From E55
 
-Status: planned.
+Status: launched on Runpod.
 
 Hypothesis: the reference PDFs, especially Topotein, argue that effective
 protein TDL requires dedicated cross-rank and within-rank communication over
@@ -1844,3 +1844,11 @@ Decision rule: keep only if step 3500 or 4000 beats E55's
 `val_lddt_ca=0.3604`, or preserves lDDT while materially improving FoldScore
 or dRMSD. Reject if it follows E57's pattern of better global geometry with
 worse local lDDT.
+
+Launch: E58 is running on owned Runpod H100 pod `714wc1nzy3t8qz` from commit
+`41af00a`. Launch audit passed: public train/val/all counts are
+`10000/1000/11000`, no hidden manifest was staged, feature/label cache counts
+are `11000/11000`, encoded missing paths are `0`, FoldScore import works,
+CUDA reports `NVIDIA H100 80GB HBM3`, and parameters are `3,183,282`
+(+2.47% versus AF2-medium pair-only `3,106,642`). Do not write E58 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.

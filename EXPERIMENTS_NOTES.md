@@ -1590,3 +1590,16 @@
   `--resume-model-weights-only` to load matching E55 tensors, initialize the
   new topology-context tensors fresh, and restart optimizer state while
   preserving the E55 step/history context.
+- E58 launched on owned H100 Runpod pod `714wc1nzy3t8qz`
+  (`codex-simplexfold-e58-runpod-20260511`) from commit `41af00a`. Clean
+  launch audit: public train/val/all manifest counts `10000/1000/11000`,
+  hidden manifest absent, feature/label `.npz` counts `11000/11000`,
+  encoded missing paths `0`, H100 CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E58 `3,183,282` parameters (`+2.47%`). Partial checkpoint load from E55
+  loaded `1196` matching tensors, initialized `48` new/missing outer-edge
+  context tensors, and had `0` shape mismatches.
+- E58 remote process: wrapper PID `755`, Python PID `756`, log
+  `/workspace/SimplexFold/logs/e58_outer_edge_context_from_e55.log`, artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e58_outer_edge_context_from_e55_s4000_c256_m64/`.
+  The initial log confirms the E55 weights-only load and fresh optimizer.
