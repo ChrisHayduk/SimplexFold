@@ -9,6 +9,7 @@ from minalphafold.trainer import (
 from scripts.run_nanofold_public_benchmarks import (
     _apply_model_config_overrides,
     _build_loss_fn,
+    _simplex_topology_metrics,
     _variant_config,
     parse_args,
 )
@@ -346,6 +347,25 @@ def test_outer_edge_context_runtime_scale_ramps_and_enters_model_inputs():
     )
 
     assert torch.isclose(inputs["simplex_outer_edge_context_scale_override"], torch.tensor(0.025))
+
+
+def test_simplex_topology_metrics_report_boundary_reuse():
+    outputs = {
+        "simplex_face_indices": torch.tensor([[[[0, 1, 2], [0, 1, 3]]]]),
+        "simplex_face_mask": torch.ones(1, 1, 2),
+        "simplex_tetra_indices": torch.tensor([[[[0, 1, 2, 3]]]]),
+        "simplex_tetra_mask": torch.ones(1, 1, 1),
+    }
+
+    metrics = _simplex_topology_metrics(outputs)
+
+    assert metrics["simplex_face_active_cells"] == [2.0]
+    assert metrics["simplex_face_active_fraction"] == [1.0]
+    assert abs(metrics["simplex_face_boundary_edge_mean_degree"][0] - 1.2) < 1e-6
+    assert metrics["simplex_face_boundary_edge_max_degree"] == [2.0]
+    assert metrics["simplex_face_boundary_unique_edge_fraction"] == [5.0 / 6.0]
+    assert metrics["simplex_tetra_active_cells"] == [1.0]
+    assert metrics["simplex_tetra_boundary_edge_mean_degree"] == [1.0]
 
 
 def test_model_config_overrides_preserve_resume_compatible_variant_name():

@@ -245,6 +245,66 @@ def _structure_metrics(
     }
 
 
+def _simplex_boundary_edges(indices: torch.Tensor, simplex_rank: int) -> torch.Tensor:
+    if simplex_rank == 3:
+        parts = (
+            indices[..., [0, 1]],
+            indices[..., [0, 2]],
+            indices[..., [1, 2]],
+        )
+    elif simplex_rank == 4:
+        parts = (
+            indices[..., [0, 1]],
+            indices[..., [0, 2]],
+            indices[..., [0, 3]],
+            indices[..., [1, 2]],
+            indices[..., [1, 3]],
+            indices[..., [2, 3]],
+        )
+    else:
+        raise ValueError(f"Unsupported simplex rank for boundary edges: {simplex_rank}")
+    return torch.stack(parts, dim=-2).sort(dim=-1).values
+
+
+def _simplex_topology_metrics(outputs: dict[str, Any]) -> dict[str, list[float]]:
+    metrics: dict[str, list[float]] = {}
+    for name, simplex_rank in (("face", 3), ("tetra", 4)):
+        mask = outputs.get(f"simplex_{name}_mask")
+        indices = outputs.get(f"simplex_{name}_indices")
+        if not torch.is_tensor(mask) or not torch.is_tensor(indices) or mask.ndim != 3 or indices.numel() == 0:
+            continue
+        mask_cpu = mask.detach().float().cpu()
+        indices_cpu = indices.detach().long().cpu()
+        flat_mask = mask_cpu.reshape(mask_cpu.shape[0], -1)
+        active_counts = flat_mask.sum(dim=1)
+        metrics[f"simplex_{name}_active_cells"] = [float(value.item()) for value in active_counts]
+        metrics[f"simplex_{name}_active_fraction"] = [
+            float((value / max(flat_mask.shape[1], 1)).item()) for value in active_counts
+        ]
+
+        boundary_edges = _simplex_boundary_edges(indices_cpu, simplex_rank).reshape(indices_cpu.shape[0], -1, 2)
+        edge_mask = mask_cpu[..., None].expand(*mask_cpu.shape, boundary_edges.shape[1] // max(flat_mask.shape[1], 1))
+        edge_mask = edge_mask.reshape(indices_cpu.shape[0], -1).bool()
+        mean_degrees: list[float] = []
+        max_degrees: list[float] = []
+        unique_fractions: list[float] = []
+        for batch_index in range(indices_cpu.shape[0]):
+            selected = boundary_edges[batch_index, edge_mask[batch_index]]
+            if selected.numel() == 0:
+                mean_degrees.append(float("nan"))
+                max_degrees.append(float("nan"))
+                unique_fractions.append(float("nan"))
+                continue
+            _, counts = torch.unique(selected, dim=0, return_counts=True)
+            mean_degrees.append(float(counts.float().mean().item()))
+            max_degrees.append(float(counts.max().item()))
+            unique_fractions.append(float(counts.numel() / max(selected.shape[0], 1)))
+        metrics[f"simplex_{name}_boundary_edge_mean_degree"] = mean_degrees
+        metrics[f"simplex_{name}_boundary_edge_max_degree"] = max_degrees
+        metrics[f"simplex_{name}_boundary_unique_edge_fraction"] = unique_fractions
+    return metrics
+
+
 def _tensor_mean(value: Any) -> float | None:
     if not torch.is_tensor(value):
         return None
@@ -447,6 +507,9 @@ def _evaluate(
                 batch,
                 foldscore_components_fn=foldscore_components_fn,
             )
+            simplex_metrics = _simplex_topology_metrics(outputs)
+            for key, values in simplex_metrics.items():
+                metrics.setdefault(key, []).extend(values)
             for key, values in metrics.items():
                 metric_values.setdefault(key, []).extend(values)
             if detail_path is not None:

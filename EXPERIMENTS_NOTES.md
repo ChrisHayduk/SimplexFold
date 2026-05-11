@@ -1688,3 +1688,11 @@
   `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e60_outer_edge_context_ramp005_from_e55_s3500_c256_m64/`.
   Heartbeat `check-simplexfold-e57-runpod` has been retargeted to this E60
   pod and must not touch any other Runpod instance.
+- Added evaluation-only selected-complex diagnostics for future runs:
+  active face/tetra cell counts, active fractions, boundary-edge mean/max
+  reuse degree, and unique boundary-edge fraction. This follows the reference
+  paper lesson that topology-aware runs should report properties of the
+  constructed complex, not just coordinate metrics. Local checks:
+  `python -m py_compile scripts/run_nanofold_public_benchmarks.py`,
+  `python -m pytest tests/test_nanofold_public_benchmarks.py`, and
+  `git diff --check` passed.
