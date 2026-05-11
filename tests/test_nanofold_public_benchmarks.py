@@ -10,6 +10,7 @@ from minalphafold.trainer import (
 from scripts.run_nanofold_public_benchmarks import (
     _apply_model_config_overrides,
     _build_loss_fn,
+    _simplex_boundary_geometry_metrics,
     _simplex_topology_metrics,
     _variant_config,
     parse_args,
@@ -388,6 +389,44 @@ def test_simplex_topology_metrics_report_boundary_reuse():
     assert metrics["simplex_face_boundary_unique_edge_fraction"] == [5.0 / 6.0]
     assert metrics["simplex_tetra_active_cells"] == [1.0]
     assert metrics["simplex_tetra_boundary_edge_mean_degree"] == [1.0]
+
+
+def test_simplex_boundary_geometry_metrics_report_selected_edge_errors():
+    true_ca = torch.tensor(
+        [
+            [
+                [0.0, 0.0, 0.0],
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0],
+            ]
+        ]
+    )
+    pred_ca = true_ca.clone()
+    pred_ca[0, 1] = torch.tensor([2.0, 0.0, 0.0])
+    atom14 = torch.zeros(1, 4, 14, 3)
+    atom14[:, :, 1, :] = pred_ca
+    true_atom14 = torch.zeros(1, 4, 14, 3)
+    true_atom14[:, :, 1, :] = true_ca
+    batch = {
+        "true_atom_positions": true_atom14,
+        "true_atom_mask": torch.ones(1, 4, 14),
+        "seq_mask": torch.ones(1, 4),
+    }
+    outputs = {
+        "atom14_coords": atom14,
+        "simplex_face_indices": torch.tensor([[[[0, 1, 2]]]]),
+        "simplex_face_mask": torch.ones(1, 1, 1),
+        "simplex_tetra_indices": torch.tensor([[[[0, 1, 2, 3]]]]),
+        "simplex_tetra_mask": torch.ones(1, 1, 1),
+    }
+
+    metrics = _simplex_boundary_geometry_metrics(outputs, batch)
+
+    assert metrics["simplex_face_boundary_length_mae"][0] > 0.0
+    assert metrics["simplex_face_boundary_length_rmse"][0] >= metrics["simplex_face_boundary_length_mae"][0]
+    assert metrics["simplex_face_boundary_contraction_fraction"] == [0.0]
+    assert 0.0 <= metrics["simplex_tetra_boundary_lddt"][0] <= 1.0
 
 
 def test_model_config_overrides_preserve_resume_compatible_variant_name():

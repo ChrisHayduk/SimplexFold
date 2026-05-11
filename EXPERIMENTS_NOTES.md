@@ -1721,3 +1721,11 @@
   edge-frame adapter behavior, outer-edge runtime gating, and the edge-frame
   budget test. Do not add E61 to `EXPERIMENT_RESULTS.md` unless a Runpod run
   returns.
+- Added selected-boundary geometry diagnostics for future Runpod validation:
+  face/tetra boundary-edge length MAE, RMSE, contraction fraction, and
+  boundary lDDT, computed only on the selected sparse face/tetra complex. This
+  follows the reference-paper note that topology-aware runs should inspect the
+  constructed complex, not just the final coordinates. Local checks:
+  `python -m py_compile scripts/run_nanofold_public_benchmarks.py`,
+  `python -m pytest tests/test_nanofold_public_benchmarks.py::test_simplex_boundary_geometry_metrics_report_selected_edge_errors tests/test_nanofold_public_benchmarks.py::test_simplex_topology_metrics_report_boundary_reuse`,
+  and `python -m pytest tests/test_nanofold_public_benchmarks.py`.

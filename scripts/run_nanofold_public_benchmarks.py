@@ -306,6 +306,72 @@ def _simplex_topology_metrics(outputs: dict[str, Any]) -> dict[str, list[float]]
     return metrics
 
 
+def _simplex_boundary_geometry_metrics(
+    outputs: dict[str, Any],
+    batch: dict[str, Any],
+) -> dict[str, list[float]]:
+    metrics: dict[str, list[float]] = {}
+    pred_atom14 = outputs.get("atom14_coords")
+    true_atom14 = batch.get("true_atom_positions")
+    true_atom14_mask = batch.get("true_atom_mask")
+    if (
+        not torch.is_tensor(pred_atom14)
+        or not torch.is_tensor(true_atom14)
+        or not torch.is_tensor(true_atom14_mask)
+    ):
+        return metrics
+    pred_ca = pred_atom14[:, :, 1, :].detach().float().cpu()
+    true_ca = true_atom14[:, :, 1, :].detach().float().cpu()
+    ca_mask = true_atom14_mask[:, :, 1].detach().float().cpu()
+    seq_mask = batch.get("seq_mask")
+    if torch.is_tensor(seq_mask):
+        ca_mask = ca_mask * seq_mask.detach().float().cpu()
+
+    thresholds = torch.tensor([0.5, 1.0, 2.0, 4.0], dtype=pred_ca.dtype)
+    for name, simplex_rank in (("face", 3), ("tetra", 4)):
+        mask = outputs.get(f"simplex_{name}_mask")
+        indices = outputs.get(f"simplex_{name}_indices")
+        if not torch.is_tensor(mask) or not torch.is_tensor(indices) or mask.ndim != 3 or indices.numel() == 0:
+            continue
+        mask_cpu = mask.detach().float().cpu()
+        indices_cpu = indices.detach().long().cpu()
+        boundary_edges = _simplex_boundary_edges(indices_cpu, simplex_rank)
+        edge_count = boundary_edges.shape[-2]
+        flat_edges = boundary_edges.reshape(indices_cpu.shape[0], -1, 2)
+        flat_mask = mask_cpu[..., None].expand(*mask_cpu.shape, edge_count).reshape(indices_cpu.shape[0], -1)
+
+        mae_values: list[float] = []
+        rmse_values: list[float] = []
+        contraction_values: list[float] = []
+        lddt_values: list[float] = []
+        for batch_index in range(indices_cpu.shape[0]):
+            selected_edges = flat_edges[batch_index]
+            a, c = selected_edges.unbind(dim=-1)
+            edge_mask = flat_mask[batch_index] > 0
+            edge_mask = edge_mask & (ca_mask[batch_index, a] > 0) & (ca_mask[batch_index, c] > 0)
+            if int(edge_mask.sum().item()) == 0:
+                mae_values.append(float("nan"))
+                rmse_values.append(float("nan"))
+                contraction_values.append(float("nan"))
+                lddt_values.append(float("nan"))
+                continue
+            a = a[edge_mask]
+            c = c[edge_mask]
+            pred_dist = torch.linalg.vector_norm(pred_ca[batch_index, a] - pred_ca[batch_index, c], dim=-1)
+            true_dist = torch.linalg.vector_norm(true_ca[batch_index, a] - true_ca[batch_index, c], dim=-1)
+            error = torch.abs(pred_dist - true_dist)
+            mae_values.append(float(error.mean().item()))
+            rmse_values.append(float(torch.sqrt(torch.mean(error * error)).item()))
+            contraction_values.append(float((pred_dist < true_dist).float().mean().item()))
+            lddt = (error[:, None] < thresholds[None, :]).float().mean(dim=-1).mean()
+            lddt_values.append(float(lddt.item()))
+        metrics[f"simplex_{name}_boundary_length_mae"] = mae_values
+        metrics[f"simplex_{name}_boundary_length_rmse"] = rmse_values
+        metrics[f"simplex_{name}_boundary_contraction_fraction"] = contraction_values
+        metrics[f"simplex_{name}_boundary_lddt"] = lddt_values
+    return metrics
+
+
 def _tensor_mean(value: Any) -> float | None:
     if not torch.is_tensor(value):
         return None
@@ -510,6 +576,9 @@ def _evaluate(
             )
             simplex_metrics = _simplex_topology_metrics(outputs)
             for key, values in simplex_metrics.items():
+                metrics.setdefault(key, []).extend(values)
+            simplex_geometry_metrics = _simplex_boundary_geometry_metrics(outputs, batch)
+            for key, values in simplex_geometry_metrics.items():
                 metrics.setdefault(key, []).extend(values)
             for key, values in metrics.items():
                 metric_values.setdefault(key, []).extend(values)

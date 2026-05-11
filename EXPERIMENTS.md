@@ -1961,6 +1961,12 @@ override gates the training-time contribution. A planned E61 gate should use
 `--simplex-edge-frame-message-runtime-scale-ramp-steps 500` from the E55
 checkpoint if E60 is rejected.
 
+Instrumentation: add selected-boundary geometry metrics to validation for
+future runs. For selected faces and tetras, the runner now reports
+boundary-edge length MAE/RMSE, contraction fraction, and boundary lDDT on the
+model's own selected sparse complex. These are diagnostics only; they do not
+change training loss or official scoring.
+
 Decision rule: keep only if the step-3500 lDDT beats or stays very close to
 E55's `0.3604`; otherwise reject and use the diagnostics to decide whether
 the selected complex is under-realized or over-coupled.
@@ -1970,3 +1976,6 @@ Validation:
 - `python -m py_compile minalphafold/trainer.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_simplex.py::test_edge_frame_message_runtime_scale_gates_pair_readout tests/test_simplex.py::test_edge_frame_message_scale_changes_pair_readout_within_adapter`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_simplex.py::test_edge_frame_message_runtime_scale_gates_pair_readout tests/test_simplex.py::test_edge_frame_message_scale_changes_pair_readout_within_adapter tests/test_simplex.py::test_outer_edge_context_runtime_scale_gates_context_path tests/test_trainer.py::test_simplicial_edge_frame_messages_stay_within_medium_budget`
+- `python -m py_compile scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py::test_simplex_boundary_geometry_metrics_report_selected_edge_errors tests/test_nanofold_public_benchmarks.py::test_simplex_topology_metrics_report_boundary_reuse`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py`
