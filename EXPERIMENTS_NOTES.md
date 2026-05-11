@@ -1571,8 +1571,8 @@
   More scalar auxiliary tuning is less promising than a Topotein-style
   architecture change.
 - 2026-05-11 PDF reread: both local reference PDFs in `references/papers/`
-  hash-match the downloads and were read via full text extraction into
-  `tmp/pdfs/`. The TDL guide reinforces that topology construction,
+  hash-match the downloads and were read via full text extraction with
+  `pdftotext -layout`. The TDL guide reinforces that topology construction,
   incidence/adjacency operators, and intra-/inter-rank aggregation are model
   choices. Topotein gives the protein-specific path: directed residue
   interactions, outer-edge neighborhoods, edge-centric frames, and deep

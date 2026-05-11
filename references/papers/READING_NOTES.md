@@ -4,6 +4,10 @@ These notes summarize local reference PDFs used to guide SimplexFold
 experiment design. The PDFs themselves are kept locally in this directory and
 ignored by git until redistribution rights are confirmed.
 
+Read status: both PDFs were re-read in full on 2026-05-11 from local
+`pdftotext -layout` extraction, and the local copies hash-match the files in
+`/Users/christopherhayduk/Downloads/`.
+
 ## From Nodes to Complexes: A Guide to Topological Deep Learning
 
 Main takeaways for SimplexFold:
@@ -74,6 +78,17 @@ Experiment implications:
 - Consider a small global/readout cochain only if it receives and returns
   information through incidence-aware selected-cell summaries, not as a
   generic pooled feature head.
+- For NanoFold, do not depend on DSSP/SSE labels or external structure
+  annotations. If we borrow Topotein's secondary-structure hierarchy, it must
+  be through latent selected cells derived from official features and recycled
+  predictions.
+- Treat outer-edge context as an architectural path that likely needs gating
+  or scheduling. Fresh high-rank context modules can improve global geometry
+  while disrupting local C-alpha agreement, so the next useful test should
+  measure whether weak or delayed cochain exchange preserves the E55 lDDT peak.
+- Add topology-aware diagnostics where cheap: selected-cell degree, boundary
+  edge length error, and per-rank message scale can explain whether a run is
+  learning a useful complex or merely increasing global expansion.
 
 Full-read details to carry forward:
 
