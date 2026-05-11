@@ -1,4 +1,4 @@
-## Current Plan: Branch From E55 LDDT Peak
+## Current Plan: E57 Aux-0.75 Rewarm From E55
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -19,6 +19,13 @@ simplex auxiliary pressure (`0.75` instead of `0.5`) or alternating a brief
 auxiliary rewarm, while keeping the architecture and selected face/tetra
 boundary-realization losses unchanged. Keep `EXPERIMENT_RESULTS.md` only for
 returned Runpod results.
+
+E57 should resume the E55 checkpoint at step 3000 and continue to step 4000
+with effective batch 8 and `simplex_aux_weight=0.75`. This is a topological
+curriculum test: selected face/tetra coordinate and boundary-distance
+realization remain the same, but the branch asks whether slightly stronger
+selected-cell pressure preserves the lDDT peak better than E56's constant
+`0.5` while retaining the FoldScore/dRMSD gains.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired

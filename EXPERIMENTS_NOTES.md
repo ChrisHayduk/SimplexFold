@@ -1533,3 +1533,10 @@
   FoldScore and dRMSD but does not beat E55's lDDT. Do not keep extending
   this exact branch for the lDDT objective without analyzing why E55 is the
   local lDDT peak.
+- E57 live plan: resume the E55 checkpoint from
+  `artifacts/nanofold_public_benchmarks/e55_effective_batch8_aux05_s3000_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+  and continue to step 4000 with effective batch 8, selected coordinate
+  weights `1.0/1.0`, selected boundary-distance weights `0.5/0.5`, and
+  `simplex_aux_weight=0.75`. This is a selected-simplex auxiliary rewarm from
+  the lDDT peak, not a dense metric-loss change. Do not write E57 to
+  `EXPERIMENT_RESULTS.md` until the Runpod run returns.

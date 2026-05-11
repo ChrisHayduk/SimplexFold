@@ -1781,3 +1781,27 @@ continues improving aggregate/global geometry but does not beat E55's
 `val_lddt_ca=0.3604`, so longer constant-aux-0.5 continuation should pause.
 The next branch should analyze or resume from the E55 checkpoint rather than
 spending immediately on a 30k confirmation.
+
+### E57: Aux-0.75 Rewarm From E55
+
+Status: planned for Runpod.
+
+Hypothesis: E56 shows that continuing E55 with constant
+`simplex_aux_weight=0.5` improves FoldScore and dRMSD but does not preserve
+the lDDT peak. A modest selected-simplex auxiliary rewarm to `0.75` may keep
+the higher-order face/tetra realization constraints active enough to preserve
+local C-alpha agreement while still allowing the structure module to use the
+better global geometry learned by the effective-batch-8 branch.
+
+Mechanism: resume the E55 checkpoint at step 3000 and continue to step 4000
+with `full_msa_to_face`, `batch_size=1`, `grad_accum_steps=8`, selected
+coordinate weights `1.0/1.0`, selected boundary-distance weights `0.5/0.5`,
+and constant `simplex_aux_weight=0.75`. This keeps the architecture and losses
+inside the selected residue-edge-face-tetra complex; it is not a generic dense
+lDDT hack.
+
+Decision rule: keep only if step 3500 or 4000 beats E55's
+`val_lddt_ca=0.3604` or beats E56's FoldScore/dRMSD while staying at least
+within small noise of E55's lDDT. If the rewarm worsens lDDT without a clear
+geometry tradeoff, return to architecture-level topology changes rather than
+more scalar loss tuning.
