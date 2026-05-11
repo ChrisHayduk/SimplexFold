@@ -104,6 +104,16 @@ coface-balanced loss (`0.3505`). Keep only if it improves the step-4500 lDDT
 relative to E65 and does not badly regress FoldScore, dRMSD, or selected
 boundary diagnostics; continue only if it approaches or exceeds E64.
 
+E67 is running on the owned Runpod B200 pod `3en5noqmkkiovz` from commit
+`27ddea4`. Launch audit passed with public train/val/all counts
+`10000/1000/11000`, remote manifest files exactly `all.txt`, `train.txt`, and
+`val.txt`, hidden manifest/features/labels absent, feature/label NPZ counts
+`11000/11000`, the E64 checkpoint present, FoldScore import working, CUDA
+reporting `NVIDIA B200`, `--simplex-structure-readout-scale 0.05` recorded in
+`run_metadata.json`, and `3,106,690` parameters (`+0.0015%` versus
+AF2-medium pair-only). Do not add E67 to `EXPERIMENT_RESULTS.md` until the
+Runpod run returns.
+
 Yes. With templates forbidden, the right construction is:
 
 [

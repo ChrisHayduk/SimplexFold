@@ -2128,3 +2128,28 @@
   weak selected-complex structure readout from the E64 checkpoint using
   `--simplex-structure-readout-scale 0.05` with the E64 selected-boundary
   lDDT/coordinate-loss recipe.
+- E67 launched on owned Runpod B200 pod `3en5noqmkkiovz`
+  (`codex-simplexfold-e67-runpod-20260511`) from commit `27ddea4`, SSH
+  `root@198.13.252.84 -p 55444` with
+  `/Users/christopherhayduk/.runpod/ssh/RunPod-Key-Go`. The run name is
+  `e67_structure_readout005_from_e64_s4500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e67_structure_readout005_from_e64.log`, and
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e67_structure_readout005_from_e64_s4500_c256_m64/`.
+  Only this owned E67 pod should be managed.
+- E67 clean launch audit after copying only public data/code: public
+  train/val/all manifest counts `10000/1000/11000`, remote manifest files
+  exactly `all.txt`, `train.txt`, and `val.txt`, hidden
+  manifest/features/labels absent, feature/label `.npz` counts
+  `11000/11000`, E64 checkpoint present, B200 CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E67 model `3,106,690` parameters (`+0.0015%`). `run_metadata.json` records
+  `simplex_structure_readout_scale=0.05`, static selected-boundary lDDT
+  weights `0.05` / `0.05`, weights-only resume from E64, crop 256, MSA depth
+  64, and no templates.
+- E67 remote process after launch: Python PID `518`, data-worker Python PIDs
+  `679` and `680`. Initial log shows the runner resumed E64 at step
+  4000/examples 32000, loaded 1196 matching model tensors, initialized 0
+  new/missing tensors, and started a fresh optimizer. CUDA is active with B200
+  memory allocated. Heartbeat `check-simplexfold-e57-runpod` has been
+  retargeted to E67 pod `3en5noqmkkiovz` only.

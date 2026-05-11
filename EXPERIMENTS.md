@@ -2262,7 +2262,7 @@ post-delete lookup returned 404.
 
 ### E67: Weak Selected-Complex Structure Readout
 
-Status: planned from E64.
+Status: running on owned Runpod pod `3en5noqmkkiovz`.
 
 Hypothesis: E65 and E66 show that changing selected-boundary loss weighting
 does not preserve the E64 lDDT peak. The next topology-native test should
@@ -2281,6 +2281,20 @@ gate to step 4500 with static selected-boundary lDDT weights `0.05`, selected
 face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
 weights `0.5`, `simplex_aux_weight=0.5`, and
 `--simplex-structure-readout-scale 0.05`.
+
+Launch: E67 is running on owned Runpod B200 pod `3en5noqmkkiovz`
+(`codex-simplexfold-e67-runpod-20260511`) from commit `27ddea4`. Clean launch
+audit after copying only public data/code: public train/val/all manifest
+counts are `10000/1000/11000`, remote manifest files are exactly `all.txt`,
+`train.txt`, and `val.txt`, hidden manifest/features/labels are absent,
+feature/label `.npz` counts are `11000/11000`, E64 checkpoint present, B200
+CUDA available, NanoFold `foldscore_components` import works, AF2-medium
+pair-only has `3,106,642` parameters, and E67 model has `3,106,690`
+parameters (`+0.0015%`). `run_metadata.json` records
+`simplex_structure_readout_scale=0.05`, static face/tetra selected-boundary
+lDDT weights `0.05` / `0.05`, weights-only resume from E64, crop 256, MSA
+depth 64, and no templates. Do not add E67 to `EXPERIMENT_RESULTS.md` until
+the Runpod run returns.
 
 Decision rule: keep only if the step-4500 lDDT improves over E65's unbalanced
 continuation (`0.3645`) without a large FoldScore/dRMSD or selected-boundary
