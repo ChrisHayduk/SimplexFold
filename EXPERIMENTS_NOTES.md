@@ -1963,3 +1963,10 @@
   `python -m pytest tests/test_nanofold_public_benchmarks.py tests/test_trainer.py::test_apply_loss_weight_schedule_ramps_research_weights tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights`.
   Do not launch E65 until E64 returns and the concrete direction is selected
   from the step-4000 result.
+- E64 B300 status after about 37 minutes: parent Python process and two data
+  worker children are still alive, CUDA process ownership is on PID `962`,
+  GPU SM utilization remains active, and GPU memory is stable. No
+  `results.json`, `results.csv`, checkpoint file, or step-4000 history row has
+  been written yet. Treat as active slow training for now rather than the
+  previous A100 stall. Heartbeat `check-simplexfold-e57-runpod` is active and
+  scoped only to pod `ow3ex8z84jypbs`.
