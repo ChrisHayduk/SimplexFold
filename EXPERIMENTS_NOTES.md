@@ -1788,3 +1788,18 @@
   edge-frame and outer-edge runtime gates, the trainer model-input curriculum
   test, and the Hodge zero-parameter budget test. Do not launch E62 unless E61
   returns below the E55/E56 lDDT band.
+- E61 completed on Runpod. Local returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e61_edge_frame_ramp005_from_e55_s3500_c256_m64/`.
+  Step 3500 reached `val_lddt_ca=0.345616951584816`, FoldScore
+  `0.3470576610416174`, `val_ca_drmsd=10.773000329732895`, and predicted/true
+  C-alpha radius of gyration `11.161340862512589 / 15.40340667963028`.
+  Selected-boundary diagnostics show the selected face/tetra boundary lDDT
+  remained low (`0.4750` / `0.4610`) with high contraction fractions
+  (`0.7473` / `0.7471`).
+- E61 owned Runpod pod `h2dvec04rxyoxe` was stopped and deleted after
+  artifacts were copied. A post-delete lookup returned 404, as expected. No
+  other Runpod instances were managed.
+- E61 interpretation: reject. The scheduled edge-frame message path improved
+  final dRMSD and global expansion relative to E55 but reduced the primary
+  C-alpha lDDT back into the E57/E60 band. Move to the prepared E62 scheduled
+  Hodge face residual rather than adding more output-coordinate losses.

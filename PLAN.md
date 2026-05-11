@@ -1,4 +1,4 @@
-## Current Plan: E61 Scheduled Edge-Frame Boundary Message Probe
+## Current Plan: E62 Scheduled Hodge Face Residual Probe
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -32,21 +32,21 @@ E60 tested that idea by scheduling the damped directed outer-edge context from
 predicted/true C-alpha radius `10.8522 / 15.4034`. Reject it: the schedule did
 not preserve the E55/E56 lDDT band and also gave up E59's FoldScore gain.
 
-The active branch stays in the topological architecture lane, but shifts from
-cell-level outer-edge summaries to boundary-edge scalarization. E61 is running
-on the owned Runpod H100 NVL pod `h2dvec04rxyoxe` from commit `7823038` with a
-weak scheduled edge-frame message path:
+E61 shifted from cell-level outer-edge summaries to boundary-edge
+scalarization. It completed at step 3500 with
+`val_lddt_ca=0.3456`, FoldScore `0.3471`, `val_ca_drmsd=10.7730`, and
+predicted/true C-alpha radius `11.1613 / 15.4034`. Reject it: the scheduled
+edge-frame message path improved global expansion and dRMSD relative to E55
+but moved lDDT back into the E57/E60 band. The launch used:
 `--simplex-edge-frame-message-scale 0.05`,
 `--simplex-edge-frame-message-runtime-scale 0.0`,
 `--simplex-edge-frame-message-runtime-scale-final 0.05`,
 `--simplex-edge-frame-message-runtime-scale-ramp-start-step 3000`, and
-`--simplex-edge-frame-message-runtime-scale-ramp-steps 500`. This tests
-whether selected face/tetra cochains can write geometry-sensitive messages
-through their own directed boundary-edge frames without the disruptive
-cell-level context that hurt E58-E60. The launch audit passed with public
-train/val/all counts `10000/1000/11000`, hidden manifest absent, feature/label
-NPZ counts `11000/11000`, encoded missing paths `0`, FoldScore import working,
-and `3,154,242` parameters (`+1.53%` versus AF2-medium).
+`--simplex-edge-frame-message-runtime-scale-ramp-steps 500`. The launch audit
+passed with public train/val/all counts `10000/1000/11000`, hidden manifest
+absent, feature/label NPZ counts `11000/11000`, encoded missing paths `0`,
+FoldScore import working, and `3,154,242` parameters (`+1.53%` versus
+AF2-medium).
 
 The runner should keep `EXPERIMENT_RESULTS.md` only for returned Runpod
 results. Do not launch a 30,000-step confirmation until a branch clears the
@@ -57,11 +57,10 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
-If E61 returns below the E55/E56 lDDT band, the next prepared fallback is E62:
-a scheduled Hodge-style face residual from E55. This stays within the
-topological view by ramping lower adjacency through shared boundary edges and
-upper adjacency through selected tetra cofaces, rather than adding another
-coordinate loss. It adds no parameters; use a static
+The next prepared branch is E62: a scheduled Hodge-style face residual from
+E55. This stays within the topological view by ramping lower adjacency through
+shared boundary edges and upper adjacency through selected tetra cofaces,
+rather than adding another coordinate loss. It adds no parameters; use a static
 `--simplex-hodge-face-update-scale 0.05` with a training-time runtime ramp
 from `0.0` to `0.05` over steps 3000-3500.
 
