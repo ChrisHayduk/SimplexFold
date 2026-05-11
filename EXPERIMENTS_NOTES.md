@@ -1887,3 +1887,33 @@
   realization together. Next run should continue the E63 checkpoint to step
   4000 (`32,000` effective examples at batch 8) before calling the direction
   stable.
+- E64 launch attempt 1: owned Runpod H200 NVL pod `4g78gy2fbgl5o7`
+  (`codex-simplexfold-e64-runpod-20260511`) was created for the E63
+  confirmation run but hit repeated remote `/workspace` input/output errors
+  while copying public feature NPZs. No training launched. The pod was
+  stopped/deleted and a post-delete lookup returned 404. No other Runpod
+  instances were managed.
+- E64 launch attempt 2: owned Runpod A100 SXM pod `r64q7czrpsaax4`
+  (`codex-simplexfold-e64-runpod-20260511b`) also hit a remote `/workspace`
+  input/output error during public feature transfer before any training
+  launched. The pod was stopped/deleted and a post-delete lookup returned 404.
+  No other Runpod instances were managed.
+- E64 launch attempt 3: owned Runpod A100 SXM pod `76h4drrq0mhbxp`
+  (`codex-simplexfold-e64-runpod-20260511c`) was launched with
+  `volumeInGb=0` and a 160 GB container disk, so `/workspace` is local overlay
+  storage rather than the Runpod network volume that failed on attempts 1-2.
+  Clean launch audit after copying only public data/code: public train/val/all
+  manifest counts `10000/1000/11000`, remote manifest files exactly
+  `all.txt`, `train.txt`, and `val.txt`, hidden manifest/path absent,
+  feature/label `.npz` counts `11000/11000`, encoded-chain missing paths `0`,
+  E63 checkpoint present, A100 SXM CUDA available, NanoFold
+  `foldscore_components` import works, AF2-medium pair-only `3,106,642`, and
+  E64 model `3,106,690` parameters (`+0.0015%`).
+- E64 remote process: Python PID `4466`, launch log
+  `/workspace/SimplexFold/logs/e64_boundary_lddt005_from_e63.log`, artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e64_boundary_lddt005_from_e63_s4000_c256_m64/`.
+  The log shows it resumed E63 at step 3500/examples 28000, loaded 1196
+  matching model tensors, initialized 0 new/missing tensors, and started a
+  fresh optimizer. Heartbeat `check-simplexfold-e57-runpod` has been
+  retargeted to this E64 pod and must not touch any other Runpod instance.
+  Do not add E64 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
