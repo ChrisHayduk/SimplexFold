@@ -82,3 +82,4 @@ recorded in the running notes for that run.
 | E62 scheduled Hodge face residual | completed | 3500 | 0.3468 | 0.3468 | 0.3450 | 10.9016 | 10.7278 / 15.4034 | rejected; boundary lDDT slightly improves but main lDDT remains below E55 |
 | E63 selected-boundary lDDT 0.05 | completed | 3500 | 0.3611 | 0.3611 | 0.3576 | 10.6815 | 11.4310 / 15.4034 | kept; new best and improves selected-boundary diagnostics |
 | E64 E63 confirmation to 4000 | completed | 4000 | 0.3739 | 0.3739 | 0.3634 | 10.5481 | 11.3344 / 15.4034 | current best; confirms selected-boundary lDDT direction |
+| E65 boundary lDDT 0.05->0.025 | completed | 5000 | 0.3684 | 0.3684 | 0.3666 | 10.8445 | 11.7879 / 15.4034 | rejected; relaxed continuation improved FoldScore but lost E64 lDDT |

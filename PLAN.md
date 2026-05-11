@@ -1,4 +1,4 @@
-## Current Plan: E65 Selected-Boundary lDDT Stability Ramp
+## Current Plan: E66 Coface-Balanced Boundary lDDT
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -31,6 +31,14 @@ FoldScore `0.3634`, `val_ca_drmsd=10.5481`, and predicted/true C-alpha
 radius `11.3344 / 15.4034`. This confirms that the selected-boundary lDDT
 direction is not just a one-checkpoint fluctuation, though the target remains
 far away.
+
+E65 tested whether the selected-boundary lDDT pressure could relax after E64.
+It continued E64 to step 5000, holding face/tetra boundary-lDDT weights at
+`0.05` through step 4500 and then ramping to `0.025`. Reject this schedule:
+step 4500 reached `val_lddt_ca=0.3645`, and step 5000 reached
+`val_lddt_ca=0.3684`, both below E64. FoldScore improved slightly to
+`0.3666`, but the primary C-alpha lDDT target did not survive the
+continuation.
 
 Do not spend on a blind 30,000-step continuation yet, and do not keep turning
 the scalar auxiliary knob. The full reread of the reference PDFs in
@@ -70,33 +78,21 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
-The active branch is E65: continue E64 from step 4000 to step 5000
-(`40,000` effective examples at batch 8), hold the selected-boundary lDDT
-weights at `0.05` through step 4500, then relax them to `0.025` over steps
-4500-5000. This tests whether the selected face/tetra boundary 1-skeleton can
-keep its improved local realization after the topology-native auxiliary
-pressure eases. Do not raise the weight blindly: E19/E20 showed that
-selected-boundary lDDT can be harmful when introduced too early, while E63/E64
-show it is useful after the E55 scaffold is already learned.
-
-E65 is running on the owned Runpod B200 pod `21pml3y3hbbbpb` from commit
-`d766050`. Launch audit passed with public train/val/all counts
-`10000/1000/11000`, hidden manifest absent, feature/label NPZ counts
-`11000/11000`, encoded missing paths `0`, the E64 checkpoint present,
-FoldScore import working, CUDA reporting `NVIDIA B200`, and `3,106,690`
-parameters (`+0.0015%` versus AF2-medium). Do not add E65 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
-
-Decision rule for E65: if step 4500 improves but step 5000 drops, next test a
-static `0.05` continuation from E64. If both step 4500 and step 5000 improve,
-continue the relaxed schedule. If both drop, stop the schedule family and
-return to architecture changes in selected-cell communication.
-
-Prepared follow-up: E66 is a coface-balanced selected-boundary lDDT ablation
-using `--simplex-boundary-degree-normalize`. Launch it only after the E65
-static-versus-relaxed question is resolved. The justification is topological:
+The active branch is E66: a coface-balanced selected-boundary lDDT ablation
+using `--simplex-boundary-degree-normalize`. The justification is topological:
 selected faces and tetras define the boundary 1-skeleton, but each undirected
-edge should not dominate just because it appears in many cofaces.
+edge should not dominate just because it appears in many cofaces. This is not
+a dense all-pairs metric loss; it changes how the selected sparse cell complex
+weights its own boundary 1-cochain.
+
+Launch E66 from the E64 step-4000 checkpoint for a 500-step gate to step 4500,
+with the static `0.05` selected-boundary lDDT weights, selected face/tetra
+coordinate weights `1.0`, selected boundary coordinate-distance weights `0.5`,
+`simplex_aux_weight=0.5`, and `--simplex-boundary-degree-normalize`. This
+directly compares coface-balanced boundary realization against E65's unbalanced
+step-4500 point while avoiding another rejected relaxation schedule. Keep only
+if it preserves or improves E64/E65 C-alpha lDDT while reducing boundary-edge
+over-reuse, contraction, or boundary length error.
 
 Yes. With templates forbidden, the right construction is:
 

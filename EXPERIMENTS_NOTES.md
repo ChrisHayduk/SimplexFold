@@ -2058,3 +2058,26 @@
   `results.csv`, checkpoint, or new validation row; latest history remains the
   inherited E64 step 4000 with `val_lddt_ca=0.37385757453739643`. Continue to
   leave `EXPERIMENT_RESULTS.md` unchanged until E65 returns.
+- E65 returned on owned Runpod pod `21pml3y3hbbbpb` and was rejected. Step
+  4500 reached `val_lddt_ca=0.36452375911176205`, FoldScore
+  `0.36604692228138447`, `val_ca_drmsd=10.271232694387436`, and predicted/true
+  C-alpha radius `12.000848263502121 / 15.403406739234924`. Step 5000 reached
+  `val_lddt_ca=0.368440305814147`, FoldScore `0.3666128497570753`,
+  `val_ca_drmsd=10.844526827335358`, and predicted/true C-alpha radius
+  `11.787870109081268 / 15.403406739234924`. Selected face/tetra boundary
+  lDDT ended at `0.5296795684844255` / `0.514076316729188`, contraction
+  fractions at `0.6505701839923859` / `0.6532666180282831`, boundary length
+  MAE at `2.8452821373939514` / `2.998050607740879`, mean boundary-edge degree
+  at `11.461855471134186` / `76.41236972808838`, and unique-edge fraction at
+  `0.08832908659020682` / `0.013249362988531022`.
+- E65 artifacts and launch log were copied locally under ignored
+  `artifacts/nanofold_public_benchmarks/e65_boundary_lddt005_to0025_from_e64_s5000_c256_m64/`,
+  including `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, checkpoint, and
+  `runpod_launch.log`. The owned E65 pod was stopped and deleted after copying;
+  a post-delete lookup returned 404. No other Runpod instances were managed.
+- E65 interpretation: reject the `0.05 -> 0.025` selected-boundary lDDT
+  schedule. Both returned lDDT points are below E64's `0.37385757453739643`,
+  even though FoldScore slightly improves. Next launch E66 from E64 for a
+  500-step coface-balanced selected-boundary lDDT gate with static `0.05`
+  weights and `--simplex-boundary-degree-normalize`.

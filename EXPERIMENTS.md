@@ -2143,7 +2143,7 @@ stopped and deleted after the returned result was recorded.
 
 ### E65: Scheduled Selected-Boundary lDDT Weight
 
-Status: running on owned Runpod pod `21pml3y3hbbbpb`.
+Status: completed on Runpod and rejected.
 
 Hypothesis: E63 is the first branch where selected-boundary realization and
 primary C-alpha lDDT improve together. A static `0.05` selected-boundary lDDT
@@ -2170,7 +2170,7 @@ and `simplex_aux_weight=0.5`. Start the selected-boundary lDDT weights at
 `--simplex-boundary-lddt-ramp-start-step 4500`, and
 `--simplex-boundary-lddt-ramp-steps 500`.
 
-Launch: E65 is running on owned Runpod B200 pod `21pml3y3hbbbpb` from commit
+Launch: E65 ran on owned Runpod B200 pod `21pml3y3hbbbpb` from commit
 `d766050`. The pod uses `volumeInGb=0` and a 160 GB container disk so
 `/workspace` is local overlay storage. Clean launch audit after copying only
 public data/code: public train/val/all manifest counts are `10000/1000/11000`,
@@ -2182,13 +2182,22 @@ NanoFold `foldscore_components` import works, AF2-medium pair-only
 audit confirmed face/tetra selected-boundary lDDT weights of `0.05` at steps
 4000 and 4500, `0.0375` at step 4750, and `0.025` at step 5000. The run
 resumed E64 at step 4000 with weights-only loading, loaded 1196 matching model
-tensors, initialized 0 new/missing tensors, and started a fresh optimizer. Do
-not add E65 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+tensors, initialized 0 new/missing tensors, and started a fresh optimizer.
 
 Decision rule: if step 4500 improves but step 5000 drops, next test a static
 `0.05` continuation from E64. If both step 4500 and step 5000 improve,
 continue the relaxed schedule. If both drop, reject this scheduling family and
 return to architecture changes in selected-cell communication.
+
+Result: reject. E65 step 4500 reached `val_lddt_ca=0.3645`, FoldScore
+`0.3660`, `val_ca_drmsd=10.2712`, and predicted/true C-alpha radius
+`12.0008 / 15.4034`. The final step 5000 point reached
+`val_lddt_ca=0.3684`, FoldScore `0.3666`, `val_ca_drmsd=10.8445`, and
+predicted/true C-alpha radius `11.7879 / 15.4034`. This improves FoldScore
+slightly relative to E64 but loses the primary C-alpha lDDT at both returned
+points, so the relaxed selected-boundary lDDT schedule is not the next branch.
+Artifacts were copied locally, and the owned E65 pod was stopped and deleted;
+a post-delete lookup returned 404.
 
 Validation:
 
@@ -2197,7 +2206,7 @@ Validation:
 
 ### E66: Coface-Balanced Selected-Boundary lDDT
 
-Status: planned; do not launch until E65 returns.
+Status: ready to launch from E64.
 
 Hypothesis: E63/E64 show that selected-boundary lDDT improves the learned
 boundary 1-skeleton, but the same undirected residue edge can appear many
@@ -2215,11 +2224,13 @@ edge losses, including the selected-boundary lDDT terms. It adds no
 parameters and remains topological because the weights are computed from the
 selected sparse cell complex.
 
-Planned launch: choose after E65 returns. If E65 shows the relaxed
-`0.05 -> 0.025` schedule is worse than the static step-4500 point, first run
-the static `0.05` continuation from E64 as the direct ablation. If static
-`0.05` still saturates or overweights repeated local edges, run E66 from the
-best E64/E65 checkpoint with `--simplex-boundary-degree-normalize`.
+Planned launch: resume E64 from its step-4000 checkpoint and run a 500-step
+gate to step 4500 with static selected-boundary lDDT weights `0.05`, selected
+face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
+weights `0.5`, `simplex_aux_weight=0.5`, and
+`--simplex-boundary-degree-normalize`. This directly compares coface-balanced
+boundary realization against E65's unbalanced static step-4500 point before
+spending on a longer continuation.
 
 Decision rule: keep only if coface balancing improves or preserves
 `val_lddt_ca` while reducing selected-boundary contraction and avoiding a
