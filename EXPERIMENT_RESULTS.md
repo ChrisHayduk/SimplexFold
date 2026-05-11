@@ -75,3 +75,4 @@ recorded in the running notes for that run.
 | E55 effective-batch-8 aux 0.5 continuation | completed | 3000 | 0.3604 | 0.3604 | 0.3451 | 11.3280 | 10.0507 / 15.4034 | current best; branch checkpoint |
 | E56 effective-batch-8 aux 0.5 to 4000 | completed | 4000 | 0.3575 | 0.3575 | 0.3478 | 10.9804 | 10.3192 / 15.4034 | stop; improves FoldScore not lDDT |
 | E57 aux-0.75 rewarm from E55 | completed | 4000 | 0.3465 | 0.3465 | 0.3495 | 10.7091 | 10.8574 / 15.4034 | rejected; best FoldScore but worse lDDT |
+| E58 outer-edge context from E55 weights | stopped early | 3500 | 0.3419 | 0.3419 | 0.3507 | 10.9020 | 11.1250 / 15.4034 | rejected; best FoldScore but worse lDDT |

@@ -1,4 +1,4 @@
-## Current Plan: E58 Resume-Compatible Outer-Edge Context
+## Current Plan: E59 Damped Topology Context Probe
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -11,8 +11,10 @@ E53 reached `val_lddt_ca=0.3480` at step 1000, E54 recovered to
 the new best `val_lddt_ca=0.3604` at step 3000 while improving FoldScore to
 `0.3451`. E56 continued the same checkpoint lineage to step 4000 and improved
 FoldScore/dRMSD further, but its best `val_lddt_ca=0.3575` stayed below E55.
-E57 then tried a selected-simplex auxiliary rewarm at `0.75`; it produced the
-best FoldScore seen so far but reduced lDDT to `0.3465`.
+E57 then tried a selected-simplex auxiliary rewarm at `0.75`; it improved the
+global/FoldScore side but reduced lDDT to `0.3465`. E58 initialized
+Topotein-style directed outer-edge context from E55 weights and set the best
+FoldScore so far (`0.3507`) at step 3500, but again reduced lDDT to `0.3419`.
 
 Treat E55 as the current lDDT peak checkpoint. Do not spend on a blind
 30,000-step continuation yet, and do not keep turning the scalar auxiliary
@@ -21,25 +23,24 @@ back to the core topological claim: the model should improve by changing the
 cell complex and its multi-rank message routes, not by attaching generic
 metric pressure to the output coordinates.
 
-E58 should initialize from the E55 checkpoint with the checkpoint-compatible
-`full_msa_to_face` variant name, but activate the existing directed
-outer-edge context path via a model-config override:
-`--simplex-outer-edge-context-scale 0.25`. This is a Topotein-inspired
-architecture test. Higher-rank selected face/tetra cochains receive context
-through directed boundary/interior edges that leave one selected cell and
-enter another, while preserving the E55 selected-coordinate and
-boundary-distance losses at the lDDT-preserving `simplex_aux_weight=0.5`.
-Because the outer-edge context path adds parameters, E58 must load only
-matching model tensors from E55 with `--resume-model-weights-only`; the new
-topology-context parameters and optimizer state start fresh.
+The immediate lesson is that the selected topology paths are helping global
+geometry but are too disruptive to local C-alpha agreement when applied
+strongly or abruptly. The next branch should stay architectural and
+topology-grounded, but damp or schedule the new cell-to-edge context instead
+of adding another output loss.
+
+E59 should run a smaller 3500-step gate from E55 weights with
+`--simplex-outer-edge-context-scale 0.05` and
+`--resume-model-weights-only`, keeping effective batch 8 and the E55
+selected-coordinate/boundary losses. This tests whether directed outer-edge
+communication can preserve E55-level lDDT when its messages are a weak
+topological correction instead of a strong new cochain pathway. Keep the
+branch only if it beats or stays very close to E55's `val_lddt_ca=0.3604`
+while improving FoldScore/dRMSD; reject if lDDT remains in the E57/E58 band.
 
 The runner should keep `EXPERIMENT_RESULTS.md` only for returned Runpod
-results. E58 is worth keeping only if it beats E55's `val_lddt_ca=0.3604`, or
-if it preserves lDDT while improving FoldScore/dRMSD enough to justify a
-longer effective-batch-8 confirmation. If it drifts down like E57, reject the
-branch and move to another architecture-level topology change such as
-edge-frame scalarized simplex messages or latent rank-2 segment cells built
-only from official inputs and recycled geometry.
+results. Do not launch a 30,000-step confirmation until a branch clears the
+lDDT target direction under effective batch 8.
 
 Yes. With templates forbidden, the right construction is:
 

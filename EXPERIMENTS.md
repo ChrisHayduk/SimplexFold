@@ -1817,7 +1817,7 @@ auxiliary rewarming and points back to architecture-level topology changes.
 
 ### E58: Resume-Compatible Outer-Edge Context From E55
 
-Status: launched on Runpod.
+Status: stopped early on Runpod.
 
 Hypothesis: the reference PDFs, especially Topotein, argue that effective
 protein TDL requires dedicated cross-rank and within-rank communication over
@@ -1852,3 +1852,31 @@ are `11000/11000`, encoded missing paths are `0`, FoldScore import works,
 CUDA reports `NVIDIA H100 80GB HBM3`, and parameters are `3,183,282`
 (+2.47% versus AF2-medium pair-only `3,106,642`). Do not write E58 to
 `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+
+Result: reject after the step-3500 validation point. E58 reached
+`val_lddt_ca=0.3419`, FoldScore `0.3507`, `val_ca_drmsd=10.9020`, and
+predicted/true C-alpha radius of gyration `11.1250 / 15.4034`. It gives the
+best FoldScore so far, but the primary lDDT is far below E55 and follows
+E57's pattern of better global geometry with damaged local agreement. The run
+was stopped early at the step-3500 checkpoint and the owned pod was deleted.
+
+### E59: Damped Outer-Edge Context From E55
+
+Status: planned.
+
+Hypothesis: E58 shows directed outer-edge context has useful global-geometry
+signal, but a scale of `0.25` is too disruptive when the context modules are
+freshly initialized from an E55 weight checkpoint. A much smaller context
+scale may let selected face/tetra cochains receive Topotein-style outer-edge
+information as a weak correction while preserving E55's local C-alpha lDDT.
+
+Mechanism: initialize from the E55 checkpoint with `--resume-model-weights-only`
+and variant name `full_msa_to_face`, but set
+`--simplex-outer-edge-context-scale 0.05`. Run only to step 3500 as a gate
+under the same effective-batch-8, crop 256, MSA depth 64, selected coordinate
+weights `1.0/1.0`, selected boundary-distance weights `0.5/0.5`, and
+`simplex_aux_weight=0.5` settings.
+
+Decision rule: keep only if the step-3500 lDDT beats or stays very close to
+E55's `0.3604` while preserving E58's FoldScore/dRMSD improvement. Reject if
+it remains in the E57/E58 lDDT band.

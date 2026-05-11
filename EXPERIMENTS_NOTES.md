@@ -1607,6 +1607,19 @@
   `0.35072777792811394`, `val_ca_drmsd=10.901953607797623`, and
   predicted/true C-alpha radius of gyration `11.124989807605743 /
   15.403406739234924`. This improves the global/FoldScore side but is well
-  below E55's `0.3604` lDDT, matching the E57 tradeoff so far. Let it reach
-  step 4000 before final decision because the branch started fresh
-  outer-edge-context tensors and optimizer state.
+  below E55's `0.3604` lDDT, matching the E57 tradeoff.
+- E58 was stopped early after the step-3500 checkpoint because the primary
+  lDDT objective clearly regressed and the outer-edge context run was much
+  slower than the base continuation. Local returned artifacts were copied
+  under ignored
+  `artifacts/nanofold_public_benchmarks/e58_outer_edge_context_from_e55_s4000_c256_m64/`.
+  The owned Runpod pod `714wc1nzy3t8qz` was stopped and deleted; a post-delete
+  lookup returned 404, as expected. No other Runpod instances were managed.
+- E58 interpretation: directed outer-edge context appears to help global
+  consistency/FoldScore but harms local C-alpha lDDT when applied at scale
+  `0.25` from freshly initialized context modules. Next test should damp or
+  schedule this topology-context path rather than strengthen losses.
+- E59 live plan: run a 3500-step gate from the E55 checkpoint with the same
+  weights-only initialization, but set `simplex_outer_edge_context_scale=0.05`.
+  This remains a Topotein-style architecture test while asking whether a weak
+  outer-edge context correction can preserve E55's local lDDT.
