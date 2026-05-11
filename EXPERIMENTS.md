@@ -1635,7 +1635,7 @@ readout mechanism.
 
 ### E52: Selected Cell Dropout
 
-Status: implemented locally; queued for Runpod.
+Status: completed on Runpod.
 
 Hypothesis: E15 is still the best branch, and E16/E17 suggest that simply
 continuing or further relaxing its auxiliary scaffold does not break the
@@ -1660,3 +1660,33 @@ recovers the E22/E25/E30 early band while preserving FoldScore/radius better
 than E49-E51. If it only matches the weak post-E43 pilot band, reject and
 return to longer E15/effective-batch-8 optimization rather than adding more
 auxiliary losses.
+
+Result: reject. Step 250 reached `val_lddt_ca=0.2293`, FoldScore `0.2169`,
+`val_ca_drmsd=15.7319`, and predicted/true C-alpha radius of gyration
+`5.5469 / 15.4034`. Step 500 recovered to `val_lddt_ca=0.2630`, FoldScore
+`0.2301`, `val_ca_drmsd=14.2399`, and radius `7.2057 / 15.4034`, but this
+remains below E49/E50 final and far below the stronger E22/E25/E30 early
+band. Cell dropout is too destructive at this strength and should not be the
+next main branch.
+
+### E53: Longer Effective-Batch-8 E15 Scaffold
+
+Status: queued for Runpod.
+
+Hypothesis: E25 showed that effective batch 8 is operationally viable but did
+not improve the 500-step point. The final objective, however, requires a
+30,000-step effective-batch-8 confirmation, and E09/E15-style curves often
+improve substantially after the first 500 optimizer steps. Before adding more
+architecture or auxiliary losses, run a longer effective-batch-8 gate on the
+best selected simplex scaffold.
+
+Mechanism: use `full_msa_to_face` with the E09/E15 selected face/tetra
+coordinate and boundary-distance realization losses, `batch_size=1`, and
+`grad_accum_steps=8`. This changes only optimizer batch statistics; the
+architecture remains the persistent face/tetra complex with MSA-to-face
+updates and selected boundary realization.
+
+Decision rule: run 1000 optimizer steps at crop 256 / MSA depth 64, evaluating
+at steps 500 and 1000. Continue toward a longer effective-batch-8 run only if
+step 1000 improves clearly over E25 step 500 (`val_lddt_ca=0.2946`) or shows
+substantially better FoldScore/radius without losing lDDT.

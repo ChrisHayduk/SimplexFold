@@ -1,6 +1,6 @@
 # SimplexFold Experiment Results
 
-Last updated: 2026-05-10.
+Last updated: 2026-05-11.
 
 Best validation C-alpha lDDT so far: **E15**, `val_lddt_ca=0.3556` at step
 9000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
@@ -69,3 +69,4 @@ recorded in the running notes for that run.
 | E49 directed outer-edge context | completed | 500 | 0.2695 | 0.2695 | 0.2429 | 14.5377 | 6.7858 / 15.4034 | rejected |
 | E50 selected boundary expansion hinge | completed | 500 | 0.2731 | 0.2731 | 0.2334 | 14.7809 | 6.6087 / 15.4034 | rejected |
 | E51 expansion hinge + structure readout | completed | 250 | 0.2375 | 0.2272 | 0.2233 | 15.7161 | 5.7622 / 15.4034 | rejected |
+| E52 selected cell dropout | completed | 500 | 0.2630 | 0.2630 | 0.2301 | 14.2399 | 7.2057 / 15.4034 | rejected |

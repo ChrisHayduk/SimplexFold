@@ -1432,3 +1432,30 @@
   selected coordinate and boundary-distance weights, and
   `simplex_aux_weight` annealed `1.0 -> 0.5` over steps 250-500. Do not write
   E52 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+- E52 launched on owned temporary Runpod H100 pod `thyay2y2e53fuh`
+  (`codex-simplexfold-e52-runpod-20260510`) from commit `a205a93`. Clean
+  launch audit: public train/val/all manifest counts `10000/1000/11000`,
+  hidden manifest absent, feature/label `.npz` counts `11000/11000`,
+  encoded-chain `bad_paths=0`, H100 CUDA available, FoldScore import works,
+  AF2-medium pair-only `3,106,642`, SimplexFold medium `3,106,690`, E52
+  `3,106,690`, and `simplex_cell_dropout=0.15`.
+- E52 completed on Runpod and the temporary pod was stopped/deleted. Local
+  returned artifacts were copied under ignored
+  `artifacts/nanofold_public_benchmarks/e52_selected_cell_dropout_s500_c256_m64/`.
+  Step 250 reached `val_lddt_ca=0.22932657599449158`, FoldScore
+  `0.21687721833586693`, `val_ca_drmsd=15.73187729716301`, and
+  predicted/true C-alpha radius of gyration `5.546932339668274 /
+  15.403406739234924`. Step 500 ended at
+  `val_lddt_ca=0.2629628051072359`, FoldScore `0.23007656913250685`,
+  `val_ca_drmsd=14.239901304244995`, and radius
+  `7.20567774772644 / 15.403406739234924`.
+- E52 interpretation: selected cell dropout at `0.15` is too destructive.
+  It rebounds somewhat by step 500 but remains below E49/E50 and the older
+  E22/E25/E30 early range. Reject this strength and return to the E15
+  `full_msa_to_face` scaffold for optimization-scale testing.
+- E53 live plan: extend E25's effective-batch-8 test to 1000 optimizer steps
+  using the best pre-anneal E09/E15 scaffold: `full_msa_to_face`, crop 256,
+  MSA depth 64, `batch_size=1`, `grad_accum_steps=8`, selected coordinate
+  weights `1.0/1.0`, and selected boundary-distance weights `0.5/0.5`.
+  Evaluate at steps 500 and 1000. Do not write E53 to
+  `EXPERIMENT_RESULTS.md` until the Runpod run returns.

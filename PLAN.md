@@ -1,18 +1,19 @@
-## Current Plan: E52 Cell-Dropout Gate
+## Current Plan: Longer E15 Effective-Batch Gate
 
-E44-E51 show that closure masks, broader structure readouts, and stronger
-auxiliary expansion do not break the C-alpha lDDT plateau. The next move is
-to return to the strongest observed branch, E15's `full_msa_to_face` selected
-simplex realization scaffold, and test a smaller topological regularizer
-before spending on longer effective-batch-8 training.
+E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
+expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
+The next move should stop adding side paths and return to the strongest
+observed branch: E15's `full_msa_to_face` selected simplex realization
+scaffold with the auxiliary weight annealed to `0.5`.
 
-E52 adds training-only dropout on selected face and tetra cells. The intent is
-to randomly train on subcomplexes of the learned 2-/3-cell complex so the AF2
-trunk cannot depend on a single noisy early set of selected cells. This is a
-topological architecture/curriculum change because the stochasticity acts on
-explicit higher-rank cochains and their boundary readouts, not on dense
-all-pairs coordinates or a generic lDDT surrogate. Keep
-`EXPERIMENT_RESULTS.md` only for returned Runpod results.
+The active goal calls for a final 30,000-step effective-batch-8 confirmation.
+E25 only tested that regime for 500 optimizer steps, where it was viable but
+not improved. The next concrete gate should extend the E15 scaffold under
+effective batch 8 before spending on a full 30k run. This keeps the work in
+the simplicial view because the architecture and losses remain the selected
+face/tetra boundary-realization pathway; the new question is whether the
+intended optimizer regime gives that topology enough stable updates to matter.
+Keep `EXPERIMENT_RESULTS.md` only for returned Runpod results.
 
 The reference PDFs added in `references/papers/` sharpen the next branch of
 the plan. If E38 does not move the validation curve, prefer Topotein-inspired
