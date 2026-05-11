@@ -2262,7 +2262,7 @@ post-delete lookup returned 404.
 
 ### E67: Weak Selected-Complex Structure Readout
 
-Status: running on owned Runpod pod `3en5noqmkkiovz`.
+Status: completed on Runpod and rejected as a continuation branch.
 
 Hypothesis: E65 and E66 show that changing selected-boundary loss weighting
 does not preserve the E64 lDDT peak. The next topology-native test should
@@ -2282,7 +2282,7 @@ face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
 weights `0.5`, `simplex_aux_weight=0.5`, and
 `--simplex-structure-readout-scale 0.05`.
 
-Launch: E67 is running on owned Runpod B200 pod `3en5noqmkkiovz`
+Launch: E67 ran on owned Runpod B200 pod `3en5noqmkkiovz`
 (`codex-simplexfold-e67-runpod-20260511`) from commit `27ddea4`. Clean launch
 audit after copying only public data/code: public train/val/all manifest
 counts are `10000/1000/11000`, remote manifest files are exactly `all.txt`,
@@ -2293,10 +2293,42 @@ pair-only has `3,106,642` parameters, and E67 model has `3,106,690`
 parameters (`+0.0015%`). `run_metadata.json` records
 `simplex_structure_readout_scale=0.05`, static face/tetra selected-boundary
 lDDT weights `0.05` / `0.05`, weights-only resume from E64, crop 256, MSA
-depth 64, and no templates. Do not add E67 to `EXPERIMENT_RESULTS.md` until
-the Runpod run returns.
+depth 64, and no templates.
 
 Decision rule: keep only if the step-4500 lDDT improves over E65's unbalanced
 continuation (`0.3645`) without a large FoldScore/dRMSD or selected-boundary
 diagnostic regression. Continue only if it approaches or exceeds E64's
 `0.3739`; reject if it behaves like the earlier broad readout sidecars.
+
+Result: reject as a continuation branch. E67 completed at step 4500 with
+`val_lddt_ca=0.3647`, FoldScore `0.3619`, `val_ca_drmsd=10.3503`, and
+predicted/true C-alpha radius `11.6688 / 15.4034`. It barely improved over
+E65's step-4500 lDDT but stayed below E64 and regressed FoldScore. The useful
+signal is geometric: selected face/tetra boundary length MAE improved to
+`2.6833` / `2.8167`, better than E64/E65, while boundary lDDT stayed close to
+E65 at `0.5302` / `0.5154`. Artifacts were copied locally, and the owned E67
+pod was stopped and deleted; a post-delete lookup returned 404.
+
+### E68: Damped Selected-Complex Structure Readout
+
+Status: planned from E64.
+
+Hypothesis: E67 shows the selected-complex structure readout carries useful
+geometry signal but couples too strongly into the structure module at scale
+`0.05`. Halving the readout scale may preserve local C-alpha lDDT while
+retaining the dRMSD and boundary-length benefits.
+
+Mechanism: rerun the E67 topology communication path with
+`--simplex-structure-readout-scale 0.025`, keeping the E64 selected-boundary
+lDDT and coordinate-realization losses unchanged.
+
+Planned launch: resume E64 from its step-4000 checkpoint and run a 500-step
+gate to step 4500 with static selected-boundary lDDT weights `0.05`, selected
+face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
+weights `0.5`, `simplex_aux_weight=0.5`, and
+`--simplex-structure-readout-scale 0.025`.
+
+Decision rule: keep only if step-4500 lDDT improves over E67 and E65 while
+preserving E67's dRMSD or selected-boundary length improvements. Continue only
+if it approaches or exceeds E64; otherwise reject the structure-readout scale
+family and move to a different selected-cell communication mechanism.

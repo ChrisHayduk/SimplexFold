@@ -1,4 +1,4 @@
-## Current Plan: E67 Weak Selected-Complex Structure Readout
+## Current Plan: E68 Damped Selected-Complex Structure Readout
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -47,6 +47,13 @@ lDDT `0.5090` / `0.4948`. Boundary contraction also worsened to about `0.714`,
 so inverse coface-degree weighting weakens the selected-boundary signal rather
 than making it cleaner.
 
+E67 tested a weak selected-complex structure readout from E64 with
+`--simplex-structure-readout-scale 0.05`. Reject it as a continuation branch:
+it reached `val_lddt_ca=0.3647`, essentially tied with E65 step 4500 and still
+below E64, while FoldScore fell to `0.3619`. It did improve dRMSD to `10.3503`
+and boundary length MAE to `2.6833` / `2.8167`, so the readout path has useful
+geometry signal but needs less coupling to avoid hurting local lDDT.
+
 Do not spend on a blind 30,000-step continuation yet, and do not keep turning
 the scalar auxiliary knob. The full reread of the reference PDFs in
 `references/papers/` points back to the core topological claim: the model
@@ -85,34 +92,23 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
-The active branch is E67: weak selected-complex structure readout from E64.
+The active branch is E68: damped selected-complex structure readout from E64.
 This changes the communication path rather than the boundary-loss weighting:
 selected face/tetra cochain summaries are allowed to enter the structure-module
 input through the existing simplicial readout path with
-`--simplex-structure-readout-scale 0.05`. The topological claim is that
+`--simplex-structure-readout-scale 0.025`. The topological claim is that
 higher-rank cell states should influence coordinate realization through their
 own multi-rank representation, not only through scalar auxiliary losses on
 the final coordinates.
 
-Launch E67 from the E64 step-4000 checkpoint for a 500-step gate to step 4500,
+Launch E68 from the E64 step-4000 checkpoint for a 500-step gate to step 4500,
 with static selected-boundary lDDT weights `0.05`, selected face/tetra
 coordinate weights `1.0`, selected boundary coordinate-distance weights `0.5`,
-`simplex_aux_weight=0.5`, and `--simplex-structure-readout-scale 0.05`. This
-directly tests whether a small architecture readout can preserve E64's lDDT
-better than E65's unbalanced continuation (`0.3645` at step 4500) and E66's
-coface-balanced loss (`0.3505`). Keep only if it improves the step-4500 lDDT
-relative to E65 and does not badly regress FoldScore, dRMSD, or selected
-boundary diagnostics; continue only if it approaches or exceeds E64.
-
-E67 is running on the owned Runpod B200 pod `3en5noqmkkiovz` from commit
-`27ddea4`. Launch audit passed with public train/val/all counts
-`10000/1000/11000`, remote manifest files exactly `all.txt`, `train.txt`, and
-`val.txt`, hidden manifest/features/labels absent, feature/label NPZ counts
-`11000/11000`, the E64 checkpoint present, FoldScore import working, CUDA
-reporting `NVIDIA B200`, `--simplex-structure-readout-scale 0.05` recorded in
-`run_metadata.json`, and `3,106,690` parameters (`+0.0015%` versus
-AF2-medium pair-only). Do not add E67 to `EXPERIMENT_RESULTS.md` until the
-Runpod run returns.
+`simplex_aux_weight=0.5`, and `--simplex-structure-readout-scale 0.025`. This
+directly tests whether halving the topology readout preserves E64/E65 lDDT
+while retaining E67's improved dRMSD and selected-boundary length signal. Keep
+only if it improves the step-4500 lDDT relative to E67 and E65 without losing
+E67's geometry improvements; continue only if it approaches or exceeds E64.
 
 Yes. With templates forbidden, the right construction is:
 

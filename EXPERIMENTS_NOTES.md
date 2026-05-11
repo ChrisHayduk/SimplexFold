@@ -2153,3 +2153,25 @@
   new/missing tensors, and started a fresh optimizer. CUDA is active with B200
   memory allocated. Heartbeat `check-simplexfold-e57-runpod` has been
   retargeted to E67 pod `3en5noqmkkiovz` only.
+- E67 returned on owned Runpod pod `3en5noqmkkiovz` and was rejected as a
+  continuation branch. Step 4500 reached `val_lddt_ca=0.364693870767951`,
+  FoldScore `0.36185639910399914`, `val_ca_drmsd=10.350328981876373`, and
+  predicted/true C-alpha radius `11.668777972459793 / 15.403406739234924`.
+  Selected face/tetra boundary lDDT ended at `0.530171524733305` /
+  `0.5154275149106979`, contraction fractions at `0.6802140511572361` /
+  `0.6808506213128567`, boundary length MAE at `2.683264270424843` /
+  `2.8166864067316055`, mean boundary-edge degree at `11.859311401844025` /
+  `79.06207513809204`, and unique-edge fraction at `0.08480586282465244` /
+  `0.012720879423697866`.
+- E67 artifacts and launch log were copied locally under ignored
+  `artifacts/nanofold_public_benchmarks/e67_structure_readout005_from_e64_s4500_c256_m64/`,
+  including `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, checkpoint, and
+  `runpod_launch.log`. The owned E67 pod was stopped and deleted after copying;
+  a post-delete lookup returned 404. No other Runpod instances were managed.
+  Heartbeat `check-simplexfold-e57-runpod` was paused because no Runpod job is
+  currently active.
+- E67 interpretation: reject scale `0.05` for continuation because it remains
+  below E64 and loses FoldScore, but keep the geometry lesson. The readout
+  path improved dRMSD and selected-boundary length MAE, so next test E68 with
+  a damped selected-complex structure readout scale `0.025` from E64.
