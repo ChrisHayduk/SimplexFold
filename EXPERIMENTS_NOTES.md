@@ -2039,3 +2039,9 @@
   degree prevents a repeated undirected edge from dominating just because it
   appears in many selected cofaces. Do not launch E66 until E65 returns and
   the static-versus-relaxed boundary-lDDT question is resolved.
+- E65 status check after launch: owned pod `21pml3y3hbbbpb` remains running,
+  Python PID `922` is active, CUDA memory is allocated, and GPU utilization is
+  nonzero. The E65 artifact directory still has no `results.json`,
+  `results.csv`, checkpoint, or step-4500/5000 history row; latest history row
+  remains the inherited E64 step 4000. Leave the pod running and continue to
+  keep `EXPERIMENT_RESULTS.md` unchanged until a returned result exists.
