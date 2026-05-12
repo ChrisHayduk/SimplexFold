@@ -313,17 +313,25 @@ length MAE fell to `0.8182` / `0.9820`, and boundary-edge mean degree fell to
 it realizes a cleaner selected complex but loses enough higher-rank context
 to under-expand the global structure and soften primary C-alpha lDDT.
 
-The active Runpod gate is E94: combine E87's directed source/target
-boundary readout with a gentler version of E93's filtration. Resume the E81
-checkpoint from step 8000 to 8500, ramp
-`simplex_boundary_readout_directionality` from `0.0` to `0.5`, preserve E87's
-incidence-normalized boundary transport, and ramp face/tetra caps from
-`24/48` to `18/36`. This remains a zero-parameter topology-construction/
-cochain-routing test. It keeps the broader E81 sparse complex alive longer
-than E93 while asking whether moderate filtration can move selected-boundary
-diagnostics toward E93 without giving up E87's primary lDDT gain. The launch
-counted `3,154,242` parameters under the `--max-parameters 3261974` runner
-guard and resumed E81 cleanly with 1244 matching tensors loaded.
+E94 also rejected the filtration route. It combined E87's directed
+source/target boundary readout with a gentler `24/48 -> 18/36` filtration and
+returned `val_lddt_ca=0.3914`, below E81, E86, E87, and E93. It did reduce
+selected-boundary contraction to `0.5057` / `0.5157`, but boundary-edge reuse
+stayed high and selected-boundary lDDT `0.7600` / `0.7294` did not approach
+E93. The interpretation is that further cap tightening, even moderate
+tightening, is trading away local C-alpha agreement faster than it improves
+the useful selected complex.
+
+The active Runpod gate is E95: keep the broader E81 `24/48` sparse
+complex and combine the two best cochain-communication routes instead of
+filtering further. Resume E81 from step 8000 to 8500 with incidence-normalized
+boundary transport, weak directed outer-edge context ramped `0.0 -> 0.025`
+as in E86, and directed boundary readout ramped `0.0 -> 0.5` as in E87. This
+tests whether outer-edge context can improve the face/tetra states that
+directed boundary readout writes back into `Z_ij`, without adding a generic
+coordinate loss. Use the `--max-parameters 3261974` runner guard; the expected
+parameter count is `3,230,834`, still within the 5% cap. Startup loaded 1244
+matching E81 tensors and initialized 48 outer-edge-context tensors.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank

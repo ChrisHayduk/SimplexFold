@@ -3575,3 +3575,51 @@
   at about `13,513 MiB`, GPU utilization sampled at `34%`, and the log still
   showed the clean E81 resume with 1244 matching tensors loaded and 0
   new/missing tensors initialized.
+- E94 returned on owned pod `o1dy17ouv8w5mz`: step 8500
+  `val_lddt_ca=0.3913724571466446`, FoldScore `0.37685416638851166`,
+  `val_ca_drmsd=10.302786141633987`, predicted/true C-alpha radius
+  `11.396026909351349 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.7599867060780525` / `0.7293643690645695`, boundary length MAE
+  `0.9376725740730762` / `1.1067169606685638`, contraction fractions
+  `0.5056739300489426` / `0.5157316420227289`, boundary-edge mean degree
+  `12.452479362487793` / `29.885388612747192`, and boundary unique-edge
+  fraction `0.08070104541502317` / `0.033798065517231766`.
+- E94 interpretation: reject. Moderate filtration plus directed boundary
+  readout reduced selected-boundary contraction, but primary lDDT fell below
+  E81, E86, E87, and E93; selected-boundary lDDT did not approach E93, and
+  boundary-edge reuse remained high. Stop pursuing additional top-k
+  filtration as the next primary path.
+- Copied E94 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e94_moderate_filtration_directed_boundary_from_e81_s8500_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e94_moderate_filtration_directed_boundary_from_e81.log`. The local
+  artifact pull excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8000` to add the E94 row to `EXPERIMENT_RESULTS.md`, so inherited E81
+  history does not count as E94's best validation lDDT.
+- E95 launch decision: keep the broader E81 `24/48` sparse complex and
+  combine E86's weak directed outer-edge context with E87's directed boundary
+  readout. This tests cochain communication through outer-edge neighborhoods
+  plus source/target incidence-aware writes back to `Z_ij`, rather than
+  changing the selected-cell caps or adding a generic output loss.
+- E95 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E81 checkpoint present, remote py_compile passed for
+  `scripts/run_nanofold_public_benchmarks.py`, CLI help confirmed support for
+  outer-edge context, boundary-readout directionality, boundary-incidence
+  normalization, and `--max-parameters`, and the exact E95 instantiated
+  module set counted `3,230,834` parameters, under the AF2-medium +5% ceiling
+  `3,261,974`.
+- E95 launched on the same owned H100 pod with run name
+  `e95_outer_edge_directed_boundary_from_e81_s8500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e95_outer_edge_directed_boundary_from_e81.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e95_outer_edge_directed_boundary_from_e81_s8500_c256_m64/`,
+  and Python PID `12566`. Startup poll at `2026-05-12T22:10:05Z` confirmed
+  the benchmark process is alive, metadata exists, `--max-parameters 3261974`
+  is recorded, outer-edge runtime ramp is `0.0 -> 0.025`, boundary-readout
+  directionality ramp is `0.0 -> 0.5`, fixed face/tetra caps are `24/48`, and
+  the runner resumed E81 at step 8000/examples 64000 with 1244 matching model
+  tensors loaded and 48 new/missing outer-edge-context tensors initialized.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  from E94 to E95, keeping the same owned-pod-only restriction and the rule
+  that heartbeat must not launch follow-up experiments automatically.

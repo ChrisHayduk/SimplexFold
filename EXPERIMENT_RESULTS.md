@@ -110,3 +110,4 @@ recorded in the running notes for that run.
 | E88 runtime-gated latent segment cells | completed | 8500 | 0.3891 | 0.3891 | 0.3824 | 10.1986 | 11.5027 / 15.4034 | rejected; primary lDDT regressed and parameters exceeded AF2-medium +5% budget |
 | E89 pair-preserving simplex readout | completed | 8500 | 0.3947 | 0.3947 | 0.3861 | 10.0603 | 11.6927 / 15.4034 | rejected; pair-preserving readout fell below E81/E86/E87 primary lDDT despite stronger FoldScore |
 | E93 sparse filtration from E81 | completed | 8500 | 0.3973 | 0.3973 | 0.3819 | 10.2949 | 11.0952 / 15.4034 | rejected; stricter top-k filtration improved selected-boundary diagnostics but primary lDDT fell below E81/E86/E87 |
+| E94 moderate filtration + directed boundary readout | completed | 8500 | 0.3914 | 0.3914 | 0.3769 | 10.3028 | 11.3960 / 15.4034 | rejected; combining moderate filtration with directed boundary readout fell below E81/E86/E87 primary lDDT despite lower boundary contraction |

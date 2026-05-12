@@ -595,7 +595,7 @@ more under-expanded structure and lower primary lDDT. Do not continue the
 
 ### E94 Candidate: Moderate Filtration With Directed Boundary Readout
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E87 showed that directed source/target boundary readout can
 convert selected face/tetra cochain evidence into the pair tensor without
@@ -618,7 +618,7 @@ E81/E86/E87 band while selected-boundary diagnostics move toward E93. Reject
 if primary lDDT follows E93 downward or if selected-boundary lDDT does not
 improve over E87.
 
-Launch: E94 is running as
+Launch: E94 ran as
 `e94_moderate_filtration_directed_boundary_from_e81_s8500_c256_m64`, Python
 PID `11941`, from the E81 checkpoint at step 8000/examples 64000. Remote
 prelaunch checks found no active Python benchmark process, confirmed the E81
@@ -630,6 +630,53 @@ The log path is
 `/workspace/SimplexFold/logs/e94_moderate_filtration_directed_boundary_from_e81.log`,
 and the artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e94_moderate_filtration_directed_boundary_from_e81_s8500_c256_m64/`.
+
+Result: reject. E94 reached `val_lddt_ca=0.3914`, FoldScore `0.3769`,
+`val_ca_drmsd=10.3028`, and predicted/true C-alpha radius
+`11.3960 / 15.4034`, below E81, E86, E87, and E93 on the primary metric.
+The branch did reduce selected-boundary contraction to `0.5057` / `0.5157`
+and kept boundary length MAE between E87 and E93 at `0.9377` / `1.1067`, but
+the selected face/tetra boundary lDDT `0.7600` / `0.7294` did not approach
+E93, and boundary-edge reuse stayed high. Do not continue the filtration path.
+
+### E95 Candidate: Outer-Edge Context With Directed Boundary Readout
+
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: the E93/E94 filtration family improves selected-boundary
+diagnostics at the cost of primary lDDT, so the next gate should keep the
+broader E81 `24/48` sparse complex and combine the two best cochain-routing
+signals instead. E86's weak directed outer-edge context improved FoldScore
+and dRMSD while preserving local lDDT, and E87's source/target boundary
+readout produced the current tiny primary-lDDT best. Testing them together
+asks whether outer-edge context can improve the cell states that directed
+boundary readout writes back to `Z_ij`.
+
+Mechanism: resume E81 from step 8000 to 8500 with fixed `24/48` sparse caps,
+degree-penalized cell scoring, selected-boundary realization losses,
+incidence-normalized boundary transport, weak outer-edge context
+`0.0 -> 0.025`, and directed boundary readout `0.0 -> 0.5`. This is a
+topological cochain-communication test; it adds no generic output loss and
+keeps parameters within the AF2-medium +5% budget.
+
+Decision rule: keep only if E95 beats E87's `val_lddt_ca=0.3992` or at least
+preserves the E86/E87 primary-lDDT band while improving FoldScore/dRMSD and
+selected-boundary diagnostics. Reject if the two communication routes
+interfere and primary lDDT drops into the E89/E94 band.
+
+Launch: E95 is running as
+`e95_outer_edge_directed_boundary_from_e81_s8500_c256_m64`, Python PID
+`12566`, from the E81 checkpoint at step 8000/examples 64000. Remote
+prelaunch checks found no active Python benchmark process, confirmed the E81
+checkpoint was present, py_compile passed for the runner, CLI help confirmed
+the outer-edge, directionality, incidence, and max-parameter flags, and the
+exact module set counted `3,230,834` parameters under the `3,261,974`
+ceiling. Startup resumed E81 with 1244 matching model tensors loaded and 48
+new/missing tensors initialized for the outer-edge context module. The log
+path is
+`/workspace/SimplexFold/logs/e95_outer_edge_directed_boundary_from_e81.log`,
+and the artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e95_outer_edge_directed_boundary_from_e81_s8500_c256_m64/`.
 
 ## Experiment Queue
 
