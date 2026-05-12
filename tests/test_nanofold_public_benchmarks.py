@@ -317,6 +317,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "3000",
             "--simplex-hodge-face-runtime-scale-ramp-steps",
             "500",
+            "--simplex-geometry-distance-weight",
+            "0.025",
             "--simplex-face-boundary-lddt-weight-final",
             "0.025",
             "--simplex-tetra-boundary-lddt-weight-final",
@@ -345,12 +347,16 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_hodge_face_runtime_scale_final == 0.05
     assert args.simplex_hodge_face_runtime_scale_ramp_start_step == 3000
     assert args.simplex_hodge_face_runtime_scale_ramp_steps == 500
+    assert args.simplex_geometry_distance_weight == 0.025
     assert args.simplex_face_boundary_lddt_weight_final == 0.025
     assert args.simplex_tetra_boundary_lddt_weight_final == 0.025
     assert args.simplex_boundary_lddt_ramp_start_step == 3500
     assert args.simplex_boundary_lddt_ramp_steps == 500
     assert args.simplex_segment_radius == 5
     assert args.resume_model_weights_only is True
+
+    cfg = _apply_model_config_overrides(load_model_config("simplexfold_medium_param_matched"), args)
+    assert cfg.simplex_geometry_distance_weight == 0.025
 
 
 def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():

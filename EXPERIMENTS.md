@@ -2593,3 +2593,32 @@ and no templates. The launch log shows the runner resumed E71 at step
 5000/examples 40000, loaded 1244 matching model tensors, initialized 0
 new/missing tensors, and started a fresh optimizer. Do not add E73 to
 `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+
+### E74: Light Recycled-Geometry Topology Selector
+
+Status: implemented locally and planned only if E73 fails to preserve E71.
+
+Hypothesis: E72 improved selected-boundary lDDT, FoldScore, dRMSD, and global
+radius while reducing primary local lDDT. One possible failure mode is that,
+after coordinates open up, the simplex neighbor selector's default recycled
+geometry term (`simplex_geometry_distance_weight=0.1`) over-biases the sparse
+complex toward the model's current metric geometry. Reducing that weight should
+let learned pair/contact topology retain more control over which residues
+become selected face/tetra cochains.
+
+Mechanism: add a runner override for `simplex_geometry_distance_weight` and
+test `0.025` from the E71/E73 checkpoint family. This changes the
+cell-complex construction step itself: the selected face/tetra incidence
+relations are built from a softer blend of learned pair topology and recycled
+C-alpha geometry. It adds no parameters and does not introduce a generic
+output-coordinate loss.
+
+Planned launch if needed: update the owned Runpod workspace to the commit that
+contains this runner override, resume the strongest available checkpoint, and
+run a 500-step gate with `--simplex-geometry-distance-weight 0.025` plus the
+selected-boundary lDDT/coordinate-realization recipe. If E73 beats E71, skip
+this and follow the better E73 branch instead.
+
+Validation:
+
+- `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_geometry_selector_weight_adds_no_parameters`

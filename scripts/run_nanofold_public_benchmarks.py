@@ -883,6 +883,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_outer_edge_context_scale", args.simplex_outer_edge_context_scale),
         ("simplex_hodge_face_update_scale", args.simplex_hodge_face_update_scale),
         ("simplex_edge_frame_message_scale", args.simplex_edge_frame_message_scale),
+        ("simplex_geometry_distance_weight", args.simplex_geometry_distance_weight),
         ("simplex_segment_cell_scale", args.simplex_segment_cell_scale),
         ("simplex_segment_radius", args.simplex_segment_radius),
         ("simplex_c_segment", args.simplex_c_segment),
@@ -1450,6 +1451,9 @@ def _train_variant(
         "simplex_local_bias": float(getattr(model_config, "simplex_local_bias", 0.0)) if use_simplicial else 0.0,
         "simplex_long_min_sep": int(getattr(model_config, "simplex_long_min_sep", 0)) if use_simplicial else 0,
         "simplex_long_bias": float(getattr(model_config, "simplex_long_bias", 0.0)) if use_simplicial else 0.0,
+        "simplex_geometry_distance_weight": (
+            float(getattr(model_config, "simplex_geometry_distance_weight", 0.0)) if use_simplicial else 0.0
+        ),
         "simplex_boundary_closure_weight": (
             float(getattr(model_config, "simplex_boundary_closure_weight", 0.0)) if use_simplicial else 0.0
         ),
@@ -1613,6 +1617,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_local_bias",
         "simplex_long_min_sep",
         "simplex_long_bias",
+        "simplex_geometry_distance_weight",
         "simplex_boundary_closure_weight",
         "simplex_boundary_closure_temperature",
         "simplex_cell_dropout",
@@ -1946,6 +1951,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the model config scale for edge-frame scalarized simplex messages.",
+    )
+    parser.add_argument(
+        "--simplex-geometry-distance-weight",
+        type=float,
+        default=None,
+        help="Override the recycled C-alpha distance weight used when selecting simplex neighbors.",
     )
     parser.add_argument(
         "--simplex-segment-cell-scale",

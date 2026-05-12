@@ -2428,3 +2428,15 @@
   `0.0125`, weights-only resume from the E71 checkpoint, crop 256, MSA depth
   64, and no templates. Heartbeat `check-simplexfold-e57-runpod` has been
   retargeted to E73 on pod `lovgzo4hz2k4fp` only.
+- E74 local implementation prepared while E73 runs: added
+  `--simplex-geometry-distance-weight` to
+  `scripts/run_nanofold_public_benchmarks.py`, threaded it through
+  `_apply_model_config_overrides`, and recorded `simplex_geometry_distance_weight`
+  in result JSON/CSV. This lets the next Runpod branch reduce the recycled
+  C-alpha distance prior in `build_simplex_topology` from `0.1` to `0.025`
+  without editing config files or changing parameter count.
+- E74 local validation passed:
+  `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_geometry_selector_weight_adds_no_parameters`.
+  This branch should launch only if E73 does not preserve E71's local lDDT;
+  update the owned Runpod workspace to the new commit first, because the
+  currently running E73 process is still on commit `bc1b749`.
