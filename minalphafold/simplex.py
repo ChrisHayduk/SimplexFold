@@ -651,6 +651,20 @@ def scatter_to_pair(
     return delta.reshape(b, l, l, c_z), counts.reshape(b, l, l, 1)
 
 
+def coface_degree_attenuate_pair_readout(
+    pair_readout: torch.Tensor,
+    pair_counts: torch.Tensor,
+    attenuation: float,
+) -> torch.Tensor:
+    """Dampen pair updates on boundary edges reused by many selected cells."""
+
+    strength = max(float(attenuation), 0.0)
+    if strength == 0.0:
+        return pair_readout
+    degree = pair_counts.to(pair_readout.dtype).clamp_min(1.0)
+    return pair_readout / degree.pow(strength)
+
+
 def scatter_to_single(
     updates: torch.Tensor,
     residue_indices: torch.Tensor,
@@ -1109,6 +1123,9 @@ class SimplicialAdapter(torch.nn.Module):
         self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
         self.edge_frame_message_scale = float(getattr(config, "simplex_edge_frame_message_scale", 0.0))
+        self.boundary_message_degree_attenuation = float(
+            getattr(config, "simplex_boundary_message_degree_attenuation", 0.0)
+        )
         self.segment_cell_scale = float(getattr(config, "simplex_segment_cell_scale", 0.0))
         self.segment_radius = int(getattr(config, "simplex_segment_radius", 4))
 
@@ -1555,6 +1572,11 @@ class SimplicialAdapter(torch.nn.Module):
             pair_counts = pair_counts + tet_pair_counts
 
         pair_readout = pair_delta / pair_counts.clamp_min(1.0)
+        pair_readout = coface_degree_attenuate_pair_readout(
+            pair_readout,
+            pair_counts,
+            self.boundary_message_degree_attenuation,
+        )
         if pair_mask is not None:
             pair_readout = pair_readout * pair_mask[..., None]
         pair = pair + self.dropout(pair_update_scale * pair_readout)

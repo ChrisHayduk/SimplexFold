@@ -2652,9 +2652,41 @@ artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e76_edge_frame00125_from_e73_s6000_c256_m64/`.
 Do not add E76 to `EXPERIMENT_RESULTS.md` until it returns.
 
-### E74: Light Recycled-Geometry Topology Selector
+### E77: Coface-Degree-Attenuated Boundary Messages
 
 Status: implemented locally and planned if E76 turns over.
+
+Hypothesis: E70-E76 improved lDDT only after the model learned to pass
+geometry through selected face/tetra boundary edges, but the diagnostics still
+show very high boundary-edge reuse. The current pair readout averages
+messages per edge, yet a heavily reused boundary edge can still act as a noisy
+high-order bottleneck. Damping the readout by selected coface degree should
+reduce over-coupling on those dense incidence edges while preserving the same
+selected cell complex.
+
+Mechanism: add a zero-parameter
+`simplex_boundary_message_degree_attenuation` model knob. After face/tetra
+messages are scattered and averaged into the pair tensor, the pair readout is
+divided by `coface_degree ** attenuation`. `0.0` exactly preserves current
+behavior. A small value such as `0.25` is the first candidate because it
+weakens reused boundary edges without deleting cells or changing the topology
+selector. This is an incidence-normalized cochain communication change, not a
+generic coordinate loss.
+
+Planned launch if needed: sync the implementation to the owned Runpod
+workspace after the active E76 process returns, resume the strongest available
+E73/E76 checkpoint, and run a 500-step gate with the E76 recipe plus
+`--simplex-boundary-message-degree-attenuation 0.25`. Compare against E73/E76
+on primary `val_lddt_ca` and against E72/E73 on selected-boundary diagnostics.
+
+Validation:
+
+- `python -m pytest tests/test_simplex.py::test_coface_degree_attenuation_damps_reused_boundary_edges tests/test_simplex.py::test_boundary_message_degree_attenuation_gates_pair_readout_without_single_change tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_boundary_message_degree_attenuation_adds_no_parameters`
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+
+### E74: Light Recycled-Geometry Topology Selector
+
+Status: implemented locally and still available if E76/E77 turn over.
 
 Hypothesis: E72 improved selected-boundary lDDT, FoldScore, dRMSD, and global
 radius while reducing primary local lDDT. One possible failure mode is that,

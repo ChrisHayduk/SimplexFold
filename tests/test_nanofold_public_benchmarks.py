@@ -327,6 +327,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "3000",
             "--simplex-geometry-distance-weight-ramp-steps",
             "500",
+            "--simplex-boundary-message-degree-attenuation",
+            "0.5",
             "--simplex-face-boundary-lddt-weight-final",
             "0.025",
             "--simplex-tetra-boundary-lddt-weight-final",
@@ -363,6 +365,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_geometry_distance_weight_final == 0.025
     assert args.simplex_geometry_distance_weight_ramp_start_step == 3000
     assert args.simplex_geometry_distance_weight_ramp_steps == 500
+    assert args.simplex_boundary_message_degree_attenuation == 0.5
     assert args.simplex_face_boundary_lddt_weight_final == 0.025
     assert args.simplex_tetra_boundary_lddt_weight_final == 0.025
     assert args.simplex_boundary_lddt_ramp_start_step == 3500
@@ -374,6 +377,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
 
     cfg = _apply_model_config_overrides(load_model_config("simplexfold_medium_param_matched"), args)
     assert cfg.simplex_geometry_distance_weight == 0.1
+    assert cfg.simplex_boundary_message_degree_attenuation == 0.5
     assert cfg.simplex_face_top_k == 24
     assert cfg.simplex_tetra_top_k == 48
 

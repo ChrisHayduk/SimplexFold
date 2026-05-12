@@ -896,6 +896,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_outer_edge_context_scale", args.simplex_outer_edge_context_scale),
         ("simplex_hodge_face_update_scale", args.simplex_hodge_face_update_scale),
         ("simplex_edge_frame_message_scale", args.simplex_edge_frame_message_scale),
+        ("simplex_boundary_message_degree_attenuation", args.simplex_boundary_message_degree_attenuation),
         ("simplex_geometry_distance_weight", args.simplex_geometry_distance_weight),
         ("simplex_segment_cell_scale", args.simplex_segment_cell_scale),
         ("simplex_segment_radius", args.simplex_segment_radius),
@@ -1517,6 +1518,11 @@ def _train_variant(
         "simplex_edge_frame_message_scale": (
             float(getattr(model_config, "simplex_edge_frame_message_scale", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_boundary_message_degree_attenuation": (
+            float(getattr(model_config, "simplex_boundary_message_degree_attenuation", 0.0))
+            if use_simplicial
+            else 0.0
+        ),
         "simplex_segment_cell_scale": (
             float(getattr(model_config, "simplex_segment_cell_scale", 0.0)) if use_simplicial else 0.0
         ),
@@ -1666,6 +1672,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_outer_edge_context_scale",
         "simplex_hodge_face_update_scale",
         "simplex_edge_frame_message_scale",
+        "simplex_boundary_message_degree_attenuation",
         "simplex_segment_cell_scale",
         "simplex_segment_radius",
         "simplex_c_segment",
@@ -1989,6 +1996,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the model config scale for edge-frame scalarized simplex messages.",
+    )
+    parser.add_argument(
+        "--simplex-boundary-message-degree-attenuation",
+        type=float,
+        default=None,
+        help="Dampen simplex pair messages by selected boundary-edge coface degree; 0 disables it.",
     )
     parser.add_argument(
         "--simplex-geometry-distance-weight",
@@ -2316,6 +2329,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_outer_edge_context_scale": args.simplex_outer_edge_context_scale,
         "simplex_hodge_face_update_scale": args.simplex_hodge_face_update_scale,
         "simplex_edge_frame_message_scale": args.simplex_edge_frame_message_scale,
+        "simplex_boundary_message_degree_attenuation": args.simplex_boundary_message_degree_attenuation,
         "simplex_segment_cell_scale": args.simplex_segment_cell_scale,
         "simplex_segment_radius": args.simplex_segment_radius,
         "simplex_c_segment": args.simplex_c_segment,

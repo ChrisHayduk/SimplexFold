@@ -8,6 +8,7 @@ from minalphafold.simplex import (
     _boundary_degree_weights,
     build_simplex_topology,
     cell_outer_edge_context,
+    coface_degree_attenuate_pair_readout,
     face_edge_frame_features,
     face_outer_edge_delta,
     face_tetra_coboundary_delta,
@@ -71,6 +72,7 @@ class SimplexConfig:
     simplex_outer_edge_context_scale = 0.0
     simplex_hodge_face_update_scale = 0.0
     simplex_edge_frame_message_scale = 0.0
+    simplex_boundary_message_degree_attenuation = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
     simplex_c_segment = 8
@@ -632,6 +634,52 @@ def test_edge_frame_message_runtime_scale_gates_pair_readout():
 
     assert not torch.allclose(on_pair, off_pair)
     assert torch.allclose(on_single, off_single)
+
+
+def test_coface_degree_attenuation_damps_reused_boundary_edges():
+    readout = torch.ones(1, 1, 3, 2)
+    counts = torch.tensor([[[[1.0], [4.0], [16.0]]]])
+
+    attenuated = coface_degree_attenuate_pair_readout(readout, counts, attenuation=0.5)
+
+    assert torch.allclose(attenuated[0, 0, 0], torch.ones(2))
+    assert torch.allclose(attenuated[0, 0, 1], torch.full((2,), 0.5))
+    assert torch.allclose(attenuated[0, 0, 2], torch.full((2,), 0.25))
+
+
+def test_boundary_message_degree_attenuation_gates_pair_readout_without_single_change():
+    class EdgeFrameConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_edge_frame_message_scale = 0.25
+
+    class AttenuatedConfig(EdgeFrameConfig):
+        simplex_boundary_message_degree_attenuation = 1.0
+
+    torch.manual_seed(17)
+    base_adapter = SimplicialAdapter(EdgeFrameConfig()).eval()
+    torch.manual_seed(17)
+    attenuated_adapter = SimplicialAdapter(AttenuatedConfig()).eval()
+    pair = torch.randn(1, 5, 5, EdgeFrameConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, EdgeFrameConfig.c_s)
+    coords = torch.randn(1, 5, 3)
+    frames = torch.eye(3).reshape(1, 1, 3, 3).expand(1, 5, 3, 3).clone()
+
+    with torch.no_grad():
+        base_pair, base_single, _ = base_adapter(pair, single, recycled_ca_coords=coords, recycled_frames=frames)
+        attenuated_pair, attenuated_single, _ = attenuated_adapter(
+            pair,
+            single,
+            recycled_ca_coords=coords,
+            recycled_frames=frames,
+        )
+
+    assert not torch.allclose(attenuated_pair, base_pair)
+    assert torch.allclose(attenuated_single, base_single)
 
 
 def test_outer_edge_context_runtime_scale_gates_context_path():

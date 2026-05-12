@@ -158,13 +158,20 @@ E76 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` as
 `e76_edge_frame00125_from_e73_s6000_c256_m64`. It resumes the E73 step-5500
 checkpoint, keeps effective batch 8, crop 256, MSA depth 64, and no templates.
 
-If E76 turns over, the prepared alternatives are still E74/E75. E74 reduces
-the recycled-geometry distance prior in the simplex neighbor selector from
-`0.1` to `0.025`, directly changing which sparse face/tetra cochains exist.
-E75 caps active face/tetra cells per anchor with `--simplex-face-top-k` and
+If E76 turns over, the next prepared branch is E77: add coface-degree
+attenuation to the selected boundary-edge message readout. This keeps the
+same face/tetra cell complex but changes its incidence operator: pair updates
+on boundary edges reused by many selected cells are damped by the edge's
+coface degree after the usual incidence average. It adds no parameters and
+addresses the high boundary-edge reuse diagnostic directly.
+
+The other prepared alternatives are still E74/E75. E74 reduces the
+recycled-geometry distance prior in the simplex neighbor selector from `0.1`
+to `0.025`, directly changing which sparse face/tetra cochains exist. E75
+caps active face/tetra cells per anchor with `--simplex-face-top-k` and
 `--simplex-tetra-top-k`, ranking candidate cells by selected boundary-edge
-logits. Both are cell-complex construction changes rather than generic output
-coordinate losses, and both add no parameters.
+logits. These are also cell-complex construction or incidence changes rather
+than generic output-coordinate losses.
 
 Yes. With templates forbidden, the right construction is:
 

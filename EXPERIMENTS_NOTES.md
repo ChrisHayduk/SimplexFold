@@ -2549,3 +2549,14 @@
   The runner resumed E73 at step 5500/examples 44000, loaded 1244 matching
   model tensors, initialized 0 new/missing tensors, and started a fresh
   optimizer. GPU activity was confirmed after launch.
+- E77 local implementation prepared while E76 runs: added
+  zero-parameter `simplex_boundary_message_degree_attenuation`. After selected
+  face/tetra boundary messages are scattered and averaged into the pair tensor,
+  the pair readout can now be damped by `coface_degree ** attenuation`. This
+  changes the selected-complex incidence/message operator and directly targets
+  the high boundary-edge reuse diagnostic without adding an output-only metric
+  loss or changing parameter count. Defaults preserve current behavior.
+- E77 local validation passed:
+  `python -m pytest tests/test_simplex.py::test_coface_degree_attenuation_damps_reused_boundary_edges tests/test_simplex.py::test_boundary_message_degree_attenuation_gates_pair_readout_without_single_change tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_boundary_message_degree_attenuation_adds_no_parameters`;
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`.
+  Do not sync this code into the active remote workspace until E76 returns.

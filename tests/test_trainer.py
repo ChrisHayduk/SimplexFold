@@ -574,6 +574,26 @@ def test_simplicial_cell_topk_selector_adds_no_parameters():
     assert sparse_cell_params == simplex_params
 
 
+def test_simplicial_boundary_message_degree_attenuation_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    attenuated_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_edge_frame_message_scale=0.25,
+        simplex_boundary_message_degree_attenuation=1.0,
+    )
+    edge_frame_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_edge_frame_message_scale=0.25,
+    )
+
+    attenuated_params = sum(parameter.numel() for parameter in AlphaFold2(attenuated_medium).parameters())
+    edge_frame_params = sum(parameter.numel() for parameter in AlphaFold2(edge_frame_medium).parameters())
+
+    assert attenuated_params == edge_frame_params
+
+
 def test_simplicial_cell_dropout_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     dropout_medium = replace(
