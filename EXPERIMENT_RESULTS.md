@@ -87,3 +87,4 @@ recorded in the running notes for that run.
 | E67 structure readout 0.05 | completed | 4500 | 0.3647 | 0.3647 | 0.3619 | 10.3503 | 11.6688 / 15.4034 | rejected; dRMSD improved but lDDT stayed below E64 and FoldScore regressed |
 | E68 structure readout 0.025 | completed | 4500 | 0.3617 | 0.3617 | 0.3625 | 10.2115 | 11.9645 / 15.4034 | rejected; weaker readout further reduced lDDT despite best dRMSD |
 | E69 face normal 0.05 | completed | 4500 | 0.3653 | 0.3653 | 0.3632 | 10.5833 | 11.8750 / 15.4034 | rejected; selected face orientation stayed below E64 and weakened selected-boundary diagnostics |
+| E70 edge-frame messages 0.025 | completed | 4500 | 0.3742 | 0.3742 | 0.3653 | 10.3425 | 11.4815 / 15.4034 | kept; tiny new best with improved selected-boundary diagnostics |

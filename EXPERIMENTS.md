@@ -2409,7 +2409,7 @@ stopped and deleted; a post-delete lookup returned 404.
 
 ### E70: Damped Edge-Frame Boundary Messages
 
-Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
+Status: completed on Runpod and kept for continuation.
 
 Hypothesis: E69 suggests that supervising selected face orientation as a
 separate auxiliary target weakens the boundary geometry. The orientation-aware
@@ -2435,7 +2435,7 @@ weights `0.5`, `simplex_aux_weight=0.5`,
 `--simplex-edge-frame-message-runtime-scale-ramp-start-step 4000`, and
 `--simplex-edge-frame-message-runtime-scale-ramp-steps 500`.
 
-Launch: E70 is running on owned Runpod B200 pod `lovgzo4hz2k4fp`
+Launch: E70 ran on owned Runpod B200 pod `lovgzo4hz2k4fp`
 (`codex-simplexfold-e70-runpod-20260512`) from commit `bf7de3d`. Clean launch
 audit after copying only public data/code: public train/val/all manifest
 counts are `10000/1000/11000`, remote manifest files are exactly `all.txt`,
@@ -2446,9 +2446,45 @@ files are present, E64 checkpoint present, B200 CUDA available, NanoFold
 parameters, and E70 edge-frame model has `3,154,242` parameters (`+1.53%`).
 `run_metadata.json` records `simplex_edge_frame_message_scale=0.025`, runtime
 edge-frame scale `0.0 -> 0.025`, ramp start step `4000`, ramp steps `500`,
-weights-only resume from E64, crop 256, MSA depth 64, and no templates. Do
-not add E70 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
+weights-only resume from E64, crop 256, MSA depth 64, and no templates.
 
 Decision rule: keep only if step-4500 lDDT improves over E65/E67/E69 and does
 not lose E64's selected-boundary lDDT/contraction diagnostics. Continue only if
 it approaches or exceeds E64; reject if it repeats E61's local-lDDT regression.
+
+Result: keep for a stability continuation. E70 completed at step 4500 with
+`val_lddt_ca=0.3742`, FoldScore `0.3653`, `val_ca_drmsd=10.3425`, and
+predicted/true C-alpha radius `11.4815 / 15.4034`. It is only a tiny lDDT
+gain over E64, but the topological diagnostics also improved: selected
+face/tetra boundary lDDT reached `0.5365` / `0.5215`, contraction fractions
+fell to `0.6665` / `0.6681`, and boundary length MAE improved to
+`2.6313` / `2.7606`. Artifacts were copied locally; the owned pod remains
+active for the E71 continuation.
+
+### E71: Continue Damped Edge-Frame Boundary Messages
+
+Status: planned on owned Runpod pod `lovgzo4hz2k4fp`.
+
+Hypothesis: E70 is a small but coherent improvement, so the edge-frame
+boundary-message path may be the first architecture route that improves both
+main lDDT and selected-complex diagnostics after E64. The next question is
+whether that improvement survives another 500 steps or is just a single
+checkpoint fluctuation.
+
+Mechanism: continue from the E70 step-4500 checkpoint to step 5000 on the same
+edge-frame architecture, holding runtime edge-frame contribution at `0.025`
+instead of ramping. Keep the E64/E70 selected-boundary lDDT and
+coordinate-realization recipe unchanged.
+
+Planned launch: resume
+`e70_edge_frame0025_from_e64_s4500_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+and run a 500-step continuation to step 5000 with
+`--simplex-edge-frame-message-scale 0.025`,
+`--simplex-edge-frame-message-runtime-scale 0.025`,
+static selected-boundary lDDT weights `0.05`, selected face/tetra coordinate
+weights `1.0`, selected boundary coordinate-distance weights `0.5`, and
+`simplex_aux_weight=0.5`.
+
+Decision rule: keep only if step 5000 improves or preserves E70's lDDT and
+selected-boundary diagnostics. Reject if lDDT drops back into the E65/E67/E69
+band despite the improved edge-frame boundary geometry.

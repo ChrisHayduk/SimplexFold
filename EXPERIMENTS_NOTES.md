@@ -2310,3 +2310,24 @@
   on the B200 with GPU utilization and memory allocated. Heartbeat
   `check-simplexfold-e57-runpod` has been retargeted to E70 pod
   `lovgzo4hz2k4fp` only.
+- E70 returned on owned Runpod pod `lovgzo4hz2k4fp` and is kept for a
+  stability continuation. Step 4500 reached `val_lddt_ca=0.37417401000857353`,
+  FoldScore `0.3653021454811096`, `val_ca_drmsd=10.342539131641388`, and
+  predicted/true C-alpha radius `11.481503546237946 / 15.40340667963028`.
+  Selected face/tetra boundary lDDT ended at `0.5364893395453691` /
+  `0.5214813183993101`, contraction fractions at `0.6665069051086903` /
+  `0.6680875010788441`, boundary length MAE at `2.6312515065073967` /
+  `2.7605674117803574`, mean boundary-edge degree at `11.896117627620697` /
+  `79.30745029449463`, and unique-edge fraction at `0.08471935021707062` /
+  `0.012707902532560593`. Runtime edge-frame scale reached `0.025`.
+- E70 artifacts and launch log were copied locally under ignored
+  `artifacts/nanofold_public_benchmarks/e70_edge_frame0025_from_e64_s4500_c256_m64/`,
+  including `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, checkpoint, and
+  `runpod_launch.log`. The owned E70 pod was intentionally left running for
+  the E71 continuation; no other Runpod instances were managed.
+- E70 interpretation: keep cautiously. The lDDT gain over E64 is tiny, but it
+  is aligned with the selected-boundary diagnostics, unlike E67-E69. Next run
+  E71 on the same owned pod from the E70 checkpoint to step 5000, holding
+  runtime edge-frame scale at `0.025` and keeping the E64 selected-boundary
+  lDDT/coordinate-loss recipe unchanged.
