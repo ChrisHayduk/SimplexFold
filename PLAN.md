@@ -116,6 +116,16 @@ if step-4500 lDDT improves over E65/E67 and does not badly regress FoldScore,
 dRMSD, or selected-boundary diagnostics; continue only if it approaches or
 exceeds E64.
 
+E69 is running on the owned Runpod B200 pod `eznq63h3uorbrf` from commit
+`34a2796`. Launch audit passed with public train/val/all counts
+`10000/1000/11000`, remote manifest files exactly `all.txt`, `train.txt`, and
+`val.txt`, hidden manifest/features/labels absent, feature/label NPZ counts
+`11000/11000`, the E64 checkpoint present, FoldScore import working, CUDA
+reporting `NVIDIA B200`, `--simplex-face-normal-weight 0.05` recorded in
+`run_metadata.json`, and `3,106,690` parameters (`+0.0015%` versus
+AF2-medium pair-only). Do not add E69 to `EXPERIMENT_RESULTS.md` until the
+Runpod run returns.
+
 Yes. With templates forbidden, the right construction is:
 
 [

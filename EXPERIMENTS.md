@@ -2358,7 +2358,7 @@ was stopped and deleted; a post-delete lookup returned 404.
 
 ### E69: Selected Face Normal Orientation
 
-Status: planned for Runpod.
+Status: running on owned Runpod pod `eznq63h3uorbrf`.
 
 Hypothesis: the README's face interpretation includes oriented local patches
 with area, angles, and normal direction. E64's selected-boundary lDDT improves
@@ -2377,6 +2377,20 @@ gate to step 4500 with static selected-boundary lDDT weights `0.05`, selected
 face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
 weights `0.5`, `simplex_aux_weight=0.5`, and
 `--simplex-face-normal-weight 0.05`.
+
+Launch: E69 is running on owned Runpod B200 pod `eznq63h3uorbrf`
+(`codex-simplexfold-e69-runpod-20260511`) from commit `34a2796`. Clean launch
+audit after copying only public data/code: public train/val/all manifest
+counts are `10000/1000/11000`, remote manifest files are exactly `all.txt`,
+`train.txt`, and `val.txt`, hidden manifest/features/labels are absent,
+feature/label `.npz` counts are `11000/11000`, E64 checkpoint present, B200
+CUDA available, NanoFold `foldscore_components` import works, AF2-medium
+pair-only has `3,106,642` parameters, and E69 model has `3,106,690`
+parameters (`+0.0015%`). `run_metadata.json` records
+`simplex_face_normal_weight=0.05`, static face/tetra selected-boundary lDDT
+weights `0.05` / `0.05`, weights-only resume from E64, crop 256, MSA depth
+64, and no templates. Do not add E69 to `EXPERIMENT_RESULTS.md` until the
+Runpod run returns.
 
 Decision rule: keep only if step-4500 lDDT improves over E65/E67 and does not
 badly regress FoldScore, dRMSD, or selected-boundary diagnostics. Continue only
