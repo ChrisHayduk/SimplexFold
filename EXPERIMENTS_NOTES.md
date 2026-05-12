@@ -2560,3 +2560,40 @@
   `python -m pytest tests/test_simplex.py::test_coface_degree_attenuation_damps_reused_boundary_edges tests/test_simplex.py::test_boundary_message_degree_attenuation_gates_pair_readout_without_single_change tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_boundary_message_degree_attenuation_adds_no_parameters`;
   `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`.
   Do not sync this code into the active remote workspace until E76 returns.
+- E76 returned on the owned Runpod pod `lovgzo4hz2k4fp`: step 6000
+  `val_lddt_ca=0.3712605331093073`, FoldScore `0.37234109826385975`,
+  `val_ca_drmsd=10.219059228897095`, predicted/true C-alpha radius
+  `12.003583312034607 / 15.40340667963028`, selected face/tetra boundary
+  lDDT `0.5340694449841976` / `0.518533306196332`, boundary length MAE
+  `2.8649201095104218` / `3.012835741043091`, and contraction fractions
+  `0.6487747132778168` / `0.6501699537038803`. Reject E76: the tiny
+  FoldScore improvement over E73 does not compensate for losing the primary
+  C-alpha lDDT peak and softening selected-boundary diagnostics.
+- Copied E76 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e76_edge_frame00125_from_e73_s6000_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e76_edge_frame00125_from_e73.log`. The local artifact pull excluded
+  the checkpoint directory; the remote E76 checkpoint remains available but
+  E77 should start from the stronger E73 checkpoint.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step 5500`
+  to add the E76 row to `EXPERIMENT_RESULTS.md`, so inherited E73 history does
+  not count as E76's best validation lDDT.
+- Next branch is E77: sync the committed coface-degree attenuation code to the
+  owned Runpod workspace, verify remote py_compile/parser support, and launch
+  from E73 with `--simplex-boundary-message-degree-attenuation 0.25`.
+- Synced the E77 source/tests to the owned Runpod workspace after E76 returned
+  and no benchmark process was active. Remote py_compile passed for
+  `minalphafold/simplex.py`, `minalphafold/model_config.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; parser smoke confirmed
+  attenuation `0.25`.
+- E77 launched on the same owned Runpod B200 pod `lovgzo4hz2k4fp` with run
+  name `e77_degree_atten025_from_e73_s6000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e77_degree_atten025_from_e73.log`, and
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e77_degree_atten025_from_e73_s6000_c256_m64/`.
+  Main Python PID is `24587`; data-worker PIDs are `27514` and `27515`.
+  The runner resumed E73 at step 5500/examples 44000, loaded 1244 matching
+  model tensors, initialized 0 new/missing tensors, and started a fresh
+  optimizer. Remote metadata records effective batch 8, crop 256, MSA depth
+  64, no templates, runtime edge-frame scale `0.0125`, and
+  `simplex_boundary_message_degree_attenuation=0.25`.

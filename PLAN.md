@@ -1,4 +1,4 @@
-## Current Plan: E76 Continue Half-Scale Edge-Frame Boundary Messages From E73
+## Current Plan: E77 Coface-Degree-Attenuated Boundary Messages
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -145,25 +145,27 @@ reuse remains high. The half-scale edge-frame route therefore preserves local
 C-alpha lDDT better than E72, but it does not solve the dense/reused selected
 complex problem.
 
-The active next branch is E76: continue E73 from the step-5500 checkpoint to
-step 6000 with the same topology-mediated recipe: static selected-boundary
-lDDT weights `0.05`, selected face/tetra coordinate weights `1.0`, selected
-boundary coordinate-distance weights `0.5`, `simplex_aux_weight=0.5`,
-`--simplex-edge-frame-message-scale 0.025`, and
-`--simplex-edge-frame-message-runtime-scale 0.0125`. Keep E76 only if it
-continues improving or at least preserves E73's `val_lddt_ca=0.3807`; reject
-the branch if local lDDT turns over again.
+E76 continued E73 from step 5500 to step 6000 with the same half-scale
+selected boundary-edge message recipe. Reject it as a primary-lDDT
+continuation: step 6000 fell to `val_lddt_ca=0.3713`, below E73's `0.3807`.
+FoldScore edged up to `0.3723`, but `val_ca_drmsd` worsened to `10.2191`,
+predicted/true C-alpha radius moved to `12.0036 / 15.4034`, and selected
+face/tetra boundary lDDT softened to `0.5341` / `0.5185`.
 
-E76 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` as
-`e76_edge_frame00125_from_e73_s6000_c256_m64`. It resumes the E73 step-5500
-checkpoint, keeps effective batch 8, crop 256, MSA depth 64, and no templates.
+The active next branch is E77: add coface-degree attenuation to the selected
+boundary-edge message readout and resume from the stronger E73 checkpoint.
+This keeps the same face/tetra cell complex but changes its incidence
+operator: pair updates on boundary edges reused by many selected cells are
+damped by the edge's coface degree after the usual incidence average. It adds
+no parameters and addresses the high boundary-edge reuse diagnostic directly.
+The first gate uses `--simplex-boundary-message-degree-attenuation 0.25` with
+the E76 recipe, effective batch 8, crop 256, MSA depth 64, and no templates.
 
-If E76 turns over, the next prepared branch is E77: add coface-degree
-attenuation to the selected boundary-edge message readout. This keeps the
-same face/tetra cell complex but changes its incidence operator: pair updates
-on boundary edges reused by many selected cells are damped by the edge's
-coface degree after the usual incidence average. It adds no parameters and
-addresses the high boundary-edge reuse diagnostic directly.
+E77 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` as
+`e77_degree_atten025_from_e73_s6000_c256_m64`. It resumes the E73 step-5500
+checkpoint, keeps the half-scale edge-frame route, and should be judged first
+on whether it recovers or exceeds E73's `val_lddt_ca=0.3807` while improving
+the high boundary-edge reuse diagnostics.
 
 The other prepared alternatives are still E74/E75. E74 reduces the
 recycled-geometry distance prior in the simplex neighbor selector from `0.1`

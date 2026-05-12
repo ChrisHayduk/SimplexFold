@@ -2614,7 +2614,7 @@ or fully recover E72's selected-boundary realization gains.
 
 ### E76: Continue Half-Scale Edge-Frame Boundary Messages To 6000
 
-Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
+Status: completed and rejected.
 
 Hypothesis: E73 is the first edge-frame continuation past E71 to improve
 local C-alpha lDDT, FoldScore, and dRMSD together. Continuing the same
@@ -2639,9 +2639,9 @@ boundary coordinate-distance weights `0.5`, `simplex_aux_weight=0.5`, crop
 Decision rule: keep only if step 6000 improves or preserves E73's
 `val_lddt_ca=0.3807` without a serious selected-boundary diagnostic collapse.
 If local lDDT turns over, stop the half-scale edge-frame continuation branch
-and move to E74/E75, which alter selected-complex construction itself.
+and move to a topology operator or selected-complex construction change.
 
-Launch: E76 is running as
+Launch: E76 ran as
 `e76_edge_frame00125_from_e73_s6000_c256_m64` on the same owned Runpod B200
 pod. The launch resumed
 `e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64/checkpoints/full_msa_to_face_latest.pt`
@@ -2650,11 +2650,22 @@ new/missing tensors, and started a fresh optimizer. The log path is
 `/workspace/SimplexFold/logs/e76_edge_frame00125_from_e73.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e76_edge_frame00125_from_e73_s6000_c256_m64/`.
-Do not add E76 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: step 6000 reached `val_lddt_ca=0.3713`, FoldScore `0.3723`,
+`val_ca_drmsd=10.2191`, and predicted/true C-alpha radius
+`12.0036 / 15.4034`. Selected face/tetra boundary lDDT ended at `0.5341` /
+`0.5185`, boundary length MAE at `2.8649` / `3.0128`, and contraction
+fractions at `0.6488` / `0.6502`.
+
+Interpretation: reject. The tiny FoldScore gain does not compensate for the
+loss of local C-alpha lDDT from E73's `0.3807`, and the selected-boundary
+diagnostics also softened relative to the stronger checkpoints. Stop the
+plain half-scale edge-frame continuation branch and test an incidence
+operator change next.
 
 ### E77: Coface-Degree-Attenuated Boundary Messages
 
-Status: implemented locally and planned if E76 turns over.
+Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
 
 Hypothesis: E70-E76 improved lDDT only after the model learned to pass
 geometry through selected face/tetra boundary edges, but the diagnostics still
@@ -2673,11 +2684,25 @@ weakens reused boundary edges without deleting cells or changing the topology
 selector. This is an incidence-normalized cochain communication change, not a
 generic coordinate loss.
 
-Planned launch if needed: sync the implementation to the owned Runpod
-workspace after the active E76 process returns, resume the strongest available
-E73/E76 checkpoint, and run a 500-step gate with the E76 recipe plus
-`--simplex-boundary-message-degree-attenuation 0.25`. Compare against E73/E76
-on primary `val_lddt_ca` and against E72/E73 on selected-boundary diagnostics.
+Launch plan: sync the implementation to the owned Runpod workspace, resume the
+stronger E73 checkpoint, and run a 500-step gate to step 6000 with the E76
+recipe plus `--simplex-boundary-message-degree-attenuation 0.25`. Compare
+against E73/E76 on primary `val_lddt_ca` and against E72/E73 on
+selected-boundary diagnostics.
+
+Launch: E77 is running as `e77_degree_atten025_from_e73_s6000_c256_m64` on
+the owned Runpod B200 pod. Remote py_compile passed for
+`minalphafold/simplex.py`, `minalphafold/model_config.py`, and
+`scripts/run_nanofold_public_benchmarks.py`, and parser smoke confirmed
+`--simplex-boundary-message-degree-attenuation 0.25`. The launch resumed
+`e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+at step 5500/examples 44000, loaded 1244 matching tensors, initialized 0
+new/missing tensors, and started a fresh optimizer. Main Python PID is
+`24587`; data-worker PIDs are `27514` and `27515`. The log path is
+`/workspace/SimplexFold/logs/e77_degree_atten025_from_e73.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e77_degree_atten025_from_e73_s6000_c256_m64/`.
+Do not add E77 to `EXPERIMENT_RESULTS.md` until it returns.
 
 Validation:
 
