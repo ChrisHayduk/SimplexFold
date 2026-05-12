@@ -247,3 +247,36 @@ Implications for the live queue:
   the weaker outer-edge route.
 - Generic C-alpha lDDT, radius, or all-pairs distance losses still look
   unjustified unless restricted to realization of the selected sparse complex.
+
+## 2026-05-12 E92/E90 Design Recheck
+
+I re-extracted and reread both saved PDFs again while E92 was live:
+
+- `hands_on_geometric_deep_learning_nodes_to_complexes.pdf`: 28 pages,
+  about 3.8k extracted words.
+- `2509.03885v1.pdf`: 22 pages, about 10.7k extracted words.
+
+The main conclusion is unchanged but sharper: SimplexFold experiments should
+keep naming the topological operator they change. The defensible levers are
+complex construction, boundary incidence, same-rank adjacency through
+higher-rank cells, outer-edge neighborhoods, and edge-frame scalarization.
+
+Current experiment implications:
+
+- E92 is justified as a source/target incidence test. Directed boundary readout
+  changes how selected face/tetra cochains write back into pair features; it
+  is not a generic output correction.
+- E90 remains a paper-aligned fallback. Outer-edge-supported cell scoring
+  changes which rank-2 and rank-3 cochains exist by preferring cells with
+  usable outgoing/incoming edge neighborhoods.
+- Selected-cell realization losses remain defensible only because they
+  supervise the sparse complex that SimplexFold constructs. A dense
+  C-alpha/radius/all-pairs objective would not follow from these references.
+- The best next architecture idea after the current queue is a small,
+  delayed, edge-centric scalarization path: project selected face/tetra
+  geometric content onto boundary or outer-edge frames before scalar updates,
+  rather than pooling higher-rank state into an orientation-free correction.
+- Do not introduce DSSP, SSE labels, external structure annotations, or
+  pretrained features into NanoFold official paths. Topotein's hierarchy must
+  be adapted through latent selected cells built from official inputs and
+  recycled predictions.

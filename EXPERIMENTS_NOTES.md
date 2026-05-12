@@ -3299,3 +3299,14 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   from E87 to E92, keeping the same owned-pod-only restriction and the rule
   that heartbeat must not launch follow-up experiments automatically.
+- 2026-05-12T15:55Z current PDF reread: re-extracted and reread both saved
+  reference PDFs from `references/papers/`. The TDL guide keeps E92/E90 framed
+  around explicit topology operators: boundary incidence, rank-to-rank
+  aggregation, and complex construction. Topotein keeps the protein-specific
+  emphasis on directed edges, outer-edge neighborhoods, and edge-centric
+  scalarization, while ruling out DSSP/SSE labels for official NanoFold paths.
+  This supports E92 as a directed source/target incidence readout test and E90
+  as a complex-construction fallback; it does not support a generic dense
+  lDDT/radius/all-pairs loss. E92 status at this poll: Python PID `8068` is
+  active, `results.json` is absent, and history still ends at inherited E87
+  step 8500 with `val_lddt_ca=0.39919308573007584`.
