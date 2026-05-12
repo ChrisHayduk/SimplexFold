@@ -1,4 +1,4 @@
-## Current Plan: E90 Outer-Edge-Supported Cell Scoring Gate
+## Current Plan: E88 Runtime-Gated Latent Segment Cells
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -280,13 +280,20 @@ FoldScore stayed roughly flat at `0.3829` and dRMSD improved to `9.9617`, but
 the written rule was primary-lDDT preservation. Stop continuing the same
 readout mechanism.
 
-E90 is now running from the cleaner E81 checkpoint to step 8500. It keeps the
-fixed `24` / `48` sparse caps, degree-penalized cell scoring, selected-boundary
-realization losses, and half-scale edge-frame messages, then ramps
-`simplex_cell_score_outer_edge_weight` from `0.0` to `0.25` over steps
-8000-8500. This changes which rank-2/rank-3 cochains exist by preferring
-cells with usable outer-edge support; it does not add output-side metric
-pressure or parameters.
+E90 also rejected as a primary-lDDT branch. It resumed E81 to step 8500 and
+ramped `simplex_cell_score_outer_edge_weight` from `0.0` to `0.25`.
+Selected-boundary contraction improved to about `0.546`, but
+`val_lddt_ca=0.3920`, FoldScore `0.3783`, and selected-boundary lDDT
+`0.7365` / `0.7197` all stayed below the E81/E86/E87 leaders. Outer-edge
+availability is therefore not enough as a cell-score bonus.
+
+The next active gate is E88, runtime-gated latent segment cells from the E81
+checkpoint. This is the paper-aligned way to borrow Topotein's
+secondary-structure rank without DSSP/SSE labels: contiguous segment cochains
+are latent, built from official sequence/MSA/pair features and recycled
+geometry, and weakly ramped into selected face states. Keep it only if it
+recovers the E81/E86/E87 primary-lDDT band while improving selected-complex
+diagnostics.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank

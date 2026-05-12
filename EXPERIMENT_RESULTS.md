@@ -106,3 +106,4 @@ recorded in the running notes for that run.
 | E91 continue weak directed outer-edge transport | completed | 9000 | 0.3897 | 0.3897 | 0.3820 | 9.9309 | 11.8230 / 15.4034 | rejected; continuing weak outer-edge transport improved dRMSD/selected-boundary diagnostics but primary lDDT fell below E86 |
 | E87 directed boundary readout | completed | 8500 | 0.3992 | 0.3992 | 0.3831 | 10.2428 | 11.4322 / 15.4034 | kept; tiny new primary-lDDT best over E86 with directed source/target boundary readout, but FoldScore/dRMSD softened |
 | E92 continue directed boundary readout | completed | 9000 | 0.3968 | 0.3968 | 0.3829 | 9.9617 | 11.7362 / 15.4034 | rejected; continuation fell below E87/E86 primary lDDT despite improved dRMSD, pivot to outer-edge-supported cell scoring |
+| E90 outer-edge-supported cell scoring | completed | 8500 | 0.3920 | 0.3920 | 0.3783 | 10.0407 | 11.5245 / 15.4034 | rejected; outer-edge-supported scoring fell below E81/E86/E87 primary lDDT |

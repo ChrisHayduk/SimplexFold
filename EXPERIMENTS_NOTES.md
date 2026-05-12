@@ -3362,3 +3362,51 @@
   PID `9139` is active, GPU utilization sampled at `48%`, `results.json` is
   absent, and history still ends at the inherited E81 step 8000 row with
   `val_lddt_ca=0.39799308963119984`.
+- E90 returned on owned pod `o1dy17ouv8w5mz`: step 8500
+  `val_lddt_ca=0.3920442685484886`, FoldScore `0.37827762216329575`,
+  `val_ca_drmsd=10.040688931941986`, predicted/true C-alpha radius
+  `11.524468511343002 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.7364524565637112` / `0.7197068147361279`, boundary length MAE
+  `1.0608491748571396` / `1.1697352267801762`, contraction fractions
+  `0.5463919192552567` / `0.5451707523316145`, boundary-edge mean degree
+  `11.607987940311432` / `32.68083894252777`, and boundary unique-edge
+  fraction `0.0863968789105419` / `0.03085274268859773`.
+- E90 interpretation: reject as a primary-lDDT branch. It improved
+  selected-boundary contraction versus E81, but primary lDDT fell below E81,
+  E86, E87, and E92; FoldScore and selected-boundary lDDT also stayed below
+  the E81/E86/E87 leaders. The outer-edge-supported scorer is not useful as a
+  standalone construction change. Move next to E88 runtime-gated latent
+  segment cells from the E81 checkpoint.
+- Copied E90 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e90_outer_edge_score_from_e81_s8500_c256_m64/`
+  and copied the launch log to ignored `logs/e90_outer_edge_score_from_e81.log`.
+  The local artifact pull excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8000` to add the E90 row to `EXPERIMENT_RESULTS.md`, so inherited E81
+  history does not count as E90's best validation lDDT.
+- E88 launch decision: E90 improved selected-boundary contraction but lost
+  primary lDDT, so the next useful paper-aligned test is the runtime-gated
+  latent segment-cell route rather than another cell-score bonus. This borrows
+  Topotein's secondary-structure rank without DSSP/SSE labels by using latent
+  contiguous segment cochains built from official features and recycled model
+  state.
+- E88 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E81 checkpoint present at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e81_degree_penalty_from_e82_s8000_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  remote py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/model_config.py`, `minalphafold/evoformer.py`,
+  `minalphafold/model.py`, `minalphafold/trainer.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; CLI help confirmed support for
+  the segment-cell runtime flags.
+- E88 launched on the same owned H100 pod with run name
+  `e88_segment_cells_from_e81_s8500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e88_segment_cells_from_e81.log`, artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e88_segment_cells_from_e81_s8500_c256_m64/`,
+  and Python PID `9628`. Startup poll at `2026-05-12T17:41:06Z` confirmed the
+  benchmark process is alive, `results.json` is absent as expected, metadata
+  and history files exist, and the runner resumed E81 at step 8000/examples
+  64000 with 1244 matching model tensors loaded and 48 new/missing segment
+  tensors initialized.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  from E90 to E88, keeping the same owned-pod-only restriction and the rule
+  that heartbeat must not launch follow-up experiments automatically.

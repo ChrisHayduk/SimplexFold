@@ -376,7 +376,7 @@ Validation:
 
 ### E88 Candidate: Runtime-Gated Latent Segment Cells
 
-Status: implemented locally; not launched.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: Topotein's secondary-structure-cell rank is not directly usable in
 NanoFold because official inference cannot depend on DSSP/SSE annotations.
@@ -405,6 +405,19 @@ and add a very weak latent segment route:
 `--simplex-segment-radius 4`, and `--simplex-c-segment 12`. Keep the
 degree-penalized sparse selector, selected-boundary realization losses, and
 fixed `24`/`48` cell caps.
+
+Launch: E90 regressed, so E88 is now running as
+`e88_segment_cells_from_e81_s8500_c256_m64`, Python PID `9628`, from the E81
+checkpoint at step 8000/examples 64000. Remote prelaunch checks found no
+active Python benchmark process, confirmed the E81 checkpoint was present,
+py_compile passed for the simplex/model-config/evoformer/model/trainer/runner
+files, and CLI help confirmed the segment-cell runtime flags. Startup resumed
+E81 with 1244 matching model tensors loaded and 48 new/missing tensors
+initialized for the latent segment-cell modules. The log path is
+`/workspace/SimplexFold/logs/e88_segment_cells_from_e81.log`, and the artifact
+path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e88_segment_cells_from_e81_s8500_c256_m64/`.
+Do not add E88 to `EXPERIMENT_RESULTS.md` until it returns.
 
 Validation:
 
@@ -448,7 +461,7 @@ Validation:
 
 ### E90 Candidate: Outer-Edge-Supported Cell Scoring
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E81's degree penalty improved the sparse selected complex by
 discouraging repeated use of the same boundary edges, and the PDF reread
@@ -485,7 +498,13 @@ runtime override plumbing, and startup confirmed the E81 checkpoint loaded
 `/workspace/SimplexFold/logs/e90_outer_edge_score_from_e81.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e90_outer_edge_score_from_e81_s8500_c256_m64/`.
-Do not add E90 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: reject. E90 reached `val_lddt_ca=0.3920`, FoldScore `0.3783`,
+`val_ca_drmsd=10.0407`, and predicted/true C-alpha radius
+`11.5245 / 15.4034`. It improved selected-boundary contraction versus E81,
+but primary lDDT, FoldScore, and selected-boundary lDDT stayed below the
+E81/E86/E87 leaders. Do not continue outer-edge-supported cell scoring as a
+standalone construction change.
 
 Validation:
 
