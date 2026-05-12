@@ -150,20 +150,22 @@ E71, stop this edge-frame continuation family and move to changing the
 selected complex construction itself rather than spending more on the same
 runtime scale knob.
 
-E73 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` from commit
-`bc1b749`, reusing the clean E70-E72 public-data environment. It resumed the
-E71 checkpoint at step 5000/examples 40000, loaded 1244 matching model
-tensors, initialized 0 new/missing tensors, and recorded edge-frame runtime
-scale `0.0125` in `run_metadata.json`. Do not add E73 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+E73 has been relaunched on the owned Runpod B200 pod `lovgzo4hz2k4fp` from
+the fixed runner snapshot corresponding to commit `7f83b2e`. The accepted
+in-flight run is
+`e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64`, not the first
+`bc1b749` launch. The first E73 process was stopped before any returned result
+because the previous runner used runtime simplex overrides during training but
+not validation.
 
-Implementation correction: before accepting any E73 result, relaunch it from
-the fixed runner commit. The previous runner used runtime simplex overrides
-during training but not validation, so a half-scale edge-frame run would have
-validated with the static model scale. The fixed runner applies runtime
+The corrected run reuses the clean E70-E72 public-data environment, resumes
+the E71 checkpoint at step 5000/examples 40000, loads 1244 matching model
+tensors, initializes 0 new/missing tensors, and records edge-frame runtime
+scale `0.0125` in `run_metadata.json`. The fixed runner applies runtime
 simplex overrides during validation as well, and supports a scheduled
 `--simplex-geometry-distance-weight` selector prior for the next topology
-construction branch.
+construction branch. Do not add E73 to `EXPERIMENT_RESULTS.md` until this
+evalfix Runpod run returns.
 
 If E73 does not recover E71's local lDDT, the next branch is E74: reduce the
 recycled-geometry distance prior in the simplex neighbor selector from `0.1`

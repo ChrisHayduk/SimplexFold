@@ -5,8 +5,8 @@ experiment design. The PDFs themselves are kept locally in this directory and
 ignored by git until redistribution rights are confirmed.
 
 Read status: both PDFs were re-read in full on 2026-05-11 from local
-`pdftotext -layout` extraction, and the local copies hash-match the files in
-`/Users/christopherhayduk/Downloads/`.
+`pdftotext -layout` extraction, rechecked in the current session, and the
+local copies hash-match the files in `/Users/christopherhayduk/Downloads/`.
 
 ## From Nodes to Complexes: A Guide to Topological Deep Learning
 
@@ -134,3 +134,13 @@ The rules I will carry into the next SimplexFold experiments are:
 - Keep the near-term architecture path on scheduled or gated outer-edge
   communication, followed by edge-centric scalarization/readout if the gated
   context preserves local C-alpha lDDT.
+
+## Current Session Recheck
+
+The current full-text recheck did not add a better generic objective. It
+reinforces that the most defensible SimplexFold changes are those that alter
+the learned cell complex or its incidence/outer-edge communication paths. For
+the active E73/E74 branch, the paper-derived rationale is strongest for
+runtime-gated boundary-edge messages and for changing the recycled-geometry
+prior in neighbor selection, because both choices affect which edge/face/tetra
+cochains exist and how they exchange information.

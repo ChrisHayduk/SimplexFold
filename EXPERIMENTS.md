@@ -2584,21 +2584,23 @@ Decision rule: keep only if step 5500 improves or preserves E71's primary
 Reject if it remains below E71, and then stop this edge-frame continuation
 family in favor of changing the selected complex construction itself.
 
-Launch: E73 is running on the same owned Runpod B200 pod `lovgzo4hz2k4fp`
-(`codex-simplexfold-e70-runpod-20260512`) from commit `bc1b749`, reusing the
-clean public-data environment staged for E70-E72. `run_metadata.json` records
+Launch: the accepted E73 run is
+`e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64`, running on the same
+owned Runpod B200 pod `lovgzo4hz2k4fp`
+(`codex-simplexfold-e70-runpod-20260512`) from the fixed runner snapshot
+corresponding to commit `7f83b2e`. It reuses the clean public-data environment
+staged for E70-E72. The first launch from commit `bc1b749` was stopped before
+any result because it trained with runtime simplex overrides but would have
+validated with static simplex settings.
+
+`run_metadata.json` for the evalfix run records
 `simplex_edge_frame_message_scale=0.025`, runtime edge-frame scale `0.0125`,
 weights-only resume from the E71 step-5000 checkpoint, crop 256, MSA depth 64,
 and no templates. The launch log shows the runner resumed E71 at step
 5000/examples 40000, loaded 1244 matching model tensors, initialized 0
-new/missing tensors, and started a fresh optimizer. Do not add E73 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
-
-Implementation correction before accepting E73: relaunch from the fixed runner
-commit because the first E73 launch used runtime simplex overrides during
-training but not validation. The fixed runner applies runtime simplex overrides
-inside `_evaluate`, so the half-scale edge-frame hypothesis is measured at the
-same scale used during the continuation.
+new/missing tensors, and started a fresh optimizer. The heartbeat has been
+retargeted to the evalfix artifact path. Do not add E73 to
+`EXPERIMENT_RESULTS.md` until this Runpod run returns.
 
 ### E74: Light Recycled-Geometry Topology Selector
 

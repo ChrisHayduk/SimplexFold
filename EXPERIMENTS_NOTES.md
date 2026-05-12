@@ -2454,3 +2454,31 @@
 - Stop the first E73 process on owned pod `lovgzo4hz2k4fp` and relaunch from
   the fixed commit before recording any E73 result. The first process has no
   returned result yet and should not be added to `EXPERIMENT_RESULTS.md`.
+- 2026-05-11 late-session PDF recheck: verified both user-provided PDFs are
+  still present in `references/papers/` and hash-match the Downloads copies,
+  then re-read the local `pdftotext -layout` extraction. No new generic loss
+  direction was promoted. The full-text pass reinforces the current E73/E74
+  path: runtime-gated boundary-edge messages and a changed recycled-geometry
+  selector prior are topological interventions because they affect the
+  selected edge/face/tetra cochains and their incidence-mediated
+  communication.
+- Fixed E73 relaunch on owned pod `lovgzo4hz2k4fp`: remote py_compile passed
+  for `minalphafold/simplex.py`, `minalphafold/evoformer.py`,
+  `minalphafold/model.py`, `minalphafold/trainer.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; parser smoke confirmed
+  edge-frame runtime scale `0.0125` and geometry selector schedule
+  `0.1 -> 0.025`; no benchmark process was active and the B200 was idle before
+  launch.
+- E73 evalfix launch: run name
+  `e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e73_evalfix_edge_frame00125_from_e71.log`, and
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64/`.
+  Main Python PID is `17416`; data-worker PIDs are `20343` and `20344`. The
+  run resumed E71 at step 5000/examples 40000, loaded 1244 matching model
+  tensors, initialized 0 new/missing tensors, and `run_metadata.json` records
+  `simplex_edge_frame_message_scale=0.025`,
+  `simplex_edge_frame_message_runtime_scale=0.0125`, weights-only resume,
+  crop 256, MSA depth 64, and no templates. Heartbeat
+  `check-simplexfold-e57-runpod` has been retargeted to the E73 evalfix run
+  on pod `lovgzo4hz2k4fp` only.
