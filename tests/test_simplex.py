@@ -178,6 +178,32 @@ def test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells():
     assert {tuple(face.tolist()) for face in active_anchor0_faces} == {(0, 1, 2), (0, 1, 3)}
 
 
+def test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells():
+    class TopKOverrideConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_geometry_distance_weight = 0.0
+        simplex_face_top_k = 0
+        simplex_tetra_top_k = 0
+
+    adapter = SimplicialAdapter(TopKOverrideConfig())
+    pair = torch.randn(1, 5, 5, TopKOverrideConfig.c_z)
+    single = torch.randn(1, 5, TopKOverrideConfig.c_s)
+
+    _, _, aux = adapter(
+        pair,
+        single,
+        seq_mask=torch.ones(1, 5),
+        simplex_face_top_k_override=torch.tensor(2.0),
+        simplex_tetra_top_k_override=torch.tensor(1.0),
+    )
+
+    assert torch.all(aux["simplex_face_mask"].sum(dim=-1) <= 2)
+    assert torch.all(aux["simplex_tetra_mask"].sum(dim=-1) <= 1)
+
+
 def test_build_simplex_topology_flag_closure_downweights_open_cells():
     score = torch.full((1, 4, 4), -8.0, dtype=torch.float32)
     score[:, 0, 1:] = 8.0

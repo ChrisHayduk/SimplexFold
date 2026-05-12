@@ -65,10 +65,12 @@ from minalphafold.trainer import (  # noqa: E402
     set_optimizer_learning_rate,
     set_seed,
     simplex_edge_frame_message_runtime_scale_at_step,
+    simplex_face_top_k_at_step,
     simplex_geometry_distance_weight_at_step,
     simplex_hodge_face_runtime_scale_at_step,
     simplex_local_neighbor_k_at_step,
     simplex_outer_edge_context_runtime_scale_at_step,
+    simplex_tetra_top_k_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     simplex_update_scale_at_step,
     zero_dropout_model_config,
@@ -578,6 +580,7 @@ def _evaluate(
                         use_simplex_edge_frame_message_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
                         use_simplex_geometry_distance_weight=True,
+                        use_simplex_cell_top_k=True,
                         step=step,
                     )
                 )
@@ -1102,6 +1105,8 @@ def _train_variant(
         simplex_hodge_face_runtime_scale = simplex_hodge_face_runtime_scale_at_step(training_config, step)
         simplex_local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
         simplex_geometry_distance_weight = simplex_geometry_distance_weight_at_step(training_config, step)
+        simplex_face_top_k = simplex_face_top_k_at_step(training_config, step)
+        simplex_tetra_top_k = simplex_tetra_top_k_at_step(training_config, step)
         optimizer.zero_grad(set_to_none=True)
         loss_accum = 0.0
         term_accum: dict[str, list[float]] = {}
@@ -1127,6 +1132,7 @@ def _train_variant(
                         use_simplex_edge_frame_message_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
                         use_simplex_geometry_distance_weight=True,
+                        use_simplex_cell_top_k=True,
                         step=step,
                     )
                 )
@@ -1249,6 +1255,8 @@ def _train_variant(
                     if simplex_geometry_distance_weight is None
                     else simplex_geometry_distance_weight
                 ),
+                "simplex_face_top_k": float("nan") if simplex_face_top_k is None else simplex_face_top_k,
+                "simplex_tetra_top_k": float("nan") if simplex_tetra_top_k is None else simplex_tetra_top_k,
                 "backbone_loss_weight": float(loss_fn.backbone_loss_weight),
                 "sidechain_fape_loss_weight": float(loss_fn.sidechain_fape_loss_weight),
                 "torsion_loss_weight": float(loss_fn.torsion_loss_weight),
@@ -1454,6 +1462,14 @@ def _train_variant(
             training_config.simplex_geometry_distance_weight_ramp_start_step
         ),
         "simplex_geometry_distance_weight_ramp_steps": training_config.simplex_geometry_distance_weight_ramp_steps,
+        "simplex_face_top_k": training_config.simplex_face_top_k,
+        "simplex_face_top_k_final": training_config.simplex_face_top_k_final,
+        "simplex_face_top_k_ramp_start_step": training_config.simplex_face_top_k_ramp_start_step,
+        "simplex_face_top_k_ramp_steps": training_config.simplex_face_top_k_ramp_steps,
+        "simplex_tetra_top_k": training_config.simplex_tetra_top_k,
+        "simplex_tetra_top_k_final": training_config.simplex_tetra_top_k_final,
+        "simplex_tetra_top_k_ramp_start_step": training_config.simplex_tetra_top_k_ramp_start_step,
+        "simplex_tetra_top_k_ramp_steps": training_config.simplex_tetra_top_k_ramp_steps,
         "backbone_loss_weight": training_config.backbone_loss_weight,
         "sidechain_fape_loss_weight": training_config.sidechain_fape_loss_weight,
         "torsion_loss_weight": training_config.torsion_loss_weight,
@@ -1612,7 +1628,13 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_geometry_distance_weight_ramp_start_step",
         "simplex_geometry_distance_weight_ramp_steps",
         "simplex_face_top_k",
+        "simplex_face_top_k_final",
+        "simplex_face_top_k_ramp_start_step",
+        "simplex_face_top_k_ramp_steps",
         "simplex_tetra_top_k",
+        "simplex_tetra_top_k_final",
+        "simplex_tetra_top_k_ramp_start_step",
+        "simplex_tetra_top_k_ramp_steps",
         "resume_model_weights_only",
         "elapsed_seconds",
         "examples_per_second",
@@ -2036,12 +2058,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Keep only the top N selected face cells per anchor; 0 keeps the full neighbor-star clique.",
     )
+    parser.add_argument("--simplex-face-top-k-final", type=float, default=None)
+    parser.add_argument("--simplex-face-top-k-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-face-top-k-ramp-steps", type=int, default=1)
     parser.add_argument(
         "--simplex-tetra-top-k",
         type=int,
         default=None,
         help="Keep only the top N selected tetra cells per anchor; 0 keeps the full neighbor-star clique.",
     )
+    parser.add_argument("--simplex-tetra-top-k-final", type=float, default=None)
+    parser.add_argument("--simplex-tetra-top-k-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-tetra-top-k-ramp-steps", type=int, default=1)
     parser.add_argument(
         "--simplex-local-neighbor-k",
         type=float,
@@ -2205,6 +2233,14 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_geometry_distance_weight_final=args.simplex_geometry_distance_weight_final,
         simplex_geometry_distance_weight_ramp_start_step=args.simplex_geometry_distance_weight_ramp_start_step,
         simplex_geometry_distance_weight_ramp_steps=args.simplex_geometry_distance_weight_ramp_steps,
+        simplex_face_top_k=args.simplex_face_top_k,
+        simplex_face_top_k_final=args.simplex_face_top_k_final,
+        simplex_face_top_k_ramp_start_step=args.simplex_face_top_k_ramp_start_step,
+        simplex_face_top_k_ramp_steps=args.simplex_face_top_k_ramp_steps,
+        simplex_tetra_top_k=args.simplex_tetra_top_k,
+        simplex_tetra_top_k_final=args.simplex_tetra_top_k_final,
+        simplex_tetra_top_k_ramp_start_step=args.simplex_tetra_top_k_ramp_start_step,
+        simplex_tetra_top_k_ramp_steps=args.simplex_tetra_top_k_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,
@@ -2334,7 +2370,13 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_segment_radius": args.simplex_segment_radius,
         "simplex_c_segment": args.simplex_c_segment,
         "simplex_face_top_k": args.simplex_face_top_k,
+        "simplex_face_top_k_final": args.simplex_face_top_k_final,
+        "simplex_face_top_k_ramp_start_step": args.simplex_face_top_k_ramp_start_step,
+        "simplex_face_top_k_ramp_steps": args.simplex_face_top_k_ramp_steps,
         "simplex_tetra_top_k": args.simplex_tetra_top_k,
+        "simplex_tetra_top_k_final": args.simplex_tetra_top_k_final,
+        "simplex_tetra_top_k_ramp_start_step": args.simplex_tetra_top_k_ramp_start_step,
+        "simplex_tetra_top_k_ramp_steps": args.simplex_tetra_top_k_ramp_steps,
         "simplex_local_neighbor_k": args.simplex_local_neighbor_k,
         "simplex_local_neighbor_k_final": args.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": args.simplex_local_neighbor_k_ramp_start_step,

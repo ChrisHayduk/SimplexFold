@@ -2844,3 +2844,32 @@ Validation:
 
 - `python -m pytest tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+
+### E79: Scheduled Sparse Selected Higher-Rank Cell Complex
+
+Status: implemented locally and planned only if E78 turns over or if static
+E75 is too abrupt.
+
+Hypothesis: E75's sparse selected-cell complex is the right topology-native
+response to high boundary-edge reuse, but switching directly from the full
+neighbor-star clique to a small face/tetra cap may shock a resumed checkpoint.
+A schedule can preserve the learned E74/E78 geometry while gradually reducing
+which rank-2 and rank-3 cochains exist and send messages.
+
+Mechanism: add runtime overrides for `simplex_face_top_k` and
+`simplex_tetra_top_k`, with optional final values and ramp windows. For
+example, `--simplex-face-top-k 0 --simplex-face-top-k-final 24` plus
+`--simplex-tetra-top-k 0 --simplex-tetra-top-k-final 48` starts from the full
+selected-cell clique and linearly introduces the E75 cap. This changes the
+active cell complex during training without changing parameter count.
+
+Planned launch if needed: from the strongest available E74/E78 checkpoint,
+run a 500-step gate with the E74 recipe and a cap schedule such as
+`0 -> 24` faces and `0 -> 48` tetras over 250-500 steps. Compare against
+E74/E78 on primary `val_lddt_ca` and against E72/E77 on selected-boundary
+diagnostics.
+
+Validation:
+
+- `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`

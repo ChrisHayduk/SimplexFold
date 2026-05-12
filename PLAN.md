@@ -175,19 +175,20 @@ The active branch is now E78 on the owned H100 pod `o1dy17ouv8w5mz` as
 from step 6000 to 6500 with the same light-geometry selector, selected
 boundary-edge losses, and half-scale edge-frame message recipe.
 
-The other prepared alternative is still E75. It
-caps active face/tetra cells per anchor with `--simplex-face-top-k` and
-`--simplex-tetra-top-k`, ranking candidate cells by selected boundary-edge
-logits. These are also cell-complex construction or incidence changes rather
-than generic output-coordinate losses.
+The other prepared alternatives are E75 and E79. E75 caps active face/tetra
+cells per anchor with `--simplex-face-top-k` and `--simplex-tetra-top-k`,
+ranking candidate cells by selected boundary-edge logits. E79 adds a runtime
+schedule for those caps so the selected higher-rank complex can be sparsified
+gradually during a continuation. Both are cell-complex construction changes
+rather than generic output-coordinate losses.
 
 The 2026-05-12 full-text recheck of the saved reference PDFs keeps this plan
 topology-first. The strongest paper-derived criterion is that a new branch
 should change the selected cell complex, incidence/outer-edge communication,
 or realization of selected cells. E74/E78 satisfy that by changing the
-recycled-geometry prior in topology construction; E75 remains the next
-prepared fallback because it sparsifies which higher-rank cochains exist and
-send messages.
+recycled-geometry prior in topology construction; E75/E79 remain prepared
+fallbacks because they sparsify which higher-rank cochains exist and send
+messages.
 
 Yes. With templates forbidden, the right construction is:
 

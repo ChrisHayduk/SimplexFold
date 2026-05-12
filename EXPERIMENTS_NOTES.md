@@ -2697,3 +2697,14 @@
   was present. Main Python PID is `1969`. The runner resumed E74 at step
   6000/examples 48000, loaded 1244 matching model tensors, initialized 0
   new/missing tensors, and started a fresh optimizer.
+- E79 local implementation prepared while E78 runs: added runtime overrides
+  and schedules for `simplex_face_top_k` and `simplex_tetra_top_k`. This lets
+  a resumed checkpoint start with the full selected higher-rank clique and
+  gradually sparsify which face/tetra cochains exist, send messages, and
+  contribute selected-cell losses. It is a topology-construction curriculum,
+  not a new output-coordinate loss, and it adds no parameters.
+- E79 local validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`.
+  Do not sync or launch E79 while E78 is still active; use it only after the
+  E78 result is copied, recorded, and interpreted.

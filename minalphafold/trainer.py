@@ -241,6 +241,14 @@ class TrainingConfig:
     simplex_geometry_distance_weight_final: float | None = None
     simplex_geometry_distance_weight_ramp_start_step: int | None = None
     simplex_geometry_distance_weight_ramp_steps: int = 1
+    simplex_face_top_k: float | None = None
+    simplex_face_top_k_final: float | None = None
+    simplex_face_top_k_ramp_start_step: int | None = None
+    simplex_face_top_k_ramp_steps: int = 1
+    simplex_tetra_top_k: float | None = None
+    simplex_tetra_top_k_final: float | None = None
+    simplex_tetra_top_k_ramp_start_step: int | None = None
+    simplex_tetra_top_k_ramp_steps: int = 1
     backbone_loss_weight: float = 1.0
     sidechain_fape_loss_weight: float = 1.0
     torsion_loss_weight: float = 1.0
@@ -917,6 +925,34 @@ def simplex_geometry_distance_weight_at_step(training_config: TrainingConfig, st
     )
 
 
+def simplex_face_top_k_at_step(training_config: TrainingConfig, step: int | None) -> float | None:
+    if training_config.simplex_face_top_k is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_face_top_k)
+    return _ramped_value(
+        training_config.simplex_face_top_k,
+        training_config.simplex_face_top_k_final,
+        step=step,
+        start_step=training_config.simplex_face_top_k_ramp_start_step,
+        ramp_steps=training_config.simplex_face_top_k_ramp_steps,
+    )
+
+
+def simplex_tetra_top_k_at_step(training_config: TrainingConfig, step: int | None) -> float | None:
+    if training_config.simplex_tetra_top_k is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_tetra_top_k)
+    return _ramped_value(
+        training_config.simplex_tetra_top_k,
+        training_config.simplex_tetra_top_k_final,
+        step=step,
+        start_step=training_config.simplex_tetra_top_k_ramp_start_step,
+        ramp_steps=training_config.simplex_tetra_top_k_ramp_steps,
+    )
+
+
 def model_inputs_from_batch(
     batch: dict[str, Any],
     training_config: TrainingConfig,
@@ -928,6 +964,7 @@ def model_inputs_from_batch(
     use_simplex_edge_frame_message_runtime_scale: bool = False,
     use_simplex_local_neighbor_k: bool = False,
     use_simplex_geometry_distance_weight: bool = False,
+    use_simplex_cell_top_k: bool = False,
     step: int | None = None,
 ) -> dict[str, torch.Tensor | int]:
     """Unpack a collated batch into the kwargs ``AlphaFold2.forward`` expects."""
@@ -988,6 +1025,12 @@ def model_inputs_from_batch(
         inputs["simplex_geometry_distance_weight_override"] = batch["target_feat"].new_tensor(
             float(geometry_distance_weight)
         )
+    face_top_k = simplex_face_top_k_at_step(training_config, step)
+    if use_simplex_cell_top_k and face_top_k is not None:
+        inputs["simplex_face_top_k_override"] = batch["target_feat"].new_tensor(float(face_top_k))
+    tetra_top_k = simplex_tetra_top_k_at_step(training_config, step)
+    if use_simplex_cell_top_k and tetra_top_k is not None:
+        inputs["simplex_tetra_top_k_override"] = batch["target_feat"].new_tensor(float(tetra_top_k))
     return inputs
 
 
@@ -1092,6 +1135,7 @@ def train_step(
             use_simplex_edge_frame_message_runtime_scale=True,
             use_simplex_local_neighbor_k=True,
             use_simplex_geometry_distance_weight=True,
+            use_simplex_cell_top_k=True,
             step=1,
         )
     )
@@ -1424,6 +1468,7 @@ def fit(
                     use_simplex_edge_frame_message_runtime_scale=True,
                     use_simplex_local_neighbor_k=True,
                     use_simplex_geometry_distance_weight=True,
+                    use_simplex_cell_top_k=True,
                     step=global_step + 1,
                 )
             )
@@ -1812,6 +1857,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-geometry-distance-weight-final", type=float, default=None)
     parser.add_argument("--simplex-geometry-distance-weight-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-geometry-distance-weight-ramp-steps", type=int, default=1)
+    parser.add_argument("--simplex-face-top-k", type=float, default=None)
+    parser.add_argument("--simplex-face-top-k-final", type=float, default=None)
+    parser.add_argument("--simplex-face-top-k-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-face-top-k-ramp-steps", type=int, default=1)
+    parser.add_argument("--simplex-tetra-top-k", type=float, default=None)
+    parser.add_argument("--simplex-tetra-top-k-final", type=float, default=None)
+    parser.add_argument("--simplex-tetra-top-k-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-tetra-top-k-ramp-steps", type=int, default=1)
     parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
     parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
     parser.add_argument("--torsion-loss-weight", type=float, default=1.0)
@@ -1943,6 +1996,14 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_geometry_distance_weight_final=args.simplex_geometry_distance_weight_final,
         simplex_geometry_distance_weight_ramp_start_step=args.simplex_geometry_distance_weight_ramp_start_step,
         simplex_geometry_distance_weight_ramp_steps=args.simplex_geometry_distance_weight_ramp_steps,
+        simplex_face_top_k=args.simplex_face_top_k,
+        simplex_face_top_k_final=args.simplex_face_top_k_final,
+        simplex_face_top_k_ramp_start_step=args.simplex_face_top_k_ramp_start_step,
+        simplex_face_top_k_ramp_steps=args.simplex_face_top_k_ramp_steps,
+        simplex_tetra_top_k=args.simplex_tetra_top_k,
+        simplex_tetra_top_k_final=args.simplex_tetra_top_k_final,
+        simplex_tetra_top_k_ramp_start_step=args.simplex_tetra_top_k_ramp_start_step,
+        simplex_tetra_top_k_ramp_steps=args.simplex_tetra_top_k_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,

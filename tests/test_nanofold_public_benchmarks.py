@@ -5,9 +5,11 @@ from minalphafold.trainer import (
     load_model_config,
     model_inputs_from_batch,
     simplex_edge_frame_message_runtime_scale_at_step,
+    simplex_face_top_k_at_step,
     simplex_geometry_distance_weight_at_step,
     simplex_hodge_face_runtime_scale_at_step,
     simplex_outer_edge_context_runtime_scale_at_step,
+    simplex_tetra_top_k_at_step,
 )
 from scripts.run_nanofold_public_benchmarks import (
     _apply_model_config_overrides,
@@ -341,8 +343,20 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "5",
             "--simplex-face-top-k",
             "24",
+            "--simplex-face-top-k-final",
+            "12",
+            "--simplex-face-top-k-ramp-start-step",
+            "3500",
+            "--simplex-face-top-k-ramp-steps",
+            "500",
             "--simplex-tetra-top-k",
             "48",
+            "--simplex-tetra-top-k-final",
+            "24",
+            "--simplex-tetra-top-k-ramp-start-step",
+            "3500",
+            "--simplex-tetra-top-k-ramp-steps",
+            "500",
             "--resume-model-weights-only",
         ]
     )
@@ -372,7 +386,13 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_boundary_lddt_ramp_steps == 500
     assert args.simplex_segment_radius == 5
     assert args.simplex_face_top_k == 24
+    assert args.simplex_face_top_k_final == 12
+    assert args.simplex_face_top_k_ramp_start_step == 3500
+    assert args.simplex_face_top_k_ramp_steps == 500
     assert args.simplex_tetra_top_k == 48
+    assert args.simplex_tetra_top_k_final == 24
+    assert args.simplex_tetra_top_k_ramp_start_step == 3500
+    assert args.simplex_tetra_top_k_ramp_steps == 500
     assert args.resume_model_weights_only is True
 
     cfg = _apply_model_config_overrides(load_model_config("simplexfold_medium_param_matched"), args)
@@ -400,6 +420,14 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         simplex_geometry_distance_weight_final=0.025,
         simplex_geometry_distance_weight_ramp_start_step=3000,
         simplex_geometry_distance_weight_ramp_steps=500,
+        simplex_face_top_k=0,
+        simplex_face_top_k_final=24,
+        simplex_face_top_k_ramp_start_step=3000,
+        simplex_face_top_k_ramp_steps=500,
+        simplex_tetra_top_k=0,
+        simplex_tetra_top_k_final=48,
+        simplex_tetra_top_k_ramp_start_step=3000,
+        simplex_tetra_top_k_ramp_steps=500,
     )
     batch = {
         "target_feat": torch.zeros(1, 4, 22),
@@ -428,6 +456,12 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert simplex_geometry_distance_weight_at_step(cfg, 3000) == 0.1
     assert simplex_geometry_distance_weight_at_step(cfg, 3250) == 0.0625
     assert abs(simplex_geometry_distance_weight_at_step(cfg, 3500) - 0.025) < 1e-9
+    assert simplex_face_top_k_at_step(cfg, 3000) == 0
+    assert simplex_face_top_k_at_step(cfg, 3250) == 12
+    assert simplex_face_top_k_at_step(cfg, 3500) == 24
+    assert simplex_tetra_top_k_at_step(cfg, 3000) == 0
+    assert simplex_tetra_top_k_at_step(cfg, 3250) == 24
+    assert simplex_tetra_top_k_at_step(cfg, 3500) == 48
     inputs = model_inputs_from_batch(
         batch,
         cfg,
@@ -435,6 +469,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         use_simplex_edge_frame_message_runtime_scale=True,
         use_simplex_hodge_face_runtime_scale=True,
         use_simplex_geometry_distance_weight=True,
+        use_simplex_cell_top_k=True,
         step=3250,
     )
 
@@ -442,6 +477,8 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert torch.isclose(inputs["simplex_edge_frame_message_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_geometry_distance_weight_override"], torch.tensor(0.0625))
+    assert torch.isclose(inputs["simplex_face_top_k_override"], torch.tensor(12.0))
+    assert torch.isclose(inputs["simplex_tetra_top_k_override"], torch.tensor(24.0))
 
 
 def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
@@ -465,6 +502,14 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
         simplex_geometry_distance_weight_final=0.025,
         simplex_geometry_distance_weight_ramp_start_step=3000,
         simplex_geometry_distance_weight_ramp_steps=500,
+        simplex_face_top_k=0,
+        simplex_face_top_k_final=24,
+        simplex_face_top_k_ramp_start_step=3000,
+        simplex_face_top_k_ramp_steps=500,
+        simplex_tetra_top_k=0,
+        simplex_tetra_top_k_final=48,
+        simplex_tetra_top_k_ramp_start_step=3000,
+        simplex_tetra_top_k_ramp_steps=500,
     )
     batch = {
         "target_feat": torch.zeros(1, 4, 22),
@@ -511,6 +556,8 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
     assert result["val_lddt_ca"] == 0.1
     assert torch.isclose(model.kwargs["simplex_edge_frame_message_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_geometry_distance_weight_override"], torch.tensor(0.0625))
+    assert torch.isclose(model.kwargs["simplex_face_top_k_override"], torch.tensor(12.0))
+    assert torch.isclose(model.kwargs["simplex_tetra_top_k_override"], torch.tensor(24.0))
 
 
 def test_simplex_topology_metrics_report_boundary_reuse():
