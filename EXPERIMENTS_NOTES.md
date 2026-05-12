@@ -283,6 +283,55 @@
   `o1dy17ouv8w5mz`: process `6369` was still alive after about 42 minutes,
   the run directory existed, and `results.json` was not present yet. Because
   no run has returned, `EXPERIMENT_RESULTS.md` remains unchanged.
+- E86 returned on owned Runpod pod `o1dy17ouv8w5mz`: step 8500
+  `val_lddt_ca=0.3990174550563097`, FoldScore `0.38581269793212414`,
+  `val_ca_drmsd=10.02808192372322`, predicted/true C-alpha radius
+  `11.538068354129791 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.7385465689003468` / `0.7216474078595638`, boundary length MAE
+  `1.0705599561333656` / `1.1790090538561344`, contraction fractions
+  `0.5956619083881378` / `0.5951620377600193`, and parameters `3,230,834`
+  (+4.00% vs AF2-medium). E86 is kept as the new tiny primary-lDDT best and
+  should be continued one short gate before launching E87/E88/E89/E90.
+- Copied E86 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e86_weak_outer_edge_from_e81_s8500_c256_m64/`
+  and copied the launch log to ignored `logs/e86_weak_outer_edge_from_e81.log`.
+  The local artifact pull excluded the checkpoint directory; the remote E86
+  checkpoint remains available for the continuation.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8000` to add the E86 row to `EXPERIMENT_RESULTS.md`, so inherited E81
+  history does not count as E86's best validation lDDT.
+- E91 launched on the same owned Runpod H100 pod `o1dy17ouv8w5mz` with run
+  name `e91_weak_outer_edge_from_e86_s9000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e91_weak_outer_edge_from_e86.log`, and artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e91_weak_outer_edge_from_e86_s9000_c256_m64/`.
+  Before launch, local source/docs/tests were synced, remote py_compile
+  passed for the simplex/model-config/trainer/runner files, parser smoke
+  confirmed the new E90 outer-edge score flag and the E91 outer-edge runtime
+  flag, no previous benchmark process was active, and the E86 checkpoint was
+  present. Main Python PID is `6904`. The runner resumed E86 at step
+  8500/examples 68000, loaded 1292 matching model tensors, initialized 0
+  new/missing tensors, and started a fresh optimizer. Startup poll at
+  2026-05-12T13:30:01Z showed the process alive, GPU active, and no
+  `results.json` yet.
+- Heartbeat `check-simplexfold-e57-runpod` has been retargeted to E91 on
+  owned pod `o1dy17ouv8w5mz` and must not touch any other Runpod instance.
+- E90 local implementation prepared during the E86 run: added a zero-parameter
+  outer-edge-support bonus for capped face/tetra cell scoring. The term counts
+  selected neighbor edges leaving each candidate cell's vertices and can
+  reward cells that are better embedded in the outer-edge neighborhood before
+  selected-cell top-k masking. This is a topological domain-construction
+  change, not a generic output-coordinate loss.
+- E90 focused validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py
+  scripts/run_nanofold_public_benchmarks.py`; `python -m pytest
+  tests/test_simplex.py::test_cell_score_outer_edge_weight_prefers_context_supported_cells
+  tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser
+  tests/test_trainer.py::test_simplicial_cell_outer_edge_score_adds_no_parameters`
+  reported `3 passed`.
+- Broader E90 validation also passed: `python -m pytest tests/test_simplex.py
+  tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` reported
+  `159 passed`; `git diff --check` was clean.
 
 ## 2026-05-09
 

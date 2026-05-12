@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-12.
 
-Best validation C-alpha lDDT so far: **E81**, `val_lddt_ca=0.3980` at step
-8000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E86**, `val_lddt_ca=0.3990` at step
+8500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -102,3 +102,4 @@ recorded in the running notes for that run.
 | E81 degree-penalized sparse cells | completed | 8000 | 0.3980 | 0.3980 | 0.3826 | 10.0954 | 11.4973 / 15.4034 | kept; new best lDDT/FoldScore/dRMSD with lower boundary-edge reuse, continue degree-penalized sparse selector one short gate |
 | E84 degree-penalized sparse continue | completed | 8500 | 0.3964 | 0.3964 | 0.3767 | 10.4047 | 11.0245 / 15.4034 | regressed vs E81 at step 8500; launch incidence-normalized E85 from E81 checkpoint |
 | E85 incidence-normalized boundary transport | completed | 8500 | 0.3858 | 0.3858 | 0.3767 | 10.1112 | 11.7053 / 15.4034 | rejected; incidence normalization worsened lDDT and selected-boundary diagnostics vs E81 |
+| E86 weak directed outer-edge transport | completed | 8500 | 0.3990 | 0.3990 | 0.3858 | 10.0281 | 11.5381 / 15.4034 | kept; tiny new best lDDT and improved dRMSD, continue one short weak outer-edge gate from E86 |

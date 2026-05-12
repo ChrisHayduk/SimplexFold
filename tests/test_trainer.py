@@ -621,6 +621,25 @@ def test_simplicial_cell_degree_penalty_adds_no_parameters():
     assert degree_penalty_params == simplex_params
 
 
+def test_simplicial_cell_outer_edge_score_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    outer_edge_score_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_face_top_k=24,
+        simplex_tetra_top_k=48,
+        simplex_cell_score_outer_edge_weight=0.25,
+    )
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    outer_edge_score_params = sum(
+        parameter.numel() for parameter in AlphaFold2(outer_edge_score_medium).parameters()
+    )
+
+    assert simplex_params == 3_106_690
+    assert outer_edge_score_params == simplex_params
+
+
 def test_simplicial_boundary_message_degree_attenuation_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     attenuated_medium = replace(

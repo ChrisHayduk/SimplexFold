@@ -6,6 +6,7 @@ from minalphafold.simplex import (
     SimplexTopology,
     SimplicialAdapter,
     _boundary_degree_weights,
+    _cell_outer_edge_support,
     boundary_incidence_weights,
     build_simplex_topology,
     cell_outer_edge_context,
@@ -217,12 +218,67 @@ def test_cell_score_degree_penalty_prefers_less_reused_boundary_edges():
         cell_score_degree_penalty=10.0,
     )
 
-    base_face = tuple(base_topology.face_indices[0, 0][base_topology.face_mask[0, 0] > 0][0].tolist())
+    base_face = tuple(
+        base_topology.face_indices[0, 0][base_topology.face_mask[0, 0] > 0][0].tolist()
+    )
     penalized_face = tuple(
         penalized_topology.face_indices[0, 0][penalized_topology.face_mask[0, 0] > 0][0].tolist()
     )
     assert base_face == (0, 1, 2)
     assert penalized_face == (0, 1, 4)
+
+
+def test_cell_score_outer_edge_weight_prefers_context_supported_cells():
+    score = torch.zeros((1, 6, 6), dtype=torch.float32)
+    for a, b, value in (
+        (0, 1, 10.0),
+        (0, 2, 9.0),
+        (0, 3, 8.9),
+        (1, 2, 8.0),
+        (1, 3, 7.5),
+        (2, 3, 7.0),
+        (3, 4, 10.0),
+        (3, 5, 9.5),
+        (1, 4, 2.0),
+        (2, 4, 2.0),
+        (1, 5, 2.0),
+        (2, 5, 2.0),
+    ):
+        score[:, a, b] = value
+        score[:, b, a] = value
+
+    base_topology = build_simplex_topology(
+        score,
+        neighbor_k=3,
+        local_radius=-1,
+        local_bias=0.0,
+        long_min_sep=-1,
+        geometry_distance_weight=0.0,
+        face_top_k=1,
+    )
+    supported_topology = build_simplex_topology(
+        score,
+        neighbor_k=3,
+        local_radius=-1,
+        local_bias=0.0,
+        long_min_sep=-1,
+        geometry_distance_weight=0.0,
+        face_top_k=1,
+        cell_score_outer_edge_weight=10.0,
+    )
+
+    support = _cell_outer_edge_support(
+        base_topology.face_indices,
+        torch.ones_like(base_topology.face_mask),
+        base_topology.nbr_idx,
+    )
+    assert support[0, 0, 1] > support[0, 0, 0]
+    base_face = tuple(base_topology.face_indices[0, 0][base_topology.face_mask[0, 0] > 0][0].tolist())
+    supported_face = tuple(
+        supported_topology.face_indices[0, 0][supported_topology.face_mask[0, 0] > 0][0].tolist()
+    )
+    assert base_face == (0, 1, 2)
+    assert supported_face == (0, 1, 3)
 
 
 def test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells():

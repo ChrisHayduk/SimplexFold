@@ -233,18 +233,17 @@ edge-face-tetra cochain transport. Reject E85: it fell to
 `val_lddt_ca=0.3858`, FoldScore `0.3767`, and selected face/tetra boundary
 lDDT `0.7265` / `0.7090`, without reducing boundary-edge reuse.
 
-The active next gate is E86 on the owned H100 pod `o1dy17ouv8w5mz` as
-`e86_weak_outer_edge_from_e81_s8500_c256_m64`, Python PID `6369`: resume the
-strongest sparse-complex checkpoint, E81, and add a deliberately weak directed
-outer-edge context route. This uses the existing `simplex_outer_edge_context`
-path rather than adding another module: allocate the context pathway at
-`0.05`, but ramp runtime contribution only from `0.0` to `0.025` during the
-8000-8500 gate. Keep the degree-penalized sparse selector, fixed `24`/`48`
-cell caps, selected-boundary realization losses, and incidence-normalized
-cochain transport fixed for this test. This is a short topology-communication
-gate, not a commitment to a blind 30,000-step run. Do not launch a blind
-30,000-step confirmation until a branch shows a credible trajectory toward
-`val_lddt_ca > 0.7`, not merely a small local best below 0.4.
+E86 returned as the new tiny best at `val_lddt_ca=0.3990`, FoldScore
+`0.3858`, and `val_ca_drmsd=10.0281`. It resumed the strongest sparse-complex
+checkpoint, E81, and added a deliberately weak directed outer-edge context
+route by allocating `simplex_outer_edge_context_scale=0.05` but ramping
+runtime contribution only from `0.0` to `0.025` during the 8000-8500 gate.
+The next active gate should continue E86 to step 9000 with the weak
+outer-edge runtime contribution held at `0.025`. This is still a short
+topology-communication gate, not a commitment to a blind 30,000-step run. Do
+not launch a blind 30,000-step confirmation until a branch shows a credible
+trajectory toward `val_lddt_ca > 0.7`, not merely a small local best below
+0.4.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank
@@ -287,6 +286,12 @@ selected face/tetra cochain evidence flowing into the pair tensor `Z_ij` while
 allowing the direct single/residue readout to be damped separately. This is a
 zero-parameter routing test for the central README claim that higher-order
 states should improve pair/edge reasoning before the structure module.
+
+A fifth prepared fallback is an outer-edge-supported cell scorer. It keeps the
+degree-penalized sparse complex, but adds an optional zero-parameter bonus for
+candidate faces/tetras whose vertices have selected neighbor edges leaving the
+cell. This treats outer-edge availability as part of the topological domain
+construction itself, not merely as a diagnostic after training.
 
 Yes. With templates forbidden, the right construction is:
 

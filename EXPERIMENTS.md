@@ -168,9 +168,9 @@ Validation:
 - `python -m pytest tests/test_simplex.py::test_boundary_incidence_weights_normalize_selected_cell_edges tests/test_simplex.py::test_boundary_incidence_normalization_changes_cochain_transport tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_boundary_incidence_normalization_adds_no_parameters`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
-### E86 Candidate: Directed Outer-Edge Transport Revisit
+### E86: Directed Outer-Edge Transport Revisit
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: early outer-edge runs were too disruptive, but Topotein's directed
 outer-edge neighborhoods remain the best protein-specific route for
@@ -204,14 +204,56 @@ Decision rule: run only after the sparse-cell branch stabilizes. Keep if it
 improves FoldScore/dRMSD while preserving primary `val_lddt_ca` and selected
 boundary diagnostics.
 
-Launch: E86 is running as `e86_weak_outer_edge_from_e81_s8500_c256_m64`,
-Python PID `6369`. It resumes the E81 checkpoint from step 8000 to 8500 with
+Launch: E86 ran as `e86_weak_outer_edge_from_e81_s8500_c256_m64`,
+with Python PID `6369`. It resumed the E81 checkpoint from step 8000 to 8500 with
 the E85 sparse/selected-boundary recipe plus weak runtime-gated outer-edge
 context. The log path is
 `/workspace/SimplexFold/logs/e86_weak_outer_edge_from_e81.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e86_weak_outer_edge_from_e81_s8500_c256_m64/`.
-Do not add E86 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: keep, but only for another short gate. E86 reached
+`val_lddt_ca=0.3990`, FoldScore `0.3858`, `val_ca_drmsd=10.0281`, and
+predicted/true C-alpha radius `11.5381 / 15.4034`. This is a tiny new primary
+lDDT best over E81's `0.3980`, with better FoldScore and dRMSD. Selected
+face/tetra boundary lDDT also improved to `0.7385` / `0.7216`, though
+contraction fraction rose to `0.5957` / `0.5952`. Continue one weak
+outer-edge gate from E86 before trying a different fallback.
+
+### E91 Candidate: Continue Weak Directed Outer-Edge Transport
+
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E86 slightly improved primary lDDT, FoldScore, dRMSD, and
+selected-boundary lDDT from the E81 checkpoint. A short continuation can test
+whether weak outer-edge transport is a real upward slope or a one-checkpoint
+fluctuation.
+
+Mechanism: resume the E86 checkpoint from step 8500 to 9000 with the same
+degree-penalized sparse selector, fixed `24` / `48` selected cell caps,
+selected-boundary realization losses, incidence-normalized cochain transport,
+and weak directed outer-edge context with runtime scale held at `0.025`.
+This continues the topology-communication branch without adding a new loss.
+
+Prepared gate: launch on the owned H100 pod after source/docs are synced and
+remote py_compile/parser checks pass. Keep only if it improves or at least
+preserves E86's `val_lddt_ca=0.3990` without selected-boundary collapse.
+
+Launch: E91 is running as `e91_weak_outer_edge_from_e86_s9000_c256_m64`,
+Python PID `6904`. Local source/docs/tests were synced to the owned H100 pod
+after E86 returned and no benchmark process was active. Remote py_compile
+passed for `minalphafold/simplex.py`, `minalphafold/model_config.py`,
+`minalphafold/trainer.py`, and
+`scripts/run_nanofold_public_benchmarks.py`; parser smoke confirmed
+`--simplex-cell-score-outer-edge-weight 0.25` and
+`--simplex-outer-edge-context-runtime-scale 0.025`; and the E86 checkpoint was
+present. The launch resumed E86 at step 8500/examples 68000, loaded 1292
+matching tensors, initialized 0 new/missing tensors, and started a fresh
+optimizer. The log path is
+`/workspace/SimplexFold/logs/e91_weak_outer_edge_from_e86.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e91_weak_outer_edge_from_e86_s9000_c256_m64/`.
+Do not add E91 to `EXPERIMENT_RESULTS.md` until it returns.
 
 ### E87 Candidate: Directed Boundary Readout
 
@@ -233,11 +275,11 @@ pair readout linearly blends between them before any coface-degree attenuation.
 Single-stream updates are unchanged, so this isolates the directionality test
 to simplex-to-pair communication.
 
-Prepared gate: do not launch while E85 is active. If incidence normalization
-and the weak outer-edge revisit do not recover a primary-lDDT gain, test a
-short gate from the strongest sparse-complex checkpoint with the model-config
-directionality set to `0.5`, but ramp the runtime contribution from `0.0` to
-`0.5` over the gate:
+Prepared gate: keep behind the E86 continuation. If weak outer-edge transport
+does not preserve the E86 primary-lDDT gain, test a short gate from the
+strongest sparse-complex checkpoint with the model-config directionality set
+to `0.5`, but ramp the runtime contribution from `0.0` to `0.5` over the
+gate:
 `--simplex-boundary-readout-directionality 0.5`,
 `--simplex-boundary-readout-directionality-runtime-scale 0.0`,
 `--simplex-boundary-readout-directionality-runtime-scale-final 0.5`,
@@ -273,9 +315,9 @@ update from zero to a small value. This changes the cochain communication path
 from latent local segment cells into selected face states; it is not a new
 coordinate-output loss.
 
-Prepared gate: do not launch while E86 is active. If E86/E87 fail to recover
-a primary-lDDT gain, resume the strongest sparse-complex checkpoint and add a
-very weak latent segment route:
+Prepared gate: keep behind the E86 continuation and E87. If those fail to
+recover a primary-lDDT gain, resume the strongest sparse-complex checkpoint
+and add a very weak latent segment route:
 `--simplex-segment-cell-scale 0.05`,
 `--simplex-segment-cell-runtime-scale 0.0`,
 `--simplex-segment-cell-runtime-scale-final 0.05`,
@@ -309,9 +351,10 @@ shared `simplex_update_scale` still works, but either stream can now be
 scheduled independently. This changes the selected cochain readout route, not
 the loss or selected cells.
 
-Prepared gate: do not launch while E86 is active. If E86/E87/E88 do not
-recover primary lDDT, resume the strongest sparse-complex checkpoint with the
-E81 recipe and keep pair readout at `1.0` while ramping single readout down:
+Prepared gate: keep behind the E86 continuation, E87, and E88. If those do
+not recover primary lDDT, resume the strongest sparse-complex checkpoint with
+the E81 recipe and keep pair readout at `1.0` while ramping single readout
+down:
 `--simplex-pair-update-runtime-scale 1.0`,
 `--simplex-single-update-runtime-scale 1.0`,
 `--simplex-single-update-runtime-scale-final 0.5`,
@@ -322,6 +365,38 @@ Validation:
 
 - `python -m py_compile minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+
+### E90 Candidate: Outer-Edge-Supported Cell Scoring
+
+Status: implemented locally; not launched.
+
+Hypothesis: E81's degree penalty improved the sparse selected complex by
+discouraging repeated use of the same boundary edges, and the PDF reread
+points to outer-edge neighborhoods as part of the topological domain rather
+than just a post-hoc diagnostic. When selecting capped face/tetra cochains,
+candidate cells with more selected neighbor edges leaving the cell may be
+better embedded in the local residue complex and less isolated from the pair
+tensor.
+
+Mechanism: add zero-parameter `simplex_cell_score_outer_edge_weight`. During
+face/tetra top-k masking, each candidate cell receives an optional score bonus
+from the normalized count of selected neighbor edges that leave the cell's
+vertices. This changes which rank-2/rank-3 cochains exist and communicate; it
+does not alter output coordinate losses or add parameters.
+
+Prepared gate: keep behind the E86 continuation and E87. If those fail but
+the sparse-cell branch remains the best topology-construction direction,
+resume the E81 checkpoint with the fixed `24` / `48` sparse caps,
+`--simplex-cell-score-degree-penalty 0.75`, and a small first reward such as
+`--simplex-cell-score-outer-edge-weight 0.25`. Compare selected outer-edge
+availability, boundary-edge reuse, selected-boundary lDDT, and primary
+`val_lddt_ca` against E81/E86.
+
+Validation:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_cell_score_outer_edge_weight_prefers_context_supported_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_cell_outer_edge_score_adds_no_parameters`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
 ## Experiment Queue

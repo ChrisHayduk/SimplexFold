@@ -958,6 +958,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_face_top_k", args.simplex_face_top_k),
         ("simplex_tetra_top_k", args.simplex_tetra_top_k),
         ("simplex_cell_score_degree_penalty", args.simplex_cell_score_degree_penalty),
+        ("simplex_cell_score_outer_edge_weight", args.simplex_cell_score_outer_edge_weight),
     ):
         if value is not None:
             overrides[field] = value
@@ -1623,6 +1624,9 @@ def _train_variant(
         "simplex_cell_score_degree_penalty": (
             float(getattr(model_config, "simplex_cell_score_degree_penalty", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_cell_score_outer_edge_weight": (
+            float(getattr(model_config, "simplex_cell_score_outer_edge_weight", 0.0)) if use_simplicial else 0.0
+        ),
         "simplex_boundary_closure_weight": (
             float(getattr(model_config, "simplex_boundary_closure_weight", 0.0)) if use_simplicial else 0.0
         ),
@@ -1781,6 +1785,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_tetra_top_k_ramp_start_step",
         "simplex_tetra_top_k_ramp_steps",
         "simplex_cell_score_degree_penalty",
+        "simplex_cell_score_outer_edge_weight",
         "resume_model_weights_only",
         "elapsed_seconds",
         "examples_per_second",
@@ -2281,6 +2286,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Penalize candidate face/tetra scores by boundary-edge reuse before selected-cell top-k masking.",
     )
     parser.add_argument(
+        "--simplex-cell-score-outer-edge-weight",
+        type=float,
+        default=None,
+        help="Reward candidate face/tetra cells with selected outer-edge support before top-k masking.",
+    )
+    parser.add_argument(
         "--simplex-local-neighbor-k",
         type=float,
         default=None,
@@ -2644,6 +2655,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_tetra_top_k_ramp_start_step": args.simplex_tetra_top_k_ramp_start_step,
         "simplex_tetra_top_k_ramp_steps": args.simplex_tetra_top_k_ramp_steps,
         "simplex_cell_score_degree_penalty": args.simplex_cell_score_degree_penalty,
+        "simplex_cell_score_outer_edge_weight": args.simplex_cell_score_outer_edge_weight,
         "simplex_local_neighbor_k": args.simplex_local_neighbor_k,
         "simplex_local_neighbor_k_final": args.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": args.simplex_local_neighbor_k_ramp_start_step,
