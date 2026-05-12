@@ -2502,3 +2502,11 @@
   `scripts/run_nanofold_public_benchmarks.py`; parser smoke confirmed
   `--simplex-face-top-k 24` and `--simplex-tetra-top-k 48`. E73 evalfix is
   still the only active benchmark process on pod `lovgzo4hz2k4fp`.
+- Added `scripts/format_experiment_result_row.py` to format returned
+  `results.json` plus optional history into an `EXPERIMENT_RESULTS.md` table
+  row. Use `--start-after-step` for resumed continuations so inherited
+  checkpoint history, such as E71's step-5000 row inside E73/E74 histories, is
+  not counted as the continuation's best validation lDDT. Local tests passed:
+  `python -m pytest tests/test_format_experiment_result_row.py`;
+  `python -m py_compile scripts/format_experiment_result_row.py`;
+  `git diff --check`.
