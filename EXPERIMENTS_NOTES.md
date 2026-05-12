@@ -3310,3 +3310,55 @@
   lDDT/radius/all-pairs loss. E92 status at this poll: Python PID `8068` is
   active, `results.json` is absent, and history still ends at inherited E87
   step 8500 with `val_lddt_ca=0.39919308573007584`.
+- 2026-05-12T16:09Z E92 status poll on owned pod `o1dy17ouv8w5mz`: Python
+  PID `8068` remains active, GPU utilization sampled at `74%`, `results.json`
+  is still absent, and the run history/log still end at the inherited E87
+  startup state. No `EXPERIMENT_RESULTS.md` update yet because E92 has not
+  returned.
+- E92 returned on owned pod `o1dy17ouv8w5mz`: step 9000
+  `val_lddt_ca=0.39684198051691055`, FoldScore `0.3829442337155342`,
+  `val_ca_drmsd=9.961655408143997`, predicted/true C-alpha radius
+  `11.736155331134796 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.7400240190327168` / `0.7230039089918137`, boundary length MAE
+  `1.0625056326389313` / `1.173266414552927`, contraction fractions
+  `0.5681420378386974` / `0.5686059035360813`, boundary-edge mean degree
+  `11.466184198856354` / `32.314730405807495`, and boundary unique-edge
+  fraction `0.08755682366733795` / `0.031285135159139124`.
+- E92 interpretation: reject as a primary-lDDT continuation. It improved
+  dRMSD versus E87, but primary C-alpha lDDT fell below E87's
+  `0.39919308573007584` and E86's `0.3990174550563097`, and selected-boundary
+  lDDT softened. Pivot to the prepared E90 outer-edge-supported cell scorer
+  rather than continuing the directed boundary-readout mechanism.
+- Copied E92 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e92_continue_directed_boundary_from_e87_s9000_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e92_continue_directed_boundary_from_e87.log`. The local artifact pull
+  excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8500` to add the E92 row to `EXPERIMENT_RESULTS.md`, so inherited E87
+  history does not count as E92's best validation lDDT.
+- E90 launch repair: the first E90 launch attempt exposed stale runtime
+  plumbing on the remote checkout. The runner/trainer could create
+  `simplex_cell_score_outer_edge_weight_override`, but the model/evoformer
+  path did not yet accept and forward it. Added the missing
+  `AlphaFold2 -> SimplicialEvoformer -> SimplicialAdapter` override plumbing
+  locally, added a focused regression test for the forward signatures, passed
+  local py_compile and seven focused pytest cases, synced the patched files to
+  the owned pod, and cleared only the failed E90 artifact directory that this
+  thread created.
+- E90 launched cleanly on the same owned H100 pod with run name
+  `e90_outer_edge_score_from_e81_s8500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e90_outer_edge_score_from_e81.log`, artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e90_outer_edge_score_from_e81_s8500_c256_m64/`,
+  and Python PID `9139`. Startup poll at `2026-05-12T16:41:01Z` confirmed the
+  benchmark process is alive, `results.json` is absent as expected, metadata
+  and history files exist, and the runner resumed E81 at step 8000/examples
+  64000 with 1244 matching model tensors loaded and 0 new/missing tensors.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  from E92 to E90, keeping the same owned-pod-only restriction and the rule
+  that heartbeat must not launch follow-up experiments automatically.
+- 2026-05-12T16:45Z E90 status poll on owned pod `o1dy17ouv8w5mz`: Python
+  PID `9139` is active, GPU utilization sampled at `48%`, `results.json` is
+  absent, and history still ends at the inherited E81 step 8000 row with
+  `val_lddt_ca=0.39799308963119984`.

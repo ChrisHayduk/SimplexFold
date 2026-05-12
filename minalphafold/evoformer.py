@@ -250,6 +250,7 @@ class SimplicialEvoformer(torch.nn.Module):
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
         simplex_tetra_top_k_override: Optional[torch.Tensor] = None,
+        simplex_cell_score_outer_edge_weight_override: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
         assert msa_representation.ndim == 4, \
             f"msa_representation must be (batch, N_seq, N_res, c_m), got {msa_representation.shape}"
@@ -312,6 +313,9 @@ class SimplicialEvoformer(torch.nn.Module):
                 simplex_geometry_distance_weight_override=simplex_geometry_distance_weight_override,
                 simplex_face_top_k_override=simplex_face_top_k_override,
                 simplex_tetra_top_k_override=simplex_tetra_top_k_override,
+                simplex_cell_score_outer_edge_weight_override=(
+                    simplex_cell_score_outer_edge_weight_override
+                ),
             )
 
         pair_representation = pair_representation + self.pair_transition(pair_representation)

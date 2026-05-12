@@ -1,4 +1,4 @@
-## Current Plan: E87 Directed Boundary Readout Gate
+## Current Plan: E90 Outer-Edge-Supported Cell Scoring Gate
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -273,11 +273,20 @@ E92 continuation with the directed boundary-readout runtime scale held at
 E87/E86 level without selected-boundary collapse; otherwise pivot to the
 outer-edge-supported cell scorer.
 
-E92 is now running from the E87 checkpoint to step 9000 with directionality
-held at `0.5`. This is a short stability gate for the directed boundary-readout
-route, not a 30,000-step confirmation. If it regresses, the next branch should
-change selected-cell construction via the outer-edge-supported scorer rather
-than continuing the same readout mechanism.
+E92 rejected the directed boundary-readout continuation. It resumed E87 to
+step 9000 with directionality held at `0.5` and returned
+`val_lddt_ca=0.3968`, below both E87's `0.3992` and E86's `0.3990`.
+FoldScore stayed roughly flat at `0.3829` and dRMSD improved to `9.9617`, but
+the written rule was primary-lDDT preservation. Stop continuing the same
+readout mechanism.
+
+E90 is now running from the cleaner E81 checkpoint to step 8500. It keeps the
+fixed `24` / `48` sparse caps, degree-penalized cell scoring, selected-boundary
+realization losses, and half-scale edge-frame messages, then ramps
+`simplex_cell_score_outer_edge_weight` from `0.0` to `0.25` over steps
+8000-8500. This changes which rank-2/rank-3 cochains exist by preferring
+cells with usable outer-edge support; it does not add output-side metric
+pressure or parameters.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank

@@ -73,6 +73,19 @@ def make_processed_cache_dirs(tmp_path: Path) -> tuple[Path, Path]:
     return feature_dir, label_dir
 
 
+def test_simplicial_cell_outer_edge_runtime_override_reaches_model_path():
+    import inspect
+
+    from minalphafold.evoformer import SimplicialEvoformer
+    from minalphafold.simplex import SimplicialAdapter
+
+    parameter = "simplex_cell_score_outer_edge_weight_override"
+
+    assert parameter in inspect.signature(AlphaFold2.forward).parameters
+    assert parameter in inspect.signature(SimplicialEvoformer.forward).parameters
+    assert parameter in inspect.signature(SimplicialAdapter.forward).parameters
+
+
 def test_train_step_updates_model_parameters(tmp_path):
     feature_dir, label_dir = make_processed_cache_dirs(tmp_path)
     data_config = DataConfig(

@@ -331,7 +331,7 @@ this mechanism and pivot to outer-edge-supported cell scoring.
 
 ### E92 Candidate: Continue Directed Boundary Readout
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E87 showed that directed source/target simplex-to-pair boundary
 readout can preserve or slightly improve local C-alpha lDDT while improving
@@ -359,7 +359,14 @@ new/missing tensors, and started a fresh optimizer. The log path is
 `/workspace/SimplexFold/logs/e92_continue_directed_boundary_from_e87.log`,
 and the artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e92_continue_directed_boundary_from_e87_s9000_c256_m64/`.
-Do not add E92 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: reject. E92 reached `val_lddt_ca=0.3968`, FoldScore `0.3829`,
+`val_ca_drmsd=9.9617`, and predicted/true C-alpha radius
+`11.7362 / 15.4034`. The dRMSD improvement is useful, but the primary lDDT
+fell below both E87 (`0.3992`) and E86 (`0.3990`), and selected face/tetra
+boundary lDDT softened to `0.7400` / `0.7230`. Stop this continuation route
+and launch E90, the outer-edge-supported cell scorer, from the cleaner E81
+checkpoint.
 
 Validation:
 
@@ -441,7 +448,7 @@ Validation:
 
 ### E90 Candidate: Outer-Edge-Supported Cell Scoring
 
-Status: implemented locally; not launched.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E81's degree penalty improved the sparse selected complex by
 discouraging repeated use of the same boundary edges, and the PDF reread
@@ -469,10 +476,21 @@ reward such as `--simplex-cell-score-outer-edge-weight 0.0`,
 outer-edge availability, boundary-edge reuse, selected-boundary lDDT, and
 primary `val_lddt_ca` against E81/E86.
 
+Launch: E92 regressed, so E90 is now running as
+`e90_outer_edge_score_from_e81_s8500_c256_m64`, Python PID `9139`, from the
+E81 checkpoint at step 8000/examples 64000. Remote py_compile passed for the
+simplex/model-config/evoformer/model/trainer/runner files after syncing the
+runtime override plumbing, and startup confirmed the E81 checkpoint loaded
+1244 matching tensors with 0 new/missing tensors. The log path is
+`/workspace/SimplexFold/logs/e90_outer_edge_score_from_e81.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e90_outer_edge_score_from_e81_s8500_c256_m64/`.
+Do not add E90 to `EXPERIMENT_RESULTS.md` until it returns.
+
 Validation:
 
-- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
-- `python -m pytest tests/test_simplex.py::test_cell_score_outer_edge_weight_prefers_context_supported_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_cell_outer_edge_score_adds_no_parameters`
+- `python -m py_compile minalphafold/model.py minalphafold/evoformer.py minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_trainer.py::test_simplicial_cell_outer_edge_runtime_override_reaches_model_path tests/test_trainer.py::test_simplicial_cell_outer_edge_score_adds_no_parameters tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_cell_score_outer_edge_weight_prefers_context_supported_cells`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
 ## Experiment Queue
