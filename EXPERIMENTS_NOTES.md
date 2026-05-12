@@ -3202,3 +3202,8 @@
   keep E91/E90 focused on selected-complex construction and incidence/
   outer-edge cochain communication; do not add generic lDDT/radius/all-pairs
   losses unless they supervise only the selected sparse complex.
+- 2026-05-12T14:20:59Z E91 status poll on owned pod `o1dy17ouv8w5mz`: Python
+  PID `6904` is still active, `results.json` is absent, and
+  `history_full_msa_to_face.json` still ends at the inherited E86 step-8500
+  row with `val_lddt_ca=0.3990174550563097`. No E91 result has returned yet,
+  so `EXPERIMENT_RESULTS.md` remains unchanged.
