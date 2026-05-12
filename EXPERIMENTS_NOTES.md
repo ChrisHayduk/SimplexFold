@@ -176,6 +176,12 @@
   `python -m pytest tests/test_simplex.py::test_boundary_readout_directionality_preserves_pair_orientation tests/test_simplex.py::test_boundary_readout_directionality_override_gates_pair_readout tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_boundary_readout_directionality_adds_no_parameters`;
   `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
   reported `157 passed`.
+- E85 live health check at `2026-05-12T11:56:18Z`: no `results.json` yet.
+  The process is still PID `5476` on the owned pod, inherited history is
+  present through E81 step 8000, and a five-sample `nvidia-smi` check showed
+  H100 utilization ranging from `0%` to `67%` with `13417 MiB` allocated.
+  Interpretation: quiet logs are expected before the 8500-step validation;
+  leave the run undisturbed.
 
 ## 2026-05-09
 
