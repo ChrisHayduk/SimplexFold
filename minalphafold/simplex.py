@@ -1220,6 +1220,10 @@ class SimplicialAdapter(torch.nn.Module):
         self.boundary_incidence_normalization = float(
             getattr(config, "simplex_boundary_incidence_normalization", 0.0)
         )
+        self.boundary_readout_directionality = min(
+            max(float(getattr(config, "simplex_boundary_readout_directionality", 0.0)), 0.0),
+            1.0,
+        )
         self.segment_cell_scale = float(getattr(config, "simplex_segment_cell_scale", 0.0))
         self.segment_radius = int(getattr(config, "simplex_segment_radius", 4))
 
@@ -1640,6 +1644,16 @@ class SimplicialAdapter(torch.nn.Module):
             edge_mask=face_edge_mask,
             include_reverse=True,
         )
+        directed_pair_delta = pair_delta
+        directed_pair_counts = pair_counts
+        if self.boundary_readout_directionality > 0.0:
+            directed_pair_delta, directed_pair_counts = scatter_to_pair(
+                face_edge_update,
+                face_edge_indices,
+                pair_shape=tuple(pair.shape),  # type: ignore[arg-type]
+                edge_mask=face_edge_mask,
+                include_reverse=False,
+            )
 
         if self.use_tetra and tetra_state.numel() > 0:
             tet_i, tet_j, tet_k, tet_l = topology.tetra_indices.unbind(dim=-1)
@@ -1696,8 +1710,23 @@ class SimplicialAdapter(torch.nn.Module):
             )
             pair_delta = pair_delta + tet_pair_delta
             pair_counts = pair_counts + tet_pair_counts
+            if self.boundary_readout_directionality > 0.0:
+                directed_tet_pair_delta, directed_tet_pair_counts = scatter_to_pair(
+                    tet_edge_update,
+                    tet_edge_indices,
+                    pair_shape=tuple(pair.shape),  # type: ignore[arg-type]
+                    edge_mask=tet_edge_mask,
+                    include_reverse=False,
+                )
+                directed_pair_delta = directed_pair_delta + directed_tet_pair_delta
+                directed_pair_counts = directed_pair_counts + directed_tet_pair_counts
 
         pair_readout = pair_delta / pair_counts.clamp_min(1.0)
+        if self.boundary_readout_directionality > 0.0:
+            directed_pair_readout = directed_pair_delta / directed_pair_counts.clamp_min(1.0)
+            directionality = pair_readout.new_tensor(self.boundary_readout_directionality)
+            pair_readout = (1.0 - directionality) * pair_readout + directionality * directed_pair_readout
+            pair_counts = (1.0 - directionality) * pair_counts + directionality * directed_pair_counts
         pair_readout = coface_degree_attenuate_pair_readout(
             pair_readout,
             pair_counts,

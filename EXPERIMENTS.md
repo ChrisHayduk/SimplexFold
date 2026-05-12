@@ -204,6 +204,39 @@ Decision rule: run only after the sparse-cell branch stabilizes. Keep if it
 improves FoldScore/dRMSD while preserving primary `val_lddt_ca` and selected
 boundary diagnostics.
 
+### E87 Candidate: Directed Boundary Readout
+
+Status: implemented locally; not launched.
+
+Hypothesis: SimplexFold's selected face/tetra cells are built from directed
+anchored neighbor lists, but their final boundary-edge messages have been
+scattered symmetrically into both pair directions. That is convenient for a
+pairwise AF2-style trunk, but it partly erases the source/target incidence cue
+that Topotein's directed protein complex makes explicit. A zero-parameter
+blend toward directed boundary-edge scatter may let selected cochains write
+orientation-aware information into `Z_ij` without adding another loss.
+
+Mechanism: add `simplex_boundary_readout_directionality`, clamped to `[0, 1]`.
+At `0`, face/tetra boundary messages use the previous symmetric scatter. At
+positive values, the adapter computes both the symmetric readout and a directed
+readout that writes only to the selected boundary-edge orientation; the final
+pair readout linearly blends between them before any coface-degree attenuation.
+Single-stream updates are unchanged, so this isolates the directionality test
+to simplex-to-pair communication.
+
+Prepared gate: do not launch while E85 is active. If incidence normalization
+and the weak outer-edge revisit do not recover a primary-lDDT gain, test a
+short gate from the strongest sparse-complex checkpoint with
+`--simplex-boundary-readout-directionality 0.5`, while keeping the
+degree-penalized sparse selector, selected-boundary realization losses, and
+incidence normalization fixed.
+
+Validation:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_boundary_readout_directionality_preserves_pair_orientation tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_boundary_readout_directionality_adds_no_parameters`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+
 ## Experiment Queue
 
 ### E00: Matched Short-Run Baseline

@@ -75,6 +75,7 @@ class SimplexConfig:
     simplex_edge_frame_message_scale = 0.0
     simplex_boundary_message_degree_attenuation = 0.0
     simplex_boundary_incidence_normalization = 0.0
+    simplex_boundary_readout_directionality = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
     simplex_c_segment = 8
@@ -796,6 +797,34 @@ def test_boundary_incidence_normalization_changes_cochain_transport():
 
     assert not torch.allclose(incidence_pair, base_pair)
     assert not torch.allclose(incidence_single, base_single)
+
+
+def test_boundary_readout_directionality_preserves_pair_orientation():
+    class BaseConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class DirectedConfig(BaseConfig):
+        simplex_boundary_readout_directionality = 1.0
+
+    torch.manual_seed(31)
+    base_adapter = SimplicialAdapter(BaseConfig()).eval()
+    torch.manual_seed(31)
+    directed_adapter = SimplicialAdapter(DirectedConfig()).eval()
+    pair = torch.randn(1, 5, 5, BaseConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, BaseConfig.c_s)
+    coords = torch.randn(1, 5, 3)
+
+    with torch.no_grad():
+        base_pair, base_single, _ = base_adapter(pair, single, recycled_ca_coords=coords)
+        directed_pair, directed_single, _ = directed_adapter(pair, single, recycled_ca_coords=coords)
+
+    assert not torch.allclose(directed_pair, base_pair)
+    assert torch.allclose(directed_single, base_single)
 
 
 def test_outer_edge_context_runtime_scale_gates_context_path():

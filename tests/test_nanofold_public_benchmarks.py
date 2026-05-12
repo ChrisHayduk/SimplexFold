@@ -333,6 +333,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.5",
             "--simplex-boundary-incidence-normalization",
             "1.0",
+            "--simplex-boundary-readout-directionality",
+            "0.5",
             "--simplex-face-boundary-lddt-weight-final",
             "0.025",
             "--simplex-tetra-boundary-lddt-weight-final",
@@ -385,6 +387,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_geometry_distance_weight_ramp_steps == 500
     assert args.simplex_boundary_message_degree_attenuation == 0.5
     assert args.simplex_boundary_incidence_normalization == 1.0
+    assert args.simplex_boundary_readout_directionality == 0.5
     assert args.simplex_face_boundary_lddt_weight_final == 0.025
     assert args.simplex_tetra_boundary_lddt_weight_final == 0.025
     assert args.simplex_boundary_lddt_ramp_start_step == 3500
@@ -405,6 +408,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_geometry_distance_weight == 0.1
     assert cfg.simplex_boundary_message_degree_attenuation == 0.5
     assert cfg.simplex_boundary_incidence_normalization == 1.0
+    assert cfg.simplex_boundary_readout_directionality == 0.5
     assert cfg.simplex_face_top_k == 24
     assert cfg.simplex_tetra_top_k == 48
     assert cfg.simplex_cell_score_degree_penalty == 0.75

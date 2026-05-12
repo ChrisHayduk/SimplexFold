@@ -263,7 +263,11 @@ outer-edge revisit deliberately weaker than E60: allocate the existing
 outer-edge context modules at `0.05`, but ramp the runtime contribution only
 from `0.0` to `0.025` during the 8000-8500 gate while keeping incidence
 normalization, degree-penalized sparse cells, and the selected-boundary loss
-recipe fixed.
+recipe fixed. A second prepared fallback is directed boundary readout:
+`simplex_boundary_readout_directionality` keeps the default symmetric
+simplex-to-pair scatter at `0`, but can blend toward source/target directed
+boundary-edge writes. This is another zero-parameter cochain-communication
+test aligned with the directed-incidence view rather than a new metric loss.
 
 Yes. With templates forbidden, the right construction is:
 
