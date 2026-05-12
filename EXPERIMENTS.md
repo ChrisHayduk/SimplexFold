@@ -291,6 +291,39 @@ Validation:
 - `python -m pytest tests/test_simplex.py::test_segment_cells_change_face_mediated_outputs_within_adapter tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_segment_cells_stay_within_medium_budget`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
+### E89 Candidate: Pair-Preserving Simplex Readout Gate
+
+Status: implemented locally; not launched.
+
+Hypothesis: the README motivation centers on persistent face/tetra states
+communicating back into the AF2-style pair tensor `Z_ij`. Some failed
+readout/sidecar runs may have been too disruptive because simplex cochain
+messages wrote equally into pair and single streams. A zero-parameter
+pair/single runtime gate can test whether higher-rank evidence is more useful
+when it primarily updates pair edges while direct residue/single updates are
+damped.
+
+Mechanism: add separate training-time runtime overrides for
+`simplex_pair_update_scale` and `simplex_single_update_scale`. The existing
+shared `simplex_update_scale` still works, but either stream can now be
+scheduled independently. This changes the selected cochain readout route, not
+the loss or selected cells.
+
+Prepared gate: do not launch while E86 is active. If E86/E87/E88 do not
+recover primary lDDT, resume the strongest sparse-complex checkpoint with the
+E81 recipe and keep pair readout at `1.0` while ramping single readout down:
+`--simplex-pair-update-runtime-scale 1.0`,
+`--simplex-single-update-runtime-scale 1.0`,
+`--simplex-single-update-runtime-scale-final 0.5`,
+`--simplex-single-update-runtime-scale-ramp-start-step 8000`, and
+`--simplex-single-update-runtime-scale-ramp-steps 500`.
+
+Validation:
+
+- `python -m py_compile minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+
 ## Experiment Queue
 
 ### E00: Matched Short-Run Baseline

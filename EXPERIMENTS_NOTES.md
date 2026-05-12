@@ -256,6 +256,29 @@
   `python -m pytest tests/test_simplex.py
   tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` reported
   `157 passed`.
+- E89 local implementation prepared while E86 runs: added separate training
+  runtime gates for simplex readout into pair/edge states and residue/single
+  states. This reuses the existing adapter overrides and adds no parameters.
+  The topological motivation is to test whether selected face/tetra cochains
+  should write primarily back into the AF2-style pair tensor `Z_ij`, while
+  damping direct single-stream perturbations that may disrupt the structure
+  module.
+- E89 is a fallback, not an active run. A cautious gate should keep the E81
+  sparse-complex recipe and test `--simplex-pair-update-runtime-scale 1.0`
+  with `--simplex-single-update-runtime-scale 1.0` ramped to `0.5` over the
+  500-step gate. This isolates the cochain readout route without changing the
+  selected complex or adding a new loss.
+- E89 local validation passed:
+  `python -m py_compile minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest
+  tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser
+  tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs
+  tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation
+  tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula`
+  reported `4 passed`; `python -m pytest tests/test_simplex.py
+  tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` reported
+  `157 passed`.
 
 ## 2026-05-09
 

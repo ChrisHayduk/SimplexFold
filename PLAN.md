@@ -282,6 +282,12 @@ recycled geometry, then passed into selected face states. The new
 allocate that local rank-2 route but ramp its contribution from zero, avoiding
 the abrupt static sidecar tested much earlier.
 
+A fourth prepared fallback is a pair-preserving simplex readout gate. It keeps
+selected face/tetra cochain evidence flowing into the pair tensor `Z_ij` while
+allowing the direct single/residue readout to be damped separately. This is a
+zero-parameter routing test for the central README claim that higher-order
+states should improve pair/edge reasoning before the structure module.
+
 Yes. With templates forbidden, the right construction is:
 
 [

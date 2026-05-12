@@ -51,7 +51,9 @@ from minalphafold.trainer import (
     save_checkpoint,
     simplex_hodge_face_runtime_scale_at_step,
     simplex_local_neighbor_k_at_step,
+    simplex_pair_update_runtime_scale_at_step,
     simplex_segment_cell_runtime_scale_at_step,
+    simplex_single_update_runtime_scale_at_step,
     simplex_update_scale_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     train_step,
@@ -142,6 +144,14 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_update_scale_final=1.0,
         simplex_update_scale_ramp_start_step=10,
         simplex_update_scale_ramp_steps=10,
+        simplex_pair_update_runtime_scale=0.5,
+        simplex_pair_update_runtime_scale_final=1.0,
+        simplex_pair_update_runtime_scale_ramp_start_step=10,
+        simplex_pair_update_runtime_scale_ramp_steps=10,
+        simplex_single_update_runtime_scale=1.0,
+        simplex_single_update_runtime_scale_final=0.0,
+        simplex_single_update_runtime_scale_ramp_start_step=10,
+        simplex_single_update_runtime_scale_ramp_steps=10,
         simplex_hodge_face_runtime_scale=0.0,
         simplex_hodge_face_runtime_scale_final=0.1,
         simplex_hodge_face_runtime_scale_ramp_start_step=10,
@@ -162,6 +172,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
 
     assert simplex_topology_teacher_forcing_weight_at_step(training_config, 15) == 0.5
     assert simplex_update_scale_at_step(training_config, 15) == 0.625
+    assert simplex_pair_update_runtime_scale_at_step(training_config, 15) == 0.75
+    assert simplex_single_update_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_hodge_face_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, 15) == 0.25
     assert simplex_segment_cell_runtime_scale_at_step(training_config, 15) == 0.05
@@ -189,8 +201,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_teacher_ca_coords"], batch["true_atom_positions"][:, :, 1, :])
     assert torch.allclose(train_inputs["simplex_teacher_ca_mask"], batch["seq_mask"])
     assert torch.allclose(train_inputs["simplex_teacher_forcing_weight"], torch.tensor(0.5))
-    assert torch.allclose(train_inputs["simplex_pair_update_scale_override"], torch.tensor(0.625))
-    assert torch.allclose(train_inputs["simplex_single_update_scale_override"], torch.tensor(0.625))
+    assert torch.allclose(train_inputs["simplex_pair_update_scale_override"], torch.tensor(0.75))
+    assert torch.allclose(train_inputs["simplex_single_update_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
     assert torch.allclose(train_inputs["simplex_segment_cell_scale_override"], torch.tensor(0.05))

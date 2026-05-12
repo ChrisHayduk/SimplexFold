@@ -221,6 +221,14 @@ class TrainingConfig:
     simplex_update_scale_final: float | None = None
     simplex_update_scale_ramp_start_step: int | None = None
     simplex_update_scale_ramp_steps: int = 1
+    simplex_pair_update_runtime_scale: float | None = None
+    simplex_pair_update_runtime_scale_final: float | None = None
+    simplex_pair_update_runtime_scale_ramp_start_step: int | None = None
+    simplex_pair_update_runtime_scale_ramp_steps: int = 1
+    simplex_single_update_runtime_scale: float | None = None
+    simplex_single_update_runtime_scale_final: float | None = None
+    simplex_single_update_runtime_scale_ramp_start_step: int | None = None
+    simplex_single_update_runtime_scale_ramp_steps: int = 1
     simplex_outer_edge_context_runtime_scale: float | None = None
     simplex_outer_edge_context_runtime_scale_final: float | None = None
     simplex_outer_edge_context_runtime_scale_ramp_start_step: int | None = None
@@ -854,6 +862,40 @@ def simplex_update_scale_at_step(training_config: TrainingConfig, step: int | No
     )
 
 
+def simplex_pair_update_runtime_scale_at_step(
+    training_config: TrainingConfig,
+    step: int | None,
+) -> float | None:
+    if training_config.simplex_pair_update_runtime_scale is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_pair_update_runtime_scale)
+    return _ramped_value(
+        training_config.simplex_pair_update_runtime_scale,
+        training_config.simplex_pair_update_runtime_scale_final,
+        step=step,
+        start_step=training_config.simplex_pair_update_runtime_scale_ramp_start_step,
+        ramp_steps=training_config.simplex_pair_update_runtime_scale_ramp_steps,
+    )
+
+
+def simplex_single_update_runtime_scale_at_step(
+    training_config: TrainingConfig,
+    step: int | None,
+) -> float | None:
+    if training_config.simplex_single_update_runtime_scale is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_single_update_runtime_scale)
+    return _ramped_value(
+        training_config.simplex_single_update_runtime_scale,
+        training_config.simplex_single_update_runtime_scale_final,
+        step=step,
+        start_step=training_config.simplex_single_update_runtime_scale_ramp_start_step,
+        ramp_steps=training_config.simplex_single_update_runtime_scale_ramp_steps,
+    )
+
+
 def simplex_outer_edge_context_runtime_scale_at_step(
     training_config: TrainingConfig,
     step: int | None,
@@ -1046,6 +1088,12 @@ def model_inputs_from_batch(
         update_scale_tensor = batch["target_feat"].new_tensor(float(update_scale))
         inputs["simplex_pair_update_scale_override"] = update_scale_tensor
         inputs["simplex_single_update_scale_override"] = update_scale_tensor
+    pair_update_scale = simplex_pair_update_runtime_scale_at_step(training_config, step)
+    if use_simplex_update_scale and pair_update_scale is not None:
+        inputs["simplex_pair_update_scale_override"] = batch["target_feat"].new_tensor(float(pair_update_scale))
+    single_update_scale = simplex_single_update_runtime_scale_at_step(training_config, step)
+    if use_simplex_update_scale and single_update_scale is not None:
+        inputs["simplex_single_update_scale_override"] = batch["target_feat"].new_tensor(float(single_update_scale))
     outer_context_scale = simplex_outer_edge_context_runtime_scale_at_step(training_config, step)
     if use_simplex_outer_edge_context_runtime_scale and outer_context_scale is not None:
         inputs["simplex_outer_edge_context_scale_override"] = batch["target_feat"].new_tensor(
@@ -1875,6 +1923,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-update-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-update-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
+        "--simplex-pair-update-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for selected simplex readout into pair/edge states.",
+    )
+    parser.add_argument("--simplex-pair-update-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-pair-update-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-pair-update-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-single-update-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for selected simplex readout into residue/single states.",
+    )
+    parser.add_argument("--simplex-single-update-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-single-update-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-single-update-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-outer-edge-context-runtime-scale",
         type=float,
         default=None,
@@ -2060,6 +2126,14 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_update_scale_final=args.simplex_update_scale_final,
         simplex_update_scale_ramp_start_step=args.simplex_update_scale_ramp_start_step,
         simplex_update_scale_ramp_steps=args.simplex_update_scale_ramp_steps,
+        simplex_pair_update_runtime_scale=args.simplex_pair_update_runtime_scale,
+        simplex_pair_update_runtime_scale_final=args.simplex_pair_update_runtime_scale_final,
+        simplex_pair_update_runtime_scale_ramp_start_step=args.simplex_pair_update_runtime_scale_ramp_start_step,
+        simplex_pair_update_runtime_scale_ramp_steps=args.simplex_pair_update_runtime_scale_ramp_steps,
+        simplex_single_update_runtime_scale=args.simplex_single_update_runtime_scale,
+        simplex_single_update_runtime_scale_final=args.simplex_single_update_runtime_scale_final,
+        simplex_single_update_runtime_scale_ramp_start_step=args.simplex_single_update_runtime_scale_ramp_start_step,
+        simplex_single_update_runtime_scale_ramp_steps=args.simplex_single_update_runtime_scale_ramp_steps,
         simplex_outer_edge_context_runtime_scale=args.simplex_outer_edge_context_runtime_scale,
         simplex_outer_edge_context_runtime_scale_final=args.simplex_outer_edge_context_runtime_scale_final,
         simplex_outer_edge_context_runtime_scale_ramp_start_step=(

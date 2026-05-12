@@ -71,7 +71,9 @@ from minalphafold.trainer import (  # noqa: E402
     simplex_hodge_face_runtime_scale_at_step,
     simplex_local_neighbor_k_at_step,
     simplex_outer_edge_context_runtime_scale_at_step,
+    simplex_pair_update_runtime_scale_at_step,
     simplex_segment_cell_runtime_scale_at_step,
+    simplex_single_update_runtime_scale_at_step,
     simplex_tetra_top_k_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     simplex_update_scale_at_step,
@@ -619,6 +621,7 @@ def _evaluate(
                     **model_inputs_from_batch(
                         batch,
                         training_config,
+                        use_simplex_update_scale=True,
                         use_simplex_outer_edge_context_runtime_scale=True,
                         use_simplex_hodge_face_runtime_scale=True,
                         use_simplex_edge_frame_message_runtime_scale=True,
@@ -1143,6 +1146,8 @@ def _train_variant(
         apply_loss_weight_schedule(loss_fn, training_config, step)
         teacher_forcing_weight = simplex_topology_teacher_forcing_weight_at_step(training_config, step)
         simplex_update_scale = simplex_update_scale_at_step(training_config, step)
+        simplex_pair_update_runtime_scale = simplex_pair_update_runtime_scale_at_step(training_config, step)
+        simplex_single_update_runtime_scale = simplex_single_update_runtime_scale_at_step(training_config, step)
         simplex_outer_edge_context_runtime_scale = simplex_outer_edge_context_runtime_scale_at_step(
             training_config,
             step,
@@ -1287,6 +1292,16 @@ def _train_variant(
                 ),
                 "simplex_topology_teacher_forcing_weight": teacher_forcing_weight,
                 "simplex_update_scale": float("nan") if simplex_update_scale is None else simplex_update_scale,
+                "simplex_pair_update_runtime_scale": (
+                    float("nan")
+                    if simplex_pair_update_runtime_scale is None
+                    else simplex_pair_update_runtime_scale
+                ),
+                "simplex_single_update_runtime_scale": (
+                    float("nan")
+                    if simplex_single_update_runtime_scale is None
+                    else simplex_single_update_runtime_scale
+                ),
                 "simplex_outer_edge_context_runtime_scale": (
                     float("nan")
                     if simplex_outer_edge_context_runtime_scale is None
@@ -1492,6 +1507,22 @@ def _train_variant(
         "simplex_update_scale_final": training_config.simplex_update_scale_final,
         "simplex_update_scale_ramp_start_step": training_config.simplex_update_scale_ramp_start_step,
         "simplex_update_scale_ramp_steps": training_config.simplex_update_scale_ramp_steps,
+        "simplex_pair_update_runtime_scale": training_config.simplex_pair_update_runtime_scale,
+        "simplex_pair_update_runtime_scale_final": training_config.simplex_pair_update_runtime_scale_final,
+        "simplex_pair_update_runtime_scale_ramp_start_step": (
+            training_config.simplex_pair_update_runtime_scale_ramp_start_step
+        ),
+        "simplex_pair_update_runtime_scale_ramp_steps": (
+            training_config.simplex_pair_update_runtime_scale_ramp_steps
+        ),
+        "simplex_single_update_runtime_scale": training_config.simplex_single_update_runtime_scale,
+        "simplex_single_update_runtime_scale_final": training_config.simplex_single_update_runtime_scale_final,
+        "simplex_single_update_runtime_scale_ramp_start_step": (
+            training_config.simplex_single_update_runtime_scale_ramp_start_step
+        ),
+        "simplex_single_update_runtime_scale_ramp_steps": (
+            training_config.simplex_single_update_runtime_scale_ramp_steps
+        ),
         "simplex_outer_edge_context_runtime_scale": training_config.simplex_outer_edge_context_runtime_scale,
         "simplex_outer_edge_context_runtime_scale_final": (
             training_config.simplex_outer_edge_context_runtime_scale_final
@@ -1705,6 +1736,14 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_update_scale_final",
         "simplex_update_scale_ramp_start_step",
         "simplex_update_scale_ramp_steps",
+        "simplex_pair_update_runtime_scale",
+        "simplex_pair_update_runtime_scale_final",
+        "simplex_pair_update_runtime_scale_ramp_start_step",
+        "simplex_pair_update_runtime_scale_ramp_steps",
+        "simplex_single_update_runtime_scale",
+        "simplex_single_update_runtime_scale_final",
+        "simplex_single_update_runtime_scale_ramp_start_step",
+        "simplex_single_update_runtime_scale_ramp_steps",
         "simplex_outer_edge_context_runtime_scale",
         "simplex_outer_edge_context_runtime_scale_final",
         "simplex_outer_edge_context_runtime_scale_ramp_start_step",
@@ -2072,6 +2111,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-update-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-update-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
+        "--simplex-pair-update-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for selected simplex readout into pair/edge states.",
+    )
+    parser.add_argument("--simplex-pair-update-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-pair-update-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-pair-update-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-single-update-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for selected simplex readout into residue/single states.",
+    )
+    parser.add_argument("--simplex-single-update-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-single-update-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-single-update-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-structure-readout-scale",
         type=float,
         default=None,
@@ -2362,6 +2419,14 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_update_scale_final=args.simplex_update_scale_final,
         simplex_update_scale_ramp_start_step=args.simplex_update_scale_ramp_start_step,
         simplex_update_scale_ramp_steps=args.simplex_update_scale_ramp_steps,
+        simplex_pair_update_runtime_scale=args.simplex_pair_update_runtime_scale,
+        simplex_pair_update_runtime_scale_final=args.simplex_pair_update_runtime_scale_final,
+        simplex_pair_update_runtime_scale_ramp_start_step=args.simplex_pair_update_runtime_scale_ramp_start_step,
+        simplex_pair_update_runtime_scale_ramp_steps=args.simplex_pair_update_runtime_scale_ramp_steps,
+        simplex_single_update_runtime_scale=args.simplex_single_update_runtime_scale,
+        simplex_single_update_runtime_scale_final=args.simplex_single_update_runtime_scale_final,
+        simplex_single_update_runtime_scale_ramp_start_step=args.simplex_single_update_runtime_scale_ramp_start_step,
+        simplex_single_update_runtime_scale_ramp_steps=args.simplex_single_update_runtime_scale_ramp_steps,
         simplex_outer_edge_context_runtime_scale=args.simplex_outer_edge_context_runtime_scale,
         simplex_outer_edge_context_runtime_scale_final=args.simplex_outer_edge_context_runtime_scale_final,
         simplex_outer_edge_context_runtime_scale_ramp_start_step=(
@@ -2509,6 +2574,18 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_update_scale_final": args.simplex_update_scale_final,
         "simplex_update_scale_ramp_start_step": args.simplex_update_scale_ramp_start_step,
         "simplex_update_scale_ramp_steps": args.simplex_update_scale_ramp_steps,
+        "simplex_pair_update_runtime_scale": args.simplex_pair_update_runtime_scale,
+        "simplex_pair_update_runtime_scale_final": args.simplex_pair_update_runtime_scale_final,
+        "simplex_pair_update_runtime_scale_ramp_start_step": (
+            args.simplex_pair_update_runtime_scale_ramp_start_step
+        ),
+        "simplex_pair_update_runtime_scale_ramp_steps": args.simplex_pair_update_runtime_scale_ramp_steps,
+        "simplex_single_update_runtime_scale": args.simplex_single_update_runtime_scale,
+        "simplex_single_update_runtime_scale_final": args.simplex_single_update_runtime_scale_final,
+        "simplex_single_update_runtime_scale_ramp_start_step": (
+            args.simplex_single_update_runtime_scale_ramp_start_step
+        ),
+        "simplex_single_update_runtime_scale_ramp_steps": args.simplex_single_update_runtime_scale_ramp_steps,
         "simplex_outer_edge_context_runtime_scale": args.simplex_outer_edge_context_runtime_scale,
         "simplex_outer_edge_context_runtime_scale_final": args.simplex_outer_edge_context_runtime_scale_final,
         "simplex_outer_edge_context_runtime_scale_ramp_start_step": (
