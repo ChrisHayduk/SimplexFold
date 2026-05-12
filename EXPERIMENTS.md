@@ -59,13 +59,14 @@ The 2026-05-12 full reread adds several concrete filters for the next queue:
   through the selected complex; a generic pooled coordinate head is out of
   scope.
 
-The current full-read pass keeps the live queue narrow. E91 is justified as a
-weak directed outer-edge cochain-communication test on the sparse E81/E86
-complex. The outer-edge-supported scorer remains a good fallback because it
-changes selected-cell construction by rewarding candidate cells with available
-external boundary edges. Generic radius, C-alpha lDDT, or all-pairs distance
-losses should stay out of the queue unless they supervise only the selected
-sparse complex.
+The current full-read pass keeps the live queue narrow. E96 is justified as a
+directed-incidence curriculum on the sparse E87 complex: it relaxes how
+selected face/tetra cochains write back into directed boundary edges rather
+than adding an output-side metric loss. If E96 fails, the next paper-aligned
+ideas should be delayed edge-centric scalarization or latent selected segment
+cochains derived only from official sequence/MSA/pair features and recycled
+geometry. Generic radius, C-alpha lDDT, or all-pairs distance losses should
+stay out of the queue unless they supervise only the selected sparse complex.
 
 ## Paper-Informed Backlog
 
@@ -641,7 +642,7 @@ E93, and boundary-edge reuse stayed high. Do not continue the filtration path.
 
 ### E95 Candidate: Outer-Edge Context With Directed Boundary Readout
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: the E93/E94 filtration family improves selected-boundary
 diagnostics at the cost of primary lDDT, so the next gate should keep the
@@ -664,7 +665,7 @@ preserves the E86/E87 primary-lDDT band while improving FoldScore/dRMSD and
 selected-boundary diagnostics. Reject if the two communication routes
 interfere and primary lDDT drops into the E89/E94 band.
 
-Launch: E95 is running as
+Launch: E95 ran as
 `e95_outer_edge_directed_boundary_from_e81_s8500_c256_m64`, Python PID
 `12566`, from the E81 checkpoint at step 8000/examples 64000. Remote
 prelaunch checks found no active Python benchmark process, confirmed the E81
@@ -677,6 +678,37 @@ path is
 `/workspace/SimplexFold/logs/e95_outer_edge_directed_boundary_from_e81.log`,
 and the artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e95_outer_edge_directed_boundary_from_e81_s8500_c256_m64/`.
+
+Result: reject as a primary-lDDT branch. E95 reached `val_lddt_ca=0.3931`,
+FoldScore `0.3817`, `val_ca_drmsd=9.9984`, and predicted/true C-alpha radius
+`11.7152 / 15.4034`. It produced the best dRMSD in this local branch, but
+primary lDDT fell well below E86 and E87, FoldScore also stayed below E86,
+and selected face/tetra boundary lDDT softened to `0.7295` / `0.7140`.
+Stacking outer-edge context and directed boundary readout interferes with the
+local C-alpha objective, so stop combining those routes for now.
+
+### E96 Candidate: Anneal Directed Boundary Readout After E87
+
+Status: planned after E95.
+
+Hypothesis: E87's directed source/target boundary readout produced the
+current tiny primary-lDDT best, but E92 showed that holding directionality at
+`0.5` during a continuation causes regression. Treat the directed readout as
+a topology curriculum instead: use it to shape pair/cochain communication,
+then partially relax it so the structure module can keep local C-alpha
+agreement while retaining some source/target incidence signal.
+
+Mechanism: resume the E87 checkpoint from step 8500 to 9000 with the same
+fixed `24/48` sparse caps, degree-penalized cell scoring, selected-boundary
+realization losses, edge-frame messages, and incidence-normalized boundary
+transport, but ramp `simplex_boundary_readout_directionality` from `0.5` down
+to `0.25` over the 8500-9000 gate. This changes only the directed incidence
+readout strength of selected higher-rank cells into `Z_ij`; it adds no
+parameters and no generic output loss.
+
+Decision rule: keep only if E96 preserves or improves E87's primary
+`val_lddt_ca=0.3992` while avoiding E92's held-directionality regression.
+Reject if annealing directionality still falls below the E86/E87 band.
 
 ## Experiment Queue
 

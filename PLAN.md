@@ -1,4 +1,4 @@
-## Current Plan: E94 Moderate Filtration With Directed Boundary Readout
+## Current Plan: E96 Annealed Directed Boundary Readout
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -322,16 +322,30 @@ E93. The interpretation is that further cap tightening, even moderate
 tightening, is trading away local C-alpha agreement faster than it improves
 the useful selected complex.
 
-The active Runpod gate is E95: keep the broader E81 `24/48` sparse
-complex and combine the two best cochain-communication routes instead of
-filtering further. Resume E81 from step 8000 to 8500 with incidence-normalized
-boundary transport, weak directed outer-edge context ramped `0.0 -> 0.025`
-as in E86, and directed boundary readout ramped `0.0 -> 0.5` as in E87. This
-tests whether outer-edge context can improve the face/tetra states that
-directed boundary readout writes back into `Z_ij`, without adding a generic
-coordinate loss. Use the `--max-parameters 3261974` runner guard; the expected
-parameter count is `3,230,834`, still within the 5% cap. Startup loaded 1244
-matching E81 tensors and initialized 48 outer-edge-context tensors.
+E95 also rejected as a primary-lDDT branch. It kept the broader E81 `24/48`
+sparse complex and stacked weak directed outer-edge context with directed
+boundary readout. The result was `val_lddt_ca=0.3931`, below both E86 and
+E87, even though `val_ca_drmsd=9.9984` was the best local dRMSD. The selected
+face/tetra boundary lDDT softened to `0.7295` / `0.7140`, so stacking the two
+communication routes improves one global geometry metric while interfering
+with local C-alpha agreement.
+
+The active next gate should be E96: treat E87's directed boundary readout as a
+curriculum rather than a permanent setting. Resume E87 from step 8500 to 9000
+and ramp boundary-readout directionality down from `0.5` to `0.25`, while
+keeping the same fixed `24/48` sparse caps, degree-penalized selected cells,
+selected-boundary realization losses, edge-frame messages, and
+incidence-normalized boundary transport. E92 showed that holding
+directionality at `0.5` regresses; E96 tests whether partial relaxation keeps
+the useful directed-incidence signal without overdriving the pair tensor.
+This is zero-parameter and should remain at `3,154,242` parameters.
+
+The current 2026-05-12 full reread of the saved PDFs reinforces the E79-E81
+direction and the E96 interpretation. The right lesson is not to add another
+generic coordinate objective; it is to treat directed incidence as a
+cochain-routing curriculum and to measure whether that route helps the selected
+complex write useful edge information back into `Z_ij` without overdriving the
+pair tensor.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank

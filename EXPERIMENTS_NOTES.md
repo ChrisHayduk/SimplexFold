@@ -3629,3 +3629,39 @@
   at about `15,205 MiB`, GPU utilization sampled at `79%`, and the log still
   showed the clean E81 resume with 1244 matching tensors loaded and 48
   new/missing outer-edge-context tensors initialized.
+- E95 returned on owned pod `o1dy17ouv8w5mz`: step 8500
+  `val_lddt_ca=0.39309102669358253`, FoldScore `0.3817453645169735`,
+  `val_ca_drmsd=9.998381435871124`, predicted/true C-alpha radius
+  `11.715169727802277 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.7295449376106262` / `0.7139960415661335`, boundary length MAE
+  `1.1037089079618454` / `1.204644788056612`, contraction fractions
+  `0.6324849687516689` / `0.6339563354849815`, boundary-edge mean degree
+  `11.942960619926453` / `34.161340832710266`, and boundary unique-edge
+  fraction `0.0840773594868793` / `0.029563833235177802`.
+- E95 interpretation: reject as a primary-lDDT branch. Stacking weak
+  outer-edge context with directed boundary readout improved dRMSD but
+  primary lDDT fell well below E86/E87, and selected-boundary lDDT softened.
+  Do not keep stacking these cochain-communication routes as the next main
+  path.
+- Copied E95 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e95_outer_edge_directed_boundary_from_e81_s8500_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e95_outer_edge_directed_boundary_from_e81.log`. The local artifact
+  pull excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8000` to add the E95 row to `EXPERIMENT_RESULTS.md`, so inherited E81
+  history does not count as E95's best validation lDDT.
+- E96 launch decision: resume the E87 checkpoint from step 8500 to 9000 and
+  anneal boundary-readout directionality from `0.5` down to `0.25`. E92 showed
+  that holding directionality at `0.5` regresses; E96 tests whether directed
+  boundary readout is better as a partial cochain-routing curriculum than as a
+  fixed setting.
+- Re-extracted and read both saved reference PDFs end to end for the current
+  request: the TDL guide is 28 pages / 3,799 extracted words, and Topotein is
+  22 pages / 10,651 extracted words. The saved copies in `references/papers/`
+  hash-match the user-provided Downloads files and remain git-ignored pending
+  redistribution-rights confirmation. The reading does not justify a generic
+  C-alpha lDDT, radius, or all-pairs distance loss; it supports E96 as a
+  directed-incidence cochain-routing curriculum and points to delayed
+  edge-centric scalarization or latent selected segment cochains as the next
+  paper-aligned architecture branches if E96 regresses.

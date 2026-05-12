@@ -280,3 +280,37 @@ Current experiment implications:
   pretrained features into NanoFold official paths. Topotein's hierarchy must
   be adapted through latent selected cells built from official inputs and
   recycled predictions.
+
+## 2026-05-12 Current Request Full Intake
+
+I re-extracted and read both saved repo copies end to end:
+
+- `hands_on_geometric_deep_learning_nodes_to_complexes.pdf`: 28 pages,
+  3,799 extracted words.
+- `2509.03885v1.pdf`: 22 pages, 10,651 extracted words.
+
+The saved PDFs still hash-match the user-provided files in Downloads and are
+kept local/ignored until redistribution rights are clear.
+
+Experiment implications for the active SimplexFold queue:
+
+- The TDL guide supports treating the selected topological domain as part of
+  the model. For SimplexFold, that means neighbor selection, active
+  face/tetra cells, incidence operators, and rank-to-rank aggregation routes
+  are legitimate experiment variables.
+- Topotein's most portable ideas are directed interaction edges, outer-edge
+  neighborhoods, edge-centric scalarization, and multi-rank message passing.
+  Its DSSP/SSE-derived 2-cells are not directly admissible for NanoFold
+  official inference, so any secondary-structure-like route must be latent and
+  built from official inputs plus recycled predictions.
+- E96 remains paper-aligned because it treats directed boundary readout as a
+  scheduled incidence-routing mechanism, not as a generic lDDT or radius
+  objective.
+- If E96 regresses, the next architecture branch should be a delayed
+  edge-centric scalarization path for selected face/tetra information or a
+  runtime-gated latent segment cochain. Both would alter cochain communication
+  in the SimplexFold complex while preserving the NanoFold no-external-data
+  contract.
+- Do not add dense C-alpha lDDT, radius-of-gyration, or all-pairs distance
+  losses as independent score hacks. A loss is justified only when it
+  supervises realization of the model-selected sparse complex.
