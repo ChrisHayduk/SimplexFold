@@ -1,4 +1,4 @@
-## Current Plan: E77 Coface-Degree-Attenuated Boundary Messages
+## Current Plan: E78 Light-Geometry Selector Continuation
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -152,15 +152,6 @@ FoldScore edged up to `0.3723`, but `val_ca_drmsd` worsened to `10.2191`,
 predicted/true C-alpha radius moved to `12.0036 / 15.4034`, and selected
 face/tetra boundary lDDT softened to `0.5341` / `0.5185`.
 
-The active next branch is E77: add coface-degree attenuation to the selected
-boundary-edge message readout and resume from the stronger E73 checkpoint.
-This keeps the same face/tetra cell complex but changes its incidence
-operator: pair updates on boundary edges reused by many selected cells are
-damped by the edge's coface degree after the usual incidence average. It adds
-no parameters and addresses the high boundary-edge reuse diagnostic directly.
-The first gate uses `--simplex-boundary-message-degree-attenuation 0.25` with
-the E76 recipe, effective batch 8, crop 256, MSA depth 64, and no templates.
-
 E77 tested coface-degree attenuation on the selected boundary-edge readout.
 Reject it as a primary-lDDT branch: step 6000 reached `val_lddt_ca=0.3733`,
 below E73's `0.3807`, and FoldScore softened to `0.3710`. The diagnostic is
@@ -169,12 +160,20 @@ still useful: selected face/tetra boundary lDDT improved to `0.5421` /
 attenuation therefore cleans up selected-boundary realization but is not
 enough by itself to preserve local C-alpha agreement.
 
-The active branch is now E74 on a second owned Runpod H100 pod
-`o1dy17ouv8w5mz` as `e74_light_geom0025_from_e73_s6000_c256_m64`. This tests
-the prepared topology-construction alternative: keep the E73/E77 loss and
-edge-frame recipe, but reduce the recycled-geometry selector weight to
-`0.025` so learned pair/contact topology has more control over which sparse
-face/tetra cochains exist.
+E74 tested the prepared topology-construction alternative: keep the E73/E77
+loss and edge-frame recipe, but reduce the recycled-geometry selector weight
+to `0.025` so learned pair/contact topology has more control over which sparse
+face/tetra cochains exist. Keep it as the new primary-lDDT leader. Step 6000
+reached `val_lddt_ca=0.3841`, above E73's `0.3807`, with selected face/tetra
+boundary lDDT improving to `0.5409` / `0.5258` and boundary length MAE
+improving to `2.5149` / `2.6510`. The caveat is that FoldScore softened to
+`0.3666` and dRMSD to `10.1893`, so the branch still needs continuation and
+diagnostic monitoring rather than a 30k-step commitment.
+
+The active branch is now E78 on the owned H100 pod `o1dy17ouv8w5mz` as
+`e78_light_geom0025_from_e74_s6500_c256_m64`. It resumes the E74 checkpoint
+from step 6000 to 6500 with the same light-geometry selector, selected
+boundary-edge losses, and half-scale edge-frame message recipe.
 
 The other prepared alternative is still E75. It
 caps active face/tetra cells per anchor with `--simplex-face-top-k` and
@@ -185,10 +184,10 @@ than generic output-coordinate losses.
 The 2026-05-12 full-text recheck of the saved reference PDFs keeps this plan
 topology-first. The strongest paper-derived criterion is that a new branch
 should change the selected cell complex, incidence/outer-edge communication,
-or realization of selected cells. E74 satisfies that by changing the
-recycled-geometry prior in topology construction; E75 is the next prepared
-fallback because it sparsifies which higher-rank cochains exist and send
-messages.
+or realization of selected cells. E74/E78 satisfy that by changing the
+recycled-geometry prior in topology construction; E75 remains the next
+prepared fallback because it sparsifies which higher-rank cochains exist and
+send messages.
 
 Yes. With templates forbidden, the right construction is:
 

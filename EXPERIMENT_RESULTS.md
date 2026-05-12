@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-12.
 
-Best validation C-alpha lDDT so far: **E73**, `val_lddt_ca=0.3807` at step
-5500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E74**, `val_lddt_ca=0.3841` at step
+6000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -90,6 +90,7 @@ recorded in the running notes for that run.
 | E70 edge-frame messages 0.025 | completed | 4500 | 0.3742 | 0.3742 | 0.3653 | 10.3425 | 11.4815 / 15.4034 | kept; tiny new best with improved selected-boundary diagnostics |
 | E71 continue edge-frame 0.025 | completed | 5000 | 0.3751 | 0.3751 | 0.3679 | 10.1926 | 11.4483 / 15.4034 | kept; new best lDDT/FoldScore/dRMSD but boundary lDDT softened |
 | E72 continue edge-frame 0.025 to 5500 | completed | 5500 | 0.3718 | 0.3718 | 0.3722 | 10.1027 | 12.0872 / 15.4034 | rejected; FoldScore/dRMSD/boundary diagnostics improved but primary lDDT fell below E71 |
-| E73 half-scale edge-frame 0.0125 to 5500 | completed | 5500 | 0.3807 | 0.3807 | 0.3720 | 10.0777 | 11.6741 / 15.4034 | kept; new best lDDT/FoldScore/dRMSD, boundary diagnostics below E72 |
+| E73 half-scale edge-frame 0.0125 to 5500 | completed | 5500 | 0.3807 | 0.3807 | 0.3720 | 10.0777 | 11.6741 / 15.4034 | kept; previous best lDDT/FoldScore/dRMSD, boundary diagnostics below E72 |
+| E74 light geometry selector 0.025 | completed | 6000 | 0.3841 | 0.3841 | 0.3666 | 10.1893 | 11.4266 / 15.4034 | keep as new primary lDDT leader; continue same light-geometry topology-construction branch from E74 |
 | E76 continue edge-frame 0.0125 to 6000 | completed | 6000 | 0.3713 | 0.3713 | 0.3723 | 10.2191 | 12.0036 / 15.4034 | rejected; continuing half-scale edge-frame reduced lDDT below E73 despite a tiny FoldScore uptick |
 | E77 coface-degree atten 0.25 | completed | 6000 | 0.3733 | 0.3733 | 0.3710 | 10.1286 | 11.8632 / 15.4034 | rejected; improves selected-boundary diagnostics but primary lDDT remains below E73 |

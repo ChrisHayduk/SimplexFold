@@ -2662,3 +2662,38 @@
   alter the selected cell complex, incidence operators, outer-edge or
   boundary-edge communication, or selected-cell realization diagnostics. Do
   not promote a generic all-pairs coordinate loss just to chase lDDT.
+- E74 returned on owned pod `o1dy17ouv8w5mz`: step 6000
+  `val_lddt_ca=0.38410646840929985`, FoldScore `0.3665613066405058`,
+  `val_ca_drmsd=10.189340263605118`, predicted/true C-alpha radius
+  `11.426604449748993 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.5408848244696856` / `0.5257674232125282`, boundary length MAE
+  `2.514910012483597` / `2.650992676615715`, contraction fractions
+  `0.5940733812749386` / `0.5957129746675491`, and boundary-edge mean degree
+  `11.593819439411163` / `77.29213094711304`.
+- E74 interpretation: keep as the new primary-lDDT leader. It improves E73's
+  `0.3807267025113106` local C-alpha lDDT and improves selected-boundary
+  lDDT/length/contraction diagnostics, supporting the topology-construction
+  hypothesis behind the lighter recycled-geometry selector. FoldScore and
+  dRMSD softened versus E73, so continue with a short gate rather than a
+  30,000-step commitment.
+- Copied E74 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e74_light_geom0025_from_e73_s6000_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e74_light_geom0025_from_e73.log`. The local artifact pull excluded the
+  checkpoint directory; the remote E74 checkpoint remains available for the
+  continuation.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step 5500`
+  to add the E74 row to `EXPERIMENT_RESULTS.md`, so inherited E73 history does
+  not count as E74's best validation lDDT.
+- E78 launched on the same owned H100 pod `o1dy17ouv8w5mz` with run name
+  `e78_light_geom0025_from_e74_s6500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e78_light_geom0025_from_e74.log`, and artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e78_light_geom0025_from_e74_s6500_c256_m64/`.
+  Remote prelaunch checks found no active Python benchmark process, py_compile
+  passed for `minalphafold/simplex.py`, `minalphafold/model_config.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`, parser support for
+  `--simplex-geometry-distance-weight` was confirmed, and the E74 checkpoint
+  was present. Main Python PID is `1969`. The runner resumed E74 at step
+  6000/examples 48000, loaded 1244 matching model tensors, initialized 0
+  new/missing tensors, and started a fresh optimizer.
