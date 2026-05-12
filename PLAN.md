@@ -127,6 +127,17 @@ coordinate weights `1.0`, selected boundary coordinate-distance weights `0.5`,
 step-4500 lDDT improves over E65/E67/E69 without losing E64's selected-boundary
 diagnostics; continue only if it approaches or exceeds E64.
 
+E70 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` from commit
+`bf7de3d`. Launch audit passed with public train/val/all counts
+`10000/1000/11000`, remote manifest files exactly `all.txt`, `train.txt`, and
+`val.txt`, hidden manifest/features/labels absent, feature/label NPZ counts
+`11000/11000`, the E64 checkpoint present, FoldScore import working, CUDA
+reporting `NVIDIA B200`, no AppleDouble sidecar feature files,
+`--simplex-edge-frame-message-scale 0.025` and the `0.0 -> 0.025` runtime
+ramp recorded in `run_metadata.json`, and `3,154,242` parameters (`+1.53%`
+versus AF2-medium pair-only). Do not add E70 to `EXPERIMENT_RESULTS.md` until
+the Runpod run returns.
+
 Yes. With templates forbidden, the right construction is:
 
 [

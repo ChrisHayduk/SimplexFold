@@ -2409,7 +2409,7 @@ stopped and deleted; a post-delete lookup returned 404.
 
 ### E70: Damped Edge-Frame Boundary Messages
 
-Status: planned for Runpod.
+Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
 
 Hypothesis: E69 suggests that supervising selected face orientation as a
 separate auxiliary target weakens the boundary geometry. The orientation-aware
@@ -2434,6 +2434,20 @@ weights `0.5`, `simplex_aux_weight=0.5`,
 `--simplex-edge-frame-message-runtime-scale-final 0.025`,
 `--simplex-edge-frame-message-runtime-scale-ramp-start-step 4000`, and
 `--simplex-edge-frame-message-runtime-scale-ramp-steps 500`.
+
+Launch: E70 is running on owned Runpod B200 pod `lovgzo4hz2k4fp`
+(`codex-simplexfold-e70-runpod-20260512`) from commit `bf7de3d`. Clean launch
+audit after copying only public data/code: public train/val/all manifest
+counts are `10000/1000/11000`, remote manifest files are exactly `all.txt`,
+`train.txt`, and `val.txt`, hidden manifest/features/labels are absent,
+feature/label `.npz` counts are `11000/11000`, no AppleDouble sidecar feature
+files are present, E64 checkpoint present, B200 CUDA available, NanoFold
+`foldscore_components` import works, AF2-medium pair-only has `3,106,642`
+parameters, and E70 edge-frame model has `3,154,242` parameters (`+1.53%`).
+`run_metadata.json` records `simplex_edge_frame_message_scale=0.025`, runtime
+edge-frame scale `0.0 -> 0.025`, ramp start step `4000`, ramp steps `500`,
+weights-only resume from E64, crop 256, MSA depth 64, and no templates. Do
+not add E70 to `EXPERIMENT_RESULTS.md` until the Runpod run returns.
 
 Decision rule: keep only if step-4500 lDDT improves over E65/E67/E69 and does
 not lose E64's selected-boundary lDDT/contraction diagnostics. Continue only if
