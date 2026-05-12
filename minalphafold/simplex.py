@@ -1361,6 +1361,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
+        simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
@@ -1398,6 +1399,12 @@ class SimplicialAdapter(torch.nn.Module):
             boundary_readout_directionality = min(
                 max(float(simplex_boundary_readout_directionality_override.detach().float().cpu().item()), 0.0),
                 1.0,
+            )
+        segment_cell_scale = self.segment_cell_scale
+        if simplex_segment_cell_scale_override is not None:
+            segment_cell_scale = max(
+                float(simplex_segment_cell_scale_override.detach().float().cpu().item()),
+                0.0,
             )
         local_neighbor_k = self.local_neighbor_k
         if simplex_local_neighbor_k_override is not None:
@@ -1489,7 +1496,7 @@ class SimplicialAdapter(torch.nn.Module):
         face_state = self.face_init(torch.cat([z_ij, z_ik, z_jk, s_i, s_j, s_k, face_geom], dim=-1))
         face_state = face_state * topology.face_mask[..., None]
         segment_state = pair.new_empty((pair.shape[0], pair.shape[1], 0))
-        if self.segment_cell_scale > 0.0:
+        if self.segment_cell_scale > 0.0 and segment_cell_scale > 0.0:
             segment_state = self._segment_pass(
                 pair,
                 single,
@@ -1504,14 +1511,14 @@ class SimplicialAdapter(torch.nn.Module):
                 msa_mask=msa_mask,
             )
             face_state = face_state * topology.face_mask[..., None]
-        if self.segment_cell_scale > 0.0:
+        if self.segment_cell_scale > 0.0 and segment_cell_scale > 0.0:
             seg_i = gather_single(segment_state, i)
             seg_j = gather_single(segment_state, j)
             seg_k = gather_single(segment_state, k)
             segment_context = (seg_i + seg_j + seg_k) / 3.0
             segment_msg = self.segment_to_face(torch.cat([face_state, segment_context], dim=-1))
             face_state = face_state + self.dropout(
-                self.segment_cell_scale
+                segment_cell_scale
                 * torch.sigmoid(self.face_gate(face_state))
                 * segment_msg
                 * topology.face_mask[..., None]

@@ -214,6 +214,35 @@
   active, the run metadata existed, and the E81 checkpoint loaded cleanly:
   `1244` tensors loaded and `48` new/missing tensors initialized for the
   outer-edge context path.
+- E88 local implementation prepared while E86 runs: added a training-time
+  runtime override for `simplex_segment_cell_scale`. This lets a resumed model
+  allocate the existing latent contiguous segment-cell path but ramp its
+  segment-to-face contribution gently, instead of switching a fresh rank-2
+  cochain route on at full strength. The motivation is Topotein's
+  secondary-structure-cell hierarchy, adapted without DSSP/SSE labels by using
+  official sequence/MSA/pair features and recycled geometry only.
+- E88 is a fallback after E86/E87, not an active run. A cautious gate should
+  resume the strongest sparse-complex checkpoint, allocate
+  `--simplex-segment-cell-scale 0.05 --simplex-segment-radius 4
+  --simplex-c-segment 12`, and ramp runtime scale from `0.0` to `0.05` across
+  the 500-step gate while keeping the degree-penalized sparse selector and
+  selected-boundary recipe fixed.
+- E88 local validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py
+  minalphafold/model.py minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest
+  tests/test_simplex.py::test_segment_cells_change_face_mediated_outputs_within_adapter
+  tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser
+  tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs
+  tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation
+  tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula
+  tests/test_trainer.py::test_simplicial_segment_cells_stay_within_medium_budget`
+  reported `6 passed`.
+- Broader E88 validation also passed:
+  `python -m pytest tests/test_simplex.py
+  tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` reported
+  `157 passed`.
 
 ## 2026-05-09
 

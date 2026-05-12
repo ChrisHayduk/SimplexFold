@@ -252,6 +252,44 @@ Validation:
 - `python -m pytest tests/test_simplex.py::test_boundary_readout_directionality_preserves_pair_orientation tests/test_simplex.py::test_boundary_readout_directionality_override_gates_pair_readout tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_boundary_readout_directionality_adds_no_parameters`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
+### E88 Candidate: Runtime-Gated Latent Segment Cells
+
+Status: implemented locally; not launched.
+
+Hypothesis: Topotein's secondary-structure-cell rank is not directly usable in
+NanoFold because official inference cannot depend on DSSP/SSE annotations.
+SimplexFold can still test the same topological idea with latent contiguous
+segment cells built from official sequence/MSA/pair features and recycled
+geometry. The previous static segment-cell sidecar was too abrupt early in
+training; a runtime-gated version may let a resumed sparse-complex checkpoint
+use weak local segment cochains without disrupting the learned face/tetra
+complex.
+
+Mechanism: add a training-time override for `simplex_segment_cell_scale`.
+`simplex_segment_cell_scale` still allocates the existing segment-cell modules,
+but `simplex_segment_cell_runtime_scale` can ramp the actual segment-to-face
+update from zero to a small value. This changes the cochain communication path
+from latent local segment cells into selected face states; it is not a new
+coordinate-output loss.
+
+Prepared gate: do not launch while E86 is active. If E86/E87 fail to recover
+a primary-lDDT gain, resume the strongest sparse-complex checkpoint and add a
+very weak latent segment route:
+`--simplex-segment-cell-scale 0.05`,
+`--simplex-segment-cell-runtime-scale 0.0`,
+`--simplex-segment-cell-runtime-scale-final 0.05`,
+`--simplex-segment-cell-runtime-scale-ramp-start-step 8000`,
+`--simplex-segment-cell-runtime-scale-ramp-steps 500`,
+`--simplex-segment-radius 4`, and `--simplex-c-segment 12`. Keep the
+degree-penalized sparse selector, selected-boundary realization losses, and
+fixed `24`/`48` cell caps.
+
+Validation:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_segment_cells_change_face_mediated_outputs_within_adapter tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_segment_cells_stay_within_medium_budget`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+
 ## Experiment Queue
 
 ### E00: Matched Short-Run Baseline

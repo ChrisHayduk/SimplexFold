@@ -979,11 +979,27 @@ def test_segment_cells_change_face_mediated_outputs_within_adapter():
     coords = torch.randn(1, 5, 3)
 
     off_pair, off_single, _ = off_adapter(pair, single, recycled_ca_coords=coords)
+    gated_pair, gated_single, _ = on_adapter(
+        pair,
+        single,
+        recycled_ca_coords=coords,
+        simplex_segment_cell_scale_override=pair.new_tensor(0.0),
+    )
     on_pair, on_single, _ = on_adapter(pair, single, recycled_ca_coords=coords)
+    ramped_pair, ramped_single, _ = on_adapter(
+        pair,
+        single,
+        recycled_ca_coords=coords,
+        simplex_segment_cell_scale_override=pair.new_tensor(0.25),
+    )
 
     assert sum(p.numel() for p in on_adapter.parameters()) > sum(p.numel() for p in off_adapter.parameters())
+    assert torch.allclose(gated_pair, off_pair)
+    assert torch.allclose(gated_single, off_single)
     assert not torch.allclose(on_pair, off_pair)
     assert not torch.allclose(on_single, off_single)
+    assert torch.allclose(ramped_pair, on_pair)
+    assert torch.allclose(ramped_single, on_single)
 
 
 def test_simplex_geometry_features_are_rigid_transform_invariant():

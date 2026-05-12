@@ -271,6 +271,14 @@ from `0.0` to `0.5` rather than switching it on abruptly. This is another
 zero-parameter cochain-communication test aligned with the directed-incidence
 view rather than a new metric loss.
 
+A third prepared fallback is runtime-gated latent segment cells. This borrows
+Topotein's secondary-structure-cell idea without using DSSP/SSE labels:
+segment cochains are derived only from official sequence/MSA/pair features and
+recycled geometry, then passed into selected face states. The new
+`simplex_segment_cell_runtime_scale` gate lets a resumed sparse-complex model
+allocate that local rank-2 route but ramp its contribution from zero, avoiding
+the abrupt static sidecar tested much earlier.
+
 Yes. With templates forbidden, the right construction is:
 
 [
