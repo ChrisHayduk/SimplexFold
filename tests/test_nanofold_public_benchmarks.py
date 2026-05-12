@@ -632,6 +632,17 @@ def test_simplex_topology_metrics_report_boundary_reuse():
         "simplex_face_mask": torch.ones(1, 1, 2),
         "simplex_tetra_indices": torch.tensor([[[[0, 1, 2, 3]]]]),
         "simplex_tetra_mask": torch.ones(1, 1, 1),
+        "simplex_neighbor_indices": torch.tensor(
+            [
+                [
+                    [1, 2, 3, 4],
+                    [0, 2, 3, 4],
+                    [0, 1, 3, 4],
+                    [0, 1, 2, 4],
+                    [0, 1, 2, 3],
+                ]
+            ]
+        ),
     }
 
     metrics = _simplex_topology_metrics(outputs)
@@ -641,8 +652,13 @@ def test_simplex_topology_metrics_report_boundary_reuse():
     assert abs(metrics["simplex_face_boundary_edge_mean_degree"][0] - 1.2) < 1e-6
     assert metrics["simplex_face_boundary_edge_max_degree"] == [2.0]
     assert metrics["simplex_face_boundary_unique_edge_fraction"] == [5.0 / 6.0]
+    assert metrics["simplex_face_outer_edge_mean_degree"] == [6.0]
+    assert metrics["simplex_face_outer_edge_max_degree"] == [6.0]
+    assert metrics["simplex_face_outer_edge_active_fraction"] == [1.0]
     assert metrics["simplex_tetra_active_cells"] == [1.0]
     assert metrics["simplex_tetra_boundary_edge_mean_degree"] == [1.0]
+    assert metrics["simplex_tetra_outer_edge_mean_degree"] == [4.0]
+    assert metrics["simplex_tetra_outer_edge_active_fraction"] == [1.0]
 
 
 def test_simplex_boundary_geometry_metrics_report_selected_edge_errors():

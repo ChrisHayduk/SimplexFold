@@ -262,8 +262,11 @@ a valid topology-construction lever. E85 showed that plain incidence
 normalization is not enough. The existing `simplex_outer_edge_context_scale`
 path already supplies directed incoming and outgoing outer-edge summaries, so
 the paper-aligned E86 version is to combine that path with sparse cells plus
-incidence normalization, not to add a second duplicate outer-edge module. A
-second prepared fallback is directed boundary readout:
+incidence normalization, not to add a second duplicate outer-edge module.
+Future runs now report selected face/tetra outer-edge availability alongside
+boundary-edge reuse, so E86-style runs can be interpreted in terms of the
+actual selected cochain neighborhoods. A second prepared fallback is directed
+boundary readout:
 `simplex_boundary_readout_directionality` keeps the default symmetric
 simplex-to-pair scatter at `0`, but can blend toward source/target directed
 boundary-edge writes. The prepared test should ramp the runtime contribution

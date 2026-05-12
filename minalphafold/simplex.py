@@ -1314,6 +1314,7 @@ class SimplicialAdapter(torch.nn.Module):
                 "simplex_face_mask": pair.new_empty((b, l, 0)),
                 "simplex_tetra_mask": pair.new_empty((b, l, 0)),
                 "simplex_tetra_face_slots": torch.empty((0, 3), device=pair.device, dtype=torch.long),
+                "simplex_neighbor_indices": torch.empty((b, l, 0), device=pair.device, dtype=torch.long),
             }
         )
         return aux
@@ -1793,6 +1794,7 @@ class SimplicialAdapter(torch.nn.Module):
                 "simplex_face_mask": topology.face_mask,
                 "simplex_tetra_mask": topology.tetra_mask,
                 "simplex_tetra_face_slots": topology.tetra_face_slots,
+                "simplex_neighbor_indices": topology.nbr_idx,
             }
         )
         if self.structure_readout_scale > 0.0:

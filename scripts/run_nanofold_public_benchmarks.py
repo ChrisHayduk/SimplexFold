@@ -273,8 +273,31 @@ def _simplex_boundary_edges(indices: torch.Tensor, simplex_rank: int) -> torch.T
     return torch.stack(parts, dim=-2).sort(dim=-1).values
 
 
+def _simplex_outer_edge_degrees(
+    indices: torch.Tensor,
+    mask: torch.Tensor,
+    neighbor_indices: torch.Tensor,
+) -> torch.Tensor:
+    if indices.numel() == 0 or neighbor_indices.numel() == 0:
+        return mask.new_zeros(mask.shape)
+    batch_size = indices.shape[0]
+    vertices = indices.clamp(min=0, max=max(neighbor_indices.shape[1] - 1, 0))
+    batch_ids = torch.arange(batch_size, device=indices.device).view(batch_size, 1, 1, 1)
+    batch_ids = batch_ids.expand_as(vertices)
+    outer_nbrs = neighbor_indices[batch_ids, vertices]
+    is_inner = (outer_nbrs[..., None] == vertices[..., None, None, :]).any(dim=-1)
+    outer_mask = (~is_inner).to(mask.dtype) * mask[..., None, None].to(mask.dtype)
+    return outer_mask.sum(dim=(-2, -1))
+
+
 def _simplex_topology_metrics(outputs: dict[str, Any]) -> dict[str, list[float]]:
     metrics: dict[str, list[float]] = {}
+    neighbor_indices = outputs.get("simplex_neighbor_indices")
+    neighbor_indices_cpu = (
+        neighbor_indices.detach().long().cpu()
+        if torch.is_tensor(neighbor_indices) and neighbor_indices.ndim == 3
+        else None
+    )
     for name, simplex_rank in (("face", 3), ("tetra", 4)):
         mask = outputs.get(f"simplex_{name}_mask")
         indices = outputs.get(f"simplex_{name}_indices")
@@ -309,6 +332,25 @@ def _simplex_topology_metrics(outputs: dict[str, Any]) -> dict[str, list[float]]
         metrics[f"simplex_{name}_boundary_edge_mean_degree"] = mean_degrees
         metrics[f"simplex_{name}_boundary_edge_max_degree"] = max_degrees
         metrics[f"simplex_{name}_boundary_unique_edge_fraction"] = unique_fractions
+        if neighbor_indices_cpu is not None and neighbor_indices_cpu.numel() > 0:
+            outer_degrees = _simplex_outer_edge_degrees(indices_cpu, mask_cpu, neighbor_indices_cpu)
+            flat_outer_degrees = outer_degrees.reshape(outer_degrees.shape[0], -1)
+            outer_mean_degrees: list[float] = []
+            outer_max_degrees: list[float] = []
+            outer_active_fractions: list[float] = []
+            for batch_index in range(indices_cpu.shape[0]):
+                selected_degrees = flat_outer_degrees[batch_index][flat_mask[batch_index].bool()]
+                if selected_degrees.numel() == 0:
+                    outer_mean_degrees.append(float("nan"))
+                    outer_max_degrees.append(float("nan"))
+                    outer_active_fractions.append(float("nan"))
+                    continue
+                outer_mean_degrees.append(float(selected_degrees.float().mean().item()))
+                outer_max_degrees.append(float(selected_degrees.max().item()))
+                outer_active_fractions.append(float((selected_degrees > 0).float().mean().item()))
+            metrics[f"simplex_{name}_outer_edge_mean_degree"] = outer_mean_degrees
+            metrics[f"simplex_{name}_outer_edge_max_degree"] = outer_max_degrees
+            metrics[f"simplex_{name}_outer_edge_active_fraction"] = outer_active_fractions
     return metrics
 
 

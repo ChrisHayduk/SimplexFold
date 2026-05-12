@@ -243,6 +243,19 @@
   `python -m pytest tests/test_simplex.py
   tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` reported
   `157 passed`.
+- Added outer-edge topology diagnostics for future returned runs. The adapter
+  now exposes `simplex_neighbor_indices`, and the NanoFold runner reports
+  selected face/tetra outer-edge mean degree, max degree, and active fraction
+  whenever neighbor indices are present. These are diagnostics only; they add
+  no training objective and do not change model parameters.
+- Outer-edge diagnostic validation passed:
+  `python -m py_compile minalphafold/simplex.py
+  scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest
+  tests/test_nanofold_public_benchmarks.py::test_simplex_topology_metrics_report_boundary_reuse`;
+  `python -m pytest tests/test_simplex.py
+  tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` reported
+  `157 passed`.
 
 ## 2026-05-09
 

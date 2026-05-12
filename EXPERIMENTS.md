@@ -37,7 +37,8 @@ on 2026-05-12. They sharpen the filter for future ideas:
   weights, or external MSA/template retrieval in official NanoFold paths.
 - When a complex-construction change returns, report topology-aware
   diagnostics alongside lDDT: selected-cell counts, boundary-edge reuse,
-  selected boundary lDDT, boundary length error, and contraction fraction.
+  outer-edge availability, selected boundary lDDT, boundary length error, and
+  contraction fraction.
 
 The 2026-05-12 full reread adds several concrete filters for the next queue:
 
