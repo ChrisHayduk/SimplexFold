@@ -1,4 +1,4 @@
-## Current Plan: E86 Weak Directed Outer-Edge Transport Gate
+## Current Plan: E87 Directed Boundary Readout Gate
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -244,6 +244,24 @@ topology-communication gate, not a commitment to a blind 30,000-step run. Do
 not launch a blind 30,000-step confirmation until a branch shows a credible
 trajectory toward `val_lddt_ca > 0.7`, not merely a small local best below
 0.4.
+
+E91 tested that continuation and should be rejected as a primary-lDDT branch.
+It reached `val_lddt_ca=0.3897`, below E86's `0.3990`, while improving
+`val_ca_drmsd` to `9.9309` and selected face/tetra boundary lDDT to
+`0.7414` / `0.7256`. This is useful evidence: weak outer-edge communication
+continues to improve global/selected-complex geometry, but it no longer
+preserves local C-alpha agreement. The next active gate should therefore pivot
+to E87 directed boundary readout from the strongest sparse-complex checkpoint,
+so the simplex cochains can write source/target-aware information into
+`Z_ij` without adding a new loss.
+
+E87 is now running from the cleaner E81 checkpoint, not the regressed E91
+checkpoint, to isolate the source/target boundary-readout mechanism. It ramps
+`simplex_boundary_readout_directionality` from `0.0` to `0.5` over steps
+8000-8500 while preserving the fixed `24` / `48` sparse caps, degree-penalized
+cell scoring, selected-boundary realization losses, half-scale edge-frame
+messages, and incidence-normalized cochain transport. Keep it only if primary
+`val_lddt_ca` recovers against E81/E86 without selected-boundary collapse.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank

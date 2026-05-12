@@ -3207,3 +3207,48 @@
   `history_full_msa_to_face.json` still ends at the inherited E86 step-8500
   row with `val_lddt_ca=0.3990174550563097`. No E91 result has returned yet,
   so `EXPERIMENT_RESULTS.md` remains unchanged.
+- E91 returned on owned pod `o1dy17ouv8w5mz`: step 9000
+  `val_lddt_ca=0.38974714651703835`, FoldScore `0.38195772282779217`,
+  `val_ca_drmsd=9.930909246206284`, predicted/true C-alpha radius
+  `11.822966694831848 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.7414444871246815` / `0.7256345339119434`, boundary length MAE
+  `1.0578380264341831` / `1.1556165665388107`, and contraction fractions
+  `0.6197949759662151` / `0.6163310036063194`.
+- E91 interpretation: reject as a primary-lDDT continuation. It improved
+  dRMSD and selected-boundary realization over E86, but primary C-alpha lDDT
+  fell from E86's `0.3990174550563097` to `0.38974714651703835`. Pivot to
+  the directed boundary-readout gate rather than continuing weak outer-edge
+  transport.
+- Copied E91 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e91_weak_outer_edge_from_e86_s9000_c256_m64/`
+  and copied the launch log to ignored `logs/e91_weak_outer_edge_from_e86.log`.
+  The local artifact pull excluded the checkpoint directory; the remote E91
+  checkpoint remains available if needed, but it is not the preferred next
+  branch.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8500` to add the E91 row to `EXPERIMENT_RESULTS.md`, so inherited E86
+  history does not count as E91's best validation lDDT.
+- E87 launch decision: use the cleaner E81 checkpoint rather than the E91
+  checkpoint. E91 improved dRMSD and selected-boundary lDDT but lost primary
+  lDDT, so the next useful gate should isolate source/target-directed
+  simplex-to-pair readout instead of stacking more changes on the regressed
+  outer-edge continuation.
+- E87 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E81 checkpoint present at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e81_degree_penalty_from_e82_s8000_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  remote py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/model_config.py`, `minalphafold/trainer.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; CLI help confirmed support for
+  `--simplex-boundary-readout-directionality` and its runtime schedule flags.
+- E87 launched on the same owned H100 pod with run name
+  `e87_directed_boundary_from_e81_s8500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e87_directed_boundary_from_e81.log`, artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e87_directed_boundary_from_e81_s8500_c256_m64/`,
+  and Python PID `7573`. Startup poll at `2026-05-12T14:30:13Z` confirmed the
+  benchmark process is alive, `results.json` is absent as expected, metadata
+  and history files exist, and the runner resumed E81 at step 8000/examples
+  64000 with 1244 matching model tensors loaded and 0 new/missing tensors.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  from E91 to E87, keeping the same owned-pod-only restriction and the rule
+  that heartbeat must not launch follow-up experiments automatically.

@@ -228,9 +228,9 @@ face/tetra boundary lDDT also improved to `0.7385` / `0.7216`, though
 contraction fraction rose to `0.5957` / `0.5952`. Continue one weak
 outer-edge gate from E86 before trying a different fallback.
 
-### E91 Candidate: Continue Weak Directed Outer-Edge Transport
+### E91: Continue Weak Directed Outer-Edge Transport
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E86 slightly improved primary lDDT, FoldScore, dRMSD, and
 selected-boundary lDDT from the E81 checkpoint. A short continuation can test
@@ -261,11 +261,20 @@ optimizer. The log path is
 `/workspace/SimplexFold/logs/e91_weak_outer_edge_from_e86.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e91_weak_outer_edge_from_e86_s9000_c256_m64/`.
-Do not add E91 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: reject as a primary-lDDT continuation. E91 reached
+`val_lddt_ca=0.3897`, FoldScore `0.3820`, `val_ca_drmsd=9.9309`, and
+predicted/true C-alpha radius `11.8230 / 15.4034`. It improved dRMSD and
+selected face/tetra boundary lDDT to `0.7414` / `0.7256`, with boundary
+length MAE `1.0578` / `1.1556`, but the primary C-alpha lDDT fell below E86's
+`0.3990`. This suggests weak outer-edge communication keeps pushing global
+geometry and selected-boundary realization, but the local C-alpha agreement
+turns over. Pivot to directed boundary readout rather than continuing the
+outer-edge path.
 
 ### E87 Candidate: Directed Boundary Readout
 
-Status: implemented locally; not launched.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: SimplexFold's selected face/tetra cells are built from directed
 anchored neighbor lists, but their final boundary-edge messages have been
@@ -296,6 +305,21 @@ gate:
 `--simplex-boundary-readout-directionality-runtime-scale-ramp-steps 500`.
 Keep the degree-penalized sparse selector, selected-boundary realization
 losses, and incidence normalization fixed.
+
+Launch: E87 is running as `e87_directed_boundary_from_e81_s8500_c256_m64`,
+Python PID `7573`. Because E91 showed weak outer-edge continuation loses
+primary lDDT, this gate resumes the cleaner E81 sparse-complex checkpoint from
+step 8000 to 8500 rather than stacking directionality on the failed E91 path.
+Remote prelaunch checks found no active Python benchmark process, confirmed
+the E81 checkpoint was present, py_compile passed for the simplex/model-config/
+trainer/runner files, and CLI help confirmed support for the boundary-readout
+directionality runtime flags. Startup resumed E81 at step 8000/examples 64000,
+loaded 1244 matching model tensors, initialized 0 new/missing tensors, and
+started a fresh optimizer. The log path is
+`/workspace/SimplexFold/logs/e87_directed_boundary_from_e81.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e87_directed_boundary_from_e81_s8500_c256_m64/`.
+Do not add E87 to `EXPERIMENT_RESULTS.md` until it returns.
 
 Validation:
 
