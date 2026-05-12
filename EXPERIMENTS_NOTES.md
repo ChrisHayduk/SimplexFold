@@ -3470,3 +3470,8 @@
   gate while keeping degree-penalized scoring and selected-boundary
   realization fixed. This is a zero-parameter filtration of the learned
   sparse cell complex, not a new coordinate or lDDT-style objective.
+- E89 live health check at `2026-05-12T19:41:52Z` on owned pod
+  `o1dy17ouv8w5mz`: Python PID `10400` was still active after about
+  36 minutes, `results.json` was not present yet, GPU memory was allocated
+  at about `13,535 MiB`, and the log still showed the clean E81 resume with
+  1244 matching tensors loaded and 0 new/missing tensors initialized.
