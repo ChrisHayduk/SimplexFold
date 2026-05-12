@@ -689,7 +689,7 @@ local C-alpha objective, so stop combining those routes for now.
 
 ### E96 Candidate: Anneal Directed Boundary Readout After E87
 
-Status: planned after E95.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E87's directed source/target boundary readout produced the
 current tiny primary-lDDT best, but E92 showed that holding directionality at
@@ -709,6 +709,22 @@ parameters and no generic output loss.
 Decision rule: keep only if E96 preserves or improves E87's primary
 `val_lddt_ca=0.3992` while avoiding E92's held-directionality regression.
 Reject if annealing directionality still falls below the E86/E87 band.
+
+Launch: E96 is running as
+`e96_anneal_directed_boundary_from_e87_s9000_c256_m64`, Python PID `13303`,
+on the owned H100 pod. A remote dirty working tree from earlier source syncs
+was preserved in a stash before fast-forwarding the checkout to commit
+`962be73`. Remote preflight confirmed no active Python benchmark process, the
+E87 checkpoint present, py_compile passing for the runner/model files, CLI
+support for the boundary-readout runtime flags and `--max-parameters`, and
+the exact E96 parameter count `3,154,242 <= 3,261,974`. Startup metadata
+recorded the `0.5 -> 0.25` directionality ramp, fixed `24/48` caps,
+degree penalty `0.75`, and `--max-parameters 3261974`; the runner resumed
+E87 at step 8500/examples 68000, loaded 1244 matching tensors, initialized 0
+new/missing tensors, and started a fresh optimizer. The log path is
+`/workspace/SimplexFold/logs/e96_anneal_directed_boundary_from_e87.log`, and
+the artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e96_anneal_directed_boundary_from_e87_s9000_c256_m64/`.
 
 ## Experiment Queue
 

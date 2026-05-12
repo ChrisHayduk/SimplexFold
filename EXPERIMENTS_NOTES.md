@@ -3665,3 +3665,27 @@
   directed-incidence cochain-routing curriculum and points to delayed
   edge-centric scalarization or latent selected segment cochains as the next
   paper-aligned architecture branches if E96 regresses.
+- Remote E96 preparation on owned pod `o1dy17ouv8w5mz`: the pod checkout was
+  dirty from earlier tracked source/doc syncs at commit `60c8213`, so I
+  preserved that state in stash
+  `codex-pre-e96-remote-dirty-state-20260512T231948Z`, fast-forwarded to
+  pushed commit `962be73`, and confirmed the remote status was clean before
+  launch.
+- E96 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E87 checkpoint present, remote py_compile passed for
+  `scripts/run_nanofold_public_benchmarks.py`, `minalphafold/simplex.py`,
+  `minalphafold/model_config.py`, and `minalphafold/trainer.py`; CLI help
+  confirmed support for boundary-readout directionality runtime flags and
+  `--max-parameters`; and the exact E96 instantiated module set counted
+  `3,154,242` parameters, under the AF2-medium +5% ceiling `3,261,974`.
+- E96 launched on owned pod `o1dy17ouv8w5mz` as
+  `e96_anneal_directed_boundary_from_e87_s9000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e96_anneal_directed_boundary_from_e87.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e96_anneal_directed_boundary_from_e87_s9000_c256_m64/`,
+  and Python PID `13303`. Startup poll confirmed metadata exists,
+  `--max-parameters 3261974` is recorded, boundary-readout directionality
+  ramps `0.5 -> 0.25` from step 8500 over 500 steps, fixed face/tetra caps
+  are `24/48`, degree penalty is `0.75`, and the runner resumed E87 at step
+  8500/examples 68000 with 1244 matching model tensors loaded and 0
+  new/missing tensors initialized.

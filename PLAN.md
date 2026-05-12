@@ -330,15 +330,17 @@ face/tetra boundary lDDT softened to `0.7295` / `0.7140`, so stacking the two
 communication routes improves one global geometry metric while interfering
 with local C-alpha agreement.
 
-The active next gate should be E96: treat E87's directed boundary readout as a
-curriculum rather than a permanent setting. Resume E87 from step 8500 to 9000
-and ramp boundary-readout directionality down from `0.5` to `0.25`, while
-keeping the same fixed `24/48` sparse caps, degree-penalized selected cells,
-selected-boundary realization losses, edge-frame messages, and
+The active Runpod gate is E96: treat E87's directed boundary readout as a
+curriculum rather than a permanent setting. It resumes E87 from step 8500 to
+9000 and ramps boundary-readout directionality down from `0.5` to `0.25`,
+while keeping the same fixed `24/48` sparse caps, degree-penalized selected
+cells, selected-boundary realization losses, edge-frame messages, and
 incidence-normalized boundary transport. E92 showed that holding
 directionality at `0.5` regresses; E96 tests whether partial relaxation keeps
 the useful directed-incidence signal without overdriving the pair tensor.
-This is zero-parameter and should remain at `3,154,242` parameters.
+The remote preflight counted `3,154,242` parameters under the `3,261,974`
+ceiling, and startup loaded 1244 matching E87 tensors with 0 new/missing
+tensors initialized.
 
 The current 2026-05-12 full reread of the saved PDFs reinforces the E79-E81
 direction and the E96 interpretation. The right lesson is not to add another
