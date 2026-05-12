@@ -6,6 +6,7 @@ from minalphafold.simplex import (
     SimplexTopology,
     SimplicialAdapter,
     _boundary_degree_weights,
+    boundary_incidence_weights,
     build_simplex_topology,
     cell_outer_edge_context,
     coface_degree_attenuate_pair_readout,
@@ -73,6 +74,7 @@ class SimplexConfig:
     simplex_hodge_face_update_scale = 0.0
     simplex_edge_frame_message_scale = 0.0
     simplex_boundary_message_degree_attenuation = 0.0
+    simplex_boundary_incidence_normalization = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
     simplex_c_segment = 8
@@ -706,6 +708,26 @@ def test_coface_degree_attenuation_damps_reused_boundary_edges():
     assert torch.allclose(attenuated[0, 0, 2], torch.full((2,), 0.25))
 
 
+def test_boundary_incidence_weights_normalize_selected_cell_edges():
+    edge_indices = torch.tensor(
+        [
+            [
+                [
+                    [[0, 1], [0, 2], [1, 2]],
+                    [[0, 1], [0, 3], [1, 3]],
+                    [[0, 1], [0, 4], [1, 4]],
+                ]
+            ]
+        ]
+    )
+    edge_mask = torch.ones(1, 1, 3, 3)
+
+    weights = boundary_incidence_weights(edge_indices, edge_mask, num_residues=5, strength=1.0)
+
+    assert torch.allclose(weights[0, 0, :, 0], torch.full((3,), 1.0 / 3.0))
+    assert torch.allclose(weights[0, 0, :, 1:], torch.ones(3, 2))
+
+
 def test_boundary_message_degree_attenuation_gates_pair_readout_without_single_change():
     class EdgeFrameConfig(SimplexConfig):
         simplex_neighbor_k = 3
@@ -739,6 +761,41 @@ def test_boundary_message_degree_attenuation_gates_pair_readout_without_single_c
 
     assert not torch.allclose(attenuated_pair, base_pair)
     assert torch.allclose(attenuated_single, base_single)
+
+
+def test_boundary_incidence_normalization_changes_cochain_transport():
+    class BaseConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_edge_frame_message_scale = 0.25
+
+    class IncidenceConfig(BaseConfig):
+        simplex_boundary_incidence_normalization = 1.0
+
+    torch.manual_seed(29)
+    base_adapter = SimplicialAdapter(BaseConfig()).eval()
+    torch.manual_seed(29)
+    incidence_adapter = SimplicialAdapter(IncidenceConfig()).eval()
+    pair = torch.randn(1, 5, 5, BaseConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, BaseConfig.c_s)
+    coords = torch.randn(1, 5, 3)
+    frames = torch.eye(3).reshape(1, 1, 3, 3).expand(1, 5, 3, 3).clone()
+
+    with torch.no_grad():
+        base_pair, base_single, _ = base_adapter(pair, single, recycled_ca_coords=coords, recycled_frames=frames)
+        incidence_pair, incidence_single, _ = incidence_adapter(
+            pair,
+            single,
+            recycled_ca_coords=coords,
+            recycled_frames=frames,
+        )
+
+    assert not torch.allclose(incidence_pair, base_pair)
+    assert not torch.allclose(incidence_single, base_single)
 
 
 def test_outer_edge_context_runtime_scale_gates_context_path():

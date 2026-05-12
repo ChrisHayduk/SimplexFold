@@ -107,6 +107,22 @@
   incidence-normalized boundary or outer-edge transport. The current sparse
   branch has strong selected-boundary lDDT but still nontrivial boundary-edge
   reuse, so edge-cell incidence degree remains the natural pressure point.
+- E85 local implementation prepared while E84 runs: added zero-parameter
+  `simplex_boundary_incidence_normalization`. This is intentionally different
+  from rejected E77's final pair-readout attenuation. E85 normalizes the
+  selected cochain transport itself: face edge-to-cell updates use the mean
+  inverse boundary incidence degree, face/tetra cell-to-edge messages are
+  scaled per selected boundary edge before scattering into pair state, and the
+  tetra face-to-tetra message is scaled by tetra boundary incidence degree.
+- E85 local validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_boundary_incidence_weights_normalize_selected_cell_edges tests/test_simplex.py::test_boundary_incidence_normalization_changes_cochain_transport tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_boundary_incidence_normalization_adds_no_parameters`;
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `154 passed`.
+- Do not sync or launch E85 while E84 is active. If E84 regresses from E81 or
+  shows no stable lDDT gain with continued boundary-edge reuse, launch E85 from
+  the strongest E81/E84 checkpoint as a short gate with the E84 recipe plus
+  `--simplex-boundary-incidence-normalization 1.0`.
 
 ## 2026-05-09
 

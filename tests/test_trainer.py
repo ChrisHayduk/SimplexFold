@@ -611,6 +611,23 @@ def test_simplicial_boundary_message_degree_attenuation_adds_no_parameters():
     assert attenuated_params == edge_frame_params
 
 
+def test_simplicial_boundary_incidence_normalization_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    incidence_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_face_top_k=24,
+        simplex_tetra_top_k=48,
+        simplex_boundary_incidence_normalization=1.0,
+    )
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    incidence_params = sum(parameter.numel() for parameter in AlphaFold2(incidence_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert incidence_params == simplex_params
+
+
 def test_simplicial_cell_dropout_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     dropout_medium = replace(

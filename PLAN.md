@@ -247,11 +247,13 @@ The other prepared alternatives are now incidence-normalized boundary
 transport and directed outer-edge transport. E81 showed that changing the
 selected-cell score is a valid topology-construction lever. If E84 regresses
 from E81 or keeps high boundary-edge reuse without a primary-lDDT gain, the
-next code idea should be incidence-normalized boundary or outer-edge transport
-rather than another coordinate loss: normalize messages by selected edge-cell
-degree inside the cochain exchange path, preserve directed source/target
-incidence, and measure whether this reduces boundary-edge reuse without
-erasing the strong selected-boundary lDDT seen in E79-E81.
+next code path is now prepared locally as E85:
+`simplex_boundary_incidence_normalization`. This is not the rejected E77
+readout attenuation; it normalizes selected edge-cell incidences inside the
+cochain exchange path before messages move between edges, faces, tetras, and
+the pair stream. If E84 turns over, launch E85 as a short gate from the
+strongest E81/E84 checkpoint and measure whether it reduces boundary-edge
+reuse without erasing the strong selected-boundary lDDT seen in E79-E81.
 
 Yes. With templates forbidden, the right construction is:
 

@@ -134,22 +134,33 @@ transport.
 
 ### E85 Candidate: Incidence-Normalized Boundary Transport
 
-Status: design candidate, not implemented.
+Status: implemented locally while E84 runs; not launched.
 
 Hypothesis: the selected sparse complex may be learning useful local cells
 while over-routing messages through a small set of boundary edges. Normalizing
 face/tetra-to-edge and edge-to-cell exchange by selected incidence degree
 could keep the cochain communication topological while reducing overcounting.
 
-Mechanism sketch: add a runtime message-scale normalization in the selected
-boundary-edge exchange path using edge-cell incidence degrees. Keep the
-normalization in the message route, not in the loss, and preserve directed
-source/target edge frames for scalarization.
+Mechanism: add zero-parameter `simplex_boundary_incidence_normalization`.
+Unlike E77's `simplex_boundary_message_degree_attenuation`, which damped only
+the final pair readout after selected-cell messages had already been averaged,
+this normalizes selected edge-cell incidences inside the cochain transport
+itself. The face edge-to-cell update is scaled by the mean inverse boundary
+incidence degree of the face; face/tetra cell-to-edge messages are scaled per
+boundary edge before scattering back into the pair tensor; and the tetra
+face-to-tetra update is scaled by the tetra boundary incidence degree. This
+changes the selected complex's communication route, not the output loss.
 
 Decision rule: test if E84 regresses from E81 or if the degree-penalized
 sparse branch retains strong selected-boundary lDDT but continues to show high
 edge reuse. Keep if selected boundary-edge reuse falls without losing the E81
 local lDDT gain.
+
+Validation:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_boundary_incidence_weights_normalize_selected_cell_edges tests/test_simplex.py::test_boundary_incidence_normalization_changes_cochain_transport tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_boundary_incidence_normalization_adds_no_parameters`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
 ### E86 Candidate: Directed Outer-Edge Transport Revisit
 

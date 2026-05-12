@@ -288,7 +288,8 @@ def _boundary_degree_weights(
     edge_ids = lo * int(num_residues) + hi
     batch = edge_indices.shape[0]
     flat_ids = edge_ids.reshape(batch, -1)
-    flat_mask = edge_mask.reshape(batch, -1).to(edge_mask.dtype)
+    active = (edge_mask > 0).to(edge_mask.dtype)
+    flat_mask = active.reshape(batch, -1)
     degree = edge_mask.new_zeros((batch, int(num_residues) * int(num_residues)))
     degree.scatter_add_(1, flat_ids, flat_mask)
     flat_degree = torch.gather(degree, 1, flat_ids).reshape_as(edge_mask)
@@ -709,6 +710,49 @@ def coface_degree_attenuate_pair_readout(
         return pair_readout
     degree = pair_counts.to(pair_readout.dtype).clamp_min(1.0)
     return pair_readout / degree.pow(strength)
+
+
+def boundary_incidence_weights(
+    edge_indices: torch.Tensor,
+    edge_mask: torch.Tensor,
+    *,
+    num_residues: int,
+    strength: float,
+) -> torch.Tensor:
+    """Weight each selected cell-edge incidence by inverse boundary degree."""
+
+    power = max(float(strength), 0.0)
+    if power == 0.0 or edge_mask.numel() == 0:
+        return torch.ones_like(edge_mask)
+    a, c = edge_indices.unbind(dim=-1)
+    lo = torch.minimum(a, c)
+    hi = torch.maximum(a, c)
+    edge_ids = lo * int(num_residues) + hi
+    batch = edge_indices.shape[0]
+    flat_ids = edge_ids.reshape(batch, -1)
+    active = (edge_mask > 0).to(edge_mask.dtype)
+    flat_mask = active.reshape(batch, -1)
+    degree = edge_mask.new_zeros((batch, int(num_residues) * int(num_residues)))
+    degree.scatter_add_(1, flat_ids, flat_mask)
+    flat_degree = torch.gather(degree, 1, flat_ids).reshape_as(edge_mask).clamp_min(1.0)
+    return active / flat_degree.pow(power)
+
+
+def _cell_boundary_incidence_weights(
+    edge_indices: torch.Tensor,
+    edge_mask: torch.Tensor,
+    *,
+    num_residues: int,
+    strength: float,
+) -> torch.Tensor:
+    edge_weights = boundary_incidence_weights(
+        edge_indices,
+        edge_mask,
+        num_residues=num_residues,
+        strength=strength,
+    )
+    denom = (edge_mask > 0).to(edge_weights.dtype).sum(dim=-1).clamp_min(1.0)
+    return edge_weights.sum(dim=-1) / denom
 
 
 def scatter_to_single(
@@ -1173,6 +1217,9 @@ class SimplicialAdapter(torch.nn.Module):
         self.boundary_message_degree_attenuation = float(
             getattr(config, "simplex_boundary_message_degree_attenuation", 0.0)
         )
+        self.boundary_incidence_normalization = float(
+            getattr(config, "simplex_boundary_incidence_normalization", 0.0)
+        )
         self.segment_cell_scale = float(getattr(config, "simplex_segment_cell_scale", 0.0))
         self.segment_radius = int(getattr(config, "simplex_segment_radius", 4))
 
@@ -1461,6 +1508,23 @@ class SimplicialAdapter(torch.nn.Module):
             face_state = face_state * topology.face_mask[..., None]
 
         edge_msg = self.edge_to_face(torch.cat([face_state, z_ij, z_ik, z_jk], dim=-1))
+        face_edge_indices = torch.stack(
+            [
+                torch.stack([i, j], dim=-1),
+                torch.stack([i, k], dim=-1),
+                torch.stack([j, k], dim=-1),
+            ],
+            dim=-2,
+        )
+        face_edge_mask = topology.face_mask[..., None].expand(-1, -1, -1, 3)
+        if self.boundary_incidence_normalization > 0.0:
+            face_cell_weight = _cell_boundary_incidence_weights(
+                face_edge_indices,
+                face_edge_mask,
+                num_residues=pair.shape[1],
+                strength=self.boundary_incidence_normalization,
+            )
+            edge_msg = edge_msg * face_cell_weight[..., None]
         face_state = face_state + self.dropout(
             torch.sigmoid(self.face_gate(face_state)) * edge_msg * topology.face_mask[..., None]
         )
@@ -1521,6 +1585,7 @@ class SimplicialAdapter(torch.nn.Module):
                 topology,
                 coords_for_geometry,
                 outer_edge_context_scale=outer_edge_context_scale,
+                boundary_incidence_normalization=self.boundary_incidence_normalization,
             )
 
             face_delta = self.tetra_to_face(tetra_state).reshape(*tetra_state.shape[:-1], 3, self.c_face)
@@ -1548,15 +1613,6 @@ class SimplicialAdapter(torch.nn.Module):
             face_state = face_state * topology.face_mask[..., None]
 
         face_edge_update = self.face_to_edge(face_state).reshape(*face_state.shape[:-1], 3, self.c_z)
-        face_edge_indices = torch.stack(
-            [
-                torch.stack([i, j], dim=-1),
-                torch.stack([i, k], dim=-1),
-                torch.stack([j, k], dim=-1),
-            ],
-            dim=-2,
-        )
-        face_edge_mask = topology.face_mask[..., None].expand(-1, -1, -1, 3)
         if edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0:
             face_opposite_indices = torch.stack([k, j, i], dim=-1)
             face_frame_features = face_edge_frame_features(
@@ -1570,6 +1626,13 @@ class SimplicialAdapter(torch.nn.Module):
             face_edge_update = face_edge_update + edge_frame_message_scale * self.face_edge_frame_to_edge(
                 torch.cat([face_edge_state, face_frame_features], dim=-1)
             )
+        if self.boundary_incidence_normalization > 0.0:
+            face_edge_update = face_edge_update * boundary_incidence_weights(
+                face_edge_indices,
+                face_edge_mask,
+                num_residues=pair.shape[1],
+                strength=self.boundary_incidence_normalization,
+            )[..., None]
         pair_delta, pair_counts = scatter_to_pair(
             face_edge_update,
             face_edge_indices,
@@ -1617,6 +1680,13 @@ class SimplicialAdapter(torch.nn.Module):
                 tet_edge_update = tet_edge_update + edge_frame_message_scale * self.tetra_edge_frame_to_edge(
                     torch.cat([tetra_edge_state, tet_frame_features], dim=-1)
                 )
+            if self.boundary_incidence_normalization > 0.0:
+                tet_edge_update = tet_edge_update * boundary_incidence_weights(
+                    tet_edge_indices,
+                    tet_edge_mask,
+                    num_residues=pair.shape[1],
+                    strength=self.boundary_incidence_normalization,
+                )[..., None]
             tet_pair_delta, tet_pair_counts = scatter_to_pair(
                 tet_edge_update,
                 tet_edge_indices,
@@ -1756,6 +1826,7 @@ class SimplicialAdapter(torch.nn.Module):
         recycled_ca_coords: Optional[torch.Tensor],
         *,
         outer_edge_context_scale: float,
+        boundary_incidence_normalization: float,
     ) -> torch.Tensor:
         tet_i, tet_j, tet_k, tet_l = topology.tetra_indices.unbind(dim=-1)
         z_ij = gather_pair(pair, tet_i, tet_j)
@@ -1805,6 +1876,25 @@ class SimplicialAdapter(torch.nn.Module):
         )
         tetra_state = tetra_state * topology.tetra_mask[..., None]
         tetra_msg = self.face_to_tetra(torch.cat([tetra_state, f_ijk, f_ijl, f_ikl], dim=-1))
+        if boundary_incidence_normalization > 0.0:
+            tet_edge_indices = torch.stack(
+                [
+                    torch.stack([tet_i, tet_j], dim=-1),
+                    torch.stack([tet_i, tet_k], dim=-1),
+                    torch.stack([tet_i, tet_l], dim=-1),
+                    torch.stack([tet_j, tet_k], dim=-1),
+                    torch.stack([tet_j, tet_l], dim=-1),
+                    torch.stack([tet_k, tet_l], dim=-1),
+                ],
+                dim=-2,
+            )
+            tet_edge_mask = topology.tetra_mask[..., None].expand(-1, -1, -1, 6)
+            tetra_msg = tetra_msg * _cell_boundary_incidence_weights(
+                tet_edge_indices,
+                tet_edge_mask,
+                num_residues=pair.shape[1],
+                strength=boundary_incidence_normalization,
+            )[..., None]
         tetra_state = tetra_state + self.dropout(
             torch.sigmoid(self.tetra_gate(tetra_state)) * tetra_msg * topology.tetra_mask[..., None]
         )
