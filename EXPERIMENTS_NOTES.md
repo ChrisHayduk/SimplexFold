@@ -153,6 +153,16 @@
   still leaves a strong selected-boundary complex but weak global/FoldScore
   geometry, revisit outer-edge context by combining the existing runtime-gated
   outer-edge path with sparse cells and E85 incidence normalization.
+- E86 code sanity check: `simplex_outer_edge_context_runtime_scale_at_step`
+  already ramps the training-time override, `model_inputs_from_batch` emits
+  `simplex_outer_edge_context_scale_override`, and the adapter consumes that
+  override for both face and tetra context updates. The existing tests cover
+  parser/runtime gating and the parameter budget. A cautious post-E85 gate
+  should allocate the context modules with
+  `--simplex-outer-edge-context-scale 0.05`, but ramp runtime contribution
+  only from `0.0` to `0.025` over the 8000-8500 gate, retaining incidence
+  normalization and sparse degree-penalized cells. Do not launch this
+  automatically while E85 is active.
 
 ## 2026-05-09
 

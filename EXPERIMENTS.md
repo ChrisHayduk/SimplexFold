@@ -185,6 +185,21 @@ only on top of the sparse E81/E85 selected complex, with runtime gating and
 through a cleaner incidence-normalized complex rather than the earlier dense
 cell context that disrupted E49/E58-E60.
 
+Prepared gate: do not launch while E85 is active. If E85 regresses or only
+matches E81 without reducing boundary-edge reuse, resume the strongest
+E81/E85 checkpoint for another 500-step gate and add a very weak directed
+outer-edge context:
+`--simplex-outer-edge-context-scale 0.05`,
+`--simplex-outer-edge-context-runtime-scale 0.0`,
+`--simplex-outer-edge-context-runtime-scale-final 0.025`,
+`--simplex-outer-edge-context-runtime-scale-ramp-start-step 8000`, and
+`--simplex-outer-edge-context-runtime-scale-ramp-steps 500`. Keep
+`--simplex-boundary-incidence-normalization 1.0`, the degree-penalized sparse
+selector, the fixed `24`/`48` cell caps, and the E81/E85 selected-boundary
+loss recipe. This stays within the AF2-medium 5% budget: the existing
+outer-edge context profile was measured at `3,183,282` parameters, +2.47%
+versus the AF2-medium baseline.
+
 Decision rule: run only after the sparse-cell branch stabilizes. Keep if it
 improves FoldScore/dRMSD while preserving primary `val_lddt_ca` and selected
 boundary diagnostics.

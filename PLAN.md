@@ -258,7 +258,12 @@ revisit should wait until after that: the existing
 `simplex_outer_edge_context_scale` path already supplies directed incoming and
 outgoing outer-edge summaries, so the paper-aligned version is to combine that
 path with sparse cells plus E85 incidence normalization, not to add a second
-duplicate outer-edge module.
+duplicate outer-edge module. If E85 does not beat E81, make the first
+outer-edge revisit deliberately weaker than E60: allocate the existing
+outer-edge context modules at `0.05`, but ramp the runtime contribution only
+from `0.0` to `0.025` during the 8000-8500 gate while keeping incidence
+normalization, degree-penalized sparse cells, and the selected-boundary loss
+recipe fixed.
 
 Yes. With templates forbidden, the right construction is:
 
