@@ -3465,3 +3465,8 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   from E88 to E89, keeping the same owned-pod-only restriction and the rule
   that heartbeat must not launch follow-up experiments automatically.
+- While E89 runs, queued E93 as the next fallback if E89 rejects: ramp the
+  active selected face/tetra caps from `24/48` to `12/24` over the 8000-8500
+  gate while keeping degree-penalized scoring and selected-boundary
+  realization fixed. This is a zero-parameter filtration of the learned
+  sparse cell complex, not a new coordinate or lDDT-style objective.

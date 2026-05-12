@@ -306,6 +306,12 @@ adding a new coordinate or lDDT-style objective. The launch uses the new
 `--max-parameters 3261974` runner guard so any accidental over-budget
 combination fails before training.
 
+If E89 rejects, the next queued topology-construction fallback is E93:
+tighten the selected sparse complex itself by ramping face/tetra caps from
+`24/48` down to `12/24` while keeping degree-penalized scoring and the
+selected-boundary recipe fixed. This tests filtration of the learned
+higher-rank cell complex rather than adding another readout or loss.
+
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank
 aggregation, inter-rank aggregation, and topology-aware diagnostics as core

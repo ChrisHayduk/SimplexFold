@@ -534,6 +534,36 @@ Validation:
 - `python -m pytest tests/test_trainer.py::test_simplicial_cell_outer_edge_runtime_override_reaches_model_path tests/test_trainer.py::test_simplicial_cell_outer_edge_score_adds_no_parameters tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_cell_score_outer_edge_weight_prefers_context_supported_cells`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
+### E93 Candidate: Stricter Sparse-Cell Filtration
+
+Status: queued only if E89 rejects; not launched.
+
+Hypothesis: E79-E82 showed that making the higher-rank complex sparse was the
+strongest topology-construction lever so far, but the retained tetra complex
+still has high boundary-edge reuse and over-contraction. Instead of adding
+another message module, test whether a second filtration step that tightens
+the active selected complex can reduce overused cofaces while preserving the
+E81 local-lDDT gain.
+
+Mechanism: resume the strongest sparse-complex checkpoint and ramp the active
+cell caps from the E81 values to a stricter subcomplex:
+`--simplex-face-top-k 24`,
+`--simplex-face-top-k-final 12`,
+`--simplex-face-top-k-ramp-start-step 8000`,
+`--simplex-face-top-k-ramp-steps 500`,
+`--simplex-tetra-top-k 48`,
+`--simplex-tetra-top-k-final 24`,
+`--simplex-tetra-top-k-ramp-start-step 8000`, and
+`--simplex-tetra-top-k-ramp-steps 500`. Keep the degree-penalized cell
+scorer and selected-boundary realization recipe fixed. This changes which
+rank-2 and rank-3 cochains exist; it does not add parameters or a new output
+metric loss.
+
+Decision rule: only launch after E89 returns. Keep if the tighter filtration
+preserves or improves E81/E86/E87 primary lDDT while lowering boundary-edge
+reuse or selected-boundary contraction. Reject if selected-boundary lDDT
+collapses or if primary lDDT follows E90/E88 downward.
+
 ## Experiment Queue
 
 ### E00: Matched Short-Run Baseline
