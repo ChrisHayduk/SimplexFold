@@ -62,7 +62,7 @@ The 2026-05-12 full reread adds several concrete filters for the next queue:
 
 ### E83: Fixed Sparse Cell Continuation
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E82 showed that E79's scheduled top-k result was not just a
 schedule-end artifact. Holding `24` face cells and `48` tetra cells per anchor
@@ -73,14 +73,15 @@ Mechanism: resume the E82 checkpoint from step 7500 to 8000 with the same
 selected-boundary realization losses, half-scale edge-frame messages, light
 recycled-geometry selector, and fixed face/tetra top-k caps.
 
-Decision rule: keep and consider another short continuation only if primary
-`val_lddt_ca` improves or holds near E82 while FoldScore and selected-boundary
-diagnostics do not collapse. If it regresses, pivot to E81 from the strongest
-E82/E83 checkpoint.
+Result: reject. E83 fell to `val_lddt_ca=0.3876` and FoldScore `0.3747`,
+below E82's `0.3924` / `0.3788`. Selected-boundary lDDT, boundary length
+MAE, contraction fraction, and boundary-edge reuse all softened from E82.
+This makes the fixed-cap continuation a local peak rather than a reason for a
+long confirmation.
 
 ### E81: Degree-Penalized Sparse Cell Scoring
 
-Status: implemented and held as the next fallback if E83 stalls.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E79 improved selected-boundary geometry by sparsifying the active
 higher-rank complex, but the retained tetra cells still reuse boundary edges
@@ -95,6 +96,9 @@ does not add output-side coordinate pressure.
 Decision rule: keep if it preserves or improves E82/E83 `val_lddt_ca` while
 reducing boundary-edge mean degree and increasing unique boundary-edge
 fraction.
+
+Runpod test: resume the E82 checkpoint from step 7500 to 8000 with the same
+fixed sparse caps and add `--simplex-cell-score-degree-penalty 0.75`.
 
 ### E84 Candidate: Incidence-Normalized Boundary Transport
 

@@ -27,6 +27,29 @@
 - E83 resumes the E82 checkpoint from step 7500 to 8000 with the same fixed
   sparse caps (`--simplex-face-top-k 24`, `--simplex-tetra-top-k 48`) and the
   same selected-boundary / edge-frame / light-geometry recipe.
+- E83 completed and was pulled locally under
+  `artifacts/nanofold_public_benchmarks/e83_sparse_topk_from_e82_s8000_c256_m64/`
+  plus `logs/e83_sparse_topk_from_e82.log`.
+- E83 result: `completed_steps=8000`, `train_examples=64000`,
+  `parameters=3,154,242`, `val_lddt_ca=0.3875777218490839`,
+  FoldScore `0.374724255874753`, `val_ca_drmsd=10.3538738489151`,
+  and predicted/true C-alpha radius `11.175740718841553 /
+  15.403406739234924`.
+- E83 selected-complex diagnostics softened from E82: face/tetra boundary
+  lDDT `0.7033939026296139` / `0.6880575008690357`, boundary length MAE
+  `1.229560237377882` / `1.334547944366932`, contraction fraction
+  `0.6593854054808617` / `0.6625464409589767`, boundary-edge mean degree
+  `12.405892848968506` / `34.80449962615967`, and unique-edge fraction
+  `0.08078695792292354` / `0.02897821614822659`.
+- Interpretation: reject E83 as a primary branch. A plain fixed-cap
+  continuation fell below E82 and slightly below E79, so the sparse selector
+  needs a construction change rather than more blind continuation.
+- Launched E81 on the same owned pod as
+  `e81_degree_penalty_from_e82_s8000_c256_m64`, PID `4434`, log
+  `/workspace/SimplexFold/logs/e81_degree_penalty_from_e82.log`.
+- E81 resumes the E82 checkpoint from step 7500 to 8000 with the same fixed
+  sparse caps and adds `--simplex-cell-score-degree-penalty 0.75` to
+  down-rank candidate cells that reuse overrepresented boundary edges.
 
 ## 2026-05-12 PDF Reference Pass
 

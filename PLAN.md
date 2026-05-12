@@ -1,4 +1,4 @@
-## Current Plan: E83 Fixed Sparse-Cell Continuation
+## Current Plan: E81 Degree-Penalized Sparse-Cell Scoring
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -207,11 +207,20 @@ lDDT improved again to `0.7135` / `0.6987`, boundary length MAE improved to
 The caveat remains under-expansion: predicted/true C-alpha radius is
 `11.3363 / 15.4034`, still far from solved.
 
-The active branch is now E83 on the owned H100 pod `o1dy17ouv8w5mz` as
-`e83_sparse_topk_from_e82_s8000_c256_m64`. It resumes the E82 checkpoint from
-step 7500 to 8000 with the same fixed sparse caps. This asks whether the
-post-schedule sparse complex keeps climbing before we spend on a different
-mechanism. Do not launch a blind 30,000-step confirmation until a branch shows
+E83 showed that simply holding the fixed sparse caps is not enough. It resumed
+E82 from step 7500 to 8000 with the same sparse caps and fell to
+`val_lddt_ca=0.3876`, FoldScore `0.3747`, and `val_ca_drmsd=10.3539`.
+Selected face/tetra boundary lDDT also softened to `0.7034` / `0.6881`, and
+boundary length MAE worsened to `1.2296` / `1.3345`. Reject this continuation
+as a primary branch.
+
+The active branch is now E81 on the owned H100 pod `o1dy17ouv8w5mz` as
+`e81_degree_penalty_from_e82_s8000_c256_m64`. It resumes the stronger E82
+checkpoint from step 7500 to 8000 with the same fixed sparse caps plus
+`--simplex-cell-score-degree-penalty 0.75`. This tests whether down-ranking
+candidate cells that reuse already-overrepresented boundary edges keeps the
+sparse selected complex clean without adding parameters or output-side loss
+pressure. Do not launch a blind 30,000-step confirmation until a branch shows
 a credible trajectory toward `val_lddt_ca > 0.7`, not merely a small local
 best below 0.4.
 
@@ -235,14 +244,14 @@ candidate cells that reuse already-overrepresented boundary edges are
 down-ranked. All three are cell-complex construction changes rather than
 generic output-coordinate losses.
 
-If E83 stalls or regresses, the preferred paper-aligned pivot is E81's
-degree-penalized sparse-cell scoring from the strongest E82/E83 checkpoint.
-If that is not enough, the next code idea should be incidence-normalized
-boundary or outer-edge transport rather than another coordinate loss:
-normalize messages by selected edge-cell degree inside the cochain exchange
-path, preserve directed source/target incidence, and measure whether this
-reduces boundary-edge reuse without erasing the strong selected-boundary lDDT
-seen in E79-E82.
+If E81 preserves E82's primary lDDT while reducing boundary-edge reuse, keep
+the degree-penalized sparse-cell selector for a short confirmation gate. If it
+does not, the next code idea should be incidence-normalized boundary or
+outer-edge transport rather than another coordinate loss: normalize messages
+by selected edge-cell degree inside the cochain exchange path, preserve
+directed source/target incidence, and measure whether this reduces
+boundary-edge reuse without erasing the strong selected-boundary lDDT seen in
+E79-E82.
 
 Yes. With templates forbidden, the right construction is:
 
