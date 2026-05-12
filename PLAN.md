@@ -192,12 +192,15 @@ acts upstream on which higher-rank cochains exist. Do not launch a blind
 30,000-step confirmation until a branch shows a credible trajectory toward
 `val_lddt_ca > 0.7`, not merely a small local best below 0.4.
 
-The other prepared alternatives are E75 and E79. E75 caps active face/tetra
-cells per anchor with `--simplex-face-top-k` and `--simplex-tetra-top-k`,
-ranking candidate cells by selected boundary-edge logits. E79 adds a runtime
-schedule for those caps so the selected higher-rank complex can be sparsified
-gradually during a continuation. Both are cell-complex construction changes
-rather than generic output-coordinate losses.
+The other prepared alternatives are E75, E79, and E81. E75 caps active
+face/tetra cells per anchor with `--simplex-face-top-k` and
+`--simplex-tetra-top-k`, ranking candidate cells by selected boundary-edge
+logits. E79 adds a runtime schedule for those caps so the selected
+higher-rank complex can be sparsified gradually during a continuation. E81
+adds a zero-parameter degree penalty to the capped cell score so high-scoring
+candidate cells that reuse already-overrepresented boundary edges are
+down-ranked. All three are cell-complex construction changes rather than
+generic output-coordinate losses.
 
 The 2026-05-12 full-text recheck of the saved reference PDFs keeps this plan
 topology-first. The strongest paper-derived criterion is that a new branch

@@ -76,6 +76,28 @@ def _topk_cell_mask(cell_mask: torch.Tensor, cell_score: torch.Tensor, cell_top_
     return cell_mask * keep
 
 
+def _cell_boundary_degree_penalty(
+    edge_indices: torch.Tensor,
+    cell_mask: torch.Tensor,
+    *,
+    num_residues: int,
+) -> torch.Tensor:
+    """Measure how much candidate cells reuse the same undirected edges."""
+
+    if edge_indices.numel() == 0 or cell_mask.numel() == 0:
+        return cell_mask.new_zeros(cell_mask.shape)
+    lo = torch.minimum(edge_indices[..., 0], edge_indices[..., 1])
+    hi = torch.maximum(edge_indices[..., 0], edge_indices[..., 1])
+    edge_ids = lo * int(num_residues) + hi
+    batch = edge_indices.shape[0]
+    flat_ids = edge_ids.reshape(batch, -1)
+    flat_mask = cell_mask[..., None].expand_as(edge_ids).reshape(batch, -1).to(cell_mask.dtype)
+    degree = cell_mask.new_zeros((batch, int(num_residues) * int(num_residues)))
+    degree.scatter_add_(1, flat_ids, flat_mask)
+    edge_degree = torch.gather(degree, 1, flat_ids).reshape_as(edge_ids).clamp_min(1.0)
+    return torch.log1p(edge_degree).mean(dim=-1)
+
+
 def rbf(values: torch.Tensor, *, n_bins: int, max_value: float) -> torch.Tensor:
     """Radial basis encoding on the last implicit scalar dimension."""
 
@@ -346,6 +368,7 @@ def build_simplex_topology(
     boundary_closure_temperature: float = 1.0,
     face_top_k: int = 0,
     tetra_top_k: int = 0,
+    cell_score_degree_penalty: float = 0.0,
 ) -> SimplexTopology:
     """Select top-k neighbors and expand them into anchored faces/tetrahedra.
 
@@ -433,11 +456,26 @@ def build_simplex_topology(
             ],
             dim=-1,
         )
+        face_cell_score = face_edge_scores.mean(dim=-1)
         if closure_weight > 0.0:
             face_edge_probs = torch.sigmoid(face_edge_scores / closure_temperature).clamp_min(1e-6)
             face_closure = face_edge_probs.log().mean(dim=-1).exp()
             face_mask = face_mask * ((1.0 - closure_weight) + closure_weight * face_closure)
-        face_mask = _topk_cell_mask(face_mask, face_edge_scores.mean(dim=-1), face_top_k)
+        if cell_score_degree_penalty > 0.0 and face_top_k > 0:
+            face_edges = torch.stack(
+                [
+                    torch.stack([face_i, face_j], dim=-1),
+                    torch.stack([face_i, face_k], dim=-1),
+                    torch.stack([face_j, face_k], dim=-1),
+                ],
+                dim=-2,
+            )
+            face_cell_score = face_cell_score - float(cell_score_degree_penalty) * _cell_boundary_degree_penalty(
+                face_edges,
+                face_mask,
+                num_residues=l,
+            )
+        face_mask = _topk_cell_mask(face_mask, face_cell_score, face_top_k)
 
     if tetra_combos.numel() == 0:
         tetra_indices = torch.empty((b, l, 0, 4), device=device, dtype=torch.long)
@@ -453,11 +491,19 @@ def build_simplex_topology(
         for a, c in pairs:
             tetra_mask = tetra_mask * gather_pair(valid_pair.to(dtype), a, c)
         tetra_edge_scores = torch.stack([gather_pair(work_score, a, c) for a, c in pairs], dim=-1)
+        tetra_cell_score = tetra_edge_scores.mean(dim=-1)
         if closure_weight > 0.0:
             tetra_edge_probs = torch.sigmoid(tetra_edge_scores / closure_temperature).clamp_min(1e-6)
             tetra_closure = tetra_edge_probs.log().mean(dim=-1).exp()
             tetra_mask = tetra_mask * ((1.0 - closure_weight) + closure_weight * tetra_closure)
-        tetra_mask = _topk_cell_mask(tetra_mask, tetra_edge_scores.mean(dim=-1), tetra_top_k)
+        if cell_score_degree_penalty > 0.0 and tetra_top_k > 0:
+            tetra_edges = torch.stack([torch.stack([a, c], dim=-1) for a, c in pairs], dim=-2)
+            tetra_cell_score = tetra_cell_score - float(cell_score_degree_penalty) * _cell_boundary_degree_penalty(
+                tetra_edges,
+                tetra_mask,
+                num_residues=l,
+            )
+        tetra_mask = _topk_cell_mask(tetra_mask, tetra_cell_score, tetra_top_k)
 
     return SimplexTopology(
         nbr_idx=nbr_idx,
@@ -1109,6 +1155,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.boundary_closure_temperature = float(getattr(config, "simplex_boundary_closure_temperature", 1.0))
         self.face_top_k = int(getattr(config, "simplex_face_top_k", 0))
         self.tetra_top_k = int(getattr(config, "simplex_tetra_top_k", 0))
+        self.cell_score_degree_penalty = float(getattr(config, "simplex_cell_score_degree_penalty", 0.0))
         self.rbf_bins = int(getattr(config, "simplex_rbf_bins", 8))
         self.sequence_max = float(getattr(config, "simplex_sequence_max", 64.0))
         self.distance_max = float(getattr(config, "simplex_distance_max", 32.0))
@@ -1357,6 +1404,7 @@ class SimplicialAdapter(torch.nn.Module):
                 boundary_closure_temperature=self.boundary_closure_temperature,
                 face_top_k=face_top_k,
                 tetra_top_k=tetra_top_k,
+                cell_score_degree_penalty=self.cell_score_degree_penalty,
             )
         topology = self._apply_cell_dropout(topology)
 

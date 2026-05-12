@@ -357,6 +357,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "3500",
             "--simplex-tetra-top-k-ramp-steps",
             "500",
+            "--simplex-cell-score-degree-penalty",
+            "0.75",
             "--resume-model-weights-only",
         ]
     )
@@ -393,6 +395,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_tetra_top_k_final == 24
     assert args.simplex_tetra_top_k_ramp_start_step == 3500
     assert args.simplex_tetra_top_k_ramp_steps == 500
+    assert args.simplex_cell_score_degree_penalty == 0.75
     assert args.resume_model_weights_only is True
 
     cfg = _apply_model_config_overrides(load_model_config("simplexfold_medium_param_matched"), args)
@@ -400,6 +403,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_boundary_message_degree_attenuation == 0.5
     assert cfg.simplex_face_top_k == 24
     assert cfg.simplex_tetra_top_k == 48
+    assert cfg.simplex_cell_score_degree_penalty == 0.75
 
 
 def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():

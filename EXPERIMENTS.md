@@ -2912,3 +2912,37 @@ Validation:
 
 - `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+
+### E81: Degree-Penalized Sparse Cell Scoring
+
+Status: implemented locally and planned only if the sparse-cell fallback is
+needed after E80.
+
+Hypothesis: E78 improved selected-boundary lDDT and boundary length error, but
+its selected-boundary contraction fraction rose. The topology metrics have
+also repeatedly shown high boundary-edge reuse, especially for tetra cells.
+When E75/E79 cap the higher-rank complex, a pure boundary-logit score can
+still spend many face/tetra cochains on the same overrepresented boundary
+edges. A degree penalty should make the selected complex cover more distinct
+boundary edges without adding parameters or supervising output coordinates.
+
+Mechanism: add `simplex_cell_score_degree_penalty` to the selected-cell
+top-k scorer. For each candidate face/tetra, compute how often its undirected
+boundary edges appear across the candidate complex, subtract a log-degree
+penalty from the boundary-edge logit score, then apply the existing
+per-anchor face/tetra top-k mask. This changes which rank-2 and rank-3
+cochains exist and send messages; it does not change tensor shapes,
+checkpoint compatibility, or parameter count.
+
+Planned launch if needed: combine with E79's scheduled caps from the strongest
+E78/E80 checkpoint, for example
+`--simplex-face-top-k 0 --simplex-face-top-k-final 24`,
+`--simplex-tetra-top-k 0 --simplex-tetra-top-k-final 48`, and
+`--simplex-cell-score-degree-penalty 0.75`. Compare against E79 on primary
+`val_lddt_ca`, selected boundary lDDT/length, contraction fraction, and
+boundary unique-edge fraction.
+
+Validation:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_cell_score_degree_penalty_prefers_less_reused_boundary_edges tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_cell_degree_penalty_adds_no_parameters tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`

@@ -178,6 +178,50 @@ def test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells():
     assert {tuple(face.tolist()) for face in active_anchor0_faces} == {(0, 1, 2), (0, 1, 3)}
 
 
+def test_cell_score_degree_penalty_prefers_less_reused_boundary_edges():
+    score = torch.zeros((1, 5, 5), dtype=torch.float32)
+    score[:, 0, 1:] = 10.0
+    score[:, 1:, 0] = 10.0
+    for a, b, value in ((1, 2, 9.0), (1, 3, 8.8), (2, 3, 8.6), (1, 4, 8.5)):
+        score[:, a, b] = value
+        score[:, b, a] = value
+
+    pair_mask = torch.ones((1, 5, 5), dtype=torch.float32)
+    pair_mask[:, 2, 4] = 0.0
+    pair_mask[:, 4, 2] = 0.0
+    pair_mask[:, 3, 4] = 0.0
+    pair_mask[:, 4, 3] = 0.0
+
+    base_topology = build_simplex_topology(
+        score,
+        neighbor_k=4,
+        pair_mask=pair_mask,
+        local_radius=-1,
+        local_bias=0.0,
+        long_min_sep=-1,
+        geometry_distance_weight=0.0,
+        face_top_k=1,
+    )
+    penalized_topology = build_simplex_topology(
+        score,
+        neighbor_k=4,
+        pair_mask=pair_mask,
+        local_radius=-1,
+        local_bias=0.0,
+        long_min_sep=-1,
+        geometry_distance_weight=0.0,
+        face_top_k=1,
+        cell_score_degree_penalty=10.0,
+    )
+
+    base_face = tuple(base_topology.face_indices[0, 0][base_topology.face_mask[0, 0] > 0][0].tolist())
+    penalized_face = tuple(
+        penalized_topology.face_indices[0, 0][penalized_topology.face_mask[0, 0] > 0][0].tolist()
+    )
+    assert base_face == (0, 1, 2)
+    assert penalized_face == (0, 1, 4)
+
+
 def test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells():
     class TopKOverrideConfig(SimplexConfig):
         simplex_neighbor_k = 4
