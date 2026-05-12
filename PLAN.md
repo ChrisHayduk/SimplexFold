@@ -133,6 +133,13 @@ runtime edge-frame scale held at `0.025`. Keep only if step 5500 improves or
 preserves E71's lDDT/FoldScore/dRMSD without further eroding selected-boundary
 lDDT; reject if the branch turns into a main-metric/boundary-diagnostic split.
 
+E72 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` from commit
+`1d27dd9`, reusing the clean E70/E71 staged environment. It resumed the E71
+checkpoint at step 5000/examples 40000, loaded 1244 matching model tensors,
+initialized 0 new/missing tensors, and recorded edge-frame runtime scale
+`0.025` in `run_metadata.json`. Do not add E72 to `EXPERIMENT_RESULTS.md`
+until the Runpod run returns.
+
 Yes. With templates forbidden, the right construction is:
 
 [

@@ -2508,7 +2508,7 @@ diagnostic regression as a warning even if lDDT inches upward.
 
 ### E72: Continue Edge-Frame Boundary Messages To 5500
 
-Status: planned on owned Runpod pod `lovgzo4hz2k4fp`.
+Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
 
 Hypothesis: E70-E71 are the first continuation sequence after E64 to improve
 lDDT, FoldScore, and dRMSD together. A 5500-step gate tests whether the
@@ -2527,6 +2527,16 @@ and run a 500-step continuation to step 5500 with
 static selected-boundary lDDT weights `0.05`, selected face/tetra coordinate
 weights `1.0`, selected boundary coordinate-distance weights `0.5`, and
 `simplex_aux_weight=0.5`.
+
+Launch: E72 is running on the same owned Runpod B200 pod `lovgzo4hz2k4fp`
+(`codex-simplexfold-e70-runpod-20260512`) from commit `1d27dd9`, reusing the
+clean public-data environment staged for E70/E71. `run_metadata.json` records
+`simplex_edge_frame_message_scale=0.025`, runtime edge-frame scale `0.025`,
+weights-only resume from the E71 step-5000 checkpoint, crop 256, MSA depth 64,
+and no templates. The launch log shows the runner resumed E71 at step
+5000/examples 40000, loaded 1244 matching model tensors, initialized 0
+new/missing tensors, and started a fresh optimizer. Do not add E72 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.
 
 Decision rule: keep only if step 5500 improves or preserves E71's lDDT,
 FoldScore, and dRMSD without further eroding selected-boundary lDDT. Reject if
