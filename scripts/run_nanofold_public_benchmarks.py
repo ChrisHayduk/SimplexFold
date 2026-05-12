@@ -65,6 +65,7 @@ from minalphafold.trainer import (  # noqa: E402
     set_optimizer_learning_rate,
     set_seed,
     simplex_edge_frame_message_runtime_scale_at_step,
+    simplex_geometry_distance_weight_at_step,
     simplex_hodge_face_runtime_scale_at_step,
     simplex_local_neighbor_k_at_step,
     simplex_outer_edge_context_runtime_scale_at_step,
@@ -552,6 +553,7 @@ def _evaluate(
     max_batches: int | None,
     foldscore_components_fn: Any | None,
     mixed_precision: str,
+    step: int | None = None,
     detail_path: Path | None = None,
 ) -> dict[str, float]:
     model.eval()
@@ -567,7 +569,18 @@ def _evaluate(
                 break
             batch = move_to_device(batch, device)
             with _autocast_context(device, mixed_precision):
-                outputs = model(**model_inputs_from_batch(batch, training_config))
+                outputs = model(
+                    **model_inputs_from_batch(
+                        batch,
+                        training_config,
+                        use_simplex_outer_edge_context_runtime_scale=True,
+                        use_simplex_hodge_face_runtime_scale=True,
+                        use_simplex_edge_frame_message_runtime_scale=True,
+                        use_simplex_local_neighbor_k=True,
+                        use_simplex_geometry_distance_weight=True,
+                        step=step,
+                    )
+                )
             per_example_loss, terms = _loss_with_terms(loss_fn, batch, outputs)
             losses.extend(float(v) for v in per_example_loss.detach().cpu())
             metrics = _structure_metrics(
@@ -1085,6 +1098,7 @@ def _train_variant(
         )
         simplex_hodge_face_runtime_scale = simplex_hodge_face_runtime_scale_at_step(training_config, step)
         simplex_local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
+        simplex_geometry_distance_weight = simplex_geometry_distance_weight_at_step(training_config, step)
         optimizer.zero_grad(set_to_none=True)
         loss_accum = 0.0
         term_accum: dict[str, list[float]] = {}
@@ -1109,6 +1123,7 @@ def _train_variant(
                         use_simplex_hodge_face_runtime_scale=True,
                         use_simplex_edge_frame_message_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
+                        use_simplex_geometry_distance_weight=True,
                         step=step,
                     )
                 )
@@ -1226,6 +1241,11 @@ def _train_variant(
                 "simplex_local_neighbor_k": (
                     float("nan") if simplex_local_neighbor_k is None else simplex_local_neighbor_k
                 ),
+                "simplex_geometry_distance_weight": (
+                    float("nan")
+                    if simplex_geometry_distance_weight is None
+                    else simplex_geometry_distance_weight
+                ),
                 "backbone_loss_weight": float(loss_fn.backbone_loss_weight),
                 "sidechain_fape_loss_weight": float(loss_fn.sidechain_fape_loss_weight),
                 "torsion_loss_weight": float(loss_fn.torsion_loss_weight),
@@ -1243,6 +1263,7 @@ def _train_variant(
                     max_batches=val_batch_limit,
                     foldscore_components_fn=foldscore_components_fn,
                     mixed_precision=mixed_precision,
+                    step=step,
                     detail_path=output_dir / f"eval_details_{variant}.csv"
                     if is_final_step
                     else None,
@@ -1258,6 +1279,7 @@ def _train_variant(
                         max_batches=final_max_val_batches,
                         foldscore_components_fn=foldscore_components_fn,
                         mixed_precision=mixed_precision,
+                        step=step,
                         detail_path=output_dir / f"eval_details_ema_{variant}.csv",
                     )
                     prefixed_ema_eval = _prefix_metrics(ema_eval, "ema_")
@@ -1313,6 +1335,7 @@ def _train_variant(
             max_batches=final_max_val_batches,
             foldscore_components_fn=foldscore_components_fn,
             mixed_precision=mixed_precision,
+            step=completed_step,
             detail_path=output_dir / f"eval_details_{variant}.csv",
         )
         if ema_model is not None:
@@ -1325,6 +1348,7 @@ def _train_variant(
                 max_batches=final_max_val_batches,
                 foldscore_components_fn=foldscore_components_fn,
                 mixed_precision=mixed_precision,
+                step=completed_step,
                 detail_path=output_dir / f"eval_details_ema_{variant}.csv",
             )
             final_eval.update(_prefix_metrics(ema_eval, "ema_"))
@@ -1422,6 +1446,11 @@ def _train_variant(
         "simplex_local_neighbor_k_final": training_config.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": training_config.simplex_local_neighbor_k_ramp_start_step,
         "simplex_local_neighbor_k_ramp_steps": training_config.simplex_local_neighbor_k_ramp_steps,
+        "simplex_geometry_distance_weight_final": training_config.simplex_geometry_distance_weight_final,
+        "simplex_geometry_distance_weight_ramp_start_step": (
+            training_config.simplex_geometry_distance_weight_ramp_start_step
+        ),
+        "simplex_geometry_distance_weight_ramp_steps": training_config.simplex_geometry_distance_weight_ramp_steps,
         "backbone_loss_weight": training_config.backbone_loss_weight,
         "sidechain_fape_loss_weight": training_config.sidechain_fape_loss_weight,
         "torsion_loss_weight": training_config.torsion_loss_weight,
@@ -1568,6 +1597,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_local_neighbor_k_final",
         "simplex_local_neighbor_k_ramp_start_step",
         "simplex_local_neighbor_k_ramp_steps",
+        "simplex_geometry_distance_weight",
+        "simplex_geometry_distance_weight_final",
+        "simplex_geometry_distance_weight_ramp_start_step",
+        "simplex_geometry_distance_weight_ramp_steps",
         "resume_model_weights_only",
         "elapsed_seconds",
         "examples_per_second",
@@ -1617,7 +1650,6 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_local_bias",
         "simplex_long_min_sep",
         "simplex_long_bias",
-        "simplex_geometry_distance_weight",
         "simplex_boundary_closure_weight",
         "simplex_boundary_closure_temperature",
         "simplex_cell_dropout",
@@ -1958,6 +1990,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Override the recycled C-alpha distance weight used when selecting simplex neighbors.",
     )
+    parser.add_argument("--simplex-geometry-distance-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-geometry-distance-weight-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-geometry-distance-weight-ramp-steps", type=int, default=1)
     parser.add_argument(
         "--simplex-segment-cell-scale",
         type=float,
@@ -2135,6 +2170,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_local_neighbor_k_final=args.simplex_local_neighbor_k_final,
         simplex_local_neighbor_k_ramp_start_step=args.simplex_local_neighbor_k_ramp_start_step,
         simplex_local_neighbor_k_ramp_steps=args.simplex_local_neighbor_k_ramp_steps,
+        simplex_geometry_distance_weight=args.simplex_geometry_distance_weight,
+        simplex_geometry_distance_weight_final=args.simplex_geometry_distance_weight_final,
+        simplex_geometry_distance_weight_ramp_start_step=args.simplex_geometry_distance_weight_ramp_start_step,
+        simplex_geometry_distance_weight_ramp_steps=args.simplex_geometry_distance_weight_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,
@@ -2266,6 +2305,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_local_neighbor_k_final": args.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": args.simplex_local_neighbor_k_ramp_start_step,
         "simplex_local_neighbor_k_ramp_steps": args.simplex_local_neighbor_k_ramp_steps,
+        "simplex_geometry_distance_weight": args.simplex_geometry_distance_weight,
+        "simplex_geometry_distance_weight_final": args.simplex_geometry_distance_weight_final,
+        "simplex_geometry_distance_weight_ramp_start_step": args.simplex_geometry_distance_weight_ramp_start_step,
+        "simplex_geometry_distance_weight_ramp_steps": args.simplex_geometry_distance_weight_ramp_steps,
         "backbone_loss_weight": args.backbone_loss_weight,
         "sidechain_fape_loss_weight": args.sidechain_fape_loss_weight,
         "torsion_loss_weight": args.torsion_loss_weight,

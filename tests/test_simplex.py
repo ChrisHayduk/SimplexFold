@@ -115,6 +115,35 @@ def test_build_simplex_topology_reserves_local_neighbor_slots():
     assert topology.tetra_indices.shape == (1, 6, 4, 4)
 
 
+def test_build_simplex_topology_geometry_weight_changes_selected_neighbors():
+    score = torch.zeros((1, 5, 5), dtype=torch.float32)
+    score[:, :, 4] = 4.0
+    coords = torch.tensor(
+        [[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [2.0, 0.0, 0.0], [3.0, 0.0, 0.0], [100.0, 0.0, 0.0]]],
+        dtype=torch.float32,
+    )
+
+    learned_topology = build_simplex_topology(
+        score,
+        neighbor_k=1,
+        recycled_ca_coords=coords,
+        local_radius=-1,
+        long_min_sep=-1,
+        geometry_distance_weight=0.0,
+    )
+    geometry_topology = build_simplex_topology(
+        score,
+        neighbor_k=1,
+        recycled_ca_coords=coords,
+        local_radius=-1,
+        long_min_sep=-1,
+        geometry_distance_weight=0.1,
+    )
+
+    assert learned_topology.nbr_idx[0, 0, 0].item() == 4
+    assert geometry_topology.nbr_idx[0, 0, 0].item() == 1
+
+
 def test_build_simplex_topology_flag_closure_downweights_open_cells():
     score = torch.full((1, 4, 4), -8.0, dtype=torch.float32)
     score[:, 0, 1:] = 8.0

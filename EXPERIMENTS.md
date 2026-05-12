@@ -2594,6 +2594,12 @@ and no templates. The launch log shows the runner resumed E71 at step
 new/missing tensors, and started a fresh optimizer. Do not add E73 to
 `EXPERIMENT_RESULTS.md` until the Runpod run returns.
 
+Implementation correction before accepting E73: relaunch from the fixed runner
+commit because the first E73 launch used runtime simplex overrides during
+training but not validation. The fixed runner applies runtime simplex overrides
+inside `_evaluate`, so the half-scale edge-frame hypothesis is measured at the
+same scale used during the continuation.
+
 ### E74: Light Recycled-Geometry Topology Selector
 
 Status: implemented locally and planned only if E73 fails to preserve E71.
@@ -2606,12 +2612,13 @@ complex toward the model's current metric geometry. Reducing that weight should
 let learned pair/contact topology retain more control over which residues
 become selected face/tetra cochains.
 
-Mechanism: add a runner override for `simplex_geometry_distance_weight` and
-test `0.025` from the E71/E73 checkpoint family. This changes the
-cell-complex construction step itself: the selected face/tetra incidence
-relations are built from a softer blend of learned pair topology and recycled
-C-alpha geometry. It adds no parameters and does not introduce a generic
-output-coordinate loss.
+Mechanism: add runner overrides for `simplex_geometry_distance_weight` and
+its optional final/ramp settings, then test `0.025` from the E71/E73
+checkpoint family or schedule `0.1 -> 0.025` over the continuation. This
+changes the cell-complex construction step itself: the selected face/tetra
+incidence relations are built from a softer blend of learned pair topology and
+recycled C-alpha geometry. It adds no parameters and does not introduce a
+generic output-coordinate loss.
 
 Planned launch if needed: update the owned Runpod workspace to the commit that
 contains this runner override, resume the strongest available checkpoint, and
@@ -2621,4 +2628,4 @@ this and follow the better E73 branch instead.
 
 Validation:
 
-- `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_geometry_selector_weight_adds_no_parameters`
+- `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_build_simplex_topology_geometry_weight_changes_selected_neighbors tests/test_trainer.py::test_simplicial_geometry_selector_weight_adds_no_parameters`

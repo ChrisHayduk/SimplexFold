@@ -2440,3 +2440,17 @@
   This branch should launch only if E73 does not preserve E71's local lDDT;
   update the owned Runpod workspace to the new commit first, because the
   currently running E73 process is still on commit `bc1b749`.
+- Runtime-override correction: while preparing E74 I found that
+  `scripts/run_nanofold_public_benchmarks.py` trained with runtime simplex
+  overrides but `_evaluate` did not pass those overrides, so the initial E73
+  process would validate at the static model edge-frame scale rather than the
+  intended runtime scale `0.0125`. Fixed `_evaluate` to pass runtime simplex
+  overrides, added a scheduled geometry selector override through
+  model/evoformer/adapter/trainer plumbing, and expanded focused tests.
+- Updated local validation passed:
+  `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_build_simplex_topology_geometry_weight_changes_selected_neighbors tests/test_trainer.py::test_simplicial_geometry_selector_weight_adds_no_parameters`;
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `git diff --check`.
+- Stop the first E73 process on owned pod `lovgzo4hz2k4fp` and relaunch from
+  the fixed commit before recording any E73 result. The first process has no
+  returned result yet and should not be added to `EXPERIMENT_RESULTS.md`.

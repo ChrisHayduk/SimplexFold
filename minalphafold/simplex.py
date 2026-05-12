@@ -1228,6 +1228,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
+        simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
         if pair.ndim != 4 or single.ndim != 3:
             raise ValueError("pair must be [B, L, L, Cz] and single must be [B, L, Cs]")
@@ -1260,6 +1261,12 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_local_neighbor_k_override is not None:
             local_neighbor_k = int(
                 round(max(float(simplex_local_neighbor_k_override.detach().float().cpu().item()), 0.0))
+            )
+        geometry_distance_weight = self.geometry_distance_weight
+        if simplex_geometry_distance_weight_override is not None:
+            geometry_distance_weight = max(
+                float(simplex_geometry_distance_weight_override.detach().float().cpu().item()),
+                0.0,
             )
 
         score_raw = self.topology_score(self.pair_score_norm(pair)).squeeze(-1)
@@ -1302,7 +1309,7 @@ class SimplicialAdapter(torch.nn.Module):
                 local_bias=self.local_bias,
                 long_min_sep=self.long_min_sep,
                 long_bias=self.long_bias,
-                geometry_distance_weight=self.geometry_distance_weight,
+                geometry_distance_weight=geometry_distance_weight,
                 boundary_closure_weight=self.boundary_closure_weight,
                 boundary_closure_temperature=self.boundary_closure_temperature,
             )

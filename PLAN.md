@@ -157,14 +157,22 @@ tensors, initialized 0 new/missing tensors, and recorded edge-frame runtime
 scale `0.0125` in `run_metadata.json`. Do not add E73 to
 `EXPERIMENT_RESULTS.md` until the Runpod run returns.
 
+Implementation correction: before accepting any E73 result, relaunch it from
+the fixed runner commit. The previous runner used runtime simplex overrides
+during training but not validation, so a half-scale edge-frame run would have
+validated with the static model scale. The fixed runner applies runtime
+simplex overrides during validation as well, and supports a scheduled
+`--simplex-geometry-distance-weight` selector prior for the next topology
+construction branch.
+
 If E73 does not recover E71's local lDDT, the next branch is E74: reduce the
 recycled-geometry distance prior in the simplex neighbor selector from `0.1`
 to `0.025` while keeping the E71/E73 edge-frame architecture available. This
 directly changes the selected sparse cell complex: recycled C-alpha geometry
 will still bias which residues become face/tetra cochains, but it should no
 longer dominate the learned pair/contact topology after the coordinates have
-opened up. The runner now supports this as
-`--simplex-geometry-distance-weight`; the change adds no parameters.
+opened up. The runner now supports both static and scheduled
+`--simplex-geometry-distance-weight` overrides; the change adds no parameters.
 
 Yes. With templates forbidden, the right construction is:
 

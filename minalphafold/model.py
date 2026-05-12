@@ -210,6 +210,7 @@ class AlphaFold2(torch.nn.Module):
             simplex_hodge_face_update_scale_override: torch.Tensor | None = None,
             simplex_edge_frame_message_scale_override: torch.Tensor | None = None,
             simplex_local_neighbor_k_override: torch.Tensor | None = None,
+            simplex_geometry_distance_weight_override: torch.Tensor | None = None,
         ):
         """Algorithm 2 forward pass. See the class docstring for the full map."""
         # seq_mask: (batch, N_res) — 1 for valid residues, 0 for padding
@@ -404,6 +405,9 @@ class AlphaFold2(torch.nn.Module):
                                             simplex_edge_frame_message_scale_override
                                         ),
                                         simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
+                                        simplex_geometry_distance_weight_override=(
+                                            simplex_geometry_distance_weight_override
+                                        ),
                                         use_reentrant=False,
                                     ),
                                 )
@@ -432,6 +436,9 @@ class AlphaFold2(torch.nn.Module):
                                         simplex_edge_frame_message_scale_override
                                     ),
                                     simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
+                                    simplex_geometry_distance_weight_override=(
+                                        simplex_geometry_distance_weight_override
+                                    ),
                             )
                             if simplex_aux:
                                 simplex_aux_last = simplex_aux

@@ -5,12 +5,14 @@ from minalphafold.trainer import (
     load_model_config,
     model_inputs_from_batch,
     simplex_edge_frame_message_runtime_scale_at_step,
+    simplex_geometry_distance_weight_at_step,
     simplex_hodge_face_runtime_scale_at_step,
     simplex_outer_edge_context_runtime_scale_at_step,
 )
 from scripts.run_nanofold_public_benchmarks import (
     _apply_model_config_overrides,
     _build_loss_fn,
+    _evaluate,
     _simplex_boundary_geometry_metrics,
     _simplex_topology_metrics,
     _variant_config,
@@ -318,7 +320,13 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "--simplex-hodge-face-runtime-scale-ramp-steps",
             "500",
             "--simplex-geometry-distance-weight",
+            "0.1",
+            "--simplex-geometry-distance-weight-final",
             "0.025",
+            "--simplex-geometry-distance-weight-ramp-start-step",
+            "3000",
+            "--simplex-geometry-distance-weight-ramp-steps",
+            "500",
             "--simplex-face-boundary-lddt-weight-final",
             "0.025",
             "--simplex-tetra-boundary-lddt-weight-final",
@@ -347,7 +355,10 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_hodge_face_runtime_scale_final == 0.05
     assert args.simplex_hodge_face_runtime_scale_ramp_start_step == 3000
     assert args.simplex_hodge_face_runtime_scale_ramp_steps == 500
-    assert args.simplex_geometry_distance_weight == 0.025
+    assert args.simplex_geometry_distance_weight == 0.1
+    assert args.simplex_geometry_distance_weight_final == 0.025
+    assert args.simplex_geometry_distance_weight_ramp_start_step == 3000
+    assert args.simplex_geometry_distance_weight_ramp_steps == 500
     assert args.simplex_face_boundary_lddt_weight_final == 0.025
     assert args.simplex_tetra_boundary_lddt_weight_final == 0.025
     assert args.simplex_boundary_lddt_ramp_start_step == 3500
@@ -356,7 +367,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.resume_model_weights_only is True
 
     cfg = _apply_model_config_overrides(load_model_config("simplexfold_medium_param_matched"), args)
-    assert cfg.simplex_geometry_distance_weight == 0.025
+    assert cfg.simplex_geometry_distance_weight == 0.1
 
 
 def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
@@ -373,6 +384,10 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         simplex_hodge_face_runtime_scale_final=0.05,
         simplex_hodge_face_runtime_scale_ramp_start_step=3000,
         simplex_hodge_face_runtime_scale_ramp_steps=500,
+        simplex_geometry_distance_weight=0.1,
+        simplex_geometry_distance_weight_final=0.025,
+        simplex_geometry_distance_weight_ramp_start_step=3000,
+        simplex_geometry_distance_weight_ramp_steps=500,
     )
     batch = {
         "target_feat": torch.zeros(1, 4, 22),
@@ -398,18 +413,92 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert simplex_hodge_face_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_hodge_face_runtime_scale_at_step(cfg, 3250) == 0.025
     assert simplex_hodge_face_runtime_scale_at_step(cfg, 3500) == 0.05
+    assert simplex_geometry_distance_weight_at_step(cfg, 3000) == 0.1
+    assert simplex_geometry_distance_weight_at_step(cfg, 3250) == 0.0625
+    assert abs(simplex_geometry_distance_weight_at_step(cfg, 3500) - 0.025) < 1e-9
     inputs = model_inputs_from_batch(
         batch,
         cfg,
         use_simplex_outer_edge_context_runtime_scale=True,
         use_simplex_edge_frame_message_runtime_scale=True,
         use_simplex_hodge_face_runtime_scale=True,
+        use_simplex_geometry_distance_weight=True,
         step=3250,
     )
 
     assert torch.isclose(inputs["simplex_outer_edge_context_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_edge_frame_message_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.025))
+    assert torch.isclose(inputs["simplex_geometry_distance_weight_override"], torch.tensor(0.0625))
+
+
+def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
+    class CaptureModel:
+        def __init__(self):
+            self.kwargs = None
+
+        def eval(self):
+            return self
+
+        def __call__(self, **kwargs):
+            self.kwargs = kwargs
+            return {"atom14_coords": torch.zeros(1, 4, 14, 3)}
+
+    cfg = TrainingConfig(
+        simplex_edge_frame_message_runtime_scale=0.0,
+        simplex_edge_frame_message_runtime_scale_final=0.05,
+        simplex_edge_frame_message_runtime_scale_ramp_start_step=3000,
+        simplex_edge_frame_message_runtime_scale_ramp_steps=500,
+        simplex_geometry_distance_weight=0.1,
+        simplex_geometry_distance_weight_final=0.025,
+        simplex_geometry_distance_weight_ramp_start_step=3000,
+        simplex_geometry_distance_weight_ramp_steps=500,
+    )
+    batch = {
+        "target_feat": torch.zeros(1, 4, 22),
+        "residue_index": torch.arange(4).unsqueeze(0),
+        "msa_feat": torch.zeros(1, 2, 4, 49),
+        "extra_msa_feat": torch.zeros(1, 0, 4, 25),
+        "template_pair_feat": torch.zeros(1, 0, 4, 4, 88),
+        "aatype": torch.zeros(1, 4, dtype=torch.long),
+        "template_angle_feat": torch.zeros(1, 0, 4, 57),
+        "template_mask": torch.zeros(1, 0),
+        "template_residue_mask": torch.zeros(1, 0, 4),
+        "seq_mask": torch.ones(1, 4),
+        "msa_mask": torch.ones(1, 2, 4),
+        "extra_msa_mask": torch.ones(1, 0, 4),
+    }
+    model = CaptureModel()
+
+    monkeypatch.setattr(
+        "scripts.run_nanofold_public_benchmarks._loss_with_terms",
+        lambda loss_fn, batch, outputs: (torch.ones(1), {}),
+    )
+    monkeypatch.setattr(
+        "scripts.run_nanofold_public_benchmarks._structure_metrics",
+        lambda outputs, batch, foldscore_components_fn: {"lddt_ca": [0.1], "ca_rmsd": [1.0]},
+    )
+    monkeypatch.setattr("scripts.run_nanofold_public_benchmarks._simplex_topology_metrics", lambda outputs: {})
+    monkeypatch.setattr(
+        "scripts.run_nanofold_public_benchmarks._simplex_boundary_geometry_metrics",
+        lambda outputs, batch: {},
+    )
+
+    result = _evaluate(
+        model,
+        object(),
+        [batch],
+        cfg,
+        torch.device("cpu"),
+        max_batches=None,
+        foldscore_components_fn=None,
+        mixed_precision="off",
+        step=3250,
+    )
+
+    assert result["val_lddt_ca"] == 0.1
+    assert torch.isclose(model.kwargs["simplex_edge_frame_message_scale_override"], torch.tensor(0.025))
+    assert torch.isclose(model.kwargs["simplex_geometry_distance_weight_override"], torch.tensor(0.0625))
 
 
 def test_simplex_topology_metrics_report_boundary_reuse():

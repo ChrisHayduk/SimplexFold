@@ -237,6 +237,10 @@ class TrainingConfig:
     simplex_local_neighbor_k_final: float | None = None
     simplex_local_neighbor_k_ramp_start_step: int | None = None
     simplex_local_neighbor_k_ramp_steps: int = 1
+    simplex_geometry_distance_weight: float | None = None
+    simplex_geometry_distance_weight_final: float | None = None
+    simplex_geometry_distance_weight_ramp_start_step: int | None = None
+    simplex_geometry_distance_weight_ramp_steps: int = 1
     backbone_loss_weight: float = 1.0
     sidechain_fape_loss_weight: float = 1.0
     torsion_loss_weight: float = 1.0
@@ -899,6 +903,20 @@ def simplex_local_neighbor_k_at_step(training_config: TrainingConfig, step: int 
     )
 
 
+def simplex_geometry_distance_weight_at_step(training_config: TrainingConfig, step: int | None) -> float | None:
+    if training_config.simplex_geometry_distance_weight is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_geometry_distance_weight)
+    return _ramped_value(
+        training_config.simplex_geometry_distance_weight,
+        training_config.simplex_geometry_distance_weight_final,
+        step=step,
+        start_step=training_config.simplex_geometry_distance_weight_ramp_start_step,
+        ramp_steps=training_config.simplex_geometry_distance_weight_ramp_steps,
+    )
+
+
 def model_inputs_from_batch(
     batch: dict[str, Any],
     training_config: TrainingConfig,
@@ -909,6 +927,7 @@ def model_inputs_from_batch(
     use_simplex_hodge_face_runtime_scale: bool = False,
     use_simplex_edge_frame_message_runtime_scale: bool = False,
     use_simplex_local_neighbor_k: bool = False,
+    use_simplex_geometry_distance_weight: bool = False,
     step: int | None = None,
 ) -> dict[str, torch.Tensor | int]:
     """Unpack a collated batch into the kwargs ``AlphaFold2.forward`` expects."""
@@ -964,6 +983,11 @@ def model_inputs_from_batch(
     local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
     if use_simplex_local_neighbor_k and local_neighbor_k is not None:
         inputs["simplex_local_neighbor_k_override"] = batch["target_feat"].new_tensor(float(local_neighbor_k))
+    geometry_distance_weight = simplex_geometry_distance_weight_at_step(training_config, step)
+    if use_simplex_geometry_distance_weight and geometry_distance_weight is not None:
+        inputs["simplex_geometry_distance_weight_override"] = batch["target_feat"].new_tensor(
+            float(geometry_distance_weight)
+        )
     return inputs
 
 
@@ -1067,6 +1091,7 @@ def train_step(
             use_simplex_hodge_face_runtime_scale=True,
             use_simplex_edge_frame_message_runtime_scale=True,
             use_simplex_local_neighbor_k=True,
+            use_simplex_geometry_distance_weight=True,
             step=1,
         )
     )
@@ -1398,6 +1423,7 @@ def fit(
                     use_simplex_hodge_face_runtime_scale=True,
                     use_simplex_edge_frame_message_runtime_scale=True,
                     use_simplex_local_neighbor_k=True,
+                    use_simplex_geometry_distance_weight=True,
                     step=global_step + 1,
                 )
             )
@@ -1777,6 +1803,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-local-neighbor-k-final", type=float, default=None)
     parser.add_argument("--simplex-local-neighbor-k-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-local-neighbor-k-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-geometry-distance-weight",
+        type=float,
+        default=None,
+        help="Training-time override for the recycled C-alpha distance term in simplex neighbor selection.",
+    )
+    parser.add_argument("--simplex-geometry-distance-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-geometry-distance-weight-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-geometry-distance-weight-ramp-steps", type=int, default=1)
     parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
     parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
     parser.add_argument("--torsion-loss-weight", type=float, default=1.0)
@@ -1904,6 +1939,10 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_local_neighbor_k_final=args.simplex_local_neighbor_k_final,
         simplex_local_neighbor_k_ramp_start_step=args.simplex_local_neighbor_k_ramp_start_step,
         simplex_local_neighbor_k_ramp_steps=args.simplex_local_neighbor_k_ramp_steps,
+        simplex_geometry_distance_weight=args.simplex_geometry_distance_weight,
+        simplex_geometry_distance_weight_final=args.simplex_geometry_distance_weight_final,
+        simplex_geometry_distance_weight_ramp_start_step=args.simplex_geometry_distance_weight_ramp_start_step,
+        simplex_geometry_distance_weight_ramp_steps=args.simplex_geometry_distance_weight_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,
