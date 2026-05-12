@@ -2772,3 +2772,46 @@
   `simplex_outer_edge_update_scale` with the unrelated hodge runtime override:
   `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
   reported `151 passed`.
+- E80 returned on owned pod `o1dy17ouv8w5mz`: step 7000
+  `val_lddt_ca=0.3820213433355093`, FoldScore `0.36820204742252827`,
+  `val_ca_drmsd=10.24925634264946`, predicted/true C-alpha radius
+  `11.247207999229431 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.5358894020318985` / `0.5191911403089762`, boundary length MAE
+  `2.6559875458478928` / `2.8001304268836975`, contraction fractions
+  `0.6268004588782787` / `0.6288906000554562`, boundary-edge mean degree
+  `11.145169138908386` / `74.30112886428833`, and boundary unique-edge
+  fraction `0.09011029245462714` / `0.013516543868194071`.
+- E80 interpretation: reject as a primary branch. It lost E78's local
+  C-alpha lDDT and also regressed selected-boundary lDDT and boundary length
+  error, although contraction improved slightly. This argues against another
+  blind light-geometry continuation and for the prepared sparse-cell
+  topology-construction fallback from the stronger E78 checkpoint.
+- Copied E80 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e80_light_geom0025_from_e78_s7000_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e80_light_geom0025_from_e78.log`. The local artifact pull excluded
+  the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  6500` to add the E80 row to `EXPERIMENT_RESULTS.md`, so inherited E78
+  history does not count as E80's best validation lDDT.
+- Synced latest local SimplexFold source/docs/tests to the owned H100
+  workspace without deleting remote artifacts, logs, or checkpoints. Remote
+  py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/model_config.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; parser smoke confirmed support
+  for `--simplex-face-top-k-final`, `--simplex-tetra-top-k-final`, and
+  `--simplex-cell-score-degree-penalty`.
+- E79 launched on the same owned H100 pod `o1dy17ouv8w5mz` with run name
+  `e79_scheduled_topk_from_e78_s7000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e79_scheduled_topk_from_e78.log`, and artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e79_scheduled_topk_from_e78_s7000_c256_m64/`.
+  Remote prelaunch checks found no active Python benchmark process and the
+  E78 checkpoint was present. Main Python PID is `3128`. The launch resumes
+  E78 from step 6500 to 7000 with the same light-geometry selector,
+  selected-boundary losses, and half-scale edge-frame message recipe, while
+  scheduling active face/tetra cell caps from full clique to `24` / `48`.
+- E79 startup poll at 2026-05-12T07:41:52Z confirmed the benchmark process is
+  alive, `results.json` is absent as expected, and the runner resumed from
+  the E78 checkpoint at step 6500/examples 52000 with 1244 matching model
+  tensors loaded.

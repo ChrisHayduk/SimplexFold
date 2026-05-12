@@ -95,3 +95,4 @@ recorded in the running notes for that run.
 | E76 continue edge-frame 0.0125 to 6000 | completed | 6000 | 0.3713 | 0.3713 | 0.3723 | 10.2191 | 12.0036 / 15.4034 | rejected; continuing half-scale edge-frame reduced lDDT below E73 despite a tiny FoldScore uptick |
 | E77 coface-degree atten 0.25 | completed | 6000 | 0.3733 | 0.3733 | 0.3710 | 10.1286 | 11.8632 / 15.4034 | rejected; improves selected-boundary diagnostics but primary lDDT remains below E73 |
 | E78 light geometry selector continue | completed | 6500 | 0.3853 | 0.3853 | 0.3718 | 10.1595 | 11.3783 / 15.4034 | kept; improves E74 lDDT/FoldScore/dRMSD and selected-boundary lDDT, continue light-geometry branch another short gate |
+| E80 light geometry selector continue | completed | 7000 | 0.3820 | 0.3820 | 0.3682 | 10.2493 | 11.2472 / 15.4034 | rejected; continuing E78 reduced primary lDDT and selected-boundary lDDT/length, pivot to scheduled sparse-cell complex from E78 |

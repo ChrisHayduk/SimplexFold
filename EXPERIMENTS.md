@@ -2822,7 +2822,7 @@ selected edges.
 
 ### E80: Continue E78 Light-Geometry Selector
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E78 showed the light recycled-geometry topology selector can
 continue improving local C-alpha lDDT while also recovering FoldScore and
@@ -2836,20 +2836,22 @@ coordinate weights `1.0`, and selected boundary-distance weights `0.5`.
 This remains a topology-construction continuation rather than a new generic
 coordinate loss.
 
-Launch: E80 is running as `e80_light_geom0025_from_e78_s7000_c256_m64`.
+Launch: E80 ran as `e80_light_geom0025_from_e78_s7000_c256_m64`.
 Remote prelaunch checks confirmed no active Python benchmark process,
 successful py_compile for the simplex/model-config/runner files, and the E78
-checkpoint present. Main Python PID is `2543`. The log path is
+checkpoint present. Main Python PID was `2543`. The log path is
 `/workspace/SimplexFold/logs/e80_light_geom0025_from_e78.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e80_light_geom0025_from_e78_s7000_c256_m64/`.
-Do not add E80 to `EXPERIMENT_RESULTS.md` until it returns.
 
-Decision rule after return: keep only if E80 matches or beats E78's
-`val_lddt_ca=0.3853` without selected-boundary lDDT or length MAE collapsing.
-If the primary lDDT turns over while selected-boundary diagnostics stay
-healthy, launch E79 from the strongest E78/E80 checkpoint to change which
-higher-rank cochains exist instead of continuing the same selector weights.
+Result: reject. E80 reached `val_lddt_ca=0.3820`, FoldScore `0.3682`,
+`val_ca_drmsd=10.2493`, and predicted/true C-alpha radius
+`11.2472 / 15.4034`. This is below E78 on the primary metric, FoldScore, and
+dRMSD. Selected face/tetra boundary lDDT fell to `0.5359` / `0.5192`, and
+selected boundary length MAE worsened to `2.6560` / `2.8001`. Contraction
+improved slightly to `0.6268` / `0.6289`, but not enough to justify another
+blind continuation. Pivot to the scheduled sparse selected-cell complex from
+the stronger E78 checkpoint.
 
 ### E75: Sparse Selected Higher-Rank Cell Complex
 
@@ -2886,8 +2888,7 @@ Validation:
 
 ### E79: Scheduled Sparse Selected Higher-Rank Cell Complex
 
-Status: implemented locally and planned only if E78 turns over or if static
-E75 is too abrupt.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E75's sparse selected-cell complex is the right topology-native
 response to high boundary-edge reuse, but switching directly from the full
@@ -2902,11 +2903,23 @@ example, `--simplex-face-top-k 0 --simplex-face-top-k-final 24` plus
 selected-cell clique and linearly introduces the E75 cap. This changes the
 active cell complex during training without changing parameter count.
 
-Planned launch if needed: from the strongest available E74/E78 checkpoint,
-run a 500-step gate with the E74 recipe and a cap schedule such as
-`0 -> 24` faces and `0 -> 48` tetras over 250-500 steps. Compare against
-E74/E78 on primary `val_lddt_ca` and against E72/E77 on selected-boundary
-diagnostics.
+Launch: E79 is running as `e79_scheduled_topk_from_e78_s7000_c256_m64`.
+After E80 returned and the H100 pod was idle, local source/docs/tests were
+synced to `/workspace/SimplexFold/` without deleting remote artifacts, logs,
+or checkpoints. Remote py_compile passed, parser smoke confirmed support for
+the scheduled top-k flags and `simplex_cell_score_degree_penalty`, and the E78
+checkpoint was present. Main Python PID is `3128`. The log path is
+`/workspace/SimplexFold/logs/e79_scheduled_topk_from_e78.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e79_scheduled_topk_from_e78_s7000_c256_m64/`.
+Do not add E79 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Decision rule after return: compare E79 against E78 and E80. Keep only if the
+scheduled sparse-cell construction improves or preserves primary lDDT while
+improving selected-boundary lDDT/length or boundary-edge reuse. If E79
+improves topology diagnostics but loses primary lDDT, use E81's
+degree-penalized sparse-cell scoring as the next fallback rather than
+returning to plain light-geometry continuation.
 
 Validation:
 
