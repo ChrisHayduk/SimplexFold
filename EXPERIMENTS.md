@@ -81,7 +81,7 @@ long confirmation.
 
 ### E81: Degree-Penalized Sparse Cell Scoring
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E79 improved selected-boundary geometry by sparsifying the active
 higher-rank complex, but the retained tetra cells still reuse boundary edges
@@ -93,14 +93,46 @@ subtract a zero-parameter degree penalty from candidate cell scores based on
 current boundary-edge reuse. This changes which face/tetra cochains exist; it
 does not add output-side coordinate pressure.
 
-Decision rule: keep if it preserves or improves E82/E83 `val_lddt_ca` while
-reducing boundary-edge mean degree and increasing unique boundary-edge
-fraction.
+Result: keep as the new primary-lDDT branch. E81 reached
+`val_lddt_ca=0.3980`, FoldScore `0.3826`, `val_ca_drmsd=10.0954`, and
+predicted/true C-alpha radius `11.4973 / 15.4034`. It also improved
+selected face/tetra boundary lDDT to `0.7335` / `0.7178`, boundary length MAE
+to `1.0733` / `1.1727`, and boundary unique-edge fraction to
+`0.0856` / `0.0304`. The degree penalty did what the topology diagnosis
+asked: it changed the sparse complex itself and reduced overuse of selected
+boundary edges without adding parameters.
 
 Runpod test: resume the E82 checkpoint from step 7500 to 8000 with the same
 fixed sparse caps and add `--simplex-cell-score-degree-penalty 0.75`.
 
-### E84 Candidate: Incidence-Normalized Boundary Transport
+### E84: Degree-Penalized Sparse Cell Continuation
+
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E81's degree-penalized sparse selector improved both primary lDDT
+and topology diagnostics. A short continuation tests whether that cleaner
+selected complex is still climbing, before spending on a longer confirmation
+or changing the message route.
+
+Mechanism: resume E81 from step 8000 to 8500 with fixed `24` face cells and
+`48` tetra cells per anchor, keep `--simplex-cell-score-degree-penalty 0.75`,
+and preserve the same selected-boundary realization losses, light recycled
+geometry selector, and half-scale edge-frame boundary messages.
+
+Launch: E84 is running as `e84_degree_penalty_from_e81_s8500_c256_m64`.
+Main Python PID is `4828`. The log path is
+`/workspace/SimplexFold/logs/e84_degree_penalty_from_e81.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e84_degree_penalty_from_e81_s8500_c256_m64/`.
+Do not add E84 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Decision rule after return: keep if E84 preserves or improves E81's
+`val_lddt_ca=0.3980` without losing the selected-boundary lDDT and
+boundary-edge reuse gains. If it regresses, stop the degree-penalty
+continuation path and move to incidence-normalized boundary or outer-edge
+transport.
+
+### E85 Candidate: Incidence-Normalized Boundary Transport
 
 Status: design candidate, not implemented.
 
@@ -114,18 +146,19 @@ boundary-edge exchange path using edge-cell incidence degrees. Keep the
 normalization in the message route, not in the loss, and preserve directed
 source/target edge frames for scalarization.
 
-Decision rule: test only if E81 or E83 shows strong selected-boundary lDDT
-but high edge reuse or reduced primary lDDT. Keep if selected boundary-edge
-reuse falls without losing the E79 local lDDT gain.
+Decision rule: test if E84 regresses from E81 or if the degree-penalized
+sparse branch retains strong selected-boundary lDDT but continues to show high
+edge reuse. Keep if selected boundary-edge reuse falls without losing the E81
+local lDDT gain.
 
-### E85 Candidate: Directed Outer-Edge Transport Revisit
+### E86 Candidate: Directed Outer-Edge Transport Revisit
 
 Status: design candidate, not implemented.
 
 Hypothesis: early outer-edge runs were too disruptive, but Topotein's directed
 outer-edge neighborhoods remain the best protein-specific route for
 cell-to-cell communication. A weaker, incidence-normalized, source/target
-aware version from the sparse E79/E82 complex may be better behaved than the
+aware version from the sparse E79-E81 complex may be better behaved than the
 earlier dense-context attempts.
 
 Mechanism sketch: construct outgoing and incoming outer-edge summaries for
@@ -3027,7 +3060,7 @@ Validation:
 
 ### E82: Continue Sparse Selected Higher-Rank Cell Complex
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E79 showed that the sparse selected-cell construction can improve
 primary lDDT and dramatically clean up selected-boundary realization. A short
@@ -3040,25 +3073,24 @@ same light-geometry selector, selected-boundary losses, selected-coordinate
 losses, and half-scale edge-frame boundary messages. This keeps the active
 cell complex sparse rather than adding a new loss.
 
-Launch: E82 is running as `e82_sparse_topk_from_e79_s7500_c256_m64`. Remote
+Launch: E82 ran as `e82_sparse_topk_from_e79_s7500_c256_m64`. Remote
 prelaunch checks confirmed no active Python benchmark process, successful
 py_compile for the simplex/model-config/runner files, and the E79 checkpoint
-present. Main Python PID is `3565`. The log path is
+present. Main Python PID was `3565`. The log path is
 `/workspace/SimplexFold/logs/e82_sparse_topk_from_e79.log`, and the artifact
 path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e82_sparse_topk_from_e79_s7500_c256_m64/`.
-Do not add E82 to `EXPERIMENT_RESULTS.md` until it returns.
 
-Decision rule after return: compare E82 against E79. If E82 preserves or
-improves primary lDDT without losing the selected-boundary diagnostic gains,
-continue the sparse-cell branch. If E82 loses primary lDDT while preserving
-the topology diagnostics, try E81's degree-penalized sparse-cell scoring from
-the strongest E79/E82 checkpoint.
+Result: keep. E82 reached `val_lddt_ca=0.3924`, FoldScore `0.3788`,
+`val_ca_drmsd=10.2523`, and predicted/true C-alpha radius
+`11.3363 / 15.4034`, improving E79's primary lDDT and FoldScore. Selected
+face/tetra boundary lDDT rose again to `0.7135` / `0.6987`, and boundary
+length MAE fell to `1.1560` / `1.2579`. This confirmed that fixed sparse caps
+could keep the topology-construction gain after E79's schedule.
 
 ### E81: Degree-Penalized Sparse Cell Scoring
 
-Status: implemented locally and planned only if the sparse-cell fallback is
-needed after E80.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E78 improved selected-boundary lDDT and boundary length error, but
 its selected-boundary contraction fraction rose. The topology metrics have
@@ -3076,15 +3108,35 @@ per-anchor face/tetra top-k mask. This changes which rank-2 and rank-3
 cochains exist and send messages; it does not change tensor shapes,
 checkpoint compatibility, or parameter count.
 
-Planned launch if needed: combine with E79's scheduled caps from the strongest
-E78/E80 checkpoint, for example
-`--simplex-face-top-k 0 --simplex-face-top-k-final 24`,
-`--simplex-tetra-top-k 0 --simplex-tetra-top-k-final 48`, and
-`--simplex-cell-score-degree-penalty 0.75`. Compare against E79 on primary
-`val_lddt_ca`, selected boundary lDDT/length, contraction fraction, and
-boundary unique-edge fraction.
+Launch: E81 ran as `e81_degree_penalty_from_e82_s8000_c256_m64`, resuming the
+E82 checkpoint from step 7500 to 8000 with fixed `24` / `48` sparse caps and
+`--simplex-cell-score-degree-penalty 0.75`.
+
+Result: keep as the new primary branch. E81 reached `val_lddt_ca=0.3980`,
+FoldScore `0.3826`, `val_ca_drmsd=10.0954`, and predicted/true C-alpha
+radius `11.4973 / 15.4034`. Selected face/tetra boundary lDDT improved to
+`0.7335` / `0.7178`, boundary length MAE to `1.0733` / `1.1727`, contraction
+fraction to `0.5781` / `0.5791`, and unique-edge fraction to
+`0.0856` / `0.0304`.
 
 Validation:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py::test_cell_score_degree_penalty_prefers_less_reused_boundary_edges tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_cell_degree_penalty_adds_no_parameters tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`
+
+### E84: Continue Degree-Penalized Sparse Cell Scoring
+
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E81 improved both primary lDDT and selected-complex diagnostics by
+changing sparse cell construction. One short continuation should show whether
+the cleaner selected complex is stable before switching to incidence-normalized
+message transport.
+
+Mechanism: resume E81's checkpoint from step 8000 to step 8500 with fixed
+`--simplex-face-top-k 24`, `--simplex-tetra-top-k 48`, and
+`--simplex-cell-score-degree-penalty 0.75`.
+
+Launch: E84 is running as `e84_degree_penalty_from_e81_s8500_c256_m64`. Main
+Python PID is `4828`; a status poll at `2026-05-12T10:43:02Z` showed the
+process alive, GPU active, and no returned `results.json` yet.

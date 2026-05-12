@@ -50,6 +50,31 @@
 - E81 resumes the E82 checkpoint from step 7500 to 8000 with the same fixed
   sparse caps and adds `--simplex-cell-score-degree-penalty 0.75` to
   down-rank candidate cells that reuse overrepresented boundary edges.
+- E81 completed and was pulled locally under
+  `artifacts/nanofold_public_benchmarks/e81_degree_penalty_from_e82_s8000_c256_m64/`
+  plus `logs/e81_degree_penalty_from_e82.log`.
+- E81 result: `completed_steps=8000`, `train_examples=64000`,
+  `parameters=3,154,242`, `val_lddt_ca=0.39799308963119984`, FoldScore
+  `0.3825651463121176`, `val_ca_drmsd=10.095411986112595`, and
+  predicted/true C-alpha radius `11.497344255447388 / 15.403406739234924`.
+- E81 selected-complex diagnostics improved over E82/E83: face/tetra boundary
+  lDDT `0.7335464172065258` / `0.717821329832077`, boundary length MAE
+  `1.0733469985425472` / `1.1726838611066341`, contraction fraction
+  `0.5781249664723873` / `0.5791049208492041`, boundary-edge mean degree
+  `11.727135837078094` / `33.19685733318329`, and unique-edge fraction
+  `0.08556290429844117` / `0.030409362497511753`.
+- Interpretation: keep E81 as the new primary-lDDT branch. Penalizing
+  candidate cells that reuse overrepresented boundary edges improved lDDT,
+  FoldScore, dRMSD, selected-boundary lDDT, boundary length error,
+  contraction, and boundary-edge reuse. This is a clean topology-construction
+  win rather than an output-side metric hack.
+- Launched E84 on the same owned pod as
+  `e84_degree_penalty_from_e81_s8500_c256_m64`, PID `4828`, log
+  `/workspace/SimplexFold/logs/e84_degree_penalty_from_e81.log`.
+- E84 resumes the E81 checkpoint from step 8000 to 8500 with the same fixed
+  sparse caps and degree penalty (`--simplex-cell-score-degree-penalty 0.75`).
+  A status check at `2026-05-12T10:43:02Z` confirmed the process is alive and
+  no `results.json` has returned yet.
 
 ## 2026-05-12 PDF Reference Pass
 
@@ -74,16 +99,14 @@
   consider outer-edge neighborhoods for cell-to-cell communication, use
   edge-centric scalarization for orientation-aware updates, and avoid shallow
   higher-rank features that do not have dedicated update routes.
-- This supports the active E82 sparse-cell continuation and the prepared E81
-  degree-penalized sparse-cell fallback. Both alter the learned combinatorial
-  complex rather than attaching a generic coordinate head.
-- If E82/E81 do not produce a stable gain, the next paper-aligned idea should
-  be incidence-normalized boundary or outer-edge transport. The current E79
-  diagnostics show very strong selected-boundary lDDT but still high
-  boundary-edge reuse, so edge-cell incidence degree is the natural pressure
-  point.
-- E82 status check at `2026-05-12T08:43:27Z`: still running on owned pod
-  `o1dy17ouv8w5mz`, PID `3565`, no `results.json` yet.
+- This supports the E81/E84 degree-penalized sparse-cell branch. E81 alters
+  the learned combinatorial complex by changing which face/tetra cochains
+  exist, and the improved boundary-edge reuse metrics are exactly the kind of
+  topology-aware evidence the PDFs suggest tracking.
+- If E84 does not produce a stable gain, the next paper-aligned idea should be
+  incidence-normalized boundary or outer-edge transport. The current sparse
+  branch has strong selected-boundary lDDT but still nontrivial boundary-edge
+  reuse, so edge-cell incidence degree remains the natural pressure point.
 
 ## 2026-05-09
 

@@ -1,4 +1,4 @@
-## Current Plan: E81 Degree-Penalized Sparse-Cell Scoring
+## Current Plan: E84 Degree-Penalized Sparse-Cell Continuation
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -214,17 +214,26 @@ Selected face/tetra boundary lDDT also softened to `0.7034` / `0.6881`, and
 boundary length MAE worsened to `1.2296` / `1.3345`. Reject this continuation
 as a primary branch.
 
-The active branch is now E81 on the owned H100 pod `o1dy17ouv8w5mz` as
-`e81_degree_penalty_from_e82_s8000_c256_m64`. It resumes the stronger E82
-checkpoint from step 7500 to 8000 with the same fixed sparse caps plus
-`--simplex-cell-score-degree-penalty 0.75`. This tests whether down-ranking
-candidate cells that reuse already-overrepresented boundary edges keeps the
-sparse selected complex clean without adding parameters or output-side loss
-pressure. Do not launch a blind 30,000-step confirmation until a branch shows
-a credible trajectory toward `val_lddt_ca > 0.7`, not merely a small local
-best below 0.4.
+E81 answered the degree-penalized sparse-cell question positively. It resumed
+the stronger E82 checkpoint from step 7500 to 8000 with the same fixed sparse
+caps plus `--simplex-cell-score-degree-penalty 0.75`, and reached a new best
+`val_lddt_ca=0.3980`, FoldScore `0.3826`, `val_ca_drmsd=10.0954`, and
+predicted/true C-alpha radius `11.4973 / 15.4034`. The selected-complex
+diagnostics improved too: face/tetra boundary lDDT rose to `0.7335` /
+`0.7178`, boundary length MAE fell to `1.0733` / `1.1727`, contraction
+fraction fell to `0.5781` / `0.5791`, and unique boundary-edge fraction rose
+to `0.0856` / `0.0304`. This supports the hypothesis that high boundary-edge
+reuse is a real topological construction failure mode.
 
-The 2026-05-12 full reread of the saved PDFs reinforces the E79/E82 direction.
+The active branch is now E84 on the owned H100 pod `o1dy17ouv8w5mz` as
+`e84_degree_penalty_from_e81_s8500_c256_m64`. It resumes E81 from step 8000 to
+8500 with the same fixed sparse caps and degree penalty. This is a short
+confirmation gate for the cleaner sparse-complex selector, not a commitment to
+a blind 30,000-step run. Do not launch a blind 30,000-step confirmation until
+a branch shows a credible trajectory toward `val_lddt_ca > 0.7`, not merely a
+small local best below 0.4.
+
+The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank
 aggregation, inter-rank aggregation, and topology-aware diagnostics as core
 model choices. Topotein makes the same point in protein terms: directed
@@ -234,24 +243,15 @@ features. For SimplexFold, that means the next branch should keep changing
 which sparse cells exist or how selected cochains communicate through their
 incidence/outer-edge structure.
 
-The other prepared alternatives are E75, E79, and E81. E75 caps active
-face/tetra cells per anchor with `--simplex-face-top-k` and
-`--simplex-tetra-top-k`, ranking candidate cells by selected boundary-edge
-logits. E79 adds a runtime schedule for those caps so the selected
-higher-rank complex can be sparsified gradually during a continuation. E81
-adds a zero-parameter degree penalty to the capped cell score so high-scoring
-candidate cells that reuse already-overrepresented boundary edges are
-down-ranked. All three are cell-complex construction changes rather than
-generic output-coordinate losses.
-
-If E81 preserves E82's primary lDDT while reducing boundary-edge reuse, keep
-the degree-penalized sparse-cell selector for a short confirmation gate. If it
-does not, the next code idea should be incidence-normalized boundary or
-outer-edge transport rather than another coordinate loss: normalize messages
-by selected edge-cell degree inside the cochain exchange path, preserve
-directed source/target incidence, and measure whether this reduces
-boundary-edge reuse without erasing the strong selected-boundary lDDT seen in
-E79-E82.
+The other prepared alternatives are now incidence-normalized boundary
+transport and directed outer-edge transport. E81 showed that changing the
+selected-cell score is a valid topology-construction lever. If E84 regresses
+from E81 or keeps high boundary-edge reuse without a primary-lDDT gain, the
+next code idea should be incidence-normalized boundary or outer-edge transport
+rather than another coordinate loss: normalize messages by selected edge-cell
+degree inside the cochain exchange path, preserve directed source/target
+incidence, and measure whether this reduces boundary-edge reuse without
+erasing the strong selected-boundary lDDT seen in E79-E81.
 
 Yes. With templates forbidden, the right construction is:
 

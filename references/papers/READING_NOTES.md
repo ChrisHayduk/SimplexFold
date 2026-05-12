@@ -188,3 +188,25 @@ Specific ideas to carry forward:
   Degree-penalized cell scoring and incidence-normalized message transport
   are therefore principled topology-construction fixes, not arbitrary metric
   hacks.
+
+## 2026-05-12 E81/E84 Update
+
+I rechecked the extracted full text while E84 was running from the E81
+checkpoint. The references still point away from generic lDDT-targeted losses
+and toward two concrete SimplexFold levers:
+
+- Complex construction: choose which rank-2/rank-3 cochains exist. E81's
+  degree-penalized scorer is directly aligned with this because it changes
+  the selected face/tetra complex by discouraging repeated use of the same
+  boundary edges.
+- Incidence-aware communication: when construction alone stops improving,
+  normalize or gate boundary/outer-edge messages by selected edge-cell degree
+  while preserving directed source/target incidence.
+
+E81's returned diagnostics make this literature link stronger: the run
+improved primary lDDT while also improving selected-boundary lDDT, boundary
+length error, contraction fraction, and boundary unique-edge fraction. That is
+evidence that the change helped the learned complex itself, not merely the
+output metric. E84 is therefore a justified short continuation. If it regresses,
+the next paper-aligned branch should be incidence-normalized boundary or
+directed outer-edge transport rather than another output-coordinate loss.

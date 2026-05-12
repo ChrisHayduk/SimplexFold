@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-12.
 
-Best validation C-alpha lDDT so far: **E82**, `val_lddt_ca=0.3924` at step
-7500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E81**, `val_lddt_ca=0.3980` at step
+8000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -99,3 +99,4 @@ recorded in the running notes for that run.
 | E79 scheduled sparse cell caps | completed | 7000 | 0.3885 | 0.3885 | 0.3728 | 10.2661 | 11.1540 / 15.4034 | kept; new best lDDT and much stronger selected-boundary diagnostics, continue sparse-cell branch |
 | E82 fixed sparse cell caps | completed | 7500 | 0.3924 | 0.3924 | 0.3788 | 10.2523 | 11.3363 / 15.4034 | kept; fixed sparse-cell complex improves E79 lDDT/FoldScore and selected-boundary diagnostics, continue one short sparse-cell gate |
 | E83 fixed sparse cell continue | completed | 8000 | 0.3876 | 0.3876 | 0.3747 | 10.3539 | 11.1757 / 15.4034 | rejected; fixed sparse-cap continuation fell below E82 and softened selected-boundary diagnostics, pivot to E81 degree-penalized cell scoring from E82 |
+| E81 degree-penalized sparse cells | completed | 8000 | 0.3980 | 0.3980 | 0.3826 | 10.0954 | 11.4973 / 15.4034 | kept; new best lDDT/FoldScore/dRMSD with lower boundary-edge reuse, continue degree-penalized sparse selector one short gate |
