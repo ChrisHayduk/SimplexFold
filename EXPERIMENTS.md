@@ -2665,7 +2665,7 @@ operator change next.
 
 ### E77: Coface-Degree-Attenuated Boundary Messages
 
-Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
+Status: completed and rejected.
 
 Hypothesis: E70-E76 improved lDDT only after the model learned to pass
 geometry through selected face/tetra boundary edges, but the diagnostics still
@@ -2690,8 +2690,8 @@ recipe plus `--simplex-boundary-message-degree-attenuation 0.25`. Compare
 against E73/E76 on primary `val_lddt_ca` and against E72/E73 on
 selected-boundary diagnostics.
 
-Launch: E77 is running as `e77_degree_atten025_from_e73_s6000_c256_m64` on
-the owned Runpod B200 pod. Remote py_compile passed for
+Launch: E77 ran as `e77_degree_atten025_from_e73_s6000_c256_m64` on the
+owned Runpod B200 pod. Remote py_compile passed for
 `minalphafold/simplex.py`, `minalphafold/model_config.py`, and
 `scripts/run_nanofold_public_benchmarks.py`, and parser smoke confirmed
 `--simplex-boundary-message-degree-attenuation 0.25`. The launch resumed
@@ -2702,7 +2702,18 @@ new/missing tensors, and started a fresh optimizer. Main Python PID is
 `/workspace/SimplexFold/logs/e77_degree_atten025_from_e73.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e77_degree_atten025_from_e73_s6000_c256_m64/`.
-Do not add E77 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: step 6000 reached `val_lddt_ca=0.3733`, FoldScore `0.3710`,
+`val_ca_drmsd=10.1286`, and predicted/true C-alpha radius
+`11.8632 / 15.4034`. Selected face/tetra boundary lDDT improved to `0.5421` /
+`0.5265`, boundary length MAE improved to `2.5714` / `2.7039`, and
+contraction fractions improved to `0.6467` / `0.6475`.
+
+Interpretation: reject as a primary branch but keep the diagnostic. Coface
+degree attenuation made the selected sparse complex realize its own boundary
+edges more cleanly, but primary local C-alpha lDDT remained below E73's
+`0.3807`. The next active test should move upstream to selected-complex
+construction rather than further normalizing the same boundary-edge readout.
 
 Validation:
 
@@ -2711,7 +2722,7 @@ Validation:
 
 ### E74: Light Recycled-Geometry Topology Selector
 
-Status: implemented locally and still available if E76/E77 turn over.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E72 improved selected-boundary lDDT, FoldScore, dRMSD, and global
 radius while reducing primary local lDDT. One possible failure mode is that,
@@ -2729,11 +2740,22 @@ incidence relations are built from a softer blend of learned pair topology and
 recycled C-alpha geometry. It adds no parameters and does not introduce a
 generic output-coordinate loss.
 
-Planned launch if needed: update the owned Runpod workspace to the commit that
-contains this runner override, resume the strongest available checkpoint, and
-run a 500-step gate with `--simplex-geometry-distance-weight 0.025` plus the
-selected-boundary lDDT/coordinate-realization recipe. If E73 beats E71, skip
-this and follow the better E73 branch instead.
+Launch: E74 is running as `e74_light_geom0025_from_e73_s6000_c256_m64` on a
+second owned Runpod H100 pod. The pod was created from the same PyTorch image,
+then staged with the current SimplexFold branch, NanoFold public manifests,
+features, labels, and the E73 checkpoint. Verification before launch confirmed
+public manifest counts `10000/1000/11000`, feature/label NPZ counts
+`11000/11000`, E73 checkpoint size `35,385,519` bytes, remote py_compile for
+the runner/model files, parser support for `--simplex-geometry-distance-weight
+0.025`, and NanoFold FoldScore import. The launch resumed
+`e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+at step 5500/examples 44000, loaded 1244 matching tensors, initialized 0
+new/missing tensors, and started a fresh optimizer. Main Python PID is `850`;
+data-worker PIDs are `1027` and `1028`. The log path is
+`/workspace/SimplexFold/logs/e74_light_geom0025_from_e73.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e74_light_geom0025_from_e73_s6000_c256_m64/`.
+Do not add E74 to `EXPERIMENT_RESULTS.md` until it returns.
 
 Validation:
 
@@ -2741,7 +2763,7 @@ Validation:
 
 ### E75: Sparse Selected Higher-Rank Cell Complex
 
-Status: implemented locally and planned only if E73/E74 do not recover E71.
+Status: implemented locally and planned only if E74/E77 do not recover E73.
 
 Hypothesis: the current selector picks a sparse residue neighbor star, but then
 instantiates the full clique of faces and tetrahedra inside that star. The

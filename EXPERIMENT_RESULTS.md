@@ -92,3 +92,4 @@ recorded in the running notes for that run.
 | E72 continue edge-frame 0.025 to 5500 | completed | 5500 | 0.3718 | 0.3718 | 0.3722 | 10.1027 | 12.0872 / 15.4034 | rejected; FoldScore/dRMSD/boundary diagnostics improved but primary lDDT fell below E71 |
 | E73 half-scale edge-frame 0.0125 to 5500 | completed | 5500 | 0.3807 | 0.3807 | 0.3720 | 10.0777 | 11.6741 / 15.4034 | kept; new best lDDT/FoldScore/dRMSD, boundary diagnostics below E72 |
 | E76 continue edge-frame 0.0125 to 6000 | completed | 6000 | 0.3713 | 0.3713 | 0.3723 | 10.2191 | 12.0036 / 15.4034 | rejected; continuing half-scale edge-frame reduced lDDT below E73 despite a tiny FoldScore uptick |
+| E77 coface-degree atten 0.25 | completed | 6000 | 0.3733 | 0.3733 | 0.3710 | 10.1286 | 11.8632 / 15.4034 | rejected; improves selected-boundary diagnostics but primary lDDT remains below E73 |

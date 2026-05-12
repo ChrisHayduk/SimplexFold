@@ -2597,3 +2597,59 @@
   optimizer. Remote metadata records effective batch 8, crop 256, MSA depth
   64, no templates, runtime edge-frame scale `0.0125`, and
   `simplex_boundary_message_degree_attenuation=0.25`.
+- E77 poll on `lovgzo4hz2k4fp`: still running, no `results.json`; GPU active.
+  History still contains inherited E73 rows through step 5500 only, so there
+  is no E77 result to add to `EXPERIMENT_RESULTS.md`.
+- Launched a second owned Runpod pod for a parallel prepared fallback:
+  `o1dy17ouv8w5mz` (`codex-simplexfold-e74-runpod-20260512`), H100 SXM,
+  image `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404`, 160 GB container
+  disk, SSH `root@103.207.149.82 -p 10764`, hourly cost reported by
+  `runpodctl` as `$2.99/hr`.
+- Initial pod-to-pod workspace streaming from `lovgzo4hz2k4fp` was moving too
+  slowly and would have kept reading from the active E77 workspace, so it was
+  stopped. The H100 pod was then staged by cloning SimplexFold commit
+  `60c82133046f7a3cea393d5567af15ebc07c15b6` and nanoFold-Competition commit
+  `96afc8467a108aa8bee3b51cdf4a030cd656a960`, rsyncing only public
+  `data/processed_features`, `data/processed_labels`, and `data/manifests`
+  from local, and copying only the 34 MB E73 checkpoint from the B200 pod.
+- E74 H100 prelaunch verification passed: public manifest counts
+  `10000/1000/11000`, processed feature/label NPZ counts `11000/11000`, E73
+  checkpoint present with `35,385,519` bytes, remote py_compile passed for
+  `minalphafold/simplex.py`, `minalphafold/model_config.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; parser smoke confirmed
+  `--simplex-geometry-distance-weight 0.025`; NanoFold FoldScore import works.
+- E74 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e74_light_geom0025_from_e73_s6000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e74_light_geom0025_from_e73.log`, and artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e74_light_geom0025_from_e73_s6000_c256_m64/`.
+  Main Python PID is `850`; data-worker PIDs are `1027` and `1028`. The
+  runner resumed E73 at step 5500/examples 44000, loaded 1244 matching model
+  tensors, initialized 0 new/missing tensors, and started a fresh optimizer.
+  Remote metadata records effective batch 8, crop 256, MSA depth 64, no
+  templates, runtime edge-frame scale `0.0125`, and
+  `simplex_geometry_distance_weight=0.025`.
+- E77 returned on owned pod `lovgzo4hz2k4fp`: step 6000
+  `val_lddt_ca=0.3733267541974783`, FoldScore `0.37099136784672737`,
+  `val_ca_drmsd=10.128643780946732`, predicted/true C-alpha radius
+  `11.863174617290497 / 15.40340667963028`, selected face/tetra boundary
+  lDDT `0.5420919340103865` / `0.5265114568173885`, boundary length MAE
+  `2.5714316442608833` / `2.7038855478167534`, and contraction fractions
+  `0.6467265896499157` / `0.6474730856716633`.
+- E77 interpretation: reject as a primary branch. It did exactly what the
+  topology diagnostic asked for by improving selected-boundary lDDT and
+  boundary length errors relative to E73/E76, but it still lost primary
+  C-alpha lDDT versus E73. This suggests the next live test, E74, should move
+  upstream to the selected-complex construction prior rather than further
+  normalizing the same incidence readout.
+- Copied E77 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e77_degree_atten025_from_e73_s6000_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e77_degree_atten025_from_e73.log`. The local artifact pull excluded
+  the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step 5500`
+  to add the E77 row to `EXPERIMENT_RESULTS.md`, so inherited E73 history does
+  not count as E77's best validation lDDT.
+- Stopped the completed/rejected E77 B200 pod `lovgzo4hz2k4fp` after copying
+  and locally verifying the returned artifacts. E74 continues on the only
+  active launched pod, `o1dy17ouv8w5mz`.

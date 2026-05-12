@@ -161,15 +161,22 @@ no parameters and addresses the high boundary-edge reuse diagnostic directly.
 The first gate uses `--simplex-boundary-message-degree-attenuation 0.25` with
 the E76 recipe, effective batch 8, crop 256, MSA depth 64, and no templates.
 
-E77 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` as
-`e77_degree_atten025_from_e73_s6000_c256_m64`. It resumes the E73 step-5500
-checkpoint, keeps the half-scale edge-frame route, and should be judged first
-on whether it recovers or exceeds E73's `val_lddt_ca=0.3807` while improving
-the high boundary-edge reuse diagnostics.
+E77 tested coface-degree attenuation on the selected boundary-edge readout.
+Reject it as a primary-lDDT branch: step 6000 reached `val_lddt_ca=0.3733`,
+below E73's `0.3807`, and FoldScore softened to `0.3710`. The diagnostic is
+still useful: selected face/tetra boundary lDDT improved to `0.5421` /
+`0.5265`, and boundary length MAE improved to `2.5714` / `2.7039`. Degree
+attenuation therefore cleans up selected-boundary realization but is not
+enough by itself to preserve local C-alpha agreement.
 
-The other prepared alternatives are still E74/E75. E74 reduces the
-recycled-geometry distance prior in the simplex neighbor selector from `0.1`
-to `0.025`, directly changing which sparse face/tetra cochains exist. E75
+The active branch is now E74 on a second owned Runpod H100 pod
+`o1dy17ouv8w5mz` as `e74_light_geom0025_from_e73_s6000_c256_m64`. This tests
+the prepared topology-construction alternative: keep the E73/E77 loss and
+edge-frame recipe, but reduce the recycled-geometry selector weight to
+`0.025` so learned pair/contact topology has more control over which sparse
+face/tetra cochains exist.
+
+The other prepared alternative is still E75. It
 caps active face/tetra cells per anchor with `--simplex-face-top-k` and
 `--simplex-tetra-top-k`, ranking candidate cells by selected boundary-edge
 logits. These are also cell-complex construction or incidence changes rather
