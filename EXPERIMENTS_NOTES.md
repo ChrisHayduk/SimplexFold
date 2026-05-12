@@ -164,17 +164,18 @@
   normalization and sparse degree-penalized cells. Do not launch this
   automatically while E85 is active.
 - E87 local implementation prepared while E85 runs: added zero-parameter
-  `simplex_boundary_readout_directionality`. This keeps the previous symmetric
-  face/tetra boundary scatter at `0.0`, but can blend toward a directed
-  boundary-edge readout that writes selected cochain messages only into the
-  selected source/target pair orientation. The change is topological rather
-  than metric-driven: it preserves directed incidence information in the
-  simplex-to-pair cochain route.
+  `simplex_boundary_readout_directionality` plus training-time runtime ramp
+  flags. This keeps the previous symmetric face/tetra boundary scatter at
+  `0.0`, but can blend toward a directed boundary-edge readout that writes
+  selected cochain messages only into the selected source/target pair
+  orientation. The change is topological rather than metric-driven: it
+  preserves directed incidence information in the simplex-to-pair cochain
+  route.
 - E87 local validation passed:
-  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`;
-  `python -m pytest tests/test_simplex.py::test_boundary_readout_directionality_preserves_pair_orientation tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_boundary_readout_directionality_adds_no_parameters`;
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_boundary_readout_directionality_preserves_pair_orientation tests/test_simplex.py::test_boundary_readout_directionality_override_gates_pair_readout tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_boundary_readout_directionality_adds_no_parameters`;
   `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
-  reported `156 passed`.
+  reported `157 passed`.
 
 ## 2026-05-09
 

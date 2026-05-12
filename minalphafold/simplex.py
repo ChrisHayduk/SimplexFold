@@ -1360,6 +1360,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
         simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
@@ -1391,6 +1392,12 @@ class SimplicialAdapter(torch.nn.Module):
             edge_frame_message_scale = max(
                 float(simplex_edge_frame_message_scale_override.detach().float().cpu().item()),
                 0.0,
+            )
+        boundary_readout_directionality = self.boundary_readout_directionality
+        if simplex_boundary_readout_directionality_override is not None:
+            boundary_readout_directionality = min(
+                max(float(simplex_boundary_readout_directionality_override.detach().float().cpu().item()), 0.0),
+                1.0,
             )
         local_neighbor_k = self.local_neighbor_k
         if simplex_local_neighbor_k_override is not None:
@@ -1646,7 +1653,7 @@ class SimplicialAdapter(torch.nn.Module):
         )
         directed_pair_delta = pair_delta
         directed_pair_counts = pair_counts
-        if self.boundary_readout_directionality > 0.0:
+        if boundary_readout_directionality > 0.0:
             directed_pair_delta, directed_pair_counts = scatter_to_pair(
                 face_edge_update,
                 face_edge_indices,
@@ -1710,7 +1717,7 @@ class SimplicialAdapter(torch.nn.Module):
             )
             pair_delta = pair_delta + tet_pair_delta
             pair_counts = pair_counts + tet_pair_counts
-            if self.boundary_readout_directionality > 0.0:
+            if boundary_readout_directionality > 0.0:
                 directed_tet_pair_delta, directed_tet_pair_counts = scatter_to_pair(
                     tet_edge_update,
                     tet_edge_indices,
@@ -1722,9 +1729,9 @@ class SimplicialAdapter(torch.nn.Module):
                 directed_pair_counts = directed_pair_counts + directed_tet_pair_counts
 
         pair_readout = pair_delta / pair_counts.clamp_min(1.0)
-        if self.boundary_readout_directionality > 0.0:
+        if boundary_readout_directionality > 0.0:
             directed_pair_readout = directed_pair_delta / directed_pair_counts.clamp_min(1.0)
-            directionality = pair_readout.new_tensor(self.boundary_readout_directionality)
+            directionality = pair_readout.new_tensor(boundary_readout_directionality)
             pair_readout = (1.0 - directionality) * pair_readout + directionality * directed_pair_readout
             pair_counts = (1.0 - directionality) * pair_counts + directionality * directed_pair_counts
         pair_readout = coface_degree_attenuate_pair_readout(

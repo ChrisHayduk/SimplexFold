@@ -47,6 +47,7 @@ from minalphafold.trainer import (
     load_training_protocol,
     main,
     model_inputs_from_batch,
+    simplex_boundary_readout_directionality_runtime_scale_at_step,
     save_checkpoint,
     simplex_hodge_face_runtime_scale_at_step,
     simplex_local_neighbor_k_at_step,
@@ -144,6 +145,10 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_hodge_face_runtime_scale_final=0.1,
         simplex_hodge_face_runtime_scale_ramp_start_step=10,
         simplex_hodge_face_runtime_scale_ramp_steps=10,
+        simplex_boundary_readout_directionality_runtime_scale=0.0,
+        simplex_boundary_readout_directionality_runtime_scale_final=0.5,
+        simplex_boundary_readout_directionality_runtime_scale_ramp_start_step=10,
+        simplex_boundary_readout_directionality_runtime_scale_ramp_steps=10,
         simplex_local_neighbor_k=4.0,
         simplex_local_neighbor_k_final=0.0,
         simplex_local_neighbor_k_ramp_start_step=10,
@@ -153,12 +158,14 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_topology_teacher_forcing_weight_at_step(training_config, 15) == 0.5
     assert simplex_update_scale_at_step(training_config, 15) == 0.625
     assert simplex_hodge_face_runtime_scale_at_step(training_config, 15) == 0.05
+    assert simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, 15) == 0.25
     assert simplex_local_neighbor_k_at_step(training_config, 15) == 2.0
 
     eval_inputs = model_inputs_from_batch(batch, training_config)
     assert "simplex_teacher_ca_coords" not in eval_inputs
     assert "simplex_pair_update_scale_override" not in eval_inputs
     assert "simplex_hodge_face_update_scale_override" not in eval_inputs
+    assert "simplex_boundary_readout_directionality_override" not in eval_inputs
     assert "simplex_local_neighbor_k_override" not in eval_inputs
 
     train_inputs = model_inputs_from_batch(
@@ -167,6 +174,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
         use_simplex_teacher_forcing=True,
         use_simplex_update_scale=True,
         use_simplex_hodge_face_runtime_scale=True,
+        use_simplex_boundary_readout_directionality_runtime_scale=True,
         use_simplex_local_neighbor_k=True,
         step=15,
     )
@@ -176,6 +184,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_pair_update_scale_override"], torch.tensor(0.625))
     assert torch.allclose(train_inputs["simplex_single_update_scale_override"], torch.tensor(0.625))
     assert torch.allclose(train_inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.05))
+    assert torch.allclose(train_inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
     assert torch.allclose(train_inputs["simplex_local_neighbor_k_override"], torch.tensor(2.0))
 
 

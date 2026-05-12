@@ -266,8 +266,10 @@ normalization, degree-penalized sparse cells, and the selected-boundary loss
 recipe fixed. A second prepared fallback is directed boundary readout:
 `simplex_boundary_readout_directionality` keeps the default symmetric
 simplex-to-pair scatter at `0`, but can blend toward source/target directed
-boundary-edge writes. This is another zero-parameter cochain-communication
-test aligned with the directed-incidence view rather than a new metric loss.
+boundary-edge writes. The prepared test should ramp the runtime contribution
+from `0.0` to `0.5` rather than switching it on abruptly. This is another
+zero-parameter cochain-communication test aligned with the directed-incidence
+view rather than a new metric loss.
 
 Yes. With templates forbidden, the right construction is:
 

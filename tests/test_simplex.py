@@ -827,6 +827,39 @@ def test_boundary_readout_directionality_preserves_pair_orientation():
     assert torch.allclose(directed_single, base_single)
 
 
+def test_boundary_readout_directionality_override_gates_pair_readout():
+    class BaseConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    torch.manual_seed(37)
+    adapter = SimplicialAdapter(BaseConfig()).eval()
+    pair = torch.randn(1, 5, 5, BaseConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, BaseConfig.c_s)
+    coords = torch.randn(1, 5, 3)
+
+    with torch.no_grad():
+        off_pair, off_single, _ = adapter(
+            pair,
+            single,
+            recycled_ca_coords=coords,
+            simplex_boundary_readout_directionality_override=pair.new_tensor(0.0),
+        )
+        on_pair, on_single, _ = adapter(
+            pair,
+            single,
+            recycled_ca_coords=coords,
+            simplex_boundary_readout_directionality_override=pair.new_tensor(1.0),
+        )
+
+    assert not torch.allclose(on_pair, off_pair)
+    assert torch.allclose(on_single, off_single)
+
+
 def test_outer_edge_context_runtime_scale_gates_context_path():
     class OuterContextConfig(SimplexConfig):
         simplex_neighbor_k = 3

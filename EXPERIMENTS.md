@@ -226,15 +226,22 @@ to simplex-to-pair communication.
 
 Prepared gate: do not launch while E85 is active. If incidence normalization
 and the weak outer-edge revisit do not recover a primary-lDDT gain, test a
-short gate from the strongest sparse-complex checkpoint with
-`--simplex-boundary-readout-directionality 0.5`, while keeping the
-degree-penalized sparse selector, selected-boundary realization losses, and
-incidence normalization fixed.
+short gate from the strongest sparse-complex checkpoint with the model-config
+directionality set to `0.5`, but ramp the runtime contribution from `0.0` to
+`0.5` over the gate:
+`--simplex-boundary-readout-directionality 0.5`,
+`--simplex-boundary-readout-directionality-runtime-scale 0.0`,
+`--simplex-boundary-readout-directionality-runtime-scale-final 0.5`,
+`--simplex-boundary-readout-directionality-runtime-scale-ramp-start-step
+8000`, and
+`--simplex-boundary-readout-directionality-runtime-scale-ramp-steps 500`.
+Keep the degree-penalized sparse selector, selected-boundary realization
+losses, and incidence normalization fixed.
 
 Validation:
 
-- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
-- `python -m pytest tests/test_simplex.py::test_boundary_readout_directionality_preserves_pair_orientation tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_boundary_readout_directionality_adds_no_parameters`
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_boundary_readout_directionality_preserves_pair_orientation tests/test_simplex.py::test_boundary_readout_directionality_override_gates_pair_readout tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_boundary_readout_directionality_adds_no_parameters`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
 ## Experiment Queue
