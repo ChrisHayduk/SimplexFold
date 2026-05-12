@@ -1,5 +1,39 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-12 PDF Reference Pass
+
+- Verified the two user-provided PDFs are saved locally under
+  `references/papers/`:
+  `hands_on_geometric_deep_learning_nodes_to_complexes.pdf` and
+  `2509.03885v1.pdf`.
+- The saved copies hash-match the files in `/Users/christopherhayduk/Downloads/`.
+  They remain ignored by git pending redistribution-rights confirmation, but
+  are available in the repo working tree for future experiment reference.
+- Re-extracted both PDFs with `pdftotext -layout` and reread the full text:
+  the TDL guide is 28 pages and the Topotein paper is 22 pages, totaling
+  about 14.5k extracted words.
+- The useful experiment pressure is not a new generic lDDT loss. The papers
+  both argue that the topological domain construction and the cochain message
+  routes are the core modeling choices.
+- The guide reinforces the rule that SimplexFold changes should affect the
+  selected neighbor graph, sparse face/tetra cells, incidence relations,
+  intra-rank aggregation, inter-rank aggregation, or topology-aware
+  diagnostics.
+- Topotein adds protein-specific guidance: preserve directed incidence,
+  consider outer-edge neighborhoods for cell-to-cell communication, use
+  edge-centric scalarization for orientation-aware updates, and avoid shallow
+  higher-rank features that do not have dedicated update routes.
+- This supports the active E82 sparse-cell continuation and the prepared E81
+  degree-penalized sparse-cell fallback. Both alter the learned combinatorial
+  complex rather than attaching a generic coordinate head.
+- If E82/E81 do not produce a stable gain, the next paper-aligned idea should
+  be incidence-normalized boundary or outer-edge transport. The current E79
+  diagnostics show very strong selected-boundary lDDT but still high
+  boundary-edge reuse, so edge-cell incidence degree is the natural pressure
+  point.
+- E82 status check at `2026-05-12T08:43:27Z`: still running on owned pod
+  `o1dy17ouv8w5mz`, PID `3565`, no `results.json` yet.
+
 ## 2026-05-09
 
 - Target is `val_lddt_ca > 0.7` on NanoFold validation with parameters within

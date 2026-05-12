@@ -158,3 +158,33 @@ recycled-geometry prior used to construct the sparse edge/face/tetra complex.
 If E74 turns over, E75 is the next paper-aligned branch because top-k caps
 change which higher-rank cells exist and therefore which selected-cell losses
 and messages are active.
+
+## 2026-05-12 Full Reread for Sparse-Cell Branch
+
+I reread both extracted texts again after E79 became the leading branch.
+The papers strengthen the interpretation that E79/E82 are the right kind of
+experiment: they modify the selected combinatorial complex itself by changing
+which higher-rank face/tetra cochains exist.
+
+Specific ideas to carry forward:
+
+- The TDL guide's distinction between intra-neighborhood and
+  inter-neighborhood aggregation maps cleanly to SimplexFold's residue/pair
+  updates versus face/tetra-to-boundary-edge exchange. Future changes should
+  specify which aggregation route they alter.
+- Topotein's directed PCC edges argue against treating boundary transport as
+  a fully undirected pooled message. A better SimplexFold route would keep
+  source/target orientation when passing selected face/tetra information back
+  into pair or single streams.
+- Topotein's outer-edge equations are still the strongest literature-backed
+  justification for cell-to-cell communication. Earlier dense outer-edge
+  experiments were disruptive, but a sparse, delayed, incidence-normalized
+  outer-edge route from the E79/E82 complex remains worth testing.
+- Topotein's negative comparison for shallow TDL adaptations matches our
+  failed sidecar/readout runs. The next attempt should be an actual selected
+  cochain update path, not a pooled output correction.
+- The high boundary-edge degree and low unique-edge fraction in E79 are
+  exactly the kind of topological pathology the papers suggest measuring.
+  Degree-penalized cell scoring and incidence-normalized message transport
+  are therefore principled topology-construction fixes, not arbitrary metric
+  hacks.

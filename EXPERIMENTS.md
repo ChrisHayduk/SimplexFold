@@ -39,6 +39,82 @@ on 2026-05-12. They sharpen the filter for future ideas:
   diagnostics alongside lDDT: selected-cell counts, boundary-edge reuse,
   selected boundary lDDT, boundary length error, and contraction fraction.
 
+The 2026-05-12 full reread adds several concrete filters for the next queue:
+
+- Prefer filtration-style construction schedules before static topology
+  priors. E79's scheduled top-k caps are well aligned with this: the model
+  first explores a richer neighbor-star complex, then sparsifies the active
+  face/tetra cochains.
+- Treat high boundary-edge reuse as a topological failure mode, not only a
+  numerical diagnostic. A candidate branch should either change cell scoring
+  or normalize incidence/outer-edge messages so a few overused edges cannot
+  dominate the selected complex.
+- Preserve directed incidence where possible. Topotein's PCC routes node-to-
+  edge and edge-to-node messages by direction, which suggests source/target
+  aware boundary transport for SimplexFold rather than undirected pooled
+  boundary messages.
+- Keep global context incidence-aware. A protein-level cochain is only in
+  scope if it receives selected face/tetra summaries and returns information
+  through the selected complex; a generic pooled coordinate head is out of
+  scope.
+
+## Paper-Informed Backlog
+
+### E81: Degree-Penalized Sparse Cell Scoring
+
+Status: implemented and held as the next fallback.
+
+Hypothesis: E79 improved selected-boundary geometry by sparsifying the active
+higher-rank complex, but the retained tetra cells still reuse boundary edges
+heavily. Penalizing candidate cells that reuse already-overrepresented edges
+should produce a cleaner combinatorial complex without adding parameters.
+
+Mechanism: when `--simplex-face-top-k` or `--simplex-tetra-top-k` is active,
+subtract a zero-parameter degree penalty from candidate cell scores based on
+current boundary-edge reuse. This changes which face/tetra cochains exist; it
+does not add output-side coordinate pressure.
+
+Decision rule: launch only after E82 returns. Keep if it preserves or improves
+E79/E82 `val_lddt_ca` while reducing boundary-edge mean degree and increasing
+unique boundary-edge fraction.
+
+### E83 Candidate: Incidence-Normalized Boundary Transport
+
+Status: design candidate, not implemented.
+
+Hypothesis: the selected sparse complex may be learning useful local cells
+while over-routing messages through a small set of boundary edges. Normalizing
+face/tetra-to-edge and edge-to-cell exchange by selected incidence degree
+could keep the cochain communication topological while reducing overcounting.
+
+Mechanism sketch: add a runtime message-scale normalization in the selected
+boundary-edge exchange path using edge-cell incidence degrees. Keep the
+normalization in the message route, not in the loss, and preserve directed
+source/target edge frames for scalarization.
+
+Decision rule: test only if E81 or E82 shows strong selected-boundary lDDT
+but high edge reuse or reduced primary lDDT. Keep if selected boundary-edge
+reuse falls without losing the E79 local lDDT gain.
+
+### E84 Candidate: Directed Outer-Edge Transport Revisit
+
+Status: design candidate, not implemented.
+
+Hypothesis: early outer-edge runs were too disruptive, but Topotein's directed
+outer-edge neighborhoods remain the best protein-specific route for
+cell-to-cell communication. A weaker, incidence-normalized, source/target
+aware version from the sparse E79/E82 complex may be better behaved than the
+earlier dense-context attempts.
+
+Mechanism sketch: construct outgoing and incoming outer-edge summaries for
+selected faces/tetras through boundary edges that leave one selected cell and
+enter another. Gate the route by training step and message degree so it
+cannot immediately dominate the pair trunk.
+
+Decision rule: run only after the sparse-cell branch stabilizes. Keep if it
+improves FoldScore/dRMSD while preserving primary `val_lddt_ca` and selected
+boundary diagnostics.
+
 ## Experiment Queue
 
 ### E00: Matched Short-Run Baseline

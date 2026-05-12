@@ -1,4 +1,4 @@
-## Current Plan: E78 Light-Geometry Selector Continuation
+## Current Plan: E82 Fixed Sparse-Cell Continuation
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -206,6 +206,16 @@ after the cap schedule becomes a fixed sparse cell complex. Do not launch a
 blind 30,000-step confirmation until a branch shows a credible trajectory
 toward `val_lddt_ca > 0.7`, not merely a small local best below 0.4.
 
+The 2026-05-12 full reread of the saved PDFs reinforces the E79/E82 direction.
+The TDL guide frames construction of the topological domain, intra-rank
+aggregation, inter-rank aggregation, and topology-aware diagnostics as core
+model choices. Topotein makes the same point in protein terms: directed
+incidence, outer-edge neighborhoods, edge-centric scalarization, and
+comprehensive rank-wise updates matter more than superficial higher-rank
+features. For SimplexFold, that means the next branch should keep changing
+which sparse cells exist or how selected cochains communicate through their
+incidence/outer-edge structure.
+
 The other prepared alternatives are E75, E79, and E81. E75 caps active
 face/tetra cells per anchor with `--simplex-face-top-k` and
 `--simplex-tetra-top-k`, ranking candidate cells by selected boundary-edge
@@ -216,13 +226,13 @@ candidate cells that reuse already-overrepresented boundary edges are
 down-ranked. All three are cell-complex construction changes rather than
 generic output-coordinate losses.
 
-The 2026-05-12 full-text recheck of the saved reference PDFs keeps this plan
-topology-first. The strongest paper-derived criterion is that a new branch
-should change the selected cell complex, incidence/outer-edge communication,
-or realization of selected cells. E74/E78 satisfy that by changing the
-recycled-geometry prior in topology construction; E75/E79 remain prepared
-fallbacks because they sparsify which higher-rank cochains exist and send
-messages.
+If E82 stalls or regresses, the preferred paper-aligned pivot is E81's
+degree-penalized sparse-cell scoring. If that is not enough, the next code
+idea should be incidence-normalized boundary or outer-edge transport rather
+than another coordinate loss: normalize messages by selected edge-cell degree
+inside the cochain exchange path, preserve directed source/target incidence,
+and measure whether this reduces boundary-edge reuse without erasing the
+strong selected-boundary lDDT seen in E79.
 
 Yes. With templates forbidden, the right construction is:
 
