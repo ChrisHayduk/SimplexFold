@@ -182,6 +182,38 @@
   H100 utilization ranging from `0%` to `67%` with `13417 MiB` allocated.
   Interpretation: quiet logs are expected before the 8500-step validation;
   leave the run undisturbed.
+- E85 completed and was pulled locally under
+  `artifacts/nanofold_public_benchmarks/e85_incidence_norm_from_e81_s8500_c256_m64/`
+  plus `logs/e85_incidence_norm_from_e81.log`, excluding the checkpoint.
+- E85 result: `completed_steps=8500`, `train_examples=68000`,
+  `parameters=3,154,242`, `val_lddt_ca=0.38579474948346615`, FoldScore
+  `0.37667502649128437`, `val_ca_drmsd=10.111229300498962`, and
+  predicted/true C-alpha radius `11.705282628536224 / 15.403406739234924`.
+- E85 selected-complex diagnostics regressed from E81: face/tetra boundary
+  lDDT `0.7265209071338177` / `0.7089754231274128`, boundary length MAE
+  `1.1374360658228397` / `1.2519447579979897`, contraction fraction
+  `0.6081784218549728` / `0.6088353879749775`, boundary-edge mean degree
+  `11.795296669006348` / `33.32111215591431`, and unique-edge fraction
+  `0.08507029338800498` / `0.030259001247997887`.
+- Interpretation: reject E85. Normalizing selected edge-cell incidences inside
+  the cochain transport did not reduce boundary-edge reuse and erased the E81
+  primary-lDDT gain. The next paper-aligned gate should be weak directed
+  outer-edge transport on the sparse degree-penalized complex, using incidence
+  normalization only as a controlled communication ingredient rather than as a
+  standalone continuation.
+- Launched E86 on the same owned pod as
+  `e86_weak_outer_edge_from_e81_s8500_c256_m64`, Python PID `6369`, log
+  `/workspace/SimplexFold/logs/e86_weak_outer_edge_from_e81.log`.
+- E86 resumes the E81 checkpoint from step 8000 to 8500, keeps the
+  degree-penalized fixed sparse-cell complex and selected-boundary realization
+  recipe, keeps `--simplex-boundary-incidence-normalization 1.0` as a
+  controlled cochain-transport ingredient, and adds weak directed outer-edge
+  context with `--simplex-outer-edge-context-scale 0.05` plus runtime ramp
+  `0.0 -> 0.025` over steps 8000-8500.
+- E86 startup verification at `2026-05-12T12:24:15Z` confirmed the run was
+  active, the run metadata existed, and the E81 checkpoint loaded cleanly:
+  `1244` tensors loaded and `48` new/missing tensors initialized for the
+  outer-edge context path.
 
 ## 2026-05-09
 

@@ -128,9 +128,9 @@ boundary lDDT fell to `0.7216` / `0.7045`, boundary length MAE rose to
 `0.5862` / `0.5870`. Stop the plain degree-penalized continuation and launch
 the incidence-normalized boundary-transport gate from E81.
 
-### E85 Candidate: Incidence-Normalized Boundary Transport
+### E85: Incidence-Normalized Boundary Transport
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: the selected sparse complex may be learning useful local cells
 while over-routing messages through a small set of boundary edges. Normalizing
@@ -152,13 +152,14 @@ sparse branch retains strong selected-boundary lDDT but continues to show high
 edge reuse. Keep if selected boundary-edge reuse falls without losing the E81
 local lDDT gain.
 
-Launch: E85 is running as `e85_incidence_norm_from_e81_s8500_c256_m64`, PID
-`5476`. It resumes the E81 checkpoint from step 8000 to 8500 with the E84
-recipe plus `--simplex-boundary-incidence-normalization 1.0`. The log path is
-`/workspace/SimplexFold/logs/e85_incidence_norm_from_e81.log`, and the artifact
-path is
-`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e85_incidence_norm_from_e81_s8500_c256_m64/`.
-Do not add E85 to `EXPERIMENT_RESULTS.md` until it returns.
+Result: reject. E85 reached `val_lddt_ca=0.3858`, FoldScore `0.3767`,
+`val_ca_drmsd=10.1112`, and predicted/true C-alpha radius
+`11.7053 / 15.4034`. This is below E81's `0.3980` primary lDDT and below E84
+as a continuation point. Selected face/tetra boundary lDDT also fell to
+`0.7265` / `0.7090`, boundary length MAE worsened to `1.1374` / `1.2519`,
+and boundary-edge reuse did not improve. Incidence normalization is therefore
+not useful as a standalone sparse-complex transport change, though it can
+remain a controlled ingredient for the next directed outer-edge gate.
 
 Validation:
 
@@ -168,8 +169,7 @@ Validation:
 
 ### E86 Candidate: Directed Outer-Edge Transport Revisit
 
-Status: design candidate using existing outer-edge context plumbing; not
-launched.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: early outer-edge runs were too disruptive, but Topotein's directed
 outer-edge neighborhoods remain the best protein-specific route for
@@ -185,10 +185,9 @@ only on top of the sparse E81/E85 selected complex, with runtime gating and
 through a cleaner incidence-normalized complex rather than the earlier dense
 cell context that disrupted E49/E58-E60.
 
-Prepared gate: do not launch while E85 is active. If E85 regresses or only
-matches E81 without reducing boundary-edge reuse, resume the strongest
-E81/E85 checkpoint for another 500-step gate and add a very weak directed
-outer-edge context:
+Prepared gate: because E85 regressed and did not reduce boundary-edge reuse,
+resume the strongest sparse-complex checkpoint, E81, for another 500-step gate
+and add a very weak directed outer-edge context:
 `--simplex-outer-edge-context-scale 0.05`,
 `--simplex-outer-edge-context-runtime-scale 0.0`,
 `--simplex-outer-edge-context-runtime-scale-final 0.025`,
@@ -203,6 +202,15 @@ versus the AF2-medium baseline.
 Decision rule: run only after the sparse-cell branch stabilizes. Keep if it
 improves FoldScore/dRMSD while preserving primary `val_lddt_ca` and selected
 boundary diagnostics.
+
+Launch: E86 is running as `e86_weak_outer_edge_from_e81_s8500_c256_m64`,
+Python PID `6369`. It resumes the E81 checkpoint from step 8000 to 8500 with
+the E85 sparse/selected-boundary recipe plus weak runtime-gated outer-edge
+context. The log path is
+`/workspace/SimplexFold/logs/e86_weak_outer_edge_from_e81.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e86_weak_outer_edge_from_e81_s8500_c256_m64/`.
+Do not add E86 to `EXPERIMENT_RESULTS.md` until it returns.
 
 ### E87 Candidate: Directed Boundary Readout
 

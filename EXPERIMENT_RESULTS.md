@@ -101,3 +101,4 @@ recorded in the running notes for that run.
 | E83 fixed sparse cell continue | completed | 8000 | 0.3876 | 0.3876 | 0.3747 | 10.3539 | 11.1757 / 15.4034 | rejected; fixed sparse-cap continuation fell below E82 and softened selected-boundary diagnostics, pivot to E81 degree-penalized cell scoring from E82 |
 | E81 degree-penalized sparse cells | completed | 8000 | 0.3980 | 0.3980 | 0.3826 | 10.0954 | 11.4973 / 15.4034 | kept; new best lDDT/FoldScore/dRMSD with lower boundary-edge reuse, continue degree-penalized sparse selector one short gate |
 | E84 degree-penalized sparse continue | completed | 8500 | 0.3964 | 0.3964 | 0.3767 | 10.4047 | 11.0245 / 15.4034 | regressed vs E81 at step 8500; launch incidence-normalized E85 from E81 checkpoint |
+| E85 incidence-normalized boundary transport | completed | 8500 | 0.3858 | 0.3858 | 0.3767 | 10.1112 | 11.7053 / 15.4034 | rejected; incidence normalization worsened lDDT and selected-boundary diagnostics vs E81 |
