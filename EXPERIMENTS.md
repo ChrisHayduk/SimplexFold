@@ -60,9 +60,27 @@ The 2026-05-12 full reread adds several concrete filters for the next queue:
 
 ## Paper-Informed Backlog
 
+### E83: Fixed Sparse Cell Continuation
+
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E82 showed that E79's scheduled top-k result was not just a
+schedule-end artifact. Holding `24` face cells and `48` tetra cells per anchor
+for one more short gate should reveal whether the sparse selected complex is
+still climbing before changing mechanisms.
+
+Mechanism: resume the E82 checkpoint from step 7500 to 8000 with the same
+selected-boundary realization losses, half-scale edge-frame messages, light
+recycled-geometry selector, and fixed face/tetra top-k caps.
+
+Decision rule: keep and consider another short continuation only if primary
+`val_lddt_ca` improves or holds near E82 while FoldScore and selected-boundary
+diagnostics do not collapse. If it regresses, pivot to E81 from the strongest
+E82/E83 checkpoint.
+
 ### E81: Degree-Penalized Sparse Cell Scoring
 
-Status: implemented and held as the next fallback.
+Status: implemented and held as the next fallback if E83 stalls.
 
 Hypothesis: E79 improved selected-boundary geometry by sparsifying the active
 higher-rank complex, but the retained tetra cells still reuse boundary edges
@@ -74,11 +92,11 @@ subtract a zero-parameter degree penalty from candidate cell scores based on
 current boundary-edge reuse. This changes which face/tetra cochains exist; it
 does not add output-side coordinate pressure.
 
-Decision rule: launch only after E82 returns. Keep if it preserves or improves
-E79/E82 `val_lddt_ca` while reducing boundary-edge mean degree and increasing
-unique boundary-edge fraction.
+Decision rule: keep if it preserves or improves E82/E83 `val_lddt_ca` while
+reducing boundary-edge mean degree and increasing unique boundary-edge
+fraction.
 
-### E83 Candidate: Incidence-Normalized Boundary Transport
+### E84 Candidate: Incidence-Normalized Boundary Transport
 
 Status: design candidate, not implemented.
 
@@ -92,11 +110,11 @@ boundary-edge exchange path using edge-cell incidence degrees. Keep the
 normalization in the message route, not in the loss, and preserve directed
 source/target edge frames for scalarization.
 
-Decision rule: test only if E81 or E82 shows strong selected-boundary lDDT
+Decision rule: test only if E81 or E83 shows strong selected-boundary lDDT
 but high edge reuse or reduced primary lDDT. Keep if selected boundary-edge
 reuse falls without losing the E79 local lDDT gain.
 
-### E84 Candidate: Directed Outer-Edge Transport Revisit
+### E85 Candidate: Directed Outer-Edge Transport Revisit
 
 Status: design candidate, not implemented.
 

@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-12.
 
-Best validation C-alpha lDDT so far: **E79**, `val_lddt_ca=0.3885` at step
-7000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E82**, `val_lddt_ca=0.3924` at step
+7500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -97,3 +97,4 @@ recorded in the running notes for that run.
 | E78 light geometry selector continue | completed | 6500 | 0.3853 | 0.3853 | 0.3718 | 10.1595 | 11.3783 / 15.4034 | kept; improves E74 lDDT/FoldScore/dRMSD and selected-boundary lDDT, continue light-geometry branch another short gate |
 | E80 light geometry selector continue | completed | 7000 | 0.3820 | 0.3820 | 0.3682 | 10.2493 | 11.2472 / 15.4034 | rejected; continuing E78 reduced primary lDDT and selected-boundary lDDT/length, pivot to scheduled sparse-cell complex from E78 |
 | E79 scheduled sparse cell caps | completed | 7000 | 0.3885 | 0.3885 | 0.3728 | 10.2661 | 11.1540 / 15.4034 | kept; new best lDDT and much stronger selected-boundary diagnostics, continue sparse-cell branch |
+| E82 fixed sparse cell caps | completed | 7500 | 0.3924 | 0.3924 | 0.3788 | 10.2523 | 11.3363 / 15.4034 | kept; fixed sparse-cell complex improves E79 lDDT/FoldScore and selected-boundary diagnostics, continue one short sparse-cell gate |

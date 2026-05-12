@@ -1,5 +1,33 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-12 Sparse-Cell Branch
+
+- E82 completed on owned Runpod pod `o1dy17ouv8w5mz` as
+  `e82_sparse_topk_from_e79_s7500_c256_m64`.
+- Result: `completed_steps=7500`, `train_examples=60000`,
+  `parameters=3,154,242`, `val_lddt_ca=0.39241083338856697`,
+  FoldScore `0.3788187075406313`, `val_ca_drmsd=10.252252995967865`,
+  and predicted/true C-alpha radius `11.336281925439835 /
+  15.403406739234924`.
+- Selected-complex diagnostics improved over E79: face/tetra boundary lDDT
+  `0.7135092802345753` / `0.6986573338508606`, boundary length MAE
+  `1.1559935696423054` / `1.257934581488371`, boundary-edge mean degree
+  `12.294965147972107` / `34.21513247489929`, and unique-edge fraction
+  `0.08146965243978029` / `0.029440750303401327`.
+- Interpretation: keep. Fixed sparse face/tetra caps improved primary lDDT,
+  FoldScore, dRMSD, radius, and selected-boundary diagnostics. This supports
+  the paper-aligned topology-construction path rather than an immediate pivot
+  to another loss.
+- Pulled E82 artifacts locally under
+  `artifacts/nanofold_public_benchmarks/e82_sparse_topk_from_e79_s7500_c256_m64/`
+  and `logs/e82_sparse_topk_from_e79.log`.
+- Launched E83 on the same owned pod as
+  `e83_sparse_topk_from_e82_s8000_c256_m64`, PID `4020`, log
+  `/workspace/SimplexFold/logs/e83_sparse_topk_from_e82.log`.
+- E83 resumes the E82 checkpoint from step 7500 to 8000 with the same fixed
+  sparse caps (`--simplex-face-top-k 24`, `--simplex-tetra-top-k 48`) and the
+  same selected-boundary / edge-frame / light-geometry recipe.
+
 ## 2026-05-12 PDF Reference Pass
 
 - Verified the two user-provided PDFs are saved locally under

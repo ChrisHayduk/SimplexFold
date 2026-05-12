@@ -1,4 +1,4 @@
-## Current Plan: E82 Fixed Sparse-Cell Continuation
+## Current Plan: E83 Fixed Sparse-Cell Continuation
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -198,13 +198,22 @@ FoldScore `0.3728`, and selected face/tetra boundary lDDT `0.6963` /
 unique-edge fraction rose to `0.0283`. The caveat is that dRMSD softened to
 `10.2661` and predicted radius stayed under-expanded at `11.1540 / 15.4034`.
 
-The active branch is now E82 on the owned H100 pod `o1dy17ouv8w5mz` as
-`e82_sparse_topk_from_e79_s7500_c256_m64`. It resumes the E79 checkpoint from
-step 7000 to 7500 with the sparse caps held at `24` face cells and `48` tetra
-cells per anchor. This asks whether the topology-construction win survives
-after the cap schedule becomes a fixed sparse cell complex. Do not launch a
-blind 30,000-step confirmation until a branch shows a credible trajectory
-toward `val_lddt_ca > 0.7`, not merely a small local best below 0.4.
+E82 answered the fixed-sparse-complex question positively. It continued E79
+from step 7000 to 7500 with the sparse caps held at `24` face cells and `48`
+tetra cells per anchor and reached a new best `val_lddt_ca=0.3924`,
+FoldScore `0.3788`, and `val_ca_drmsd=10.2523`. Selected face/tetra boundary
+lDDT improved again to `0.7135` / `0.6987`, boundary length MAE improved to
+`1.1560` / `1.2579`, and tetra boundary-edge mean degree dropped to `34.2`.
+The caveat remains under-expansion: predicted/true C-alpha radius is
+`11.3363 / 15.4034`, still far from solved.
+
+The active branch is now E83 on the owned H100 pod `o1dy17ouv8w5mz` as
+`e83_sparse_topk_from_e82_s8000_c256_m64`. It resumes the E82 checkpoint from
+step 7500 to 8000 with the same fixed sparse caps. This asks whether the
+post-schedule sparse complex keeps climbing before we spend on a different
+mechanism. Do not launch a blind 30,000-step confirmation until a branch shows
+a credible trajectory toward `val_lddt_ca > 0.7`, not merely a small local
+best below 0.4.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79/E82 direction.
 The TDL guide frames construction of the topological domain, intra-rank
@@ -226,13 +235,14 @@ candidate cells that reuse already-overrepresented boundary edges are
 down-ranked. All three are cell-complex construction changes rather than
 generic output-coordinate losses.
 
-If E82 stalls or regresses, the preferred paper-aligned pivot is E81's
-degree-penalized sparse-cell scoring. If that is not enough, the next code
-idea should be incidence-normalized boundary or outer-edge transport rather
-than another coordinate loss: normalize messages by selected edge-cell degree
-inside the cochain exchange path, preserve directed source/target incidence,
-and measure whether this reduces boundary-edge reuse without erasing the
-strong selected-boundary lDDT seen in E79.
+If E83 stalls or regresses, the preferred paper-aligned pivot is E81's
+degree-penalized sparse-cell scoring from the strongest E82/E83 checkpoint.
+If that is not enough, the next code idea should be incidence-normalized
+boundary or outer-edge transport rather than another coordinate loss:
+normalize messages by selected edge-cell degree inside the cochain exchange
+path, preserve directed source/target incidence, and measure whether this
+reduces boundary-edge reuse without erasing the strong selected-boundary lDDT
+seen in E79-E82.
 
 Yes. With templates forbidden, the right construction is:
 
