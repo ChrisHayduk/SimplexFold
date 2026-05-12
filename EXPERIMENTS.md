@@ -2812,6 +2812,13 @@ artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e78_light_geom0025_from_e74_s6500_c256_m64/`.
 Do not add E78 to `EXPERIMENT_RESULTS.md` until it returns.
 
+Decision rule after return: continue the light-geometry branch only if E78
+matches or beats E74's `val_lddt_ca=0.3841` without selected-boundary lDDT,
+boundary length MAE, or contraction fraction regressing sharply. If E78 turns
+over on primary lDDT, prefer E79 from the strongest E74/E78 checkpoint because
+the next paper-aligned intervention should change the active higher-rank cell
+complex rather than keep tuning the same loss weights.
+
 ### E75: Sparse Selected Higher-Rank Cell Complex
 
 Status: implemented locally and planned only if E78 turns over.

@@ -175,6 +175,18 @@ The active branch is now E78 on the owned H100 pod `o1dy17ouv8w5mz` as
 from step 6000 to 6500 with the same light-geometry selector, selected
 boundary-edge losses, and half-scale edge-frame message recipe.
 
+When E78 returns, route the next run by evidence rather than by chronology:
+if E78 improves or preserves E74's `val_lddt_ca=0.3841` without selected
+boundary diagnostics collapsing, continue the light-geometry branch another
+short gate. If E78 loses primary lDDT while selected-boundary diagnostics
+remain strong, start E79 from the strongest E74/E78 checkpoint so the next
+change acts upstream on which higher-rank cochains exist. If E78 improves
+FoldScore/dRMSD but loses local lDDT, do not launch a blind 30k run; treat the
+branch as a geometry diagnostic and use the sparse-cell schedule to reduce
+boundary-edge over-reuse. A 30,000-step confirmation is only justified after a
+branch shows a credible trajectory toward `val_lddt_ca > 0.7`, not merely a
+small local best below 0.4.
+
 The other prepared alternatives are E75 and E79. E75 caps active face/tetra
 cells per anchor with `--simplex-face-top-k` and `--simplex-tetra-top-k`,
 ranking candidate cells by selected boundary-edge logits. E79 adds a runtime

@@ -2708,3 +2708,10 @@
   `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`.
   Do not sync or launch E79 while E78 is still active; use it only after the
   E78 result is copied, recorded, and interpreted.
+- E78 return decision rule: keep/continue only if it matches or beats E74's
+  `val_lddt_ca=0.38410646840929985` without a selected-boundary diagnostic
+  collapse. If E78 loses local lDDT but keeps or improves boundary geometry,
+  launch E79 from the strongest E74/E78 checkpoint rather than another
+  half-scale light-geometry continuation. If E78 improves only FoldScore or
+  dRMSD, treat that as geometry-side evidence and still avoid a 30,000-step
+  confirmation until a branch is plausibly moving toward `val_lddt_ca > 0.7`.
