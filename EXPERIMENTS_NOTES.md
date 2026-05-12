@@ -2348,3 +2348,24 @@
   `0.025`, weights-only resume from the E70 checkpoint, crop 256, MSA depth 64,
   and no templates. Heartbeat `check-simplexfold-e57-runpod` has been
   retargeted to E71 on pod `lovgzo4hz2k4fp` only.
+- E71 returned on owned Runpod pod `lovgzo4hz2k4fp` and is kept for another
+  continuation. Step 5000 reached `val_lddt_ca=0.37505385652184486`,
+  FoldScore `0.3678866345435381`, `val_ca_drmsd=10.19257652759552`, and
+  predicted/true C-alpha radius `11.448325783014297 / 15.40340667963028`.
+  Selected face/tetra boundary lDDT ended at `0.5335890911519527` /
+  `0.5181191172450781`, contraction fractions at `0.6445319689810276` /
+  `0.6458184905350208`, boundary length MAE at `2.791555091738701` /
+  `2.9308799281716347`, mean boundary-edge degree at `11.321606159210205` /
+  `75.47737550735474`, and unique-edge fraction at `0.08870875050350643` /
+  `0.013306312575525964`. Runtime edge-frame scale remained `0.025`.
+- E71 artifacts and launch log were copied locally under ignored
+  `artifacts/nanofold_public_benchmarks/e71_edge_frame0025_from_e70_s5000_c256_m64/`,
+  including `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, checkpoint, and
+  `runpod_launch.log`. The owned pod remains active for E72; no other Runpod
+  instances were managed.
+- E71 interpretation: keep cautiously. The branch improves lDDT, FoldScore,
+  and dRMSD together, but selected-boundary lDDT softened relative to E70 while
+  contraction improved. Launch E72 to step 5500 on the same pod, holding the
+  runtime edge-frame scale at `0.025`; stop this branch if selected-boundary
+  lDDT keeps eroding or if main lDDT drops back toward the E65/E67/E69 band.

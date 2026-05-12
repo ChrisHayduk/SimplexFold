@@ -1,4 +1,4 @@
-## Current Plan: E71 Continue Damped Edge-Frame Boundary Messages
+## Current Plan: E72 Continue Edge-Frame Boundary Messages To 5500
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -77,6 +77,15 @@ face/tetra boundary lDDT rose to `0.5365` / `0.5215`, contraction fractions
 fell to `0.6665` / `0.6681`, and boundary length MAE fell to
 `2.6313` / `2.7606`.
 
+E71 continued the same edge-frame path to step 5000 and improved the primary
+curve again: `val_lddt_ca=0.3751`, FoldScore `0.3679`,
+`val_ca_drmsd=10.1926`, and predicted/true C-alpha radius
+`11.4483 / 15.4034`. This is still far from the `0.7` target, but it is the
+first post-E64 continuation family to improve lDDT, FoldScore, and dRMSD
+together. The caveat is that selected-boundary lDDT softened from E70 to
+`0.5336` / `0.5181`, so the next continuation should watch for divergence
+between main metrics and selected-complex diagnostics.
+
 Do not spend on a blind 30,000-step continuation yet, and do not keep turning
 the scalar auxiliary knob. The full reread of the reference PDFs in
 `references/papers/` points back to the core topological claim: the model
@@ -115,22 +124,14 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
-The active branch is E71: continue the E70 edge-frame message path to step
-5000 on the same owned Runpod pod. The E70 gain is tiny, so this is a stability
-check before treating edge-frame messages as a real direction. Continue from
-the E70 step-4500 checkpoint with static selected-boundary lDDT weights
-`0.05`, selected face/tetra coordinate weights `1.0`, selected boundary
-coordinate-distance weights `0.5`, `simplex_aux_weight=0.5`,
-`--simplex-edge-frame-message-scale 0.025`, and runtime edge-frame scale held
-at `0.025`. Keep only if step 5000 improves or preserves E70's lDDT and
-selected-boundary diagnostics; reject if it repeats E65's continuation drop.
-
-E71 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` from commit
-`e201086`, reusing the clean E70 staged environment. It resumed the E70
-checkpoint at step 4500/examples 36000, loaded 1244 matching model tensors,
-initialized 0 new/missing tensors, and recorded edge-frame runtime scale
-`0.025` in `run_metadata.json`. Do not add E71 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+The active branch is E72: continue the edge-frame message path to step 5500 on
+the same owned Runpod pod. Continue from the E71 step-5000 checkpoint with
+static selected-boundary lDDT weights `0.05`, selected face/tetra coordinate
+weights `1.0`, selected boundary coordinate-distance weights `0.5`,
+`simplex_aux_weight=0.5`, `--simplex-edge-frame-message-scale 0.025`, and
+runtime edge-frame scale held at `0.025`. Keep only if step 5500 improves or
+preserves E71's lDDT/FoldScore/dRMSD without further eroding selected-boundary
+lDDT; reject if the branch turns into a main-metric/boundary-diagnostic split.
 
 Yes. With templates forbidden, the right construction is:
 

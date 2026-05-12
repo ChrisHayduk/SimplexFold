@@ -2463,7 +2463,7 @@ active for the E71 continuation.
 
 ### E71: Continue Damped Edge-Frame Boundary Messages
 
-Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
+Status: completed on Runpod and kept for continuation.
 
 Hypothesis: E70 is a small but coherent improvement, so the edge-frame
 boundary-message path may be the first architecture route that improves both
@@ -2485,16 +2485,49 @@ static selected-boundary lDDT weights `0.05`, selected face/tetra coordinate
 weights `1.0`, selected boundary coordinate-distance weights `0.5`, and
 `simplex_aux_weight=0.5`.
 
-Launch: E71 is running on the same owned Runpod B200 pod `lovgzo4hz2k4fp`
+Launch: E71 ran on the same owned Runpod B200 pod `lovgzo4hz2k4fp`
 (`codex-simplexfold-e70-runpod-20260512`) from commit `e201086`, reusing the
 clean public-data environment staged for E70. `run_metadata.json` records
 `simplex_edge_frame_message_scale=0.025`, runtime edge-frame scale `0.025`,
 weights-only resume from the E70 step-4500 checkpoint, crop 256, MSA depth 64,
 and no templates. The launch log shows the runner resumed E70 at step
 4500/examples 36000, loaded 1244 matching model tensors, initialized 0
-new/missing tensors, and started a fresh optimizer. Do not add E71 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+new/missing tensors, and started a fresh optimizer.
 
 Decision rule: keep only if step 5000 improves or preserves E70's lDDT and
 selected-boundary diagnostics. Reject if lDDT drops back into the E65/E67/E69
 band despite the improved edge-frame boundary geometry.
+
+Result: keep for another continuation. E71 completed at step 5000 with
+`val_lddt_ca=0.3751`, FoldScore `0.3679`, `val_ca_drmsd=10.1926`, and
+predicted/true C-alpha radius `11.4483 / 15.4034`. This improves E70 on the
+main validation metrics, but selected-boundary lDDT softened to
+`0.5336` / `0.5181` and boundary length MAE rose to
+`2.7916` / `2.9309`. Continue once more, but treat a further boundary
+diagnostic regression as a warning even if lDDT inches upward.
+
+### E72: Continue Edge-Frame Boundary Messages To 5500
+
+Status: planned on owned Runpod pod `lovgzo4hz2k4fp`.
+
+Hypothesis: E70-E71 are the first continuation sequence after E64 to improve
+lDDT, FoldScore, and dRMSD together. A 5500-step gate tests whether the
+edge-frame path is a stable direction or whether the selected-boundary
+diagnostics are beginning to decouple from the main metrics.
+
+Mechanism: continue from the E71 step-5000 checkpoint on the same edge-frame
+architecture, holding runtime edge-frame contribution at `0.025` and keeping
+the E64 selected-boundary lDDT and coordinate-realization recipe unchanged.
+
+Planned launch: resume
+`e71_edge_frame0025_from_e70_s5000_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+and run a 500-step continuation to step 5500 with
+`--simplex-edge-frame-message-scale 0.025`,
+`--simplex-edge-frame-message-runtime-scale 0.025`,
+static selected-boundary lDDT weights `0.05`, selected face/tetra coordinate
+weights `1.0`, selected boundary coordinate-distance weights `0.5`, and
+`simplex_aux_weight=0.5`.
+
+Decision rule: keep only if step 5500 improves or preserves E71's lDDT,
+FoldScore, and dRMSD without further eroding selected-boundary lDDT. Reject if
+the run shows main metric drift at the expense of selected-complex realization.
