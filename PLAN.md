@@ -1,4 +1,4 @@
-## Current Plan: E88 Runtime-Gated Latent Segment Cells
+## Current Plan: E89 Pair-Preserving Simplex Readout Gate
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -287,13 +287,24 @@ Selected-boundary contraction improved to about `0.546`, but
 `0.7365` / `0.7197` all stayed below the E81/E86/E87 leaders. Outer-edge
 availability is therefore not enough as a cell-score bonus.
 
-The next active gate is E88, runtime-gated latent segment cells from the E81
-checkpoint. This is the paper-aligned way to borrow Topotein's
-secondary-structure rank without DSSP/SSE labels: contiguous segment cochains
-are latent, built from official sequence/MSA/pair features and recycled
-geometry, and weakly ramped into selected face states. Keep it only if it
-recovers the E81/E86/E87 primary-lDDT band while improving selected-complex
-diagnostics.
+E88 rejected the runtime-gated latent segment-cell route in this combined
+form. It resumed E81, allocated latent contiguous segment cochains, and ramped
+their contribution into selected face states, but returned
+`val_lddt_ca=0.3891`, below E81/E86/E87. More importantly, the actual
+launched module combination had `3,282,002` parameters, which exceeds the
+AF2-medium +5% ceiling of `3,261,974`. Treat this as a budget failure as well
+as a primary-lDDT failure. Segment cells can be reconsidered only after a
+budget-safe topology-module combination is explicitly counted before launch.
+
+The active Runpod gate is E89, a pair-preserving simplex readout test from
+the E81 checkpoint. It keeps selected face/tetra cochain evidence flowing
+back into the AF2-style pair tensor `Z_ij`, while ramping the direct
+residue/single readout down from `1.0` to `0.5`. This stays inside the
+README's topological claim because it changes how persistent higher-order
+cochains write through incidence back to the edge representation, rather than
+adding a new coordinate or lDDT-style objective. The launch uses the new
+`--max-parameters 3261974` runner guard so any accidental over-budget
+combination fails before training.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank

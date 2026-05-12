@@ -3410,3 +3410,58 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   from E90 to E88, keeping the same owned-pod-only restriction and the rule
   that heartbeat must not launch follow-up experiments automatically.
+- E88 returned on owned pod `o1dy17ouv8w5mz`: step 8500
+  `val_lddt_ca=0.38908764719963074`, FoldScore `0.38241876289248466`,
+  `val_ca_drmsd=10.198628336191177`, predicted/true C-alpha radius
+  `11.50267744064331 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.7203109562397003` / `0.7046942040324211`, boundary length MAE
+  `1.2001516371965408` / `1.30133518576622`, contraction fractions
+  `0.6244679093360901` / `0.6275281123816967`, boundary-edge mean degree
+  `12.014307677745819` / `35.019731402397156`, and boundary unique-edge
+  fraction `0.0835734105056879` / `0.028839249425916206`.
+- E88 parameter audit: `parameters=3,282,002`, which is +5.64% versus the
+  AF2-medium pair-only baseline `3,106,642` and above the +5% ceiling
+  `3,261,974`. The previous segment-cell budget test counted segment cells
+  without the edge-frame module combination used in E88, so it missed the
+  actual launched profile.
+- E88 interpretation: reject. It regressed below E81/E86/E87 on primary
+  lDDT and also violated the parameter contract. Do not continue this
+  segment-cell branch in its current form. Future topology-module
+  combinations should be counted before launch and run with the new runner
+  `--max-parameters 3261974` guard.
+- Copied E88 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e88_segment_cells_from_e81_s8500_c256_m64/`
+  and copied the launch log to ignored `logs/e88_segment_cells_from_e81.log`.
+  The local artifact pull excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8000` to add the E88 row to `EXPERIMENT_RESULTS.md`, so inherited E81
+  history does not count as E88's best validation lDDT.
+- Added a runner-level `--max-parameters` preflight and a regression test for
+  the exact E88 segment-cell plus edge-frame module combination. The E88
+  module set now explicitly asserts as over budget locally, while segment
+  cells by themselves remain documented as within the 5% cap.
+- Next launch decision: because E88 is both lower-lDDT and over budget, move
+  to E89 pair-preserving simplex readout from E81. This zero-parameter gate
+  keeps selected face/tetra cochain evidence flowing to the pair tensor
+  `Z_ij` while damping direct single/residue readout, so it remains a
+  topological cochain-routing test rather than a new metric loss.
+- E89 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E81 checkpoint present at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e81_degree_penalty_from_e82_s8000_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  remote py_compile passed for `scripts/run_nanofold_public_benchmarks.py`,
+  CLI help confirmed support for the pair/single runtime gates and
+  `--max-parameters`, and the exact E89 instantiated module set counted
+  `3,154,242` parameters, under the AF2-medium +5% ceiling `3,261,974`.
+  Remote pytest could not be run because `pytest` is not installed on the pod.
+- E89 launched on the same owned H100 pod with run name
+  `e89_pair_preserving_from_e81_s8500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e89_pair_preserving_from_e81.log`, artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e89_pair_preserving_from_e81_s8500_c256_m64/`,
+  and Python PID `10400`. Startup poll at `2026-05-12T19:02Z` confirmed the
+  benchmark process is alive, metadata exists, `--max-parameters 3261974` is
+  recorded, and the runner resumed E81 at step 8000/examples 64000 with 1244
+  matching model tensors loaded and 0 new/missing tensors initialized.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  from E88 to E89, keeping the same owned-pod-only restriction and the rule
+  that heartbeat must not launch follow-up experiments automatically.

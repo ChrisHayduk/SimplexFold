@@ -376,7 +376,7 @@ Validation:
 
 ### E88 Candidate: Runtime-Gated Latent Segment Cells
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: Topotein's secondary-structure-cell rank is not directly usable in
 NanoFold because official inference cannot depend on DSSP/SSE annotations.
@@ -417,7 +417,15 @@ initialized for the latent segment-cell modules. The log path is
 `/workspace/SimplexFold/logs/e88_segment_cells_from_e81.log`, and the artifact
 path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e88_segment_cells_from_e81_s8500_c256_m64/`.
-Do not add E88 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: reject. E88 reached `val_lddt_ca=0.3891`, FoldScore `0.3824`,
+`val_ca_drmsd=10.1986`, and predicted/true C-alpha radius
+`11.5027 / 15.4034`, below the E81/E86/E87 primary-lDDT band. It also
+violated the AF2-medium +5% parameter contract: the actual combined
+segment-cell plus edge-frame recipe instantiated `3,282,002` parameters,
+above the allowed `3,261,974` ceiling. Do not continue this branch in its
+current form. Segment cells are only eligible for future testing after a
+budget-safe combination is counted before launch.
 
 Validation:
 
@@ -427,7 +435,7 @@ Validation:
 
 ### E89 Candidate: Pair-Preserving Simplex Readout Gate
 
-Status: implemented locally; not launched.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: the README motivation centers on persistent face/tetra states
 communicating back into the AF2-style pair tensor `Z_ij`. Some failed
@@ -443,15 +451,29 @@ shared `simplex_update_scale` still works, but either stream can now be
 scheduled independently. This changes the selected cochain readout route, not
 the loss or selected cells.
 
-Prepared gate: keep behind the E86 continuation, E87, and E88. If those do
-not recover primary lDDT, resume the strongest sparse-complex checkpoint with
-the E81 recipe and keep pair readout at `1.0` while ramping single readout
-down:
+Prepared gate: E88 regressed and exceeded budget, so resume the strongest
+sparse-complex checkpoint with the E81 recipe and keep pair readout at `1.0`
+while ramping single readout down:
 `--simplex-pair-update-runtime-scale 1.0`,
 `--simplex-single-update-runtime-scale 1.0`,
 `--simplex-single-update-runtime-scale-final 0.5`,
 `--simplex-single-update-runtime-scale-ramp-start-step 8000`, and
 `--simplex-single-update-runtime-scale-ramp-steps 500`.
+Pass `--max-parameters 3261974` so the runner aborts before training if this
+or any follow-up combination exceeds the AF2-medium +5% ceiling.
+
+Launch: E89 is running as `e89_pair_preserving_from_e81_s8500_c256_m64`,
+Python PID `10400`, from the E81 checkpoint at step 8000/examples 64000.
+Remote prelaunch checks found no active Python benchmark process, confirmed
+the E81 checkpoint was present, counted the instantiated module set at
+`3,154,242` parameters under the `3,261,974` ceiling, py_compile passed for
+the runner, and CLI help confirmed support for the pair/single runtime gates
+and `--max-parameters`. Startup resumed E81 with 1244 matching model tensors
+loaded and 0 new/missing tensors initialized. The log path is
+`/workspace/SimplexFold/logs/e89_pair_preserving_from_e81.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e89_pair_preserving_from_e81_s8500_c256_m64/`.
+Do not add E89 to `EXPERIMENT_RESULTS.md` until it returns.
 
 Validation:
 

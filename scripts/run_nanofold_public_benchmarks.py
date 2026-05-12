@@ -462,6 +462,16 @@ def _global_grad_norm(parameters: Any) -> float:
     return float(torch.linalg.vector_norm(torch.stack(norms), 2).cpu().item())
 
 
+def _enforce_parameter_budget(*, variant: str, parameter_count: int, max_parameters: int | None) -> None:
+    if max_parameters is None:
+        return
+    if parameter_count > max_parameters:
+        raise ValueError(
+            f"Variant {variant!r} has {parameter_count:,} parameters, "
+            f"exceeding --max-parameters={max_parameters:,}."
+        )
+
+
 def _loss_with_terms(
     loss_fn: AlphaFoldLoss,
     batch: dict[str, Any],
@@ -1015,10 +1025,17 @@ def _train_variant(
     stop_after_seconds: int | None,
     foldscore_components_fn: Any | None,
     mixed_precision: str,
+    max_parameters: int | None,
 ) -> dict[str, Any]:
     set_seed(training_config.seed)
     device = resolve_device(training_config.device)
     model = AlphaFold2(model_config).to(device)
+    initial_parameter_count = sum(p.numel() for p in model.parameters())
+    _enforce_parameter_budget(
+        variant=variant,
+        parameter_count=initial_parameter_count,
+        max_parameters=max_parameters,
+    )
     loss_fn = _build_loss_fn(training_config).to(device)
     loss_fn.msa_weight = training_config.msa_loss_weight
     loss_fn.distogram_weight = training_config.distogram_loss_weight
@@ -2348,6 +2365,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Recycling cycles. Defaults to the model profile's recommended_n_cycles.",
     )
     parser.add_argument("--n-ensemble", type=int, default=1)
+    parser.add_argument(
+        "--max-parameters",
+        type=int,
+        default=None,
+        help="Abort before training a variant whose instantiated model exceeds this parameter count.",
+    )
     parser.add_argument("--mixed-precision", choices=["off", "bf16", "fp16"], default="off")
     return parser.parse_args(argv)
 
@@ -2717,6 +2740,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "seed": args.seed,
         "n_cycles": n_cycles,
         "n_ensemble": args.n_ensemble,
+        "max_parameters": args.max_parameters,
         "mixed_precision": args.mixed_precision,
         "log_every": args.log_every,
         "eval_every": args.eval_every,
@@ -2764,6 +2788,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
                 stop_after_seconds=args.stop_after_seconds if args.stop_after_seconds > 0 else None,
                 foldscore_components_fn=foldscore_components_fn,
                 mixed_precision=args.mixed_precision,
+                max_parameters=args.max_parameters,
             )
         )
         (output_dir / "results.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")

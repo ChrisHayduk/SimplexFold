@@ -1,3 +1,4 @@
+import pytest
 import torch
 
 from minalphafold.trainer import (
@@ -19,6 +20,7 @@ from minalphafold.trainer import (
 from scripts.run_nanofold_public_benchmarks import (
     _apply_model_config_overrides,
     _build_loss_fn,
+    _enforce_parameter_budget,
     _evaluate,
     _simplex_boundary_geometry_metrics,
     _simplex_topology_metrics,
@@ -52,6 +54,23 @@ def test_full_msa_to_face_expansion_hinge_variant_is_accepted_by_cli_parser():
     args = parse_args(["--variants", "full_msa_to_face_expansion_hinge"])
 
     assert args.variants == ["full_msa_to_face_expansion_hinge"]
+
+
+def test_max_parameters_guard_is_accepted_and_enforced():
+    args = parse_args(["--max-parameters", "3261974"])
+
+    assert args.max_parameters == 3_261_974
+    _enforce_parameter_budget(
+        variant="full_msa_to_face",
+        parameter_count=3_261_974,
+        max_parameters=args.max_parameters,
+    )
+    with pytest.raises(ValueError, match="exceeding --max-parameters"):
+        _enforce_parameter_budget(
+            variant="full_msa_to_face",
+            parameter_count=3_261_975,
+            max_parameters=args.max_parameters,
+        )
 
 
 def test_full_msa_to_face_aux_closure_variant_keeps_message_masks_unchanged():

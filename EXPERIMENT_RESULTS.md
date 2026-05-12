@@ -2,7 +2,7 @@
 
 Last updated: 2026-05-12.
 
-Best validation C-alpha lDDT so far: **E86**, `val_lddt_ca=0.3990` at step
+Best validation C-alpha lDDT so far: **E87**, `val_lddt_ca=0.3992` at step
 8500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
@@ -107,3 +107,4 @@ recorded in the running notes for that run.
 | E87 directed boundary readout | completed | 8500 | 0.3992 | 0.3992 | 0.3831 | 10.2428 | 11.4322 / 15.4034 | kept; tiny new primary-lDDT best over E86 with directed source/target boundary readout, but FoldScore/dRMSD softened |
 | E92 continue directed boundary readout | completed | 9000 | 0.3968 | 0.3968 | 0.3829 | 9.9617 | 11.7362 / 15.4034 | rejected; continuation fell below E87/E86 primary lDDT despite improved dRMSD, pivot to outer-edge-supported cell scoring |
 | E90 outer-edge-supported cell scoring | completed | 8500 | 0.3920 | 0.3920 | 0.3783 | 10.0407 | 11.5245 / 15.4034 | rejected; outer-edge-supported scoring fell below E81/E86/E87 primary lDDT |
+| E88 runtime-gated latent segment cells | completed | 8500 | 0.3891 | 0.3891 | 0.3824 | 10.1986 | 11.5027 / 15.4034 | rejected; primary lDDT regressed and parameters exceeded AF2-medium +5% budget |
