@@ -542,7 +542,7 @@ Validation:
 
 ### E93 Candidate: Stricter Sparse-Cell Filtration
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E79-E82 showed that making the higher-rank complex sparse was the
 strongest topology-construction lever so far, but the retained tetra complex
@@ -570,7 +570,7 @@ preserves or improves E81/E86/E87 primary lDDT while lowering boundary-edge
 reuse or selected-boundary contraction. Reject if selected-boundary lDDT
 collapses or if primary lDDT follows E90/E88 downward.
 
-Launch: E89 rejected, so E93 is running as
+Launch: E89 rejected, so E93 ran as
 `e93_sparse_filtration_from_e81_s8500_c256_m64`, Python PID `11069`, from
 the E81 checkpoint at step 8000/examples 64000. Remote prelaunch checks found
 no active Python benchmark process, confirmed the E81 checkpoint was present,
@@ -582,7 +582,54 @@ initialized. The log path is
 `/workspace/SimplexFold/logs/e93_sparse_filtration_from_e81.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e93_sparse_filtration_from_e81_s8500_c256_m64/`.
-Do not add E93 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: reject as a primary-lDDT branch, but keep the diagnostic lesson. E93
+returned `val_lddt_ca=0.3973`, FoldScore `0.3819`, `val_ca_drmsd=10.2949`,
+and predicted/true C-alpha radius `11.0952 / 15.4034`, below E81, E86, and
+E87 on the primary metric. The stricter filtration did what it was asked to
+do inside the selected complex: selected face/tetra boundary lDDT jumped to
+`0.7897` / `0.7549`, boundary length MAE fell to `0.8182` / `0.9820`, and
+boundary-edge mean degree fell to `9.29` / `26.09`. The cost was a narrower,
+more under-expanded structure and lower primary lDDT. Do not continue the
+`12/24` filtration by itself.
+
+### E94 Candidate: Moderate Filtration With Directed Boundary Readout
+
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E87 showed that directed source/target boundary readout can
+convert selected face/tetra cochain evidence into the pair tensor without
+hurting primary lDDT, while E93 showed that a stricter cell filtration greatly
+cleans selected-boundary realization but is too narrow at `12/24`. A gentler
+filtration to `18/36`, combined with the E87 directed boundary readout ramp,
+may keep enough higher-rank context for local C-alpha agreement while reducing
+the over-reused cofaces that E81/E87 still carry.
+
+Mechanism: resume the E81 checkpoint from step 8000 to 8500 and combine two
+zero-parameter topology operations: preserve E87's incidence-normalized
+boundary transport while ramping `simplex_boundary_readout_directionality`
+from `0.0` to `0.5`, and ramp active selected-cell caps from `24/48` to
+`18/36` instead of E93's `12/24`. This changes the sparse cell complex and
+the directed incidence route by which selected cells write back to `Z_ij`; it
+does not add a generic coordinate or lDDT loss.
+
+Decision rule: keep only if primary `val_lddt_ca` meets or beats the
+E81/E86/E87 band while selected-boundary diagnostics move toward E93. Reject
+if primary lDDT follows E93 downward or if selected-boundary lDDT does not
+improve over E87.
+
+Launch: E94 is running as
+`e94_moderate_filtration_directed_boundary_from_e81_s8500_c256_m64`, Python
+PID `11941`, from the E81 checkpoint at step 8000/examples 64000. Remote
+prelaunch checks found no active Python benchmark process, confirmed the E81
+checkpoint was present, py_compile passed for the runner, CLI help confirmed
+the directionality/top-k/max-parameter flags, and the exact module set counted
+`3,154,242` parameters under the `3,261,974` ceiling. Startup resumed E81
+with 1244 matching model tensors loaded and 0 new/missing tensors initialized.
+The log path is
+`/workspace/SimplexFold/logs/e94_moderate_filtration_directed_boundary_from_e81.log`,
+and the artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e94_moderate_filtration_directed_boundary_from_e81_s8500_c256_m64/`.
 
 ## Experiment Queue
 

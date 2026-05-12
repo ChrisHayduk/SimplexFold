@@ -1,4 +1,4 @@
-## Current Plan: E89 Pair-Preserving Simplex Readout Gate
+## Current Plan: E94 Moderate Filtration With Directed Boundary Readout
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -302,12 +302,28 @@ returned `val_lddt_ca=0.3947`, below E81/E86/E87. Pair-first cochain readout
 therefore helps aggregate geometry a bit but does not recover the local
 C-alpha objective.
 
-The active Runpod gate is E93: tighten the selected sparse complex itself by
-ramping face/tetra caps from `24/48` down to `12/24` while keeping
-degree-penalized scoring and the selected-boundary recipe fixed. This tests
-filtration of the learned higher-rank cell complex rather than adding another
-readout or loss. The launch uses the `--max-parameters 3261974` runner guard
-and counted `3,154,242` parameters before training.
+E93 rejected as a primary-lDDT branch, but it is diagnostically useful. It
+tightened the selected sparse complex from `24/48` to `12/24` and returned
+`val_lddt_ca=0.3973`, below E81/E86/E87, with FoldScore `0.3819`,
+`val_ca_drmsd=10.2949`, and predicted/true C-alpha radius
+`11.0952 / 15.4034`. The selected complex itself became much cleaner:
+selected face/tetra boundary lDDT rose to `0.7897` / `0.7549`, boundary
+length MAE fell to `0.8182` / `0.9820`, and boundary-edge mean degree fell to
+`9.29` / `26.09`. The interpretation is that `12/24` is too narrow by itself:
+it realizes a cleaner selected complex but loses enough higher-rank context
+to under-expand the global structure and soften primary C-alpha lDDT.
+
+The active Runpod gate is E94: combine E87's directed source/target
+boundary readout with a gentler version of E93's filtration. Resume the E81
+checkpoint from step 8000 to 8500, ramp
+`simplex_boundary_readout_directionality` from `0.0` to `0.5`, preserve E87's
+incidence-normalized boundary transport, and ramp face/tetra caps from
+`24/48` to `18/36`. This remains a zero-parameter topology-construction/
+cochain-routing test. It keeps the broader E81 sparse complex alive longer
+than E93 while asking whether moderate filtration can move selected-boundary
+diagnostics toward E93 without giving up E87's primary lDDT gain. The launch
+counted `3,154,242` parameters under the `--max-parameters 3261974` runner
+guard and resumed E81 cleanly with 1244 matching tensors loaded.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank
