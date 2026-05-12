@@ -3252,3 +3252,50 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   from E91 to E87, keeping the same owned-pod-only restriction and the rule
   that heartbeat must not launch follow-up experiments automatically.
+- E87 returned on owned pod `o1dy17ouv8w5mz`: step 8500
+  `val_lddt_ca=0.39919308573007584`, FoldScore `0.3831401728093624`,
+  `val_ca_drmsd=10.242752134799957`, predicted/true C-alpha radius
+  `11.432185918092728 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.7446220442652702` / `0.7280045710504055`, boundary length MAE
+  `1.0540529862046242` / `1.1570463925600052`, contraction fractions
+  `0.57584448158741` / `0.5786093026399612`, boundary-edge mean degree
+  `11.664112329483032` / `33.11342191696167`, and boundary unique-edge
+  fraction `0.08602189490787632` / `0.030495643238529865`.
+- E87 interpretation: keep as a tiny new primary-lDDT best and as evidence
+  that directed source/target boundary readout is a valid topological
+  communication route. Caveat: FoldScore and dRMSD softened versus E86, so do
+  not launch a long confirmation. Run one short continuation with directionality
+  held at `0.5`; if that turns over, pivot to outer-edge-supported cell scoring.
+- Copied E87 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e87_directed_boundary_from_e81_s8500_c256_m64/`
+  and copied the launch log to ignored `logs/e87_directed_boundary_from_e81.log`.
+  The local artifact pull excluded the checkpoint directory; the remote E87
+  checkpoint remains available for the short continuation.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8000` to add the E87 row to `EXPERIMENT_RESULTS.md`, so inherited E81
+  history does not count as E87's best validation lDDT.
+- E92 launch decision: E87 is a tiny new primary-lDDT best and improves
+  selected-boundary lDDT/contraction, but FoldScore and dRMSD softened versus
+  E86. Run exactly one short continuation from E87 with boundary-readout
+  directionality held at `0.5`; if it turns over, pivot to
+  outer-edge-supported cell scoring rather than continuing directionality.
+- E92 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E87 checkpoint present at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e87_directed_boundary_from_e81_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  remote py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/model_config.py`, `minalphafold/trainer.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; CLI help confirmed support for
+  the directionality runtime flags and `--simplex-cell-score-outer-edge-weight`
+  for the fallback.
+- E92 launched on the same owned H100 pod with run name
+  `e92_continue_directed_boundary_from_e87_s9000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e92_continue_directed_boundary_from_e87.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e92_continue_directed_boundary_from_e87_s9000_c256_m64/`,
+  and Python PID `8068`. Startup poll at `2026-05-12T15:31:57Z` confirmed the
+  benchmark process is alive, `results.json` is absent as expected, metadata
+  and history files exist, and the runner resumed E87 at step 8500/examples
+  68000 with 1244 matching model tensors loaded and 0 new/missing tensors.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  from E87 to E92, keeping the same owned-pod-only restriction and the rule
+  that heartbeat must not launch follow-up experiments automatically.

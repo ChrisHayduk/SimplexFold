@@ -104,3 +104,4 @@ recorded in the running notes for that run.
 | E85 incidence-normalized boundary transport | completed | 8500 | 0.3858 | 0.3858 | 0.3767 | 10.1112 | 11.7053 / 15.4034 | rejected; incidence normalization worsened lDDT and selected-boundary diagnostics vs E81 |
 | E86 weak directed outer-edge transport | completed | 8500 | 0.3990 | 0.3990 | 0.3858 | 10.0281 | 11.5381 / 15.4034 | kept; tiny new best lDDT and improved dRMSD, continue one short weak outer-edge gate from E86 |
 | E91 continue weak directed outer-edge transport | completed | 9000 | 0.3897 | 0.3897 | 0.3820 | 9.9309 | 11.8230 / 15.4034 | rejected; continuing weak outer-edge transport improved dRMSD/selected-boundary diagnostics but primary lDDT fell below E86 |
+| E87 directed boundary readout | completed | 8500 | 0.3992 | 0.3992 | 0.3831 | 10.2428 | 11.4322 / 15.4034 | kept; tiny new primary-lDDT best over E86 with directed source/target boundary readout, but FoldScore/dRMSD softened |

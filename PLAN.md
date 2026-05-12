@@ -263,6 +263,22 @@ cell scoring, selected-boundary realization losses, half-scale edge-frame
 messages, and incidence-normalized cochain transport. Keep it only if primary
 `val_lddt_ca` recovers against E81/E86 without selected-boundary collapse.
 
+E87 returned a tiny new primary-lDDT best: `val_lddt_ca=0.3992`, just above
+E86's `0.3990`, with selected face/tetra boundary lDDT improving to
+`0.7446` / `0.7280` and contraction fractions returning to about `0.576` /
+`0.579`. The caveat is that FoldScore softened to `0.3831` and dRMSD worsened
+to `10.2428`, so this is not a 30k-step confirmation branch. Run one short
+E92 continuation with the directed boundary-readout runtime scale held at
+`0.5`. Keep it only if local lDDT continues upward or at least stays at the
+E87/E86 level without selected-boundary collapse; otherwise pivot to the
+outer-edge-supported cell scorer.
+
+E92 is now running from the E87 checkpoint to step 9000 with directionality
+held at `0.5`. This is a short stability gate for the directed boundary-readout
+route, not a 30,000-step confirmation. If it regresses, the next branch should
+change selected-cell construction via the outer-edge-supported scorer rather
+than continuing the same readout mechanism.
+
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank
 aggregation, inter-rank aggregation, and topology-aware diagnostics as core

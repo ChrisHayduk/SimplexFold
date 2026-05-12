@@ -272,9 +272,9 @@ geometry and selected-boundary realization, but the local C-alpha agreement
 turns over. Pivot to directed boundary readout rather than continuing the
 outer-edge path.
 
-### E87 Candidate: Directed Boundary Readout
+### E87: Directed Boundary Readout
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: SimplexFold's selected face/tetra cells are built from directed
 anchored neighbor lists, but their final boundary-edge messages have been
@@ -319,7 +319,47 @@ started a fresh optimizer. The log path is
 `/workspace/SimplexFold/logs/e87_directed_boundary_from_e81.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e87_directed_boundary_from_e81_s8500_c256_m64/`.
-Do not add E87 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: keep, but only for one short continuation. E87 reached
+`val_lddt_ca=0.3992`, FoldScore `0.3831`, `val_ca_drmsd=10.2428`, and
+predicted/true C-alpha radius `11.4322 / 15.4034`. This is a tiny new
+primary-lDDT best over E86's `0.3990`, and selected face/tetra boundary lDDT
+improved to `0.7446` / `0.7280` with contraction fractions `0.5758` /
+`0.5786`. The caveat is that FoldScore and dRMSD softened versus E86. Continue
+one 500-step gate with directionality held at `0.5`; if it turns over, stop
+this mechanism and pivot to outer-edge-supported cell scoring.
+
+### E92 Candidate: Continue Directed Boundary Readout
+
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E87 showed that directed source/target simplex-to-pair boundary
+readout can preserve or slightly improve local C-alpha lDDT while improving
+selected-boundary realization. A short continuation tests whether that gain is
+a real slope or another one-checkpoint peak like E86.
+
+Mechanism: resume E87 from step 8500 to 9000 with the same fixed sparse
+selected complex, degree-penalized cell scoring, selected-boundary realization
+losses, incidence-normalized transport, and edge-frame messages. Hold
+`simplex_boundary_readout_directionality_runtime_scale` at `0.5` rather than
+ramping again.
+
+Decision rule: keep only if primary `val_lddt_ca` stays at or above the
+E87/E86 level and selected-boundary lDDT does not collapse. If E92 regresses,
+do not continue directionality; launch the already implemented
+outer-edge-supported cell scorer to change selected-cell construction instead.
+
+Launch: E92 is running as `e92_continue_directed_boundary_from_e87_s9000_c256_m64`,
+Python PID `8068`. Remote prelaunch checks found no active Python benchmark
+process, confirmed the E87 checkpoint was present, py_compile passed for the
+simplex/model-config/trainer/runner files, and CLI help confirmed support for
+the directionality and outer-edge scorer flags. Startup resumed E87 at step
+8500/examples 68000, loaded 1244 matching model tensors, initialized 0
+new/missing tensors, and started a fresh optimizer. The log path is
+`/workspace/SimplexFold/logs/e92_continue_directed_boundary_from_e87.log`,
+and the artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e92_continue_directed_boundary_from_e87_s9000_c256_m64/`.
+Do not add E92 to `EXPERIMENT_RESULTS.md` until it returns.
 
 Validation:
 
