@@ -1,4 +1,4 @@
-## Current Plan: E73 Half-Scale Edge-Frame Boundary Messages From E71
+## Current Plan: E76 Continue Half-Scale Edge-Frame Boundary Messages From E73
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -133,58 +133,38 @@ runs: face/tetra boundary-edge length MAE/RMSE, contraction fraction, boundary
 lDDT, selected-cell counts, and boundary-edge reuse. These are diagnostics of
 the learned sparse complex, not training objectives.
 
-The active branch is E73: rerun the E71-to-5500 continuation with the same
-edge-frame architecture but half the runtime cochain-exchange scale
-(`0.0125`). Continue from the E71 step-5000 checkpoint with static
-selected-boundary lDDT weights `0.05`, selected face/tetra coordinate weights
-`1.0`, selected boundary coordinate-distance weights `0.5`,
-`simplex_aux_weight=0.5`, `--simplex-edge-frame-message-scale 0.025`, and
-`--simplex-edge-frame-message-runtime-scale 0.0125`. This keeps the
-intervention in the selected face/tetra boundary-edge message route while
-testing whether a softer cross-rank exchange preserves E71's local lDDT and
-retains some of E72's boundary/FoldScore gains.
+E73 reran the E71-to-5500 continuation with the same edge-frame architecture
+but half the runtime cochain-exchange scale (`0.0125`). It returned a new best:
+`val_lddt_ca=0.3807`, FoldScore `0.3720`, `val_ca_drmsd=10.0777`, and
+predicted/true C-alpha radius `11.6741 / 15.4034`. This beats E71's
+`0.3751` local lDDT and slightly improves E72's FoldScore/dRMSD trend.
 
-Keep E73 only if it improves or preserves E71's `val_lddt_ca=0.3751` while
-not giving up E72's selected-boundary realization gains. If it lands below
-E71, stop this edge-frame continuation family and move to changing the
-selected complex construction itself rather than spending more on the same
-runtime scale knob.
+The caveat is diagnostic: E73's selected face/tetra boundary lDDT
+`0.5368` / `0.5213` is below E72's `0.5450` / `0.5303`, and boundary-edge
+reuse remains high. The half-scale edge-frame route therefore preserves local
+C-alpha lDDT better than E72, but it does not solve the dense/reused selected
+complex problem.
 
-E73 has been relaunched on the owned Runpod B200 pod `lovgzo4hz2k4fp` from
-the fixed runner snapshot corresponding to commit `7f83b2e`. The accepted
-in-flight run is
-`e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64`, not the first
-`bc1b749` launch. The first E73 process was stopped before any returned result
-because the previous runner used runtime simplex overrides during training but
-not validation.
+The active next branch is E76: continue E73 from the step-5500 checkpoint to
+step 6000 with the same topology-mediated recipe: static selected-boundary
+lDDT weights `0.05`, selected face/tetra coordinate weights `1.0`, selected
+boundary coordinate-distance weights `0.5`, `simplex_aux_weight=0.5`,
+`--simplex-edge-frame-message-scale 0.025`, and
+`--simplex-edge-frame-message-runtime-scale 0.0125`. Keep E76 only if it
+continues improving or at least preserves E73's `val_lddt_ca=0.3807`; reject
+the branch if local lDDT turns over again.
 
-The corrected run reuses the clean E70-E72 public-data environment, resumes
-the E71 checkpoint at step 5000/examples 40000, loads 1244 matching model
-tensors, initializes 0 new/missing tensors, and records edge-frame runtime
-scale `0.0125` in `run_metadata.json`. The fixed runner applies runtime
-simplex overrides during validation as well, and supports a scheduled
-`--simplex-geometry-distance-weight` selector prior for the next topology
-construction branch. Do not add E73 to `EXPERIMENT_RESULTS.md` until this
-evalfix Runpod run returns.
+E76 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` as
+`e76_edge_frame00125_from_e73_s6000_c256_m64`. It resumes the E73 step-5500
+checkpoint, keeps effective batch 8, crop 256, MSA depth 64, and no templates.
 
-If E73 does not recover E71's local lDDT, the next branch is E74: reduce the
-recycled-geometry distance prior in the simplex neighbor selector from `0.1`
-to `0.025` while keeping the E71/E73 edge-frame architecture available. This
-directly changes the selected sparse cell complex: recycled C-alpha geometry
-will still bias which residues become face/tetra cochains, but it should no
-longer dominate the learned pair/contact topology after the coordinates have
-opened up. The runner now supports both static and scheduled
-`--simplex-geometry-distance-weight` overrides; the change adds no parameters.
-
-If E74 also fails, the next prepared branch is E75: keep the same selected
-neighbor star but stop instantiating every possible face and tetra clique
-inside it. Instead, cap active face/tetra cells per anchor with
-`--simplex-face-top-k` and `--simplex-tetra-top-k`, ranking candidate cells by
-their selected boundary-edge logits. This follows the combinatorial-complex
-lesson from the reference papers: higher-rank protein cells need not be the
-full flag completion of the graph. It should reduce boundary-edge reuse and
-make the rank-2/rank-3 cochains more selective without adding parameters or
-introducing a generic output-coordinate loss.
+If E76 turns over, the prepared alternatives are still E74/E75. E74 reduces
+the recycled-geometry distance prior in the simplex neighbor selector from
+`0.1` to `0.025`, directly changing which sparse face/tetra cochains exist.
+E75 caps active face/tetra cells per anchor with `--simplex-face-top-k` and
+`--simplex-tetra-top-k`, ranking candidate cells by selected boundary-edge
+logits. Both are cell-complex construction changes rather than generic output
+coordinate losses, and both add no parameters.
 
 Yes. With templates forbidden, the right construction is:
 

@@ -2515,3 +2515,37 @@
   two stray root-level helper files from the first sync attempt; the canonical
   remote paths are now `scripts/format_experiment_result_row.py` and
   `tests/test_format_experiment_result_row.py`.
+- E73 evalfix returned on owned pod `lovgzo4hz2k4fp` with a new best:
+  step 5500 `val_lddt_ca=0.3807`, FoldScore `0.3720`,
+  `val_ca_drmsd=10.0777`, and predicted/true C-alpha radius
+  `11.6741 / 15.4034`. It completed with `3,154,242` parameters
+  (`+1.53%` versus the AF2-medium baseline), effective batch 8, no templates,
+  and runtime edge-frame scale `0.0125`.
+- E73 interpretation: keep. Half-scale selected boundary-edge frame messages
+  recovered and improved E71's local lDDT while also improving FoldScore and
+  dRMSD. It did not fully retain E72's selected-boundary realization gains:
+  selected face/tetra boundary lDDT ended at `0.5368` / `0.5213`, boundary
+  length MAE at `2.7292` / `2.8698`, and contraction fractions at
+  `0.6669` / `0.6692`.
+- Copied E73 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e73_evalfix_edge_frame00125_from_e71.log`. The local artifact pull
+  intentionally excluded the checkpoint directory; the remote checkpoint stays
+  available for the next Runpod continuation.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step 5000`
+  to add the E73 row to `EXPERIMENT_RESULTS.md`, so the inherited E71 rows in
+  E73 history do not count as E73's best.
+- Next branch is E76, not E74: continue the E73 checkpoint to step 6000 with
+  the same half-scale selected boundary-edge message recipe. Launch E74/E75
+  only if E76 turns over or selected-complex diagnostics collapse.
+- E76 launched on the same owned Runpod B200 pod `lovgzo4hz2k4fp` with run
+  name `e76_edge_frame00125_from_e73_s6000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e76_edge_frame00125_from_e73.log`, and
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e76_edge_frame00125_from_e73_s6000_c256_m64/`.
+  The launch command found no active benchmark process before starting. Main
+  Python PID is `20888`; data-worker PIDs are `23815` and `23816`.
+  The runner resumed E73 at step 5500/examples 44000, loaded 1244 matching
+  model tensors, initialized 0 new/missing tensors, and started a fresh
+  optimizer. GPU activity was confirmed after launch.

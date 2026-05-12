@@ -2554,7 +2554,7 @@ longer preserve local C-alpha lDDT.
 
 ### E73: Half-Scale Edge-Frame Boundary Messages From E71
 
-Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
+Status: completed on owned Runpod pod `lovgzo4hz2k4fp`.
 
 Hypothesis: E72 shows that the selected boundary-edge frame route is not
 empty signal; it improves FoldScore, dRMSD, radius, and boundary lDDT. The
@@ -2599,12 +2599,62 @@ weights-only resume from the E71 step-5000 checkpoint, crop 256, MSA depth 64,
 and no templates. The launch log shows the runner resumed E71 at step
 5000/examples 40000, loaded 1244 matching model tensors, initialized 0
 new/missing tensors, and started a fresh optimizer. The heartbeat has been
-retargeted to the evalfix artifact path. Do not add E73 to
-`EXPERIMENT_RESULTS.md` until this Runpod run returns.
+retargeted to the evalfix artifact path.
+
+Result: keep as the new primary reference. E73 completed at step 5500 with
+`val_lddt_ca=0.3807`, FoldScore `0.3720`, `val_ca_drmsd=10.0777`, and
+predicted/true C-alpha radius `11.6741 / 15.4034`. This improves E71's local
+lDDT (`0.3751`) while preserving the E72 FoldScore/dRMSD direction. The
+selected-complex diagnostics are mixed: selected face/tetra boundary lDDT
+ended at `0.5368` / `0.5213`, below E72's `0.5450` / `0.5303`, with boundary
+length MAE `2.7292` / `2.8698` and contraction fractions
+`0.6669` / `0.6692`. Half-scale edge-frame cochain exchange is therefore a
+better local-lDDT setting than E72, but it does not solve boundary-edge reuse
+or fully recover E72's selected-boundary realization gains.
+
+### E76: Continue Half-Scale Edge-Frame Boundary Messages To 6000
+
+Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
+
+Hypothesis: E73 is the first edge-frame continuation past E71 to improve
+local C-alpha lDDT, FoldScore, and dRMSD together. Continuing the same
+half-scale boundary-edge message route for another 500 optimizer steps tests
+whether the improvement is a real trajectory or just a single checkpoint
+fluctuation.
+
+Mechanism: resume the E73 step-5500 checkpoint and keep the same
+selected-boundary lDDT, selected coordinate-realization, and half-scale
+edge-frame boundary-message recipe. This remains a selected-complex
+communication experiment: the changed signal is still the face/tetra
+boundary-edge cochain exchange, not a generic dense output-coordinate loss.
+
+Planned launch: resume
+`e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+and run to step 6000 with `--simplex-edge-frame-message-scale 0.025`,
+`--simplex-edge-frame-message-runtime-scale 0.0125`, static selected-boundary
+lDDT weights `0.05`, selected face/tetra coordinate weights `1.0`, selected
+boundary coordinate-distance weights `0.5`, `simplex_aux_weight=0.5`, crop
+256, MSA depth 64, no templates, and effective batch 8.
+
+Decision rule: keep only if step 6000 improves or preserves E73's
+`val_lddt_ca=0.3807` without a serious selected-boundary diagnostic collapse.
+If local lDDT turns over, stop the half-scale edge-frame continuation branch
+and move to E74/E75, which alter selected-complex construction itself.
+
+Launch: E76 is running as
+`e76_edge_frame00125_from_e73_s6000_c256_m64` on the same owned Runpod B200
+pod. The launch resumed
+`e73_evalfix_edge_frame00125_from_e71_s5500_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+at step 5500/examples 44000, loaded 1244 matching tensors, initialized 0
+new/missing tensors, and started a fresh optimizer. The log path is
+`/workspace/SimplexFold/logs/e76_edge_frame00125_from_e73.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e76_edge_frame00125_from_e73_s6000_c256_m64/`.
+Do not add E76 to `EXPERIMENT_RESULTS.md` until it returns.
 
 ### E74: Light Recycled-Geometry Topology Selector
 
-Status: implemented locally and planned only if E73 fails to preserve E71.
+Status: implemented locally and planned if E76 turns over.
 
 Hypothesis: E72 improved selected-boundary lDDT, FoldScore, dRMSD, and global
 radius while reducing primary local lDDT. One possible failure mode is that,
