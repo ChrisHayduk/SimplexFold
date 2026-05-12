@@ -5,6 +5,7 @@ from minalphafold.trainer import (
     load_model_config,
     model_inputs_from_batch,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
+    simplex_cell_score_outer_edge_weight_at_step,
     simplex_edge_frame_message_runtime_scale_at_step,
     simplex_face_top_k_at_step,
     simplex_geometry_distance_weight_at_step,
@@ -401,6 +402,12 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.75",
             "--simplex-cell-score-outer-edge-weight",
             "0.25",
+            "--simplex-cell-score-outer-edge-weight-final",
+            "0.5",
+            "--simplex-cell-score-outer-edge-weight-ramp-start-step",
+            "3500",
+            "--simplex-cell-score-outer-edge-weight-ramp-steps",
+            "500",
             "--resume-model-weights-only",
         ]
     )
@@ -457,6 +464,9 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_tetra_top_k_ramp_steps == 500
     assert args.simplex_cell_score_degree_penalty == 0.75
     assert args.simplex_cell_score_outer_edge_weight == 0.25
+    assert args.simplex_cell_score_outer_edge_weight_final == 0.5
+    assert args.simplex_cell_score_outer_edge_weight_ramp_start_step == 3500
+    assert args.simplex_cell_score_outer_edge_weight_ramp_steps == 500
     assert args.resume_model_weights_only is True
 
     cfg = _apply_model_config_overrides(load_model_config("simplexfold_medium_param_matched"), args)
@@ -512,6 +522,10 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         simplex_tetra_top_k_final=48,
         simplex_tetra_top_k_ramp_start_step=3000,
         simplex_tetra_top_k_ramp_steps=500,
+        simplex_cell_score_outer_edge_weight=0.0,
+        simplex_cell_score_outer_edge_weight_final=0.25,
+        simplex_cell_score_outer_edge_weight_ramp_start_step=3000,
+        simplex_cell_score_outer_edge_weight_ramp_steps=500,
     )
     batch = {
         "target_feat": torch.zeros(1, 4, 22),
@@ -558,6 +572,9 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert simplex_tetra_top_k_at_step(cfg, 3000) == 0
     assert simplex_tetra_top_k_at_step(cfg, 3250) == 24
     assert simplex_tetra_top_k_at_step(cfg, 3500) == 48
+    assert simplex_cell_score_outer_edge_weight_at_step(cfg, 3000) == 0.0
+    assert simplex_cell_score_outer_edge_weight_at_step(cfg, 3250) == 0.125
+    assert simplex_cell_score_outer_edge_weight_at_step(cfg, 3500) == 0.25
     inputs = model_inputs_from_batch(
         batch,
         cfg,
@@ -582,6 +599,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert torch.isclose(inputs["simplex_geometry_distance_weight_override"], torch.tensor(0.0625))
     assert torch.isclose(inputs["simplex_face_top_k_override"], torch.tensor(12.0))
     assert torch.isclose(inputs["simplex_tetra_top_k_override"], torch.tensor(24.0))
+    assert torch.isclose(inputs["simplex_cell_score_outer_edge_weight_override"], torch.tensor(0.125))
 
 
 def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
@@ -629,6 +647,10 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
         simplex_tetra_top_k_final=48,
         simplex_tetra_top_k_ramp_start_step=3000,
         simplex_tetra_top_k_ramp_steps=500,
+        simplex_cell_score_outer_edge_weight=0.0,
+        simplex_cell_score_outer_edge_weight_final=0.25,
+        simplex_cell_score_outer_edge_weight_ramp_start_step=3000,
+        simplex_cell_score_outer_edge_weight_ramp_steps=500,
     )
     batch = {
         "target_feat": torch.zeros(1, 4, 22),
@@ -681,6 +703,7 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
     assert torch.isclose(model.kwargs["simplex_geometry_distance_weight_override"], torch.tensor(0.0625))
     assert torch.isclose(model.kwargs["simplex_face_top_k_override"], torch.tensor(12.0))
     assert torch.isclose(model.kwargs["simplex_tetra_top_k_override"], torch.tensor(24.0))
+    assert torch.isclose(model.kwargs["simplex_cell_score_outer_edge_weight_override"], torch.tensor(0.125))
 
 
 def test_simplex_topology_metrics_report_boundary_reuse():

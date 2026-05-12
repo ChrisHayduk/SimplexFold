@@ -265,6 +265,10 @@ class TrainingConfig:
     simplex_tetra_top_k_final: float | None = None
     simplex_tetra_top_k_ramp_start_step: int | None = None
     simplex_tetra_top_k_ramp_steps: int = 1
+    simplex_cell_score_outer_edge_weight: float | None = None
+    simplex_cell_score_outer_edge_weight_final: float | None = None
+    simplex_cell_score_outer_edge_weight_ramp_start_step: int | None = None
+    simplex_cell_score_outer_edge_weight_ramp_steps: int = 1
     backbone_loss_weight: float = 1.0
     sidechain_fape_loss_weight: float = 1.0
     torsion_loss_weight: float = 1.0
@@ -1037,6 +1041,23 @@ def simplex_tetra_top_k_at_step(training_config: TrainingConfig, step: int | Non
     )
 
 
+def simplex_cell_score_outer_edge_weight_at_step(
+    training_config: TrainingConfig,
+    step: int | None,
+) -> float | None:
+    if training_config.simplex_cell_score_outer_edge_weight is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_cell_score_outer_edge_weight)
+    return _ramped_value(
+        training_config.simplex_cell_score_outer_edge_weight,
+        training_config.simplex_cell_score_outer_edge_weight_final,
+        step=step,
+        start_step=training_config.simplex_cell_score_outer_edge_weight_ramp_start_step,
+        ramp_steps=training_config.simplex_cell_score_outer_edge_weight_ramp_steps,
+    )
+
+
 def model_inputs_from_batch(
     batch: dict[str, Any],
     training_config: TrainingConfig,
@@ -1137,6 +1158,11 @@ def model_inputs_from_batch(
     tetra_top_k = simplex_tetra_top_k_at_step(training_config, step)
     if use_simplex_cell_top_k and tetra_top_k is not None:
         inputs["simplex_tetra_top_k_override"] = batch["target_feat"].new_tensor(float(tetra_top_k))
+    cell_score_outer_edge_weight = simplex_cell_score_outer_edge_weight_at_step(training_config, step)
+    if use_simplex_cell_top_k and cell_score_outer_edge_weight is not None:
+        inputs["simplex_cell_score_outer_edge_weight_override"] = batch["target_feat"].new_tensor(
+            float(cell_score_outer_edge_weight)
+        )
     return inputs
 
 
@@ -2019,6 +2045,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-tetra-top-k-final", type=float, default=None)
     parser.add_argument("--simplex-tetra-top-k-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-tetra-top-k-ramp-steps", type=int, default=1)
+    parser.add_argument("--simplex-cell-score-outer-edge-weight", type=float, default=None)
+    parser.add_argument("--simplex-cell-score-outer-edge-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-cell-score-outer-edge-weight-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-cell-score-outer-edge-weight-ramp-steps", type=int, default=1)
     parser.add_argument("--backbone-loss-weight", type=float, default=1.0)
     parser.add_argument("--sidechain-fape-loss-weight", type=float, default=1.0)
     parser.add_argument("--torsion-loss-weight", type=float, default=1.0)
@@ -2182,6 +2212,12 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_tetra_top_k_final=args.simplex_tetra_top_k_final,
         simplex_tetra_top_k_ramp_start_step=args.simplex_tetra_top_k_ramp_start_step,
         simplex_tetra_top_k_ramp_steps=args.simplex_tetra_top_k_ramp_steps,
+        simplex_cell_score_outer_edge_weight=args.simplex_cell_score_outer_edge_weight,
+        simplex_cell_score_outer_edge_weight_final=args.simplex_cell_score_outer_edge_weight_final,
+        simplex_cell_score_outer_edge_weight_ramp_start_step=(
+            args.simplex_cell_score_outer_edge_weight_ramp_start_step
+        ),
+        simplex_cell_score_outer_edge_weight_ramp_steps=args.simplex_cell_score_outer_edge_weight_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,

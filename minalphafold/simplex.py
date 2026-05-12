@@ -1399,6 +1399,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
         simplex_tetra_top_k_override: Optional[torch.Tensor] = None,
+        simplex_cell_score_outer_edge_weight_override: Optional[torch.Tensor] = None,
     ) -> tuple[torch.Tensor, torch.Tensor, dict[str, torch.Tensor]]:
         if pair.ndim != 4 or single.ndim != 3:
             raise ValueError("pair must be [B, L, L, Cz] and single must be [B, L, Cs]")
@@ -1456,6 +1457,12 @@ class SimplicialAdapter(torch.nn.Module):
         tetra_top_k = self.tetra_top_k
         if simplex_tetra_top_k_override is not None:
             tetra_top_k = int(round(max(float(simplex_tetra_top_k_override.detach().float().cpu().item()), 0.0)))
+        cell_score_outer_edge_weight = self.cell_score_outer_edge_weight
+        if simplex_cell_score_outer_edge_weight_override is not None:
+            cell_score_outer_edge_weight = max(
+                float(simplex_cell_score_outer_edge_weight_override.detach().float().cpu().item()),
+                0.0,
+            )
 
         score_raw = self.topology_score(self.pair_score_norm(pair)).squeeze(-1)
         contact_logits = 0.5 * (score_raw + score_raw.transpose(1, 2))
@@ -1503,7 +1510,7 @@ class SimplicialAdapter(torch.nn.Module):
                 face_top_k=face_top_k,
                 tetra_top_k=tetra_top_k,
                 cell_score_degree_penalty=self.cell_score_degree_penalty,
-                cell_score_outer_edge_weight=self.cell_score_outer_edge_weight,
+                cell_score_outer_edge_weight=cell_score_outer_edge_weight,
             )
         topology = self._apply_cell_dropout(topology)
 

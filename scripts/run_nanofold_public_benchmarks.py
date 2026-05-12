@@ -65,6 +65,7 @@ from minalphafold.trainer import (  # noqa: E402
     set_optimizer_learning_rate,
     set_seed,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
+    simplex_cell_score_outer_edge_weight_at_step,
     simplex_edge_frame_message_runtime_scale_at_step,
     simplex_face_top_k_at_step,
     simplex_geometry_distance_weight_at_step,
@@ -1166,6 +1167,7 @@ def _train_variant(
         simplex_geometry_distance_weight = simplex_geometry_distance_weight_at_step(training_config, step)
         simplex_face_top_k = simplex_face_top_k_at_step(training_config, step)
         simplex_tetra_top_k = simplex_tetra_top_k_at_step(training_config, step)
+        simplex_cell_score_outer_edge_weight = simplex_cell_score_outer_edge_weight_at_step(training_config, step)
         optimizer.zero_grad(set_to_none=True)
         loss_accum = 0.0
         term_accum: dict[str, list[float]] = {}
@@ -1338,6 +1340,11 @@ def _train_variant(
                 ),
                 "simplex_face_top_k": float("nan") if simplex_face_top_k is None else simplex_face_top_k,
                 "simplex_tetra_top_k": float("nan") if simplex_tetra_top_k is None else simplex_tetra_top_k,
+                "simplex_cell_score_outer_edge_weight": (
+                    float("nan")
+                    if simplex_cell_score_outer_edge_weight is None
+                    else simplex_cell_score_outer_edge_weight
+                ),
                 "backbone_loss_weight": float(loss_fn.backbone_loss_weight),
                 "sidechain_fape_loss_weight": float(loss_fn.sidechain_fape_loss_weight),
                 "torsion_loss_weight": float(loss_fn.torsion_loss_weight),
@@ -1587,6 +1594,16 @@ def _train_variant(
         "simplex_tetra_top_k_final": training_config.simplex_tetra_top_k_final,
         "simplex_tetra_top_k_ramp_start_step": training_config.simplex_tetra_top_k_ramp_start_step,
         "simplex_tetra_top_k_ramp_steps": training_config.simplex_tetra_top_k_ramp_steps,
+        "simplex_cell_score_outer_edge_weight": training_config.simplex_cell_score_outer_edge_weight,
+        "simplex_cell_score_outer_edge_weight_final": (
+            training_config.simplex_cell_score_outer_edge_weight_final
+        ),
+        "simplex_cell_score_outer_edge_weight_ramp_start_step": (
+            training_config.simplex_cell_score_outer_edge_weight_ramp_start_step
+        ),
+        "simplex_cell_score_outer_edge_weight_ramp_steps": (
+            training_config.simplex_cell_score_outer_edge_weight_ramp_steps
+        ),
         "backbone_loss_weight": training_config.backbone_loss_weight,
         "sidechain_fape_loss_weight": training_config.sidechain_fape_loss_weight,
         "torsion_loss_weight": training_config.torsion_loss_weight,
@@ -1786,6 +1803,9 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_tetra_top_k_ramp_steps",
         "simplex_cell_score_degree_penalty",
         "simplex_cell_score_outer_edge_weight",
+        "simplex_cell_score_outer_edge_weight_final",
+        "simplex_cell_score_outer_edge_weight_ramp_start_step",
+        "simplex_cell_score_outer_edge_weight_ramp_steps",
         "resume_model_weights_only",
         "elapsed_seconds",
         "examples_per_second",
@@ -2291,6 +2311,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Reward candidate face/tetra cells with selected outer-edge support before top-k masking.",
     )
+    parser.add_argument("--simplex-cell-score-outer-edge-weight-final", type=float, default=None)
+    parser.add_argument("--simplex-cell-score-outer-edge-weight-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-cell-score-outer-edge-weight-ramp-steps", type=int, default=1)
     parser.add_argument(
         "--simplex-local-neighbor-k",
         type=float,
@@ -2486,6 +2509,12 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_tetra_top_k_final=args.simplex_tetra_top_k_final,
         simplex_tetra_top_k_ramp_start_step=args.simplex_tetra_top_k_ramp_start_step,
         simplex_tetra_top_k_ramp_steps=args.simplex_tetra_top_k_ramp_steps,
+        simplex_cell_score_outer_edge_weight=args.simplex_cell_score_outer_edge_weight,
+        simplex_cell_score_outer_edge_weight_final=args.simplex_cell_score_outer_edge_weight_final,
+        simplex_cell_score_outer_edge_weight_ramp_start_step=(
+            args.simplex_cell_score_outer_edge_weight_ramp_start_step
+        ),
+        simplex_cell_score_outer_edge_weight_ramp_steps=args.simplex_cell_score_outer_edge_weight_ramp_steps,
         backbone_loss_weight=args.backbone_loss_weight,
         sidechain_fape_loss_weight=args.sidechain_fape_loss_weight,
         torsion_loss_weight=args.torsion_loss_weight,
@@ -2656,6 +2685,11 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_tetra_top_k_ramp_steps": args.simplex_tetra_top_k_ramp_steps,
         "simplex_cell_score_degree_penalty": args.simplex_cell_score_degree_penalty,
         "simplex_cell_score_outer_edge_weight": args.simplex_cell_score_outer_edge_weight,
+        "simplex_cell_score_outer_edge_weight_final": args.simplex_cell_score_outer_edge_weight_final,
+        "simplex_cell_score_outer_edge_weight_ramp_start_step": (
+            args.simplex_cell_score_outer_edge_weight_ramp_start_step
+        ),
+        "simplex_cell_score_outer_edge_weight_ramp_steps": args.simplex_cell_score_outer_edge_weight_ramp_steps,
         "simplex_local_neighbor_k": args.simplex_local_neighbor_k,
         "simplex_local_neighbor_k_final": args.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": args.simplex_local_neighbor_k_ramp_start_step,

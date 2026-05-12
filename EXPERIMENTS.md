@@ -382,21 +382,25 @@ tensor.
 Mechanism: add zero-parameter `simplex_cell_score_outer_edge_weight`. During
 face/tetra top-k masking, each candidate cell receives an optional score bonus
 from the normalized count of selected neighbor edges that leave the cell's
-vertices. This changes which rank-2/rank-3 cochains exist and communicate; it
-does not alter output coordinate losses or add parameters.
+vertices. A runtime schedule can ramp this score from zero on a resumed
+checkpoint. This changes which rank-2/rank-3 cochains exist and communicate;
+it does not alter output coordinate losses or add parameters.
 
 Prepared gate: keep behind the E86 continuation and E87. If those fail but
 the sparse-cell branch remains the best topology-construction direction,
 resume the E81 checkpoint with the fixed `24` / `48` sparse caps,
-`--simplex-cell-score-degree-penalty 0.75`, and a small first reward such as
-`--simplex-cell-score-outer-edge-weight 0.25`. Compare selected outer-edge
-availability, boundary-edge reuse, selected-boundary lDDT, and primary
-`val_lddt_ca` against E81/E86.
+`--simplex-cell-score-degree-penalty 0.75`, and a small scheduled first
+reward such as `--simplex-cell-score-outer-edge-weight 0.0`,
+`--simplex-cell-score-outer-edge-weight-final 0.25`,
+`--simplex-cell-score-outer-edge-weight-ramp-start-step 8000`, and
+`--simplex-cell-score-outer-edge-weight-ramp-steps 500`. Compare selected
+outer-edge availability, boundary-edge reuse, selected-boundary lDDT, and
+primary `val_lddt_ca` against E81/E86.
 
 Validation:
 
-- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
-- `python -m pytest tests/test_simplex.py::test_cell_score_outer_edge_weight_prefers_context_supported_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_cell_outer_edge_score_adds_no_parameters`
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_cell_score_outer_edge_weight_prefers_context_supported_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_cell_outer_edge_score_adds_no_parameters`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
 ## Experiment Queue

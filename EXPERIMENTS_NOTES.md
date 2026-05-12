@@ -322,13 +322,20 @@
   reward cells that are better embedded in the outer-edge neighborhood before
   selected-cell top-k masking. This is a topological domain-construction
   change, not a generic output-coordinate loss.
+- E90 was extended with runtime schedule support so the outer-edge-support
+  score can be ramped in on a resumed checkpoint, e.g. `0.0 -> 0.25`, instead
+  of abruptly changing the selected cell complex.
 - E90 focused validation passed:
   `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py
-  scripts/run_nanofold_public_benchmarks.py`; `python -m pytest
+  minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest
   tests/test_simplex.py::test_cell_score_outer_edge_weight_prefers_context_supported_cells
   tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser
+  tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs
+  tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation
+  tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula
   tests/test_trainer.py::test_simplicial_cell_outer_edge_score_adds_no_parameters`
-  reported `3 passed`.
+  reported `6 passed`.
 - Broader E90 validation also passed: `python -m pytest tests/test_simplex.py
   tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` reported
   `159 passed`; `git diff --check` was clean.

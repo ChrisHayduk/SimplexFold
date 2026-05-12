@@ -290,8 +290,9 @@ states should improve pair/edge reasoning before the structure module.
 A fifth prepared fallback is an outer-edge-supported cell scorer. It keeps the
 degree-penalized sparse complex, but adds an optional zero-parameter bonus for
 candidate faces/tetras whose vertices have selected neighbor edges leaving the
-cell. This treats outer-edge availability as part of the topological domain
-construction itself, not merely as a diagnostic after training.
+cell. The score can be ramped in at runtime on a resumed checkpoint, treating
+outer-edge availability as part of the topological domain construction itself
+rather than merely as a diagnostic after training.
 
 Yes. With templates forbidden, the right construction is:
 
