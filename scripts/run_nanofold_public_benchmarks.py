@@ -900,6 +900,8 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_segment_cell_scale", args.simplex_segment_cell_scale),
         ("simplex_segment_radius", args.simplex_segment_radius),
         ("simplex_c_segment", args.simplex_c_segment),
+        ("simplex_face_top_k", args.simplex_face_top_k),
+        ("simplex_tetra_top_k", args.simplex_tetra_top_k),
     ):
         if value is not None:
             overrides[field] = value
@@ -1483,6 +1485,8 @@ def _train_variant(
         "simplex_geometry_distance_weight": (
             float(getattr(model_config, "simplex_geometry_distance_weight", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_face_top_k": int(getattr(model_config, "simplex_face_top_k", 0)) if use_simplicial else 0,
+        "simplex_tetra_top_k": int(getattr(model_config, "simplex_tetra_top_k", 0)) if use_simplicial else 0,
         "simplex_boundary_closure_weight": (
             float(getattr(model_config, "simplex_boundary_closure_weight", 0.0)) if use_simplicial else 0.0
         ),
@@ -1601,6 +1605,8 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_geometry_distance_weight_final",
         "simplex_geometry_distance_weight_ramp_start_step",
         "simplex_geometry_distance_weight_ramp_steps",
+        "simplex_face_top_k",
+        "simplex_tetra_top_k",
         "resume_model_weights_only",
         "elapsed_seconds",
         "examples_per_second",
@@ -2012,6 +2018,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the model config channel count for latent rank-2 segment cells.",
     )
     parser.add_argument(
+        "--simplex-face-top-k",
+        type=int,
+        default=None,
+        help="Keep only the top N selected face cells per anchor; 0 keeps the full neighbor-star clique.",
+    )
+    parser.add_argument(
+        "--simplex-tetra-top-k",
+        type=int,
+        default=None,
+        help="Keep only the top N selected tetra cells per anchor; 0 keeps the full neighbor-star clique.",
+    )
+    parser.add_argument(
         "--simplex-local-neighbor-k",
         type=float,
         default=None,
@@ -2301,6 +2319,8 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_segment_cell_scale": args.simplex_segment_cell_scale,
         "simplex_segment_radius": args.simplex_segment_radius,
         "simplex_c_segment": args.simplex_c_segment,
+        "simplex_face_top_k": args.simplex_face_top_k,
+        "simplex_tetra_top_k": args.simplex_tetra_top_k,
         "simplex_local_neighbor_k": args.simplex_local_neighbor_k,
         "simplex_local_neighbor_k_final": args.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": args.simplex_local_neighbor_k_ramp_start_step,

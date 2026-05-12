@@ -558,6 +558,22 @@ def test_simplicial_geometry_selector_weight_adds_no_parameters():
     assert light_geometry_params == simplex_params
 
 
+def test_simplicial_cell_topk_selector_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    sparse_cell_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_face_top_k=24,
+        simplex_tetra_top_k=48,
+    )
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    sparse_cell_params = sum(parameter.numel() for parameter in AlphaFold2(sparse_cell_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert sparse_cell_params == simplex_params
+
+
 def test_simplicial_cell_dropout_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     dropout_medium = replace(

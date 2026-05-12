@@ -2631,3 +2631,36 @@ this and follow the better E73 branch instead.
 Validation:
 
 - `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_build_simplex_topology_geometry_weight_changes_selected_neighbors tests/test_trainer.py::test_simplicial_geometry_selector_weight_adds_no_parameters`
+
+### E75: Sparse Selected Higher-Rank Cell Complex
+
+Status: implemented locally and planned only if E73/E74 do not recover E71.
+
+Hypothesis: the current selector picks a sparse residue neighbor star, but then
+instantiates the full clique of faces and tetrahedra inside that star. The
+E70-E72 diagnostics show very high boundary-edge reuse, especially for tetra
+cells, which suggests the higher-rank complex may be too dense even when the
+residue-neighbor graph is sparse. A combinatorial-complex view does not require
+every possible face/tetra closure to exist. Keeping only the highest-scoring
+rank-2 and rank-3 cells should make the persistent cochains more selective and
+reduce noisy boundary-edge averaging.
+
+Mechanism: add zero-parameter `simplex_face_top_k` and `simplex_tetra_top_k`
+selector caps. `build_simplex_topology` still forms the local candidate
+neighbor-star combinations, then scores each face/tetra by the mean of its
+selected boundary-edge logits and masks out lower-scoring cells per anchor.
+The tensor shapes stay unchanged for checkpoint compatibility, but inactive
+cells stop contributing to face/tetra updates, selected-boundary losses, and
+diagnostics. This changes the active cell complex itself; it is not an output
+metric loss.
+
+Planned launch if needed: from the strongest available E71/E73/E74 checkpoint,
+run a 500-step gate with the E64 selected-boundary lDDT/coordinate-realization
+recipe, edge-frame modules available, and a first cap such as
+`--simplex-face-top-k 24 --simplex-tetra-top-k 48`. Compare against E71/E73 on
+primary `val_lddt_ca` and against E72 on selected-boundary diagnostics.
+
+Validation:
+
+- `python -m pytest tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`

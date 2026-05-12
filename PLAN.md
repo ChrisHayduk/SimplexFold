@@ -176,6 +176,16 @@ longer dominate the learned pair/contact topology after the coordinates have
 opened up. The runner now supports both static and scheduled
 `--simplex-geometry-distance-weight` overrides; the change adds no parameters.
 
+If E74 also fails, the next prepared branch is E75: keep the same selected
+neighbor star but stop instantiating every possible face and tetra clique
+inside it. Instead, cap active face/tetra cells per anchor with
+`--simplex-face-top-k` and `--simplex-tetra-top-k`, ranking candidate cells by
+their selected boundary-edge logits. This follows the combinatorial-complex
+lesson from the reference papers: higher-rank protein cells need not be the
+full flag completion of the graph. It should reduce boundary-edge reuse and
+make the rank-2/rank-3 cochains more selective without adding parameters or
+introducing a generic output-coordinate loss.
+
 Yes. With templates forbidden, the right construction is:
 
 [

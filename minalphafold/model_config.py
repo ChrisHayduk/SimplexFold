@@ -148,3 +148,5 @@ class ModelConfig:
     simplex_c_segment: int = 12
     simplex_boundary_closure_weight: float = 0.0
     simplex_boundary_closure_temperature: float = 1.0
+    simplex_face_top_k: int = 0
+    simplex_tetra_top_k: int = 0

@@ -56,6 +56,8 @@ class SimplexConfig:
     simplex_geometry_distance_weight = 0.1
     simplex_boundary_closure_weight = 0.0
     simplex_boundary_closure_temperature = 1.0
+    simplex_face_top_k = 0
+    simplex_tetra_top_k = 0
     simplex_rbf_bins = 4
     simplex_sequence_max = 16.0
     simplex_distance_max = 32.0
@@ -142,6 +144,36 @@ def test_build_simplex_topology_geometry_weight_changes_selected_neighbors():
 
     assert learned_topology.nbr_idx[0, 0, 0].item() == 4
     assert geometry_topology.nbr_idx[0, 0, 0].item() == 1
+
+
+def test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells():
+    score = torch.zeros((1, 5, 5), dtype=torch.float32)
+    score[:, 0, 1] = 9.0
+    score[:, 1, 0] = 9.0
+    score[:, 0, 2] = 8.0
+    score[:, 2, 0] = 8.0
+    score[:, 1, 2] = 7.0
+    score[:, 2, 1] = 7.0
+    score[:, 0, 3] = 6.0
+    score[:, 3, 0] = 6.0
+    score[:, 0, 4] = 5.0
+    score[:, 4, 0] = 5.0
+
+    topology = build_simplex_topology(
+        score,
+        neighbor_k=4,
+        local_radius=-1,
+        local_bias=0.0,
+        long_min_sep=-1,
+        geometry_distance_weight=0.0,
+        face_top_k=2,
+        tetra_top_k=1,
+    )
+
+    assert torch.all(topology.face_mask.sum(dim=-1) <= 2)
+    assert torch.all(topology.tetra_mask.sum(dim=-1) <= 1)
+    active_anchor0_faces = topology.face_indices[0, 0][topology.face_mask[0, 0] > 0]
+    assert {tuple(face.tolist()) for face in active_anchor0_faces} == {(0, 1, 2), (0, 1, 3)}
 
 
 def test_build_simplex_topology_flag_closure_downweights_open_cells():

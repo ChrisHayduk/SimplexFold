@@ -2482,3 +2482,16 @@
   crop 256, MSA depth 64, and no templates. Heartbeat
   `check-simplexfold-e57-runpod` has been retargeted to the E73 evalfix run
   on pod `lovgzo4hz2k4fp` only.
+- E75 local implementation prepared while E73 evalfix runs: added
+  zero-parameter `simplex_face_top_k` and `simplex_tetra_top_k` selector caps.
+  The topology builder still enumerates candidate faces/tetras inside each
+  selected neighbor star, but now can keep only the top-scoring cells per
+  anchor by mean selected boundary-edge logit. This is a combinatorial-complex
+  selector change, not another coordinate loss: inactive higher-rank cells no
+  longer send messages or contribute selected-cell losses while tensor shapes
+  remain checkpoint-compatible.
+- E75 local validation passed:
+  `python -m pytest tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`;
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`.
+  Launch only after E73/E74 decision, with an initial cap such as
+  `--simplex-face-top-k 24 --simplex-tetra-top-k 48`.
