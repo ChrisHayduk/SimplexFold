@@ -107,7 +107,7 @@ fixed sparse caps and add `--simplex-cell-score-degree-penalty 0.75`.
 
 ### E84: Degree-Penalized Sparse Cell Continuation
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E81's degree-penalized sparse selector improved both primary lDDT
 and topology diagnostics. A short continuation tests whether that cleaner
@@ -119,22 +119,18 @@ Mechanism: resume E81 from step 8000 to 8500 with fixed `24` face cells and
 and preserve the same selected-boundary realization losses, light recycled
 geometry selector, and half-scale edge-frame boundary messages.
 
-Launch: E84 is running as `e84_degree_penalty_from_e81_s8500_c256_m64`.
-Main Python PID is `4828`. The log path is
-`/workspace/SimplexFold/logs/e84_degree_penalty_from_e81.log`, and the
-artifact path is
-`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e84_degree_penalty_from_e81_s8500_c256_m64/`.
-Do not add E84 to `EXPERIMENT_RESULTS.md` until it returns.
-
-Decision rule after return: keep if E84 preserves or improves E81's
-`val_lddt_ca=0.3980` without losing the selected-boundary lDDT and
-boundary-edge reuse gains. If it regresses, stop the degree-penalty
-continuation path and move to incidence-normalized boundary or outer-edge
-transport.
+Result: reject. E84 reached `val_lddt_ca=0.3964`, FoldScore `0.3767`,
+`val_ca_drmsd=10.4047`, and predicted/true C-alpha radius
+`11.0245 / 15.4034`. This is below E81 on the primary metric, FoldScore, and
+dRMSD, and it also softened selected-boundary diagnostics: face/tetra
+boundary lDDT fell to `0.7216` / `0.7045`, boundary length MAE rose to
+`1.1435` / `1.2522`, and contraction fraction rose to
+`0.5862` / `0.5870`. Stop the plain degree-penalized continuation and launch
+the incidence-normalized boundary-transport gate from E81.
 
 ### E85 Candidate: Incidence-Normalized Boundary Transport
 
-Status: implemented locally while E84 runs; not launched.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: the selected sparse complex may be learning useful local cells
 while over-routing messages through a small set of boundary edges. Normalizing
@@ -156,6 +152,14 @@ sparse branch retains strong selected-boundary lDDT but continues to show high
 edge reuse. Keep if selected boundary-edge reuse falls without losing the E81
 local lDDT gain.
 
+Launch: E85 is running as `e85_incidence_norm_from_e81_s8500_c256_m64`, PID
+`5476`. It resumes the E81 checkpoint from step 8000 to 8500 with the E84
+recipe plus `--simplex-boundary-incidence-normalization 1.0`. The log path is
+`/workspace/SimplexFold/logs/e85_incidence_norm_from_e81.log`, and the artifact
+path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e85_incidence_norm_from_e81_s8500_c256_m64/`.
+Do not add E85 to `EXPERIMENT_RESULTS.md` until it returns.
+
 Validation:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
@@ -164,7 +168,8 @@ Validation:
 
 ### E86 Candidate: Directed Outer-Edge Transport Revisit
 
-Status: design candidate, not implemented.
+Status: design candidate using existing outer-edge context plumbing; not
+launched.
 
 Hypothesis: early outer-edge runs were too disruptive, but Topotein's directed
 outer-edge neighborhoods remain the best protein-specific route for
@@ -172,10 +177,13 @@ cell-to-cell communication. A weaker, incidence-normalized, source/target
 aware version from the sparse E79-E81 complex may be better behaved than the
 earlier dense-context attempts.
 
-Mechanism sketch: construct outgoing and incoming outer-edge summaries for
-selected faces/tetras through boundary edges that leave one selected cell and
-enter another. Gate the route by training step and message degree so it
-cannot immediately dominate the pair trunk.
+Mechanism sketch: reuse the existing `simplex_outer_edge_context_scale` path,
+which already pools directed outgoing and incoming pair edges that leave or
+enter selected face/tetra cells while excluding internal cell edges. Revisit it
+only on top of the sparse E81/E85 selected complex, with runtime gating and
+`simplex_boundary_incidence_normalization`, so outer-edge context is routed
+through a cleaner incidence-normalized complex rather than the earlier dense
+cell context that disrupted E49/E58-E60.
 
 Decision rule: run only after the sparse-cell branch stabilizes. Keep if it
 improves FoldScore/dRMSD while preserving primary `val_lddt_ca` and selected

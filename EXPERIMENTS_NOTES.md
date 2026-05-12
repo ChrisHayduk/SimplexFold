@@ -73,8 +73,25 @@
   `/workspace/SimplexFold/logs/e84_degree_penalty_from_e81.log`.
 - E84 resumes the E81 checkpoint from step 8000 to 8500 with the same fixed
   sparse caps and degree penalty (`--simplex-cell-score-degree-penalty 0.75`).
-  A status check at `2026-05-12T10:43:02Z` confirmed the process is alive and
-  no `results.json` has returned yet.
+  A status check at `2026-05-12T10:43:02Z` confirmed the process was alive and
+  no `results.json` had returned yet.
+- E84 completed and was pulled locally under
+  `artifacts/nanofold_public_benchmarks/e84_degree_penalty_from_e81_s8500_c256_m64/`
+  plus `logs/e84_degree_penalty_from_e81.log`, excluding the checkpoint.
+- E84 result: `completed_steps=8500`, `train_examples=68000`,
+  `parameters=3,154,242`, `val_lddt_ca=0.39635433070361614`, FoldScore
+  `0.37667176872491837`, `val_ca_drmsd=10.404743939638138`, and
+  predicted/true C-alpha radius `11.024506539106369 / 15.403406739234924`.
+- E84 selected-complex diagnostics regressed from E81: face/tetra boundary
+  lDDT `0.7215762287378311` / `0.7045434713363647`, boundary length MAE
+  `1.143507219851017` / `1.2522367648780346`, contraction fraction
+  `0.5862371735274792` / `0.5870118048042059`, boundary-edge mean degree
+  `11.508779883384705` / `32.077237367630005`, and unique-edge fraction
+  `0.08712434698956144` / `0.031449490492374596`.
+- Interpretation: reject E84 as a continuation. It slightly improved
+  boundary-edge reuse, but primary lDDT, FoldScore, dRMSD, radius, selected
+  boundary lDDT, boundary length error, and contraction all moved the wrong
+  way relative to E81.
 
 ## 2026-05-12 PDF Reference Pass
 
@@ -123,6 +140,19 @@
   shows no stable lDDT gain with continued boundary-edge reuse, launch E85 from
   the strongest E81/E84 checkpoint as a short gate with the E84 recipe plus
   `--simplex-boundary-incidence-normalization 1.0`.
+- E84 regressed, so E85 was synced to the same owned pod and launched as
+  `e85_incidence_norm_from_e81_s8500_c256_m64`, PID `5476`, log
+  `/workspace/SimplexFold/logs/e85_incidence_norm_from_e81.log`. It resumes
+  the stronger E81 checkpoint from step 8000 to 8500 with the E84 recipe plus
+  `--simplex-boundary-incidence-normalization 1.0`. Startup verification at
+  `2026-05-12T11:19:55Z` confirmed the process was active, the run metadata
+  path existed, and the checkpoint loaded cleanly.
+- E86 inspection after E85 launch: the code already has the directed
+  outgoing/incoming outer-edge context path through
+  `simplex_outer_edge_context_scale`. Do not add a duplicate module. If E85
+  still leaves a strong selected-boundary complex but weak global/FoldScore
+  geometry, revisit outer-edge context by combining the existing runtime-gated
+  outer-edge path with sparse cells and E85 incidence normalization.
 
 ## 2026-05-09
 

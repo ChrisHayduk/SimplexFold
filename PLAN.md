@@ -225,13 +225,16 @@ fraction fell to `0.5781` / `0.5791`, and unique boundary-edge fraction rose
 to `0.0856` / `0.0304`. This supports the hypothesis that high boundary-edge
 reuse is a real topological construction failure mode.
 
-The active branch is now E84 on the owned H100 pod `o1dy17ouv8w5mz` as
-`e84_degree_penalty_from_e81_s8500_c256_m64`. It resumes E81 from step 8000 to
-8500 with the same fixed sparse caps and degree penalty. This is a short
-confirmation gate for the cleaner sparse-complex selector, not a commitment to
-a blind 30,000-step run. Do not launch a blind 30,000-step confirmation until
-a branch shows a credible trajectory toward `val_lddt_ca > 0.7`, not merely a
-small local best below 0.4.
+The active branch is now E85 on the owned H100 pod `o1dy17ouv8w5mz` as
+`e85_incidence_norm_from_e81_s8500_c256_m64`. E84 tested whether the E81
+degree-penalized sparse selector would keep climbing to step 8500, but it
+regressed to `val_lddt_ca=0.3964`, FoldScore `0.3767`, and
+`val_ca_drmsd=10.4047`. E85 therefore resumes the stronger E81 checkpoint from
+step 8000 to 8500 and adds incidence normalization inside selected
+edge-face-tetra cochain transport. This is a short topology-communication
+gate, not a commitment to a blind 30,000-step run. Do not launch a blind
+30,000-step confirmation until a branch shows a credible trajectory toward
+`val_lddt_ca > 0.7`, not merely a small local best below 0.4.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank
@@ -245,15 +248,17 @@ incidence/outer-edge structure.
 
 The other prepared alternatives are now incidence-normalized boundary
 transport and directed outer-edge transport. E81 showed that changing the
-selected-cell score is a valid topology-construction lever. If E84 regresses
-from E81 or keeps high boundary-edge reuse without a primary-lDDT gain, the
-next code path is now prepared locally as E85:
+selected-cell score is a valid topology-construction lever. E85 is now testing
 `simplex_boundary_incidence_normalization`. This is not the rejected E77
 readout attenuation; it normalizes selected edge-cell incidences inside the
 cochain exchange path before messages move between edges, faces, tetras, and
-the pair stream. If E84 turns over, launch E85 as a short gate from the
-strongest E81/E84 checkpoint and measure whether it reduces boundary-edge
-reuse without erasing the strong selected-boundary lDDT seen in E79-E81.
+the pair stream. Measure whether it reduces boundary-edge reuse without
+erasing the strong selected-boundary lDDT seen in E79-E81. The outer-edge
+revisit should wait until after that: the existing
+`simplex_outer_edge_context_scale` path already supplies directed incoming and
+outgoing outer-edge summaries, so the paper-aligned version is to combine that
+path with sparse cells plus E85 incidence normalization, not to add a second
+duplicate outer-edge module.
 
 Yes. With templates forbidden, the right construction is:
 
