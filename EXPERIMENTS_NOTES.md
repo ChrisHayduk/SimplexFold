@@ -2653,3 +2653,12 @@
 - Stopped the completed/rejected E77 B200 pod `lovgzo4hz2k4fp` after copying
   and locally verifying the returned artifacts. E74 continues on the only
   active launched pod, `o1dy17ouv8w5mz`.
+- 2026-05-12 PDF reference recheck: local copies of
+  `references/papers/hands_on_geometric_deep_learning_nodes_to_complexes.pdf`
+  and `references/papers/2509.03885v1.pdf` still hash-match the user-provided
+  Downloads PDFs. Full-text extraction with `pdftotext -layout` covered 28
+  pages and 22 pages, respectively, and about 14.5k extracted words. The
+  takeaway for the live branch is unchanged but firmer: prefer changes that
+  alter the selected cell complex, incidence operators, outer-edge or
+  boundary-edge communication, or selected-cell realization diagnostics. Do
+  not promote a generic all-pairs coordinate loss just to chase lDDT.

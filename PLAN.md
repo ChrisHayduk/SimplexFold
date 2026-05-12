@@ -182,6 +182,14 @@ caps active face/tetra cells per anchor with `--simplex-face-top-k` and
 logits. These are also cell-complex construction or incidence changes rather
 than generic output-coordinate losses.
 
+The 2026-05-12 full-text recheck of the saved reference PDFs keeps this plan
+topology-first. The strongest paper-derived criterion is that a new branch
+should change the selected cell complex, incidence/outer-edge communication,
+or realization of selected cells. E74 satisfies that by changing the
+recycled-geometry prior in topology construction; E75 is the next prepared
+fallback because it sparsifies which higher-rank cochains exist and send
+messages.
+
 Yes. With templates forbidden, the right construction is:
 
 [

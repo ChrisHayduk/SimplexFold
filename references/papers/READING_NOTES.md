@@ -5,8 +5,8 @@ experiment design. The PDFs themselves are kept locally in this directory and
 ignored by git until redistribution rights are confirmed.
 
 Read status: both PDFs were re-read in full on 2026-05-11 from local
-`pdftotext -layout` extraction, rechecked in the current session, and the
-local copies hash-match the files in `/Users/christopherhayduk/Downloads/`.
+`pdftotext -layout` extraction and rechecked on 2026-05-12. The local copies
+hash-match the files in `/Users/christopherhayduk/Downloads/`.
 
 ## From Nodes to Complexes: A Guide to Topological Deep Learning
 
@@ -144,3 +144,17 @@ the active E73/E74 branch, the paper-derived rationale is strongest for
 runtime-gated boundary-edge messages and for changing the recycled-geometry
 prior in neighbor selection, because both choices affect which edge/face/tetra
 cochains exist and how they exchange information.
+
+## 2026-05-12 Recheck
+
+Extraction audit: the guide is 28 pages and `2509.03885v1.pdf` is 22 pages;
+the extracted text totals about 14.5k words. The saved copies in
+`references/papers/` still hash-match the Downloads originals.
+
+Experiment implication after rereading the full texts: keep prioritizing
+topology-construction and cochain-communication changes over generic
+coordinate losses. E74 is aligned with that rule because it changes the
+recycled-geometry prior used to construct the sparse edge/face/tetra complex.
+If E74 turns over, E75 is the next paper-aligned branch because top-k caps
+change which higher-rank cells exist and therefore which selected-cell losses
+and messages are active.

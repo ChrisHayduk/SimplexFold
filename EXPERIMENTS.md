@@ -20,6 +20,25 @@ pair-only baseline.
 - Validation target: `val_lddt_ca`.
 - Control variants: `no_simplex`, `faces`, `full`.
 
+## Reference-Paper Design Rules
+
+The local PDFs in `references/papers/` were re-read from full-text extraction
+on 2026-05-12. They sharpen the filter for future ideas:
+
+- Treat selected neighbor graphs, sparse faces/tetras, incidence relations,
+  and outer-edge neighborhoods as model variables, not only diagnostics.
+- Prefer changes that alter cochain communication across ranks: edge-to-face,
+  face/tetra-to-boundary-edge, outer-edge exchange, or gated selected-cell
+  readout.
+- Keep realization losses attached to the selected sparse complex. Generic
+  all-pairs coordinate losses remain out of scope unless they are recast as
+  supervision of the model-selected cell complex.
+- Do not require DSSP, SSE labels, templates, external structures, pretrained
+  weights, or external MSA/template retrieval in official NanoFold paths.
+- When a complex-construction change returns, report topology-aware
+  diagnostics alongside lDDT: selected-cell counts, boundary-edge reuse,
+  selected boundary lDDT, boundary length error, and contraction fraction.
+
 ## Experiment Queue
 
 ### E00: Matched Short-Run Baseline
