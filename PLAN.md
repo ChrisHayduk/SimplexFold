@@ -170,22 +170,27 @@ improving to `2.5149` / `2.6510`. The caveat is that FoldScore softened to
 `0.3666` and dRMSD to `10.1893`, so the branch still needs continuation and
 diagnostic monitoring rather than a 30k-step commitment.
 
-The active branch is now E78 on the owned H100 pod `o1dy17ouv8w5mz` as
-`e78_light_geom0025_from_e74_s6500_c256_m64`. It resumes the E74 checkpoint
-from step 6000 to 6500 with the same light-geometry selector, selected
-boundary-edge losses, and half-scale edge-frame message recipe.
+E78 continued E74 to step 6500 with the same light-geometry selector,
+selected boundary-edge losses, and half-scale edge-frame message recipe. Keep
+it as the new primary-lDDT leader: `val_lddt_ca=0.3853`, FoldScore `0.3718`,
+`val_ca_drmsd=10.1595`, and predicted/true C-alpha radius
+`11.3783 / 15.4034`. Selected face/tetra boundary lDDT improved to
+`0.5434` / `0.5287`, and boundary length MAE improved to `2.4519` /
+`2.5801`. Boundary contraction rose to `0.6320` / `0.6327`, so the selected
+complex is cleaner by lDDT/length but still over-contracts a large fraction
+of its boundary edges.
 
-When E78 returns, route the next run by evidence rather than by chronology:
-if E78 improves or preserves E74's `val_lddt_ca=0.3841` without selected
-boundary diagnostics collapsing, continue the light-geometry branch another
-short gate. If E78 loses primary lDDT while selected-boundary diagnostics
-remain strong, start E79 from the strongest E74/E78 checkpoint so the next
-change acts upstream on which higher-rank cochains exist. If E78 improves
-FoldScore/dRMSD but loses local lDDT, do not launch a blind 30k run; treat the
-branch as a geometry diagnostic and use the sparse-cell schedule to reduce
-boundary-edge over-reuse. A 30,000-step confirmation is only justified after a
-branch shows a credible trajectory toward `val_lddt_ca > 0.7`, not merely a
-small local best below 0.4.
+The active branch is now E80 on the owned H100 pod `o1dy17ouv8w5mz` as
+`e80_light_geom0025_from_e78_s7000_c256_m64`. It resumes the E78 checkpoint
+from step 6500 to 7000 with the same light-geometry topology-construction
+recipe. Route the next run by evidence: if E80 keeps
+improving primary lDDT and does not collapse selected-boundary lDDT/length,
+continue short gates until the curve bends or a plausible longer confirmation
+emerges. If E80 loses primary lDDT while selected-boundary diagnostics remain
+strong, start E79 from the strongest E78/E80 checkpoint so the next change
+acts upstream on which higher-rank cochains exist. Do not launch a blind
+30,000-step confirmation until a branch shows a credible trajectory toward
+`val_lddt_ca > 0.7`, not merely a small local best below 0.4.
 
 The other prepared alternatives are E75 and E79. E75 caps active face/tetra
 cells per anchor with `--simplex-face-top-k` and `--simplex-tetra-top-k`,

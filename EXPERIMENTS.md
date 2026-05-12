@@ -2789,7 +2789,7 @@ Validation:
 
 ### E78: Continue Light Recycled-Geometry Selector
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E74 improved primary C-alpha lDDT and selected-boundary
 diagnostics over E73. A short continuation can test whether the lighter
@@ -2802,22 +2802,54 @@ runtime scale `0.0125`, selected-boundary lDDT weights `0.05`, selected
 coordinate weights `1.0`, and selected boundary-distance weights `0.5`.
 This remains a topology-construction continuation rather than a new loss.
 
-Launch: E78 is running as `e78_light_geom0025_from_e74_s6500_c256_m64`.
+Launch: E78 ran as `e78_light_geom0025_from_e74_s6500_c256_m64`.
 Remote prelaunch checks confirmed no active Python benchmark process,
 successful py_compile for the simplex/model-config/runner files, parser
 support for the geometry selector flag, and the E74 checkpoint present. Main
-Python PID is `1969`. The log path is
+Python PID was `1969`. The log path is
 `/workspace/SimplexFold/logs/e78_light_geom0025_from_e74.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e78_light_geom0025_from_e74_s6500_c256_m64/`.
-Do not add E78 to `EXPERIMENT_RESULTS.md` until it returns.
 
-Decision rule after return: continue the light-geometry branch only if E78
-matches or beats E74's `val_lddt_ca=0.3841` without selected-boundary lDDT,
-boundary length MAE, or contraction fraction regressing sharply. If E78 turns
-over on primary lDDT, prefer E79 from the strongest E74/E78 checkpoint because
-the next paper-aligned intervention should change the active higher-rank cell
-complex rather than keep tuning the same loss weights.
+Result: keep. E78 reached `val_lddt_ca=0.3853`, FoldScore `0.3718`,
+`val_ca_drmsd=10.1595`, and predicted/true C-alpha radius
+`11.3783 / 15.4034`. It improved over E74 on the primary metric, FoldScore,
+dRMSD, selected face/tetra boundary lDDT (`0.5434` / `0.5287`), and selected
+boundary length MAE (`2.4519` / `2.5801`). Selected-boundary contraction
+worsened to `0.6320` / `0.6327`, so continue only as a short gate and keep
+watching whether improved local geometry is coming with over-contracted
+selected edges.
+
+### E80: Continue E78 Light-Geometry Selector
+
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E78 showed the light recycled-geometry topology selector can
+continue improving local C-alpha lDDT while also recovering FoldScore and
+dRMSD. Another 500-step continuation tests whether this is a real slope or a
+small checkpoint fluctuation.
+
+Mechanism: resume E78's checkpoint from step 6500 to step 7000 with the same
+`simplex_geometry_distance_weight=0.025`, half-scale edge-frame message
+runtime scale `0.0125`, selected-boundary lDDT weights `0.05`, selected
+coordinate weights `1.0`, and selected boundary-distance weights `0.5`.
+This remains a topology-construction continuation rather than a new generic
+coordinate loss.
+
+Launch: E80 is running as `e80_light_geom0025_from_e78_s7000_c256_m64`.
+Remote prelaunch checks confirmed no active Python benchmark process,
+successful py_compile for the simplex/model-config/runner files, and the E78
+checkpoint present. Main Python PID is `2543`. The log path is
+`/workspace/SimplexFold/logs/e80_light_geom0025_from_e78.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e80_light_geom0025_from_e78_s7000_c256_m64/`.
+Do not add E80 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Decision rule after return: keep only if E80 matches or beats E78's
+`val_lddt_ca=0.3853` without selected-boundary lDDT or length MAE collapsing.
+If the primary lDDT turns over while selected-boundary diagnostics stay
+healthy, launch E79 from the strongest E78/E80 checkpoint to change which
+higher-rank cochains exist instead of continuing the same selector weights.
 
 ### E75: Sparse Selected Higher-Rank Cell Complex
 

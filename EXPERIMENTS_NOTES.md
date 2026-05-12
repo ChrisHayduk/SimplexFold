@@ -2715,3 +2715,43 @@
   half-scale light-geometry continuation. If E78 improves only FoldScore or
   dRMSD, treat that as geometry-side evidence and still avoid a 30,000-step
   confirmation until a branch is plausibly moving toward `val_lddt_ca > 0.7`.
+- E78 returned on owned pod `o1dy17ouv8w5mz`: step 6500
+  `val_lddt_ca=0.3853302728384733`, FoldScore `0.37175922095775604`,
+  `val_ca_drmsd=10.159474521875381`, predicted/true C-alpha radius
+  `11.378286242485046 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.5434355866163969` / `0.5286743398755789`, boundary length MAE
+  `2.4519101977348328` / `2.5800751969218254`, and contraction fractions
+  `0.6319687962532043` / `0.6327483579516411`.
+- E78 interpretation: keep as the new primary-lDDT leader. It improves E74's
+  local C-alpha lDDT, FoldScore, dRMSD, selected-boundary lDDT, and selected
+  boundary length error under the same topology-construction recipe. The
+  contraction fraction regressed versus E74, so continue only as another
+  short gate and keep E79's sparse-cell schedule ready if local lDDT turns
+  over while selected-boundary diagnostics stay healthy.
+- Copied E78 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e78_light_geom0025_from_e74_s6500_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e78_light_geom0025_from_e74.log`. The local artifact pull excluded
+  the checkpoint directory; the remote E78 checkpoint remains available for
+  continuation.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  6000` to add the E78 row to `EXPERIMENT_RESULTS.md`, so inherited E74
+  history does not count as E78's best validation lDDT.
+- Refreshed local E79 fallback validation after E78 returned:
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`.
+- E80 launched on the same owned H100 pod `o1dy17ouv8w5mz` with run name
+  `e80_light_geom0025_from_e78_s7000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e80_light_geom0025_from_e78.log`, and artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e80_light_geom0025_from_e78_s7000_c256_m64/`.
+  Remote prelaunch checks found no active Python benchmark process, py_compile
+  passed for `minalphafold/simplex.py`, `minalphafold/model_config.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`, and the E78 checkpoint was
+  present. Main Python PID is `2543`. The launch resumes E78 from step 6500
+  to 7000 with the same light-geometry selector, selected-boundary losses, and
+  half-scale edge-frame message recipe.
+- E80 startup poll at 2026-05-12T06:58:18Z confirmed the benchmark process is
+  alive, `results.json` is absent as expected, and the runner resumed from
+  the E78 checkpoint at step 6500/examples 52000 with 1244 matching model
+  tensors loaded.
