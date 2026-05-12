@@ -3704,3 +3704,11 @@
   even for `simplex_c_segment=4`. Therefore, if E96 regresses, the immediate
   paper-aligned fallback should be a zero-parameter outer-edge-supported cell
   scorer, not segment cells stacked onto edge-frame messages.
+- E96 health check at `2026-05-12T23:50:43Z` on owned pod
+  `o1dy17ouv8w5mz`: Python PID `13303` was alive after about 30 minutes with
+  about 5h16m accumulated CPU time. `results.json` and the new latest
+  checkpoint were not present yet, and the log/history file mtimes remained
+  at the clean E87 resume point. This is still consistent with a quiet
+  training slice rather than a failed run: GPU memory was allocated at about
+  `13,513 MiB`, and five GPU samples showed utilization between `35%` and
+  `83%`.
