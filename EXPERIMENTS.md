@@ -2508,7 +2508,7 @@ diagnostic regression as a warning even if lDDT inches upward.
 
 ### E72: Continue Edge-Frame Boundary Messages To 5500
 
-Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
+Status: completed on Runpod and rejected.
 
 Hypothesis: E70-E71 are the first continuation sequence after E64 to improve
 lDDT, FoldScore, and dRMSD together. A 5500-step gate tests whether the
@@ -2535,9 +2535,61 @@ clean public-data environment staged for E70/E71. `run_metadata.json` records
 weights-only resume from the E71 step-5000 checkpoint, crop 256, MSA depth 64,
 and no templates. The launch log shows the runner resumed E71 at step
 5000/examples 40000, loaded 1244 matching model tensors, initialized 0
-new/missing tensors, and started a fresh optimizer. Do not add E72 to
-`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+new/missing tensors, and started a fresh optimizer.
 
 Decision rule: keep only if step 5500 improves or preserves E71's lDDT,
 FoldScore, and dRMSD without further eroding selected-boundary lDDT. Reject if
 the run shows main metric drift at the expense of selected-complex realization.
+
+Result: reject as a primary-lDDT continuation. E72 completed at step 5500 with
+`val_lddt_ca=0.3718`, below E71's `0.3751`, even though FoldScore improved to
+`0.3722`, `val_ca_drmsd` improved to `10.1027`, and predicted/true C-alpha
+radius opened to `12.0872 / 15.4034`. The selected-complex diagnostics also
+improved: selected face/tetra boundary lDDT reached `0.5450` / `0.5303`,
+contraction fractions fell to `0.6555` / `0.6555`, and boundary length MAE
+ended at `2.6296` / `2.7581`. The interpretation is a genuine
+main-metric/topological-diagnostic split: full-strength edge-frame messages
+keep improving selected-boundary realization and global geometry, but they no
+longer preserve local C-alpha lDDT.
+
+### E73: Half-Scale Edge-Frame Boundary Messages From E71
+
+Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
+
+Hypothesis: E72 shows that the selected boundary-edge frame route is not
+empty signal; it improves FoldScore, dRMSD, radius, and boundary lDDT. The
+failure mode is likely over-coupling from higher-rank face/tetra cochains back
+into boundary edges after step 5000. A half-scale runtime gate should test the
+same topological communication path without pushing the structure module as
+hard toward global expansion.
+
+Mechanism: resume the E71 step-5000 checkpoint, keep the same allocated
+edge-frame message modules (`--simplex-edge-frame-message-scale 0.025`) but
+set the runtime contribution to `0.0125`. Keep the E64 selected-boundary
+lDDT and coordinate-realization recipe unchanged. This is not a new generic
+metric loss; it is a damping test for the selected face/tetra boundary-edge
+cochain exchange.
+
+Planned launch: resume
+`e71_edge_frame0025_from_e70_s5000_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+and run a 500-step continuation to step 5500 with
+`--simplex-edge-frame-message-scale 0.025`,
+`--simplex-edge-frame-message-runtime-scale 0.0125`, static
+selected-boundary lDDT weights `0.05`, selected face/tetra coordinate weights
+`1.0`, selected boundary coordinate-distance weights `0.5`, and
+`simplex_aux_weight=0.5`.
+
+Decision rule: keep only if step 5500 improves or preserves E71's primary
+`val_lddt_ca` while retaining E72's improved selected-boundary realization.
+Reject if it remains below E71, and then stop this edge-frame continuation
+family in favor of changing the selected complex construction itself.
+
+Launch: E73 is running on the same owned Runpod B200 pod `lovgzo4hz2k4fp`
+(`codex-simplexfold-e70-runpod-20260512`) from commit `bc1b749`, reusing the
+clean public-data environment staged for E70-E72. `run_metadata.json` records
+`simplex_edge_frame_message_scale=0.025`, runtime edge-frame scale `0.0125`,
+weights-only resume from the E71 step-5000 checkpoint, crop 256, MSA depth 64,
+and no templates. The launch log shows the runner resumed E71 at step
+5000/examples 40000, loaded 1244 matching model tensors, initialized 0
+new/missing tensors, and started a fresh optimizer. Do not add E73 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.

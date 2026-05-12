@@ -2386,3 +2386,45 @@
   `0.025`, weights-only resume from the E71 checkpoint, crop 256, MSA depth 64,
   and no templates. Heartbeat `check-simplexfold-e57-runpod` has been
   retargeted to E72 on pod `lovgzo4hz2k4fp` only.
+- E72 returned on owned Runpod pod `lovgzo4hz2k4fp` and is rejected as a
+  primary-lDDT continuation. Step 5500 reached
+  `val_lddt_ca=0.37177472934126854`, below E71's
+  `0.37505385652184486`, while FoldScore improved to
+  `0.3721824511885643`, `val_ca_drmsd` improved to
+  `10.102694064378738`, and predicted/true C-alpha radius opened to
+  `12.087152183055878 / 15.40340667963028`.
+- E72 selected-complex diagnostics improved despite the main lDDT regression:
+  selected face/tetra boundary lDDT reached `0.5449902731925249` /
+  `0.530314240604639`, contraction fractions fell to
+  `0.6554896421730518` / `0.6555038057267666`, boundary length MAE ended at
+  `2.6295931339263916` / `2.7580906972289085`, mean boundary-edge degree at
+  `12.054364442825317` / `80.36243009567261`, and unique-edge fraction at
+  `0.08331795553389273` / `0.01249769333008391`.
+- E72 artifacts and launch log were copied locally under ignored
+  `artifacts/nanofold_public_benchmarks/e72_edge_frame0025_from_e71_s5500_c256_m64/`,
+  including `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, checkpoint, and
+  `runpod_launch.log`. The owned pod remains active for E73; no other Runpod
+  instances were managed.
+- E72 interpretation: the selected boundary-edge frame route is topologically
+  useful but too strong at runtime scale `0.025` after step 5000. Launch E73
+  from the E71 checkpoint to step 5500 with the same allocated edge-frame
+  modules but runtime scale `0.0125`; keep the E64 selected-boundary
+  lDDT/coordinate-loss recipe unchanged.
+- E73 launched on the same owned Runpod B200 pod `lovgzo4hz2k4fp`
+  (`codex-simplexfold-e70-runpod-20260512`) from commit `bc1b749`, SSH
+  `root@38.80.152.146 -p 31403` with
+  `/Users/christopherhayduk/.runpod/ssh/RunPod-Key-Go`. The run name is
+  `e73_edge_frame00125_from_e71_s5500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e73_edge_frame00125_from_e71.log`, and artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e73_edge_frame00125_from_e71_s5500_c256_m64/`.
+  Only this owned pod should be managed.
+- E73 remote process after launch: Python PID `14028`, data-worker Python PIDs
+  `16955` and `16956`. Initial log shows the runner resumed E71 at step
+  5000/examples 40000, loaded 1244 matching model tensors, initialized 0
+  new/missing tensors, and started a fresh optimizer. `run_metadata.json`
+  records `simplex_edge_frame_message_scale=0.025`, runtime edge-frame scale
+  `0.0125`, weights-only resume from the E71 checkpoint, crop 256, MSA depth
+  64, and no templates. Heartbeat `check-simplexfold-e57-runpod` has been
+  retargeted to E73 on pod `lovgzo4hz2k4fp` only.

@@ -1,9 +1,9 @@
 # SimplexFold Experiment Results
 
-Last updated: 2026-05-11.
+Last updated: 2026-05-12.
 
-Best validation C-alpha lDDT so far: **E64**, `val_lddt_ca=0.3739` at step
-4000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E71**, `val_lddt_ca=0.3751` at step
+5000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -89,3 +89,4 @@ recorded in the running notes for that run.
 | E69 face normal 0.05 | completed | 4500 | 0.3653 | 0.3653 | 0.3632 | 10.5833 | 11.8750 / 15.4034 | rejected; selected face orientation stayed below E64 and weakened selected-boundary diagnostics |
 | E70 edge-frame messages 0.025 | completed | 4500 | 0.3742 | 0.3742 | 0.3653 | 10.3425 | 11.4815 / 15.4034 | kept; tiny new best with improved selected-boundary diagnostics |
 | E71 continue edge-frame 0.025 | completed | 5000 | 0.3751 | 0.3751 | 0.3679 | 10.1926 | 11.4483 / 15.4034 | kept; new best lDDT/FoldScore/dRMSD but boundary lDDT softened |
+| E72 continue edge-frame 0.025 to 5500 | completed | 5500 | 0.3718 | 0.3718 | 0.3722 | 10.1027 | 12.0872 / 15.4034 | rejected; FoldScore/dRMSD/boundary diagnostics improved but primary lDDT fell below E71 |
