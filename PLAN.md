@@ -188,16 +188,23 @@ below E78. Selected face/tetra boundary lDDT also fell to `0.5359` /
 confirms that the E78 gain was a local peak rather than a reason to keep
 blindly continuing the light-geometry selector.
 
-The active branch is now E79 on the owned H100 pod `o1dy17ouv8w5mz` as
-`e79_scheduled_topk_from_e78_s7000_c256_m64`. It resumes the stronger E78
-checkpoint from step 6500 to 7000 and keeps the same selected-boundary losses
-and half-scale edge-frame messages, but schedules the selected higher-rank
-complex from the full neighbor-star clique toward `24` face cells and `48`
-tetra cells per anchor. This is the planned topology-construction fallback:
-change which rank-2/rank-3 cochains exist and send messages before trying
-another output-side pressure. Do not launch a blind 30,000-step confirmation
-until a branch shows a credible trajectory toward `val_lddt_ca > 0.7`, not
-merely a small local best below 0.4.
+E79 became the new best by changing the active higher-rank cell complex rather
+than adding output-side pressure. It resumed E78 from step 6500 to 7000 and
+scheduled the selected complex from the full neighbor-star clique toward `24`
+face cells and `48` tetra cells per anchor. Keep it: `val_lddt_ca=0.3885`,
+FoldScore `0.3728`, and selected face/tetra boundary lDDT `0.6963` /
+`0.6826`. Selected boundary length MAE improved sharply to `1.2635` /
+`1.3586`, tetra boundary-edge mean degree dropped to `35.6`, and tetra
+unique-edge fraction rose to `0.0283`. The caveat is that dRMSD softened to
+`10.2661` and predicted radius stayed under-expanded at `11.1540 / 15.4034`.
+
+The active branch is now E82 on the owned H100 pod `o1dy17ouv8w5mz` as
+`e82_sparse_topk_from_e79_s7500_c256_m64`. It resumes the E79 checkpoint from
+step 7000 to 7500 with the sparse caps held at `24` face cells and `48` tetra
+cells per anchor. This asks whether the topology-construction win survives
+after the cap schedule becomes a fixed sparse cell complex. Do not launch a
+blind 30,000-step confirmation until a branch shows a credible trajectory
+toward `val_lddt_ca > 0.7`, not merely a small local best below 0.4.
 
 The other prepared alternatives are E75, E79, and E81. E75 caps active
 face/tetra cells per anchor with `--simplex-face-top-k` and

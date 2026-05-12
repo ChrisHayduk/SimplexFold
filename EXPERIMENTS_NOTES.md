@@ -2815,3 +2815,41 @@
   alive, `results.json` is absent as expected, and the runner resumed from
   the E78 checkpoint at step 6500/examples 52000 with 1244 matching model
   tensors loaded.
+- E79 returned on owned pod `o1dy17ouv8w5mz`: step 7000
+  `val_lddt_ca=0.3885485269129276`, FoldScore `0.3728215303272009`,
+  `val_ca_drmsd=10.266113311052322`, predicted/true C-alpha radius
+  `11.153955072164536 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.6963267438113689` / `0.6825862638652325`, boundary length MAE
+  `1.2635142654180527` / `1.3586284592747688`, contraction fractions
+  `0.5353225655853748` / `0.540894154459238`, boundary-edge mean degree
+  `12.47058242559433` / `35.61734676361084`, and boundary unique-edge
+  fraction `0.080328143582315` / `0.028286503751291676`.
+- E79 interpretation: keep as the new primary-lDDT leader and the strongest
+  topology-diagnostic run. Sparse selected-cell scheduling beat E78 on local
+  C-alpha lDDT and FoldScore while dramatically improving selected-boundary
+  realization and reducing tetra boundary-edge reuse. dRMSD softened and
+  radius remains under-expanded, so continue with a short sparse-cell gate
+  rather than a long confirmation.
+- Copied E79 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e79_scheduled_topk_from_e78_s7000_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e79_scheduled_topk_from_e78.log`. The local artifact pull excluded
+  the checkpoint directory; the remote E79 checkpoint remains available for
+  continuation.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  6500` to add the E79 row to `EXPERIMENT_RESULTS.md`, so inherited E78
+  history does not count as E79's best validation lDDT.
+- E82 launched on the same owned H100 pod `o1dy17ouv8w5mz` with run name
+  `e82_sparse_topk_from_e79_s7500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e82_sparse_topk_from_e79.log`, and artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e82_sparse_topk_from_e79_s7500_c256_m64/`.
+  Remote prelaunch checks found no active Python benchmark process, py_compile
+  passed for `minalphafold/simplex.py`, `minalphafold/model_config.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`, and the E79 checkpoint was
+  present. Main Python PID is `3565`. The launch resumes E79 from step 7000
+  to 7500 with sparse face/tetra caps held at `24` / `48`.
+- E82 startup poll at 2026-05-12T08:32:38Z confirmed the benchmark process is
+  alive, `results.json` is absent as expected, and the runner resumed from
+  the E79 checkpoint at step 7000/examples 56000 with 1244 matching model
+  tensors loaded.

@@ -2888,7 +2888,7 @@ Validation:
 
 ### E79: Scheduled Sparse Selected Higher-Rank Cell Complex
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E75's sparse selected-cell complex is the right topology-native
 response to high boundary-edge reuse, but switching directly from the full
@@ -2903,28 +2903,59 @@ example, `--simplex-face-top-k 0 --simplex-face-top-k-final 24` plus
 selected-cell clique and linearly introduces the E75 cap. This changes the
 active cell complex during training without changing parameter count.
 
-Launch: E79 is running as `e79_scheduled_topk_from_e78_s7000_c256_m64`.
+Launch: E79 ran as `e79_scheduled_topk_from_e78_s7000_c256_m64`.
 After E80 returned and the H100 pod was idle, local source/docs/tests were
 synced to `/workspace/SimplexFold/` without deleting remote artifacts, logs,
 or checkpoints. Remote py_compile passed, parser smoke confirmed support for
 the scheduled top-k flags and `simplex_cell_score_degree_penalty`, and the E78
-checkpoint was present. Main Python PID is `3128`. The log path is
+checkpoint was present. Main Python PID was `3128`. The log path is
 `/workspace/SimplexFold/logs/e79_scheduled_topk_from_e78.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e79_scheduled_topk_from_e78_s7000_c256_m64/`.
-Do not add E79 to `EXPERIMENT_RESULTS.md` until it returns.
 
-Decision rule after return: compare E79 against E78 and E80. Keep only if the
-scheduled sparse-cell construction improves or preserves primary lDDT while
-improving selected-boundary lDDT/length or boundary-edge reuse. If E79
-improves topology diagnostics but loses primary lDDT, use E81's
-degree-penalized sparse-cell scoring as the next fallback rather than
-returning to plain light-geometry continuation.
+Result: keep. E79 reached `val_lddt_ca=0.3885`, FoldScore `0.3728`,
+`val_ca_drmsd=10.2661`, and predicted/true C-alpha radius
+`11.1540 / 15.4034`. It is the new primary-lDDT and FoldScore leader. The
+topology diagnostics moved much more strongly than the global geometry:
+selected face/tetra boundary lDDT improved to `0.6963` / `0.6826`,
+selected boundary length MAE fell to `1.2635` / `1.3586`, and tetra
+boundary-edge mean degree fell to `35.6`. Continue this sparse-cell branch
+before trying the E81 degree penalty.
 
 Validation:
 
 - `python -m pytest tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_simplex.py::test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+
+### E82: Continue Sparse Selected Higher-Rank Cell Complex
+
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E79 showed that the sparse selected-cell construction can improve
+primary lDDT and dramatically clean up selected-boundary realization. A short
+continuation with the caps held fixed tests whether the gain survives after
+the schedule has fully materialized the sparse rank-2/rank-3 complex.
+
+Mechanism: resume E79's checkpoint from step 7000 to step 7500 with
+`--simplex-face-top-k 24` and `--simplex-tetra-top-k 48`, while keeping the
+same light-geometry selector, selected-boundary losses, selected-coordinate
+losses, and half-scale edge-frame boundary messages. This keeps the active
+cell complex sparse rather than adding a new loss.
+
+Launch: E82 is running as `e82_sparse_topk_from_e79_s7500_c256_m64`. Remote
+prelaunch checks confirmed no active Python benchmark process, successful
+py_compile for the simplex/model-config/runner files, and the E79 checkpoint
+present. Main Python PID is `3565`. The log path is
+`/workspace/SimplexFold/logs/e82_sparse_topk_from_e79.log`, and the artifact
+path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e82_sparse_topk_from_e79_s7500_c256_m64/`.
+Do not add E82 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Decision rule after return: compare E82 against E79. If E82 preserves or
+improves primary lDDT without losing the selected-boundary diagnostic gains,
+continue the sparse-cell branch. If E82 loses primary lDDT while preserving
+the topology diagnostics, try E81's degree-penalized sparse-cell scoring from
+the strongest E79/E82 checkpoint.
 
 ### E81: Degree-Penalized Sparse Cell Scoring
 
