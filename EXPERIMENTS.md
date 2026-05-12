@@ -435,7 +435,7 @@ Validation:
 
 ### E89 Candidate: Pair-Preserving Simplex Readout Gate
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: the README motivation centers on persistent face/tetra states
 communicating back into the AF2-style pair tensor `Z_ij`. Some failed
@@ -473,7 +473,13 @@ loaded and 0 new/missing tensors initialized. The log path is
 `/workspace/SimplexFold/logs/e89_pair_preserving_from_e81.log`, and the
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e89_pair_preserving_from_e81_s8500_c256_m64/`.
-Do not add E89 to `EXPERIMENT_RESULTS.md` until it returns.
+
+Result: reject as a primary-lDDT branch. E89 reached
+`val_lddt_ca=0.3947`, FoldScore `0.3861`, `val_ca_drmsd=10.0603`, and
+predicted/true C-alpha radius `11.6927 / 15.4034`, with `3,154,242`
+parameters under the AF2-medium +5% cap. The stronger FoldScore is useful,
+but the primary lDDT fell below E81 (`0.3980`), E86 (`0.3990`), and E87
+(`0.3992`). Do not continue pair-preserving readout by itself.
 
 Validation:
 
@@ -536,7 +542,7 @@ Validation:
 
 ### E93 Candidate: Stricter Sparse-Cell Filtration
 
-Status: queued only if E89 rejects; not launched.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E79-E82 showed that making the higher-rank complex sparse was the
 strongest topology-construction lever so far, but the retained tetra complex
@@ -563,6 +569,20 @@ Decision rule: only launch after E89 returns. Keep if the tighter filtration
 preserves or improves E81/E86/E87 primary lDDT while lowering boundary-edge
 reuse or selected-boundary contraction. Reject if selected-boundary lDDT
 collapses or if primary lDDT follows E90/E88 downward.
+
+Launch: E89 rejected, so E93 is running as
+`e93_sparse_filtration_from_e81_s8500_c256_m64`, Python PID `11069`, from
+the E81 checkpoint at step 8000/examples 64000. Remote prelaunch checks found
+no active Python benchmark process, confirmed the E81 checkpoint was present,
+counted the instantiated module set at `3,154,242` parameters under the
+`3,261,974` ceiling, py_compile passed for the runner, and CLI help confirmed
+support for the top-k final ramp flags and `--max-parameters`. Startup
+resumed E81 with 1244 matching model tensors loaded and 0 new/missing tensors
+initialized. The log path is
+`/workspace/SimplexFold/logs/e93_sparse_filtration_from_e81.log`, and the
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e93_sparse_filtration_from_e81_s8500_c256_m64/`.
+Do not add E93 to `EXPERIMENT_RESULTS.md` until it returns.
 
 ## Experiment Queue
 

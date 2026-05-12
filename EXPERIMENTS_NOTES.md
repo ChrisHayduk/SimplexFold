@@ -3475,3 +3475,42 @@
   36 minutes, `results.json` was not present yet, GPU memory was allocated
   at about `13,535 MiB`, and the log still showed the clean E81 resume with
   1244 matching tensors loaded and 0 new/missing tensors initialized.
+- E89 returned on owned pod `o1dy17ouv8w5mz`: step 8500
+  `val_lddt_ca=0.39467536099255085`, FoldScore `0.3861187528818846`,
+  `val_ca_drmsd=10.060284554958344`, predicted/true C-alpha radius
+  `11.692678928375244 / 15.403406739234924`, selected face/tetra boundary
+  lDDT `0.7363793775439262` / `0.7202896736562252`, boundary length MAE
+  `1.1024678982794285` / `1.2080971263349056`, contraction fractions
+  `0.6316477954387665` / `0.6290897764265537`, boundary-edge mean degree
+  `11.755491852760315` / `34.04670584201813`, and boundary unique-edge
+  fraction `0.08531751932676811` / `0.0296416131269318`.
+- E89 interpretation: reject as a primary-lDDT branch. It stayed within the
+  parameter cap at `3,154,242` parameters and improved FoldScore to `0.3861`,
+  but primary lDDT fell below E81, E86, and E87. Pair-preserving simplex
+  readout is therefore not enough by itself.
+- Copied E89 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e89_pair_preserving_from_e81_s8500_c256_m64/`
+  and copied the launch log to ignored `logs/e89_pair_preserving_from_e81.log`.
+  The local artifact pull excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8000` to add the E89 row to `EXPERIMENT_RESULTS.md`, so inherited E81
+  history does not count as E89's best validation lDDT.
+- E93 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E81 checkpoint present, remote py_compile passed for
+  `scripts/run_nanofold_public_benchmarks.py`, CLI help confirmed support for
+  the face/tetra top-k final ramp flags and `--max-parameters`, and the exact
+  E93 instantiated module set counted `3,154,242` parameters, under the
+  AF2-medium +5% ceiling `3,261,974`.
+- E93 launched on the same owned H100 pod with run name
+  `e93_sparse_filtration_from_e81_s8500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e93_sparse_filtration_from_e81.log`, artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e93_sparse_filtration_from_e81_s8500_c256_m64/`,
+  and Python PID `11069`. Startup poll at `2026-05-12T20:00Z` confirmed the
+  benchmark process is alive, metadata exists, `--max-parameters 3261974` is
+  recorded, face/tetra top-k ramps are `24/48 -> 12/24`, and the runner
+  resumed E81 at step 8000/examples 64000 with 1244 matching model tensors
+  loaded and 0 new/missing tensors initialized.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  from E89 to E93, keeping the same owned-pod-only restriction and the rule
+  that heartbeat must not launch follow-up experiments automatically.

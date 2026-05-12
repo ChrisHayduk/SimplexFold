@@ -108,3 +108,4 @@ recorded in the running notes for that run.
 | E92 continue directed boundary readout | completed | 9000 | 0.3968 | 0.3968 | 0.3829 | 9.9617 | 11.7362 / 15.4034 | rejected; continuation fell below E87/E86 primary lDDT despite improved dRMSD, pivot to outer-edge-supported cell scoring |
 | E90 outer-edge-supported cell scoring | completed | 8500 | 0.3920 | 0.3920 | 0.3783 | 10.0407 | 11.5245 / 15.4034 | rejected; outer-edge-supported scoring fell below E81/E86/E87 primary lDDT |
 | E88 runtime-gated latent segment cells | completed | 8500 | 0.3891 | 0.3891 | 0.3824 | 10.1986 | 11.5027 / 15.4034 | rejected; primary lDDT regressed and parameters exceeded AF2-medium +5% budget |
+| E89 pair-preserving simplex readout | completed | 8500 | 0.3947 | 0.3947 | 0.3861 | 10.0603 | 11.6927 / 15.4034 | rejected; pair-preserving readout fell below E81/E86/E87 primary lDDT despite stronger FoldScore |

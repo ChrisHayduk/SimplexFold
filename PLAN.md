@@ -296,21 +296,18 @@ AF2-medium +5% ceiling of `3,261,974`. Treat this as a budget failure as well
 as a primary-lDDT failure. Segment cells can be reconsidered only after a
 budget-safe topology-module combination is explicitly counted before launch.
 
-The active Runpod gate is E89, a pair-preserving simplex readout test from
-the E81 checkpoint. It keeps selected face/tetra cochain evidence flowing
-back into the AF2-style pair tensor `Z_ij`, while ramping the direct
-residue/single readout down from `1.0` to `0.5`. This stays inside the
-README's topological claim because it changes how persistent higher-order
-cochains write through incidence back to the edge representation, rather than
-adding a new coordinate or lDDT-style objective. The launch uses the new
-`--max-parameters 3261974` runner guard so any accidental over-budget
-combination fails before training.
+E89 rejected the pair-preserving simplex readout route as a primary-lDDT
+branch. It stayed within budget and improved FoldScore to `0.3861`, but
+returned `val_lddt_ca=0.3947`, below E81/E86/E87. Pair-first cochain readout
+therefore helps aggregate geometry a bit but does not recover the local
+C-alpha objective.
 
-If E89 rejects, the next queued topology-construction fallback is E93:
-tighten the selected sparse complex itself by ramping face/tetra caps from
-`24/48` down to `12/24` while keeping degree-penalized scoring and the
-selected-boundary recipe fixed. This tests filtration of the learned
-higher-rank cell complex rather than adding another readout or loss.
+The active Runpod gate is E93: tighten the selected sparse complex itself by
+ramping face/tetra caps from `24/48` down to `12/24` while keeping
+degree-penalized scoring and the selected-boundary recipe fixed. This tests
+filtration of the learned higher-rank cell complex rather than adding another
+readout or loss. The launch uses the `--max-parameters 3261974` runner guard
+and counted `3,154,242` parameters before training.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank
