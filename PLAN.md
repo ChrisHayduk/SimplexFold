@@ -125,6 +125,13 @@ coordinate-distance weights `0.5`, `simplex_aux_weight=0.5`,
 at `0.025`. Keep only if step 5000 improves or preserves E70's lDDT and
 selected-boundary diagnostics; reject if it repeats E65's continuation drop.
 
+E71 is running on the owned Runpod B200 pod `lovgzo4hz2k4fp` from commit
+`e201086`, reusing the clean E70 staged environment. It resumed the E70
+checkpoint at step 4500/examples 36000, loaded 1244 matching model tensors,
+initialized 0 new/missing tensors, and recorded edge-frame runtime scale
+`0.025` in `run_metadata.json`. Do not add E71 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.
+
 Yes. With templates forbidden, the right construction is:
 
 [

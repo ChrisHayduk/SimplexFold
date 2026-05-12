@@ -2463,7 +2463,7 @@ active for the E71 continuation.
 
 ### E71: Continue Damped Edge-Frame Boundary Messages
 
-Status: planned on owned Runpod pod `lovgzo4hz2k4fp`.
+Status: running on owned Runpod pod `lovgzo4hz2k4fp`.
 
 Hypothesis: E70 is a small but coherent improvement, so the edge-frame
 boundary-message path may be the first architecture route that improves both
@@ -2484,6 +2484,16 @@ and run a 500-step continuation to step 5000 with
 static selected-boundary lDDT weights `0.05`, selected face/tetra coordinate
 weights `1.0`, selected boundary coordinate-distance weights `0.5`, and
 `simplex_aux_weight=0.5`.
+
+Launch: E71 is running on the same owned Runpod B200 pod `lovgzo4hz2k4fp`
+(`codex-simplexfold-e70-runpod-20260512`) from commit `e201086`, reusing the
+clean public-data environment staged for E70. `run_metadata.json` records
+`simplex_edge_frame_message_scale=0.025`, runtime edge-frame scale `0.025`,
+weights-only resume from the E70 step-4500 checkpoint, crop 256, MSA depth 64,
+and no templates. The launch log shows the runner resumed E70 at step
+4500/examples 36000, loaded 1244 matching model tensors, initialized 0
+new/missing tensors, and started a fresh optimizer. Do not add E71 to
+`EXPERIMENT_RESULTS.md` until the Runpod run returns.
 
 Decision rule: keep only if step 5000 improves or preserves E70's lDDT and
 selected-boundary diagnostics. Reject if lDDT drops back into the E65/E67/E69

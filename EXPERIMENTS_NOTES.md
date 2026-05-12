@@ -2331,3 +2331,20 @@
   E71 on the same owned pod from the E70 checkpoint to step 5000, holding
   runtime edge-frame scale at `0.025` and keeping the E64 selected-boundary
   lDDT/coordinate-loss recipe unchanged.
+- E71 launched on the same owned Runpod B200 pod `lovgzo4hz2k4fp`
+  (`codex-simplexfold-e70-runpod-20260512`) from commit `e201086`, SSH
+  `root@38.80.152.146 -p 31403` with
+  `/Users/christopherhayduk/.runpod/ssh/RunPod-Key-Go`. The run name is
+  `e71_edge_frame0025_from_e70_s5000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e71_edge_frame0025_from_e70.log`, and artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e71_edge_frame0025_from_e70_s5000_c256_m64/`.
+  Only this owned pod should be managed.
+- E71 remote process after launch: Python PID `7593`, data-worker Python PIDs
+  `10520` and `10521`. Initial log shows the runner resumed E70 at step
+  4500/examples 36000, loaded 1244 matching model tensors, initialized 0
+  new/missing tensors, and started a fresh optimizer. `run_metadata.json`
+  records `simplex_edge_frame_message_scale=0.025`, runtime edge-frame scale
+  `0.025`, weights-only resume from the E70 checkpoint, crop 256, MSA depth 64,
+  and no templates. Heartbeat `check-simplexfold-e57-runpod` has been
+  retargeted to E71 on pod `lovgzo4hz2k4fp` only.
