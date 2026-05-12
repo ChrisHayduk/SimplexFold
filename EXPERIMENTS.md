@@ -59,6 +59,14 @@ The 2026-05-12 full reread adds several concrete filters for the next queue:
   through the selected complex; a generic pooled coordinate head is out of
   scope.
 
+The current full-read pass keeps the live queue narrow. E91 is justified as a
+weak directed outer-edge cochain-communication test on the sparse E81/E86
+complex. The outer-edge-supported scorer remains a good fallback because it
+changes selected-cell construction by rewarding candidate cells with available
+external boundary edges. Generic radius, C-alpha lDDT, or all-pairs distance
+losses should stay out of the queue unless they supervise only the selected
+sparse complex.
+
 ## Paper-Informed Backlog
 
 ### E83: Fixed Sparse Cell Continuation

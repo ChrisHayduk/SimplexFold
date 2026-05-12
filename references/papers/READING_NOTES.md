@@ -210,3 +210,40 @@ evidence that the change helped the learned complex itself, not merely the
 output metric. E84 is therefore a justified short continuation. If it regresses,
 the next paper-aligned branch should be incidence-normalized boundary or
 directed outer-edge transport rather than another output-coordinate loss.
+
+## 2026-05-12 Current Full Read for E91/E90 Queue
+
+I re-extracted and reread both PDFs in full from the saved repo copies:
+
+- `hands_on_geometric_deep_learning_nodes_to_complexes.pdf`: 28 pages,
+  about 3.8k extracted words.
+- `2509.03885v1.pdf`: 22 pages, about 10.7k extracted words.
+
+The saved copies still hash-match the user-provided files in Downloads.
+
+The most useful current constraint from the TDL guide is that the topological
+domain is a modeling choice, not a visualization layer. SimplexFold changes
+should keep specifying which neighborhood operator or rank-to-rank aggregation
+route they alter: neighbor graph construction, active face/tetra cells,
+boundary incidence, outer-edge neighborhoods, or selected-cell readout.
+
+The most useful current constraint from Topotein is protein-specific:
+directed edges, outer-edge neighborhoods, and edge-centric scalarization are
+the parts most portable to NanoFold without external labels. Its SSE cells are
+not directly admissible because official inference cannot depend on DSSP/SSE
+annotations, but its message-passing pattern supports latent selected cells
+derived from official features and recycled geometry.
+
+Implications for the live queue:
+
+- E91 is paper-aligned because it tests weak directed outer-edge transport on
+  the sparse E81/E86 complex, changing cochain communication rather than adding
+  output-side pressure.
+- E90 remains a good fallback because outer-edge-supported cell scoring changes
+  which higher-rank cochains exist; it treats outer-edge availability as part
+  of complex construction.
+- Directed boundary readout is also justified as a source/target incidence
+  test, but should stay behind E91 because E86 already made a small gain with
+  the weaker outer-edge route.
+- Generic C-alpha lDDT, radius, or all-pairs distance losses still look
+  unjustified unless restricted to realization of the selected sparse complex.

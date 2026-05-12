@@ -3193,3 +3193,12 @@
   alive, `results.json` is absent as expected, and the runner resumed from
   the E79 checkpoint at step 7000/examples 56000 with 1244 matching model
   tensors loaded.
+- 2026-05-12T14:13:20Z PDF reference pass: verified the two user-provided
+  papers are saved in `references/papers/` and hash-match the Downloads
+  originals. Re-extracted both full texts with `pdftotext -layout`:
+  28 pages / about 3.8k words for the TDL guide and 22 pages / about 10.7k
+  words for Topotein. Updated `references/papers/READING_NOTES.md` and the
+  reference-paper design rules in `EXPERIMENTS.md`. Main design consequence:
+  keep E91/E90 focused on selected-complex construction and incidence/
+  outer-edge cochain communication; do not add generic lDDT/radius/all-pairs
+  losses unless they supervise only the selected sparse complex.
