@@ -2495,3 +2495,10 @@
   `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`.
   Launch only after E73/E74 decision, with an initial cap such as
   `--simplex-face-top-k 24 --simplex-tetra-top-k 48`.
+- Synced the E75 source/docs/tests to the owned Runpod workspace
+  `/workspace/SimplexFold` while leaving logs/artifacts untouched. Remote
+  py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/model_config.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; parser smoke confirmed
+  `--simplex-face-top-k 24` and `--simplex-tetra-top-k 48`. E73 evalfix is
+  still the only active benchmark process on pod `lovgzo4hz2k4fp`.
