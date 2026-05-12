@@ -349,6 +349,14 @@ cochain-routing curriculum and to measure whether that route helps the selected
 complex write useful edge information back into `Z_ij` without overdriving the
 pair tensor.
 
+If E96 regresses, the next launchable fallback should be outer-edge-supported
+cell scoring rather than latent segment cells. The remote parameter audit
+shows that an outer-edge scorer on the E87-style sparse/edge-frame setup stays
+at `3,154,242` parameters, while latent segment cells plus edge-frame modules
+exceed the `3,261,974` cap even with `simplex_c_segment=4`. Segment cells
+remain paper-aligned, but only as a separate no-edge-frame branch from a
+sparse checkpoint; they are not the immediate continuation of E96.
+
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank
 aggregation, inter-rank aggregation, and topology-aware diagnostics as core

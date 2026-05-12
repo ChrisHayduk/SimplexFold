@@ -726,6 +726,35 @@ new/missing tensors, and started a fresh optimizer. The log path is
 the artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e96_anneal_directed_boundary_from_e87_s9000_c256_m64/`.
 
+### E97 Candidate: Outer-Edge-Supported Cell Scoring After E96
+
+Status: queued only if E96 regresses; do not launch while E96 is running.
+
+Hypothesis: E96 tests whether directed boundary readout should be relaxed as
+a cochain-routing curriculum. If that still underperforms E87, the next
+topology-native lever should return to construction of the selected complex:
+prefer candidate faces/tetras whose vertices have outgoing/incoming
+outer-edge neighborhoods, instead of adding more readout pressure.
+
+Mechanism: resume the strongest sparse checkpoint compatible with the E96
+result and keep fixed `24/48` caps, degree penalty `0.75`,
+incidence-normalized transport, selected-boundary realization losses, and
+edge-frame messages. Add a runtime-ramped
+`simplex_cell_score_outer_edge_weight`, for example `0.0 -> 0.25`, so
+outer-edge availability changes which rank-2/rank-3 cochains exist. This is
+complex construction, not a generic output loss.
+
+Budget audit: remote parameter count is unchanged at `3,154,242`, under the
+AF2-medium +5% ceiling `3,261,974`. Latent segment cells are not the immediate
+E97 continuation because segment cells plus edge-frame modules exceed the
+budget (`3,282,002` with `c_segment=12`; `3,276,786` with `c_segment=4`).
+Segment cells are still a valid later no-edge-frame branch from a sparse
+checkpoint, where the audited parameter count was `3,234,450`.
+
+Decision rule: keep only if selected outer-edge availability improves without
+losing E86/E87 primary lDDT. Reject if it behaves like E95 by improving a
+global geometry metric while softening local C-alpha lDDT.
+
 ## Experiment Queue
 
 ### E00: Matched Short-Run Baseline

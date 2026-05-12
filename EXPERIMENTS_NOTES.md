@@ -3689,3 +3689,18 @@
   are `24/48`, degree penalty is `0.75`, and the runner resumed E87 at step
   8500/examples 68000 with 1244 matching model tensors loaded and 0
   new/missing tensors initialized.
+- E96 live health check at `2026-05-12T23:24:40Z` on owned pod
+  `o1dy17ouv8w5mz`: Python PID `13303` was alive after about 4 minutes,
+  `results.json` was not present yet, GPU memory was allocated at about
+  `11,721 MiB`, GPU utilization sampled at `5%`, and the log still showed the
+  clean E87 resume with 1244 matching tensors loaded and 0 new/missing tensors
+  initialized.
+- Next-fallback parameter audit while E96 runs: the E96/E87-style sparse
+  edge-frame setup has `3,154,242` parameters; adding
+  `simplex_cell_score_outer_edge_weight=0.25` remains `3,154,242`; adding
+  latent segment cells without edge-frame modules is within budget at
+  `3,234,450`; but segment cells plus edge-frame modules exceed the
+  `3,261,974` cap at `3,282,002` for `simplex_c_segment=12` and `3,276,786`
+  even for `simplex_c_segment=4`. Therefore, if E96 regresses, the immediate
+  paper-aligned fallback should be a zero-parameter outer-edge-supported cell
+  scorer, not segment cells stacked onto edge-frame messages.
