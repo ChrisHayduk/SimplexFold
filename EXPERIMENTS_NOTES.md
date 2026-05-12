@@ -3514,3 +3514,9 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   from E89 to E93, keeping the same owned-pod-only restriction and the rule
   that heartbeat must not launch follow-up experiments automatically.
+- E93 live health check at `2026-05-12T20:37:56Z` on owned pod
+  `o1dy17ouv8w5mz`: Python PID `11069` was still active after about
+  38 minutes, `results.json` was not present yet, GPU memory was allocated
+  at about `13,533 MiB`, GPU utilization sampled at `38%`, and the log still
+  showed the clean E81 resume with 1244 matching tensors loaded and 0
+  new/missing tensors initialized.
