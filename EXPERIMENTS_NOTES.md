@@ -279,6 +279,10 @@
   reported `4 passed`; `python -m pytest tests/test_simplex.py
   tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` reported
   `157 passed`.
+- E86 status at 2026-05-12T13:05:48Z on owned Runpod pod
+  `o1dy17ouv8w5mz`: process `6369` was still alive after about 42 minutes,
+  the run directory existed, and `results.json` was not present yet. Because
+  no run has returned, `EXPERIMENT_RESULTS.md` remains unchanged.
 
 ## 2026-05-09
 
