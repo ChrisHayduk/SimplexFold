@@ -2255,3 +2255,31 @@
   B200 with GPU utilization and memory allocated. Heartbeat
   `check-simplexfold-e57-runpod` has been retargeted to E69 pod
   `eznq63h3uorbrf` only.
+- E69 returned on owned Runpod pod `eznq63h3uorbrf` and was rejected. Step
+  4500 reached `val_lddt_ca=0.3652884252369404`, FoldScore
+  `0.36315777339041233`, `val_ca_drmsd=10.583343207836151`, and
+  predicted/true C-alpha radius `11.875020861625671 / 15.40340667963028`.
+  Selected face/tetra boundary lDDT ended at `0.521033963188529` /
+  `0.5058649443089962`, contraction fractions at `0.6824001856148243` /
+  `0.6835838556289673`, boundary length MAE at `2.859107196331024` /
+  `3.0093840062618256`, mean boundary-edge degree at `11.976542711257935` /
+  `79.8436188697815`, and unique-edge fraction at `0.08402037883430959` /
+  `0.012603056825146437`. The selected face-normal term was active with
+  `val_weighted_simplex_face_normal_loss=0.017673333699349314`.
+- E69 artifacts and launch log were copied locally under ignored
+  `artifacts/nanofold_public_benchmarks/e69_face_normal005_from_e64_s4500_c256_m64/`,
+  including `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, checkpoint, and
+  `runpod_launch.log`. The owned E69 pod was stopped and deleted after copying;
+  a post-delete lookup returned 404. No other Runpod instances were managed.
+  Heartbeat `check-simplexfold-e57-runpod` was paused because no Runpod job is
+  currently active.
+- E69 interpretation: reject selected face-normal orientation as an auxiliary
+  continuation from E64. It is topologically justified, but in practice it
+  pulled the selected-boundary diagnostics down and did not preserve E64's
+  lDDT. Next test E70 from the E64 checkpoint with damped edge-frame boundary
+  messages: enable `--simplex-edge-frame-message-scale 0.025` and ramp
+  runtime contribution from `0.0` to `0.025` over steps 4000-4500 while
+  keeping the E64 selected-boundary lDDT/coordinate-loss recipe. This moves
+  orientation-aware higher-rank information through selected boundary-edge
+  frames instead of attaching another standalone orientation loss.

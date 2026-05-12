@@ -2358,7 +2358,7 @@ was stopped and deleted; a post-delete lookup returned 404.
 
 ### E69: Selected Face Normal Orientation
 
-Status: running on owned Runpod pod `eznq63h3uorbrf`.
+Status: completed on Runpod and rejected.
 
 Hypothesis: the README's face interpretation includes oriented local patches
 with area, angles, and normal direction. E64's selected-boundary lDDT improves
@@ -2378,7 +2378,7 @@ face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
 weights `0.5`, `simplex_aux_weight=0.5`, and
 `--simplex-face-normal-weight 0.05`.
 
-Launch: E69 is running on owned Runpod B200 pod `eznq63h3uorbrf`
+Launch: E69 ran on owned Runpod B200 pod `eznq63h3uorbrf`
 (`codex-simplexfold-e69-runpod-20260511`) from commit `34a2796`. Clean launch
 audit after copying only public data/code: public train/val/all manifest
 counts are `10000/1000/11000`, remote manifest files are exactly `all.txt`,
@@ -2396,3 +2396,45 @@ Decision rule: keep only if step-4500 lDDT improves over E65/E67 and does not
 badly regress FoldScore, dRMSD, or selected-boundary diagnostics. Continue only
 if it approaches or exceeds E64; reject if it repeats the early E37 behavior
 at this stronger E64 checkpoint.
+
+Result: reject. E69 completed at step 4500 with
+`val_lddt_ca=0.3653`, FoldScore `0.3632`, `val_ca_drmsd=10.5833`, and
+predicted/true C-alpha radius `11.8750 / 15.4034`. The selected face-normal
+term was active (`val_weighted_simplex_face_normal_loss=0.0177`), but the run
+stayed below E64 and did not improve selected-complex realization: selected
+face/tetra boundary lDDT fell to `0.5210` / `0.5059`, contraction fractions
+were `0.6824` / `0.6836`, and boundary length MAE was
+`2.8591` / `3.0094`. Artifacts were copied locally, and the owned E69 pod was
+stopped and deleted; a post-delete lookup returned 404.
+
+### E70: Damped Edge-Frame Boundary Messages
+
+Status: planned for Runpod.
+
+Hypothesis: E69 suggests that supervising selected face orientation as a
+separate auxiliary target weakens the boundary geometry. The orientation-aware
+signal may need to move through the selected-complex communication path
+instead. Edge-frame scalarized messages let selected face/tetra cochains write
+geometry-aware information through boundary-edge frames, matching the
+topological view of cochains exchanging information across ranks.
+
+Mechanism: enable the existing edge-frame message module at a smaller scale
+than E61 and ramp the runtime contribution from `0.0` to `0.025` during the
+E64 continuation. This adds budgeted edge-frame MLP parameters but stays
+within the 5% AF2-medium allowance and keeps the intervention on selected
+face/tetra boundary-edge communication rather than adding a generic dense
+coordinate loss.
+
+Planned launch: resume E64 from its step-4000 checkpoint and run a 500-step
+gate to step 4500 with static selected-boundary lDDT weights `0.05`, selected
+face/tetra coordinate weights `1.0`, selected boundary coordinate-distance
+weights `0.5`, `simplex_aux_weight=0.5`,
+`--simplex-edge-frame-message-scale 0.025`,
+`--simplex-edge-frame-message-runtime-scale 0.0`,
+`--simplex-edge-frame-message-runtime-scale-final 0.025`,
+`--simplex-edge-frame-message-runtime-scale-ramp-start-step 4000`, and
+`--simplex-edge-frame-message-runtime-scale-ramp-steps 500`.
+
+Decision rule: keep only if step-4500 lDDT improves over E65/E67/E69 and does
+not lose E64's selected-boundary lDDT/contraction diagnostics. Continue only if
+it approaches or exceeds E64; reject if it repeats E61's local-lDDT regression.
