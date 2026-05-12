@@ -2510,3 +2510,8 @@
   `python -m pytest tests/test_format_experiment_result_row.py`;
   `python -m py_compile scripts/format_experiment_result_row.py`;
   `git diff --check`.
+- Synced the result-row formatter to the owned Runpod workspace and verified
+  it on the existing E72 artifacts with `--start-after-step 5000`. Cleaned up
+  two stray root-level helper files from the first sync attempt; the canonical
+  remote paths are now `scripts/format_experiment_result_row.py` and
+  `tests/test_format_experiment_result_row.py`.
