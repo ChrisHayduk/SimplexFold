@@ -3973,3 +3973,9 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   to E100, keeping the owned-pod-only restriction and the rule that the
   heartbeat must not launch follow-up experiments automatically.
+- E100 live health check at `2026-05-13T05:23:33Z` on owned pod
+  `o1dy17ouv8w5mz`: Python PID `16247` was alive after about 2.5 minutes,
+  `results.json` was not present yet, and the log still showed the clean E97
+  resume with 1244 matching tensors loaded and 24 new/missing feedback tensors
+  initialized. This matches the expected quiet training window before the
+  step-10000 validation.
