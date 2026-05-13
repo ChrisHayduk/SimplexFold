@@ -5063,3 +5063,33 @@
   history still had 15 rows ending at the inherited E113 step-7000 row. Do not
   launch E116 or touch the remote checkout until E115 either returns coherent
   results or shows a real failure.
+- E115 returned on owned pod `o1dy17ouv8w5mz`. Remote coherence passed across
+  `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, and `run_metadata.json`: one result
+  row, one CSV row, 16 history rows ending at step 7500, 16 eval-detail rows,
+  `completed_steps=7500`, `parameters=3154242` under the `3261974` cap,
+  `effective_batch_size=8`, `simplex_cell_score_segment_weight=0.0`, and
+  `stopped_early=False`. Metrics: `val_lddt_ca=0.3820176888257265`,
+  FoldScore `0.37714015133678913`, `val_ca_drmsd=10.377011388540268`,
+  C-alpha Rg `11.570684283971786 / 15.403406739234924`, selected
+  face/tetra boundary lDDT `0.721814651042223 / 0.7055758349597454`, and
+  face/tetra contraction `0.6876201741397381 / 0.6860276646912098`.
+- Pulled E115 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e115_no_segment_control_from_e113_s7500_c256_m64/`
+  and the log into `logs/e115_no_segment_control_from_e113.log`. Local
+  coherence passed against the same step, parameter count, effective batch,
+  stopped-early flag, disabled segment support, history/eval row counts, and
+  primary metrics.
+- E115 decision: reject. The matched no-segment continuation fell below E113
+  and E106 and nearly matched E114's primary-lDDT drop, so E114 was not only a
+  segment-support failure. The E113 recovery lineage is unstable; do not launch
+  E116 from E113/E115 blindly. Audit retained checkpoints on the owned pod
+  before deciding whether E116 should run from a stronger compatible source.
+- Owned-pod checkpoint audit after E115: no active benchmark process was found
+  on pod `o1dy17ouv8w5mz`. Retained checkpoints exist for E72 and E105a-E115,
+  but no E96/E97-family checkpoint remains on the pod. The strongest retained
+  stable source is therefore E106; E116 can be considered only as a short
+  E106-sourced recovery test unless a stronger checkpoint is restored.
+- Paused heartbeat `check-simplexfold-e57-runpod` because no SimplexFold
+  benchmark is active. Stopped owned pod `o1dy17ouv8w5mz` after local
+  verification and checkpoint audit; Runpod reported desired status `EXITED`.

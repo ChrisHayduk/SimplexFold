@@ -108,7 +108,7 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py::test_cell_score_segment_weight_prefers_sequence_supported_cells tests/test_trainer.py::test_simplicial_cell_segment_score_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
-Launch: E114 is running as
+Launch: E114 ran as
 `e114_segment_supported_filtration_from_e113_s7500_c256_m64` on owned Runpod
 pod `o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `221df89`,
 no active benchmark process was present, the E113 checkpoint was present,
@@ -134,7 +134,7 @@ scale.
 
 ### E115 Idea: No-Segment E113 Continuation Control
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E114's primary-lDDT collapse could be caused by the new
 segment-supported cell scorer, or it could be an ordinary continuation
@@ -151,7 +151,7 @@ low, reject segment-supported filtration and consider only a much weaker or
 scheduled variant. If E115 also falls below E106, stop spending short gates on
 the E113 recovery lineage.
 
-Launch: E115 is running as
+Launch: E115 ran as
 `e115_no_segment_control_from_e113_s7500_c256_m64` on owned Runpod pod
 `o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `2ccb433`, no
 active benchmark process was present, the E113 checkpoint was present,
@@ -162,9 +162,20 @@ creation, step-7000 resume from E113, `1244` matching tensors loaded, `0`
 new/missing tensors initialized, a fresh optimizer, and no
 `simplex_cell_score_segment_weight` override.
 
+Result: reject. E115 returned at step 7500 with `val_lddt_ca=0.3820`,
+FoldScore `0.3771`, `val_ca_drmsd=10.3770`, and C-alpha Rg
+`11.5707 / 15.4034`. Remote and local coherence passed: one result row, one
+CSV row, 16 history rows ending at step 7500, 16 eval-detail rows,
+`parameters=3,154,242` under the `3,261,974` cap,
+`effective_batch_size=8`, `simplex_cell_score_segment_weight=0.0`, and
+`stopped_early=False`. Because this matched no-segment continuation also fell
+well below E113 and E106, E114's drop was not mainly caused by segment support.
+The E113 recovery lineage is unstable and should not receive another local
+filtration tweak or a blind E116 launch from E113/E115.
+
 ### E116 Idea: Global Selected-Complex Context
 
-Status: implemented locally; queued behind the E115 control result.
+Status: implemented locally; queued pending retained-checkpoint audit.
 
 Hypothesis: E96-E115 repeatedly show good local selected-complex geometry but
 weak global C-alpha assembly. Selected face/tetra boundary lDDT can exceed
@@ -191,16 +202,18 @@ constructed from explicit selected higher-rank cells and can influence the
 main trunk only by returning through those cells. It is not a generic C-alpha
 lDDT, radius, or all-pairs distance loss.
 
-Gate: after E115 returns, resume the best compatible E113/E115 checkpoint for
-a short Runpod gate with the E113/E115 selected sparse complex fixed:
+Gate: after E115 returned low, do not resume blindly from E113/E115. The owned
+Runpod pod retains checkpoints for E72 and E105a-E115, but no E96/E97-family
+checkpoint. Use the retained E106 checkpoint only as a short recovery-branch
+test. Keep the E113/E115 selected sparse complex fixed where compatible:
 `--simplex-face-top-k 24`, `--simplex-tetra-top-k 48`,
 `--simplex-cell-score-degree-penalty 0.75`,
 `--simplex-cell-score-outer-edge-weight 0.25`, edge-frame message allocation,
 directed boundary readout at `0.25`, boundary incidence normalization `1.0`,
-and `--simplex-global-context-scale 0.10`. Compare primarily against E115,
-E113, E106, and the global E96 leader. Treat it as a real 30k candidate only
-if it leaves the `0.40` lDDT band and improves the local-to-global translation
-diagnostics.
+and `--simplex-global-context-scale 0.10`. Compare primarily against the source
+checkpoint, E106/E113/E115, and the global E96 leader. Treat it as a real 30k
+candidate only if it leaves the `0.40` lDDT band and improves the
+local-to-global translation diagnostics.
 
 Validation so far:
 

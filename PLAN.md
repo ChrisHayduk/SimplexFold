@@ -1,4 +1,4 @@
-## Current Plan: E115 Control, Then E116 Global Selected-Complex Context
+## Current Plan: Record E115, Audit Checkpoints, Then Decide E116 Source
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -149,43 +149,28 @@ recovery-branch handoff because it beats E106/E111/E112 on primary C-alpha
 lDDT, but do not treat it as a 30k candidate: it remains below the E96/E97
 band and worsens dRMSD.
 
-The active next branch is E114: segment-supported sparse-cell filtration. The
-branch stays in the README's simplicial/topological view by changing which
-selected face/tetra cells exist, not by adding an output-side metric loss. It
-adds a zero-parameter `simplex_cell_score_segment_weight` term to the
-face/tetra top-k scorer, rewarding candidate cells whose boundary edges are
-supported by contiguous sequence-segment cochains under `simplex_segment_radius`.
-This keeps the successful edge-frame and directed-incidence modules inside the
-AF2-medium +5% budget, unlike the parameterized latent segment-cell module,
-which only fits if edge-frame messages are disabled. Launch E114 from the E113
-checkpoint as a short Runpod gate and compare primarily against E113/E106, with
-E96 remaining the global leader.
-
-E114 launched from the E113 step-7000 checkpoint to step 7500 with
-`simplex_cell_score_segment_weight=0.25`. It returned `val_lddt_ca=0.3814`,
+E114 tested segment-supported sparse-cell filtration from the E113 step-7000
+checkpoint to step 7500. The branch stayed in the README's
+simplicial/topological view by changing which selected face/tetra cells exist,
+not by adding an output-side metric loss. It returned `val_lddt_ca=0.3814`,
 FoldScore `0.3793`, `val_ca_drmsd=10.6123`, and predicted/true C-alpha radius
 `11.8583 / 15.4034`. Reject E114 as a primary branch: segment-supported
 filtration improved FoldScore, dRMSD, expansion, and contraction, but it
 damaged primary C-alpha lDDT and softened selected-boundary lDDT/length
 diagnostics.
 
-Before trying a weaker segment-support weight, run E115 as the clean
-continuation control from the same E113 checkpoint to step 7500 with
-`simplex_cell_score_segment_weight=0.0`. This separates a general E113
-continuation regression from a segment-filtration-specific regression. If
-E115 stays near E113 while E114 remains low, segment support is the culprit; if
-E115 also falls, the E113 recovery branch itself is not stable enough for
-another local-filtration tweak.
+E115 then ran the clean no-segment continuation control from the same E113
+checkpoint to step 7500. It returned `val_lddt_ca=0.3820`, FoldScore `0.3771`,
+`val_ca_drmsd=10.3770`, and predicted/true C-alpha radius
+`11.5707 / 15.4034`. Reject E115: it fell below E113 and E106 and nearly
+matched E114's primary-lDDT drop, so E114's failure was not mainly the new
+segment-supported scorer. The E113 recovery branch itself is not stable enough
+for another local-filtration tweak or a blind 30,000-step spend.
 
-E115 is now launched on the owned Runpod pod. Remote startup confirmed clean
-resume from E113 at step 7000, `1244` matching tensors loaded, `0` new/missing
-tensors initialized, `simplex_cell_score_segment_weight` unset, and
-launch-style parameter audit `3,154,242 <= 3,261,974`.
-
-While E115 runs, prepare E116 as a stronger topology-native branch rather than
-another local filtration tweak. The motivation is the same failure pattern seen
-from E96 through E115: selected face/tetra boundary diagnostics can become
-strong while global C-alpha assembly remains near `0.40`. E116 therefore adds
+E116 is implemented as a stronger topology-native branch rather than another
+local filtration tweak. The motivation is the same failure pattern seen from
+E96 through E115: selected face/tetra boundary diagnostics can become strong
+while global C-alpha assembly remains near `0.40`. E116 adds
 `simplex_global_context_scale`, a selected-complex global cochain: each
 SimplicialAdapter pools only active face and tetra states into a protein-level
 summary, then routes that summary back into the active face/tetra cells before
@@ -195,11 +180,12 @@ all-pairs distance loss.
 
 The E116 launch-style parameter audit for the E113/E115 sparse recipe plus
 global context is `3,201,970`, still under the AF2-medium +5% cap of
-`3,261,974`. If E115 remains near E113, launch E116 from the E115/E113
-checkpoint as the next short Runpod gate. If E115 also falls sharply, use E116
-as a recovery-branch test only if no stronger retained checkpoint is available,
-and do not interpret it as evidence for spending 30,000 steps unless it breaks
-out of the `0.40` band.
+`3,261,974`. Do not launch it from E113/E115 blindly now that E115 returned
+low. The owned-pod checkpoint audit found retained checkpoints for E72 and
+E105a-E115, but no E96/E97-family checkpoint. E116 from E106 may still be a
+fair short recovery test because E106 is the strongest stable retained source;
+E116 from E113/E115 should not be treated as a candidate for 30,000 steps
+unless it breaks out of the `0.40` band quickly.
 
 ## Historical Plan Context
 
