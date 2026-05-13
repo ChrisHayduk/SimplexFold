@@ -163,7 +163,7 @@ feedback variant.
 
 ### E102 Idea: Boundary-Edge Pair Feedback
 
-Status: implemented locally; not launched yet.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E101 preserved the selected boundary 1-skeleton longer than E100
 and recovered part of the lost primary lDDT, but target-MSA feedback still
@@ -195,6 +195,16 @@ Validation so far:
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
 - Targeted E102/plumbing tests: `7 passed`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `170 passed`
+
+Launch: E102 is running as
+`e102_boundary_pair_feedback_from_e97_s10000_c256_m64`, resuming the E97
+checkpoint from step 9500 to step 10000 with fixed E97 topology settings,
+`--simplex-boundary-pair-feedback-scale 0.05`, and a runtime ramp from
+`0.0` to `0.025` over steps 9500-10000. Remote log path is
+`/workspace/SimplexFold/logs/e102_boundary_pair_feedback_from_e97.log`,
+remote artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e102_boundary_pair_feedback_from_e97_s10000_c256_m64/`,
+and Python PID is `17897`.
 
 ### E83: Fixed Sparse Cell Continuation
 

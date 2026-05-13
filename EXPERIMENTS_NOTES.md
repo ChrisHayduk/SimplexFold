@@ -4103,3 +4103,24 @@
   ramp `--simplex-boundary-pair-feedback-runtime-scale 0.0` to `0.025` over
   steps 9500-10000. Keep E100/E101 MSA-feedback routes disabled and compare
   against E99 step 10000, E101, E99 final, E97, and E96.
+- Remote E102 preparation on owned pod `o1dy17ouv8w5mz`: the pod checkout
+  fast-forwarded to commit `c73b151`, remote py_compile passed for the
+  runner/model files, CLI help confirmed support for
+  `--simplex-boundary-pair-feedback-*`, the E97 checkpoint was present, and
+  the exact E102 module set counted `3,206,882` parameters, under the
+  AF2-medium +5% ceiling `3,261,974`.
+- E102 launched on owned pod `o1dy17ouv8w5mz` as
+  `e102_boundary_pair_feedback_from_e97_s10000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e102_boundary_pair_feedback_from_e97.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e102_boundary_pair_feedback_from_e97_s10000_c256_m64/`,
+  bash PID `17895`, and Python PID `17897`. Startup poll confirmed metadata
+  exists, `--max-parameters 3261974` is recorded, boundary-pair feedback
+  allocates at `0.05` and ramps from `0.0` to `0.025` over steps 9500-10000,
+  E100/E101 MSA-feedback routes are disabled, fixed face/tetra caps are
+  `24/48`, degree penalty is `0.75`, edge-frame runtime scale is `0.0125`,
+  and the runner resumed E97 at step 9500/examples 76000 with 1244 matching
+  model tensors loaded and 24 new/missing boundary-pair tensors initialized.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  to E102, keeping the owned-pod-only restriction and the rule that the
+  heartbeat must not launch follow-up experiments automatically.
