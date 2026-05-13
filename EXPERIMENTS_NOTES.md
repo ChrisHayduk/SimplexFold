@@ -4609,3 +4609,25 @@
   allocated, `results.json` and `results.csv` were still absent, and history
   still had 14 rows ending at E106 step 6500. Continue to treat E107 as an
   active in-flight gate.
+- E107 health poll at `2026-05-13T15:51:39Z`: PID `3424` remained active after
+  about 53.3 minutes, GPU utilization sampled at `5%` with `13493 MiB`
+  allocated, `results.json` and `results.csv` were still absent, and history
+  still had 14 rows ending at E106 step 6500. Continue to treat E107 as in
+  flight.
+- E107 returned on owned pod `o1dy17ouv8w5mz` at `2026-05-13T16:02:01Z`.
+  Remote coherence passed across `results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, and `run_metadata.json`: one result row,
+  one CSV row, 15 history rows ending at step 7000, `parameters=3154242`
+  under the `3261974` cap, and `stopped_early=False`. Metrics:
+  `val_lddt_ca=0.3867832273244858`, FoldScore `0.3756795562803745`,
+  `val_ca_drmsd=10.649024993181229`, and C-alpha Rg
+  `11.111636906862259 / 15.403406739234924`.
+- Pulled E107 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e107_metric_gated_cochain_recycling_from_e106_s7000_c256_m64/`
+  and verified local coherence against the same step, parameter count, lDDT,
+  FoldScore, dRMSD, and Rg values.
+- E107 decision: reject. Metric-gating recycled selected-boundary cochains
+  regressed below E106 (`0.3929199054837227` to `0.3867832273244858`) and also
+  below E108, with worse FoldScore and dRMSD. The next gate should not hold or
+  confidence-gate strong cochain memory; queue E109 to anneal the cochain
+  memory down from the better verified E106 checkpoint.

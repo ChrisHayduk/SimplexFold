@@ -490,7 +490,7 @@ E106 step-6500 checkpoint rather than continuing E108.
 
 ### E107 Idea: Metric-Gated Boundary Cochain Recycling
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned and rejected; metric gating did not recover E106.
 
 Hypothesis: E106 recycles the learned selected-boundary pair cochain directly
 into the next AF2 cycle. If that helps, continue the cochain-memory route. If
@@ -514,15 +514,21 @@ Gate: run a 500-step gate from the verified E106 step-6500 checkpoint to step
 primary `val_lddt_ca` improves over E106's `0.3929`; a result that beats E108
 but not E106 is still evidence about gating but not a continuation candidate.
 
-Launch: E107 is running as
+Launch: E107 ran as
 `e107_metric_gated_cochain_recycling_from_e106_s7000_c256_m64`. The remote
 checkout was fast-forwarded to commit `3250890`, no active benchmark process
 was present, the E106 checkpoint was present, remote py_compile passed, and the
 E107 launch-style parameter audit counted `3,154,242` parameters under the
 `3,261,974` cap. It resumed the E106 checkpoint at step 6500/examples 52000
 with `1244` matching model tensors and `0` new/missing tensors. Main Python
-PID is `3424`; log path is
+PID was `3424`; log path was
 `/workspace/SimplexFold/logs/e107_metric_gated_cochain_recycling_from_e106.log`.
+
+Result: reject. E107 returned at step 7000 with `val_lddt_ca=0.3868`,
+FoldScore `0.3757`, `val_ca_drmsd=10.6490`, and predicted/true C-alpha radius
+`11.1116 / 15.4034`. It fell below E106 and E108 on primary C-alpha lDDT,
+FoldScore, and dRMSD, so confidence-gating recycled cochains did not solve the
+fixed-memory regression.
 
 Validation so far:
 
@@ -532,6 +538,30 @@ Validation so far:
   `simplex_boundary_cochain_recycling_scale=0.10`, and
   `simplex_boundary_cochain_recycling_metric_gate_scale=1.0`: `3,154,242`
   parameters, below the AF2-medium +5% cap of `3,261,974`.
+
+### E109 Idea: Anneal Down Selected-Boundary Cochain Recycling
+
+Status: queued for launch from the verified E106 step-6500 checkpoint.
+
+Hypothesis: E106 improved E105a while the selected-boundary cochain memory was
+ramped from `0.0` to `0.10`, but E108 and E107 both regressed by step 7000
+when strong cochain memory was maintained or confidence-gated. The cochain may
+be useful as a transient topological scaffold that helps the pair trunk align
+with explicit face/tetra boundary states, then harmful if it remains too
+strong while the structure module tries to refine global coordinates.
+
+Mechanism: no new code, no new parameters, and no new loss. Resume the verified
+E106 checkpoint, keep the selected-complex recipe fixed, disable metric
+confidence gating, and use the runtime cochain-memory schedule to anneal
+`simplex_boundary_cochain_recycling_scale` from `0.10` to `0.025` over steps
+6500-7000. The intervention remains inter-cycle recycling of the learned
+selected-boundary 1-cochain into `z_prev`.
+
+Gate: run to step 7000 under run name
+`e109_cochain_recycling_anneal_down_from_e106_s7000_c256_m64`. Keep it only if
+primary `val_lddt_ca` improves over E106's `0.3929`; if it lands between E108
+and E106, record it as evidence that annealing helps but still does not justify
+a longer spend.
 
 ### E83: Fixed Sparse Cell Continuation
 

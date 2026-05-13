@@ -1,4 +1,4 @@
-## Current Plan: E107 Metric-Gated Cochain Recycling
+## Current Plan: E109 Cochain-Memory Anneal-Down
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -103,14 +103,21 @@ at `0.10`. It returned `val_lddt_ca=0.3875`, FoldScore `0.3771`,
 maintain the E106 improvement and regressed below E106 on primary C-alpha
 lDDT, FoldScore, and dRMSD.
 
-The active fallback is E107: metric-gated selected-boundary cochain recycling
-from the better verified E106 checkpoint. It keeps the E106 inter-cycle
-cochain memory path but gates the recycled boundary cochain by the simplex
-face/tetra distance-head confidence before adding it to `z_prev`. This tests
-whether recycling uncertain selected cell cochains caused E108's regression;
-it is still an inter-cycle topological cochain-memory change, adds no
-parameters, and adds no output loss. E107 is running on the owned Runpod pod
-`o1dy17ouv8w5mz` to step 7000.
+E107 tested metric-gated selected-boundary cochain recycling from the better
+verified E106 checkpoint. It returned `val_lddt_ca=0.3868`, FoldScore
+`0.3757`, `val_ca_drmsd=10.6490`, and predicted/true C-alpha radius
+`11.1116 / 15.4034`. Reject E107: confidence-gating the recycled cochain fell
+below both E106 and E108, so the failure is not simply that uncertain selected
+cell cochains were recycled too strongly.
+
+The active fallback is E109: cochain-memory anneal-down from the verified E106
+checkpoint. E106 improved while ramping cochain recycling from `0.0` to
+`0.10`, but E108 and E107 both regressed when the memory remained strongly
+active to step 7000. E109 tests whether the cochain signal is useful as a
+transient topological scaffold but harmful as a persistent constraint: resume
+E106 and anneal selected-boundary cochain recycling from `0.10` down to `0.025`
+over steps 6500-7000. This still uses the simplex boundary 1-cochain as
+inter-cycle memory, adds no parameters, and adds no output loss.
 
 ## Historical Plan Context
 
