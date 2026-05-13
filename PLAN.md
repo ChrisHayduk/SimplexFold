@@ -78,7 +78,7 @@ It improves the retained E72/E73/E74/E76 recovery band but remains below the
 E96 primary leader, so it is a recovery handoff rather than a 30k candidate by
 itself.
 
-The next branch is E106: selected-boundary cochain
+The active branch is E106: selected-boundary cochain
 recycling. E104 showed that local face/tetra boundary metrics can be strong
 without improving global C-alpha lDDT, and E105/E105a tests recycling only the
 distance-distribution view of that selected 1-skeleton. E106 recycles the
@@ -89,6 +89,8 @@ the README's simplex view because persistent rank-2/rank-3 cells influence the
 next pair-trunk pass through their boundary 1-cochain. It adds no parameters
 and no new loss. Use the E105a checkpoint for a short 500-step gate and ramp
 the runtime cochain recycling scale from `0.0` to a small value such as `0.10`.
+E106 is running on the owned Runpod pod `o1dy17ouv8w5mz` from the verified
+E105a checkpoint to step 6500.
 
 ## Historical Plan Context
 

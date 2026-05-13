@@ -4439,3 +4439,30 @@
   retained E72/E73/E74/E76 comparison band but remains below the E96 primary
   leader, so use the E105a checkpoint as the handoff for E106 rather than
   spending 30k on E105a directly.
+- E106 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` from commit `33f4776` to `54a6635` with
+  `git merge --ff-only`, preserving remote artifacts. Verified the E105a
+  checkpoint at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e105a_boundary_metric_recycling_from_e72_s6000_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  remote py_compile for model/adapter/trainer/runner files, and CLI support
+  for `--simplex-boundary-cochain-recycling-scale` plus the runtime schedule
+  flags. E106 launch-style parameter audit counted `3,154,242` parameters
+  under the `3,261,974` AF2-medium +5% cap.
+- E106 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64`, PID `2175`,
+  log `/workspace/SimplexFold/logs/e106_boundary_cochain_recycling_from_e105a.log`,
+  and artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64/`.
+  It resumes the E105a checkpoint at step 6000/examples 48000 with
+  `--resume-model-weights-only`, keeps the E105a selected-complex recipe
+  fixed, disables metric recycling during this gate, and ramps
+  selected-boundary cochain recycling from `0.0` to `0.10` over steps
+  6000-6500. Startup showed `1244` matching tensors loaded and `0` new/missing
+  tensors initialized.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E106, preserving
+  owned-pod-only scope and the rule that the heartbeat must not launch
+  follow-up experiments automatically.
+- E106 startup health poll at `2026-05-13T12:55:09Z`: PID `2175` was active
+  after about 1 minute, GPU utilization was `38%` with `11695 MiB` allocated,
+  `results.json` was absent, and the inherited history had 13 rows ending at
+  E105a step 6000 (`val_lddt_ca=0.3894216101616621`).

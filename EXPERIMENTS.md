@@ -398,8 +398,7 @@ Validation so far:
 
 ### E106 Idea: Selected-Boundary Cochain Recycling
 
-Status: implemented locally and ready to launch from the verified E105a
-checkpoint.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E104 showed that selected face/tetra boundary lDDT can exceed
 `0.7` locally while full-chain C-alpha lDDT remains near `0.4`. E105a asks
@@ -426,6 +425,14 @@ Gate: run a 500-step recovery gate from the verified E105a checkpoint to step
 and `--simplex-boundary-cochain-recycling-runtime-scale-ramp-steps 500`.
 Reject unless primary `val_lddt_ca` improves, not just FoldScore or selected
 boundary diagnostics.
+
+Launch: E106 is running as
+`e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64`. The remote
+checkout was fast-forwarded to commit `54a6635`, remote py_compile and CLI
+flag checks passed, the E105a checkpoint was present, and the E106 launch-style
+parameter audit counted `3,154,242` parameters under the `3,261,974` cap. Main
+Python PID is `2175`; log path is
+`/workspace/SimplexFold/logs/e106_boundary_cochain_recycling_from_e105a.log`.
 
 Validation so far:
 
