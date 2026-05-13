@@ -92,6 +92,14 @@ the runtime cochain recycling scale from `0.0` to a small value such as `0.10`.
 E106 is running on the owned Runpod pod `o1dy17ouv8w5mz` from the verified
 E105a checkpoint to step 6500.
 
+If E106 fails to improve primary C-alpha lDDT, the prepared fallback is E107:
+metric-gated selected-boundary cochain recycling. It keeps the E106
+inter-cycle cochain memory path but gates the recycled boundary cochain by the
+simplex face/tetra distance-head confidence before adding it to `z_prev`.
+This tests whether E106 is hurt by recycling uncertain selected-cell cochains;
+it is still an inter-cycle topological cochain-memory change, adds no
+parameters, and adds no output loss.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

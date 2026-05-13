@@ -4466,3 +4466,21 @@
   after about 1 minute, GPU utilization was `38%` with `11695 MiB` allocated,
   `results.json` was absent, and the inherited history had 13 rows ending at
   E105a step 6000 (`val_lddt_ca=0.3894216101616621`).
+- E106 health poll at `2026-05-13T12:57:39Z`: PID `2175` was still active
+  after about 4 minutes, GPU utilization was `26%` with `11699 MiB` allocated,
+  `results.json` and `results.csv` were absent, and history still had 13 rows
+  ending at E105a step 6000. No result artifact exists yet.
+- Implemented E107 locally as
+  `simplex_boundary_cochain_recycling_metric_gate_scale`, queued only if E106
+  rejects. E107 scatters entropy-derived metric confidence from selected
+  face/tetra distance heads onto the selected boundary 1-skeleton and gates the
+  recycled `simplex_structure_pair_readout` before it is added to `z_prev`.
+  This filters inter-cycle cochain memory without changing current-cycle
+  edge transport, adding parameters, or adding a new output loss.
+- E107 validation so far:
+  focused tests for confidence-map scatter, no-new-parameter behavior,
+  uncertain-cochain suppression, and runner CLI/config override reported
+  `4 passed`; the broader local slice
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m py_compile minalphafold/simplex.py minalphafold/model.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py && /Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  reported `183 passed`. A launch-style parameter audit counted `3,154,242`
+  parameters under the `3,261,974` cap.

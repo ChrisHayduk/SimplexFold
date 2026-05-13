@@ -878,6 +878,85 @@ def simplex_boundary_metric_recycling_bins(
     return metric_bins * metric_mask, metric_mask
 
 
+def simplex_boundary_metric_confidence_map(
+    aux: dict[str, torch.Tensor],
+    *,
+    num_residues: int,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Scatter selected face/tetra metric confidence onto boundary edges."""
+
+    face_indices = aux.get("simplex_face_indices")
+    if face_indices is None:
+        raise KeyError("simplex_face_indices")
+    batch_size = int(face_indices.shape[0])
+    device = face_indices.device
+    face_logits = aux.get("simplex_face_distance_logits")
+    tetra_logits = aux.get("simplex_tetra_distance_logits")
+    dtype_source = face_logits if face_logits is not None else tetra_logits
+    dtype = dtype_source.dtype if dtype_source is not None else torch.float32
+    confidence_sum = torch.zeros((batch_size, num_residues, num_residues, 1), device=device, dtype=dtype)
+    confidence_counts = torch.zeros_like(confidence_sum)
+
+    face_mask = aux.get("simplex_face_mask")
+    if face_logits is not None and face_mask is not None and face_indices.numel() > 0:
+        i, j, k = face_indices.unbind(dim=-1)
+        face_edges = torch.stack(
+            [
+                torch.stack([i, j], dim=-1),
+                torch.stack([i, k], dim=-1),
+                torch.stack([j, k], dim=-1),
+            ],
+            dim=-2,
+        )
+        face_confidence = boundary_metric_confidence(face_logits)[..., None]
+        face_edge_mask = face_mask[..., None].expand_as(face_edges[..., 0]).to(dtype)
+        face_delta, face_counts = scatter_to_pair(
+            face_confidence,
+            face_edges,
+            pair_shape=tuple(confidence_sum.shape),  # type: ignore[arg-type]
+            edge_mask=face_edge_mask,
+            include_reverse=True,
+        )
+        confidence_sum = confidence_sum + face_delta
+        confidence_counts = confidence_counts + face_counts
+
+    tetra_indices = aux.get("simplex_tetra_indices")
+    tetra_mask = aux.get("simplex_tetra_mask")
+    if (
+        tetra_indices is not None
+        and tetra_logits is not None
+        and tetra_mask is not None
+        and tetra_indices.numel() > 0
+    ):
+        i, j, k, tet_l = tetra_indices.unbind(dim=-1)
+        tetra_edges = torch.stack(
+            [
+                torch.stack([i, j], dim=-1),
+                torch.stack([i, k], dim=-1),
+                torch.stack([i, tet_l], dim=-1),
+                torch.stack([j, k], dim=-1),
+                torch.stack([j, tet_l], dim=-1),
+                torch.stack([k, tet_l], dim=-1),
+            ],
+            dim=-2,
+        )
+        tetra_confidence = boundary_metric_confidence(tetra_logits)[..., None]
+        tetra_edge_mask = tetra_mask[..., None].expand_as(tetra_edges[..., 0]).to(dtype)
+        tetra_delta, tetra_counts = scatter_to_pair(
+            tetra_confidence,
+            tetra_edges,
+            pair_shape=tuple(confidence_sum.shape),  # type: ignore[arg-type]
+            edge_mask=tetra_edge_mask,
+            include_reverse=True,
+        )
+        confidence_sum = confidence_sum + tetra_delta
+        confidence_counts = confidence_counts + tetra_counts
+
+    confidence_mask = (confidence_counts > 0).to(dtype)
+    confidence = confidence_sum / confidence_counts.clamp_min(1.0)
+    return confidence * confidence_mask, confidence_mask
+
+
 def coface_degree_attenuate_pair_readout(
     pair_readout: torch.Tensor,
     pair_counts: torch.Tensor,

@@ -590,6 +590,21 @@ def test_simplicial_boundary_cochain_recycling_adds_no_parameters():
     assert recycling_params == simplex_params
 
 
+def test_simplicial_metric_gated_boundary_cochain_recycling_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    recycling_medium = replace(
+        simplex_medium,
+        simplex_boundary_cochain_recycling_scale=0.25,
+        simplex_boundary_cochain_recycling_metric_gate_scale=1.0,
+    )
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    recycling_params = sum(parameter.numel() for parameter in AlphaFold2(recycling_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert recycling_params == simplex_params
+
+
 def test_simplicial_expansion_hinge_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     expansion_medium = replace(simplex_medium, simplex_use_msa_to_face=True)
@@ -1109,6 +1124,64 @@ def test_simplicial_boundary_cochain_recycling_changes_only_recycled_cycles():
     assert "simplex_structure_pair_readout" not in recycling_one_cycle
     assert torch.allclose(base_one_cycle["pair_representation"], recycling_one_cycle["pair_representation"])
     assert not torch.allclose(base_two_cycles["pair_representation"], recycling_two_cycles["pair_representation"])
+
+
+def test_metric_gated_boundary_cochain_recycling_suppresses_uncertain_recycled_cochains():
+    torch.manual_seed(11)
+    base_config = replace(load_model_config("tiny"), simplex_boundary_cochain_recycling_scale=0.0)
+    recycling_config = replace(load_model_config("tiny"), simplex_boundary_cochain_recycling_scale=0.5)
+    gated_config = replace(
+        load_model_config("tiny"),
+        simplex_boundary_cochain_recycling_scale=0.5,
+        simplex_boundary_cochain_recycling_metric_gate_scale=1.0,
+    )
+    base_model = AlphaFold2(base_config)
+    recycling_model = AlphaFold2(recycling_config)
+    gated_model = AlphaFold2(gated_config)
+    recycling_model.load_state_dict(base_model.state_dict())
+    gated_model.load_state_dict(base_model.state_dict())
+    base_model.eval()
+    recycling_model.eval()
+    gated_model.eval()
+
+    target_feat = torch.zeros(1, 5, 22)
+    residue_index = torch.arange(5).reshape(1, 5)
+    msa_feat = torch.zeros(1, 2, 5, 49)
+    extra_msa_feat = torch.zeros(1, 0, 5, 25)
+    template_pair_feat = torch.zeros(1, 0, 5, 5, 88)
+    aatype = torch.zeros(1, 5, dtype=torch.long)
+
+    with torch.no_grad():
+        base_two_cycles = base_model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=2,
+        )
+        recycling_two_cycles = recycling_model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=2,
+        )
+        gated_two_cycles = gated_model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=2,
+        )
+
+    assert not torch.allclose(base_two_cycles["pair_representation"], recycling_two_cycles["pair_representation"])
+    assert torch.allclose(base_two_cycles["pair_representation"], gated_two_cycles["pair_representation"])
 
 
 def test_simplexfold_medium_width_matched_preserves_widths_near_af2_medium_budget():

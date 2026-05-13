@@ -8,7 +8,7 @@ from .structure_module import StructureModule
 from .initialization import init_gate_linear, init_linear, zero_linear
 from .embedders import InputEmbedder, TemplatePair, TemplatePointwiseAttention, ExtraMsaStack
 from .heads import DistogramHead, PLDDTHead, MaskedMSAHead, TMScoreHead, ExperimentallyResolvedHead
-from .simplex import simplex_boundary_metric_recycling_bins
+from .simplex import simplex_boundary_metric_confidence_map, simplex_boundary_metric_recycling_bins
 from .utils import recycling_distance_bin
 
 class AlphaFold2(torch.nn.Module):
@@ -58,6 +58,9 @@ class AlphaFold2(torch.nn.Module):
         )
         self.simplex_boundary_cochain_recycling_scale = float(
             getattr(config, "simplex_boundary_cochain_recycling_scale", 0.0)
+        )
+        self.simplex_boundary_cochain_recycling_metric_gate_scale = float(
+            getattr(config, "simplex_boundary_cochain_recycling_metric_gate_scale", 0.0)
         )
         simplex_every_n = max(int(getattr(config, "simplex_every_n_blocks", 1)), 1)
         if self.use_simplicial_evoformer:
@@ -629,6 +632,22 @@ class AlphaFold2(torch.nn.Module):
                     simplex_pair_readout = simplex_aux_last.get("simplex_structure_pair_readout")
                     if simplex_pair_readout is not None:
                         simplex_cochain_bias = simplex_pair_readout.to(dtype=pair_repr.dtype)
+                        cochain_metric_gate_scale = min(
+                            max(self.simplex_boundary_cochain_recycling_metric_gate_scale, 0.0),
+                            1.0,
+                        )
+                        if cochain_metric_gate_scale > 0.0:
+                            simplex_confidence, simplex_confidence_mask = simplex_boundary_metric_confidence_map(
+                                simplex_aux_last,
+                                num_residues=N_res,
+                            )
+                            simplex_gate = 1.0 + cochain_metric_gate_scale * (2.0 * simplex_confidence - 1.0)
+                            simplex_gate = torch.where(
+                                simplex_confidence_mask > 0,
+                                simplex_gate,
+                                torch.ones_like(simplex_gate),
+                            )
+                            simplex_cochain_bias = simplex_cochain_bias * simplex_gate.to(dtype=pair_repr.dtype)
                         simplex_cochain_bias = simplex_cochain_bias * pair_mask[..., None].to(dtype=pair_repr.dtype)
                         z_prev = (
                             z_prev

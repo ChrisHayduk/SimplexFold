@@ -441,6 +441,42 @@ Validation so far:
   `simplex_boundary_cochain_recycling_scale=0.10`: `3,154,242` parameters,
   below the AF2-medium +5% cap of `3,261,974`.
 
+### E107 Idea: Metric-Gated Boundary Cochain Recycling
+
+Status: implemented locally and queued only if E106 returns below E105a on
+primary C-alpha lDDT. Do not launch while E106 is in flight.
+
+Hypothesis: E106 recycles the learned selected-boundary pair cochain directly
+into the next AF2 cycle. If that helps, continue the cochain-memory route. If
+it hurts or fails to improve, the likely failure is that uncertain selected
+face/tetra cochains are being recycled with the same strength as confident
+ones. E107 keeps the E106 path but gates the recycled cochain by the simplex
+distance-head confidence already used in the metric-gate diagnostics.
+
+Mechanism: add `simplex_boundary_cochain_recycling_metric_gate_scale`. Between
+recycle cycles, build a sparse confidence map on the same selected boundary
+1-skeleton by scattering entropy-derived confidence from the face/tetra
+distance heads. Before adding `simplex_structure_pair_readout` to `z_prev`,
+multiply selected boundary edges by `1 + scale * (2 * confidence - 1)`.
+This is not a new loss and does not change current-cycle edge transport; it
+only filters inter-cycle cochain memory by the selected complex's own metric
+confidence. Parameter count is unchanged.
+
+Gate: if E106 rejects, run a 500-step gate from the best verified checkpoint
+with the E106 selected-complex/cochain recipe fixed and add only
+`--simplex-boundary-cochain-recycling-metric-gate-scale 1.0`. Prefer resuming
+E106 if it is close to E105a but below it; otherwise resume E105a again as a
+clean diagnostic. Reject unless primary `val_lddt_ca` improves.
+
+Validation so far:
+
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_simplex.py::test_simplex_boundary_metric_confidence_map_scatter_selected_boundary_edges tests/test_trainer.py::test_simplicial_metric_gated_boundary_cochain_recycling_adds_no_parameters tests/test_trainer.py::test_metric_gated_boundary_cochain_recycling_suppresses_uncertain_recycled_cochains tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `4 passed`
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m py_compile minalphafold/simplex.py minalphafold/model.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py && /Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `183 passed`
+- E107 launch-style module set with the E106 selected-complex settings,
+  `simplex_boundary_cochain_recycling_scale=0.10`, and
+  `simplex_boundary_cochain_recycling_metric_gate_scale=1.0`: `3,154,242`
+  parameters, below the AF2-medium +5% cap of `3,261,974`.
+
 ### E83: Fixed Sparse Cell Continuation
 
 Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
