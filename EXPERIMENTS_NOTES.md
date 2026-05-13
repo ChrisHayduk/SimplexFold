@@ -4499,3 +4499,9 @@
   only startup/resume lines, and the run directory file mtimes had not advanced
   past startup. Treat E106 as in flight for now, but re-check promptly for
   either a returned artifact or signs of a stalled training/evaluation loop.
+- E106 health poll at `2026-05-13T13:32:39Z`: PID `2175` remained active after
+  about 38.9 minutes. `results.json` and `results.csv` were still absent, and
+  history still had 13 rows ending at E105a step 6000. GPU utilization sampled
+  at `46%` with `13491 MiB` allocated, so the earlier `0%` sample looks like
+  a transient idle point rather than enough evidence of a stall. Continue
+  monitoring E106 as an active in-flight gate.
