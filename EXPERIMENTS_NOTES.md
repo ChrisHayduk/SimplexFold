@@ -4305,3 +4305,10 @@
   of the full face/tetra distance distribution into the AF2 recycling-bin
   basis. This keeps uncertainty in the metric cochain memory instead of
   collapsing every selected boundary edge to one nearest bin.
+- E104 live poll at `2026-05-13T10:49:47Z`: Python PID `19749` was still
+  active after about 35 minutes on owned pod `o1dy17ouv8w5mz`, with GPU
+  memory at `14365 MiB`. `results.json` was still absent, the run directory
+  contained only `run_metadata.json` and inherited
+  `history_full_msa_to_face.json`, and the history still ended at E97 step
+  9500 (`val_lddt_ca=0.4035918414592743`). Keep E104 out of
+  `EXPERIMENT_RESULTS.md` until it returns and passes coherence checks.
