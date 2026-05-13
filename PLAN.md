@@ -338,14 +338,17 @@ to 9000 and ramping boundary-readout directionality down from `0.5` to
 `11.2733 / 15.4034` with `3,154,242` parameters. This beats E87's
 `0.3992` primary lDDT and avoids E92's held-`0.5` regression.
 
-The active next gate should be E98: continue the E96 checkpoint from step 9000
-to 9500 while holding the partial directed-readout setting at `0.25`. This is
-the cleanest slope test for the directed-incidence curriculum before changing
-the selected-complex construction again. Keep the fixed `24/48` sparse caps,
-degree-penalized selected cells, selected-boundary realization losses,
-edge-frame messages, and incidence-normalized boundary transport. Reject if
-E98 falls back below the E86/E87/E96 primary-lDDT band; if it regresses, use
-the already-budgeted E97 outer-edge-supported scorer fallback.
+The active Runpod gate is E98: continue the E96 checkpoint from step 9000 to
+9500 while holding the partial directed-readout setting at `0.25`. This is the
+cleanest slope test for the directed-incidence curriculum before changing the
+selected-complex construction again. The owned H100 pod preflight counted
+`3,154,242` parameters, under the `3,261,974` AF2-medium +5% ceiling, and
+startup resumed E96 at step 9000/examples 72000 with 1244 matching tensors and
+0 new/missing tensors. Keep the fixed `24/48` sparse caps, degree-penalized
+selected cells, selected-boundary realization losses, edge-frame messages, and
+incidence-normalized boundary transport. Reject if E98 falls back below the
+E86/E87/E96 primary-lDDT band; if it regresses, use the already-budgeted E97
+outer-edge-supported scorer fallback.
 
 The current 2026-05-12 full reread of the saved PDFs reinforces the E79-E81
 direction and the E96 interpretation. The right lesson is not to add another

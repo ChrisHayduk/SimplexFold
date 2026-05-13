@@ -737,7 +737,7 @@ before changing the topology construction again.
 
 ### E98 Candidate: Continue Partial Directed Boundary Readout
 
-Status: planned after E96.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E96 improved because directed incidence was relaxed from an
 over-strong `0.5` source/target boundary readout to a partial `0.25` setting.
@@ -756,6 +756,22 @@ Decision rule: keep if E98 preserves or improves E96's
 `val_lddt_ca=0.4043`. Reject if it falls back into the E86/E87/E92 band; in
 that case launch the queued E97 outer-edge-supported cell scorer as the next
 construction change.
+
+Launch: E98 is running as
+`e98_continue_partial_directed_boundary_from_e96_s9500_c256_m64`, Python PID
+`14318`, on the owned H100 pod. The remote checkout was fast-forwarded from
+`962be73` to `7b0219a`, no active benchmark process was present, the E96
+checkpoint was present, py_compile passed for the runner/model files, CLI help
+confirmed the boundary-readout directionality flags and `--max-parameters`,
+and the exact E98 parameter count was `3,154,242 <= 3,261,974`. Startup
+metadata recorded boundary-readout directionality `0.25`, runtime scale
+`0.25`, fixed `24/48` caps, degree penalty `0.75`, edge-frame runtime scale
+`0.0125`, and `--max-parameters 3261974`; the runner resumed E96 at step
+9000/examples 72000, loaded 1244 matching tensors, initialized 0 new/missing
+tensors, and started a fresh optimizer. The log path is
+`/workspace/SimplexFold/logs/e98_continue_partial_directed_boundary_from_e96.log`,
+and the artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e98_continue_partial_directed_boundary_from_e96_s9500_c256_m64/`.
 
 ### E97 Candidate: Outer-Edge-Supported Cell Scoring After E96
 

@@ -3736,3 +3736,33 @@
   losses, edge-frame message scale, and incidence-normalized transport. If
   E98 regresses below E96, pivot to the queued zero-parameter
   outer-edge-supported cell scorer.
+- Remote E98 preparation on owned pod `o1dy17ouv8w5mz`: the pod checkout was
+  clean at commit `962be73` and was fast-forwarded to pushed commit `7b0219a`
+  before launch. No other Runpod instances were inspected or managed.
+- E98 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E96 checkpoint present, remote py_compile passed for
+  `scripts/run_nanofold_public_benchmarks.py`, `minalphafold/simplex.py`,
+  `minalphafold/model_config.py`, and `minalphafold/trainer.py`; CLI help
+  confirmed support for boundary-readout directionality runtime flags and
+  `--max-parameters`; and the exact E98 instantiated module set counted
+  `3,154,242` parameters, under the AF2-medium +5% ceiling `3,261,974`.
+- E98 launched on owned pod `o1dy17ouv8w5mz` as
+  `e98_continue_partial_directed_boundary_from_e96_s9500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e98_continue_partial_directed_boundary_from_e96.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e98_continue_partial_directed_boundary_from_e96_s9500_c256_m64/`,
+  and Python PID `14318`. Startup poll confirmed metadata exists,
+  `--max-parameters 3261974` is recorded, boundary-readout directionality and
+  runtime scale are both held at `0.25`, fixed face/tetra caps are `24/48`,
+  degree penalty is `0.75`, edge-frame runtime scale is `0.0125`, and the
+  runner resumed E96 at step 9000/examples 72000 with 1244 matching model
+  tensors loaded and 0 new/missing tensors initialized.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  to E98, keeping the same owned-pod-only restriction and the rule that the
+  heartbeat must not launch follow-up experiments automatically.
+- E98 live health check at `2026-05-13T00:24:36Z` on owned pod
+  `o1dy17ouv8w5mz`: Python PID `14318` was alive after about 2.5 minutes,
+  `results.json` was not present yet, GPU memory was allocated at about
+  `11,721 MiB`, GPU utilization sampled at `51%`, and the log still showed
+  the clean E96 resume with 1244 matching tensors loaded and 0 new/missing
+  tensors initialized.
