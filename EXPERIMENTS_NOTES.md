@@ -4741,3 +4741,7 @@
   E106 resume/startup lines, and recent files were limited to
   `run_metadata.json` plus inherited `history_full_msa_to_face.json`. Treat
   this as an active first 500-step gate rather than a returned run.
+- E110 health poll at `2026-05-13T17:32:19Z`: PID `4513` remained active, GPU
+  utilization sampled at `48%` with `13491 MiB` allocated, `results.json` and
+  `results.csv` were absent, and history still had 14 rows ending at E106 step
+  6500. Continue to treat E110 as in flight.
