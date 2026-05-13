@@ -4763,3 +4763,9 @@
   about 22.0 minutes, process state `Rl` with high CPU activity, GPU
   utilization sampled at `41%` with `13491 MiB` allocated, `results.json` and
   `results.csv` absent, and history still at E106 step 6500.
+- E110 health poll at `2026-05-13T17:43:31Z`: PID `4513` remained active after
+  about 27.3 minutes, process state `Rl` with high CPU activity, GPU
+  utilization sampled at `20%` with `13491 MiB` allocated, `results.json` and
+  `results.csv` absent, history still at E106 step 6500, and the log still
+  showed only startup/resume lines. Continue waiting for the first post-resume
+  eval/write point.
