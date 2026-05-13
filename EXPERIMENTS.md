@@ -451,7 +451,7 @@ Validation so far:
 
 ### E108 Idea: Continue Selected-Boundary Cochain Recycling
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned and rejected; launch E107 from the better E106 checkpoint.
 
 Hypothesis: E106 improved E105a on primary C-alpha lDDT, FoldScore, dRMSD,
 and C-alpha expansion, so the selected-boundary cochain memory may be useful.
@@ -472,20 +472,26 @@ cochain-memory route, but require a much stronger slope before any 30k spend.
 If E108 stalls or regresses, launch E107 from the best verified cochain-memory
 checkpoint.
 
-Launch: E108 is running as
+Launch: E108 ran as
 `e108_boundary_cochain_recycling_continue_from_e106_s7000_c256_m64`. The
 remote checkout was fast-forwarded to commit `56150c7`, no active benchmark
 process was present, the E106 checkpoint was present, remote py_compile passed,
 and the E108 launch-style parameter audit counted `3,154,242` parameters under
 the `3,261,974` cap. It resumed the E106 checkpoint at step 6500/examples
 52000 with `1244` matching model tensors and `0` new/missing tensors. Main
-Python PID is `2881`; log path is
+Python PID was `2881`; log path was
 `/workspace/SimplexFold/logs/e108_boundary_cochain_recycling_continue_from_e106.log`.
+
+Result: reject. E108 returned at step 7000 with `val_lddt_ca=0.3875`,
+FoldScore `0.3771`, `val_ca_drmsd=10.6170`, and predicted/true C-alpha radius
+`11.3118 / 15.4034`. Holding raw selected-boundary cochain recycling at
+`0.10` failed to preserve the E106 recovery gain. Launch E107 from the better
+E106 step-6500 checkpoint rather than continuing E108.
 
 ### E107 Idea: Metric-Gated Boundary Cochain Recycling
 
-Status: implemented locally and queued if the E106/E108 cochain-memory route
-stalls or regresses.
+Status: implemented and queued for launch from the verified E106 step-6500
+checkpoint because E108 regressed.
 
 Hypothesis: E106 recycles the learned selected-boundary pair cochain directly
 into the next AF2 cycle. If that helps, continue the cochain-memory route. If
@@ -503,11 +509,11 @@ This is not a new loss and does not change current-cycle edge transport; it
 only filters inter-cycle cochain memory by the selected complex's own metric
 confidence. Parameter count is unchanged.
 
-Gate: if E106 rejects, run a 500-step gate from the best verified checkpoint
-with the E106 selected-complex/cochain recipe fixed and add only
-`--simplex-boundary-cochain-recycling-metric-gate-scale 1.0`. Prefer resuming
-E106 if it is close to E105a but below it; otherwise resume E105a again as a
-clean diagnostic. Reject unless primary `val_lddt_ca` improves.
+Gate: run a 500-step gate from the verified E106 step-6500 checkpoint to step
+7000 with the E106 selected-complex/cochain recipe fixed and add only
+`--simplex-boundary-cochain-recycling-metric-gate-scale 1.0`. Reject unless
+primary `val_lddt_ca` improves over E106's `0.3929`; a result that beats E108
+but not E106 is still evidence about gating but not a continuation candidate.
 
 Validation so far:
 

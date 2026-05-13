@@ -4561,3 +4561,20 @@
   allocated, `results.json` and `results.csv` were still absent, and history
   still had 14 rows ending at E106 step 6500. Continue to treat E108 as an
   active in-flight gate; heartbeat monitoring is retargeted to this run.
+- E108 returned on owned pod `o1dy17ouv8w5mz` at `2026-05-13T14:54:28Z`.
+  Remote coherence passed across `results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, and `run_metadata.json`: one result row,
+  one CSV row, 15 history rows ending at step 7000, `parameters=3154242`
+  under the `3261974` cap, and `stopped_early=False`. Metrics:
+  `val_lddt_ca=0.38745662942528725`, FoldScore `0.3770501706749201`,
+  `val_ca_drmsd=10.616994559764862`, and C-alpha Rg
+  `11.311820685863495 / 15.403406739234924`.
+- Pulled E108 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e108_boundary_cochain_recycling_continue_from_e106_s7000_c256_m64/`
+  and verified local coherence against the same step, parameter count, lDDT,
+  FoldScore, dRMSD, and Rg values.
+- E108 decision: reject. Holding selected-boundary cochain recycling at `0.10`
+  regressed below E106 on primary C-alpha lDDT (`0.3929199054837227` to
+  `0.38745662942528725`), FoldScore, and dRMSD. Launch E107 from the better
+  verified E106 checkpoint to test whether metric confidence can suppress
+  uncertain recycled boundary cochains.
