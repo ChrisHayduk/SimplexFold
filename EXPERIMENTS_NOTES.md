@@ -3990,3 +3990,26 @@
   `run_metadata.json` plus `history_full_msa_to_face.json` were present.
   `results.json` and step-10000 checkpoints were not present yet, so the run
   remains in progress rather than returned.
+- E100 returned on owned pod `o1dy17ouv8w5mz` at step 10000 with effective
+  batch size `8`, `3,225,090` parameters, `stopped_early=False`, and
+  `val_lddt_ca=0.3935649264603853`. FoldScore was `0.3887240868061781`,
+  `val_ca_drmsd=9.969625651836395`, and predicted/true C-alpha radius was
+  `11.83768093585968 / 15.403406739234924`.
+- E100 topology diagnostics stayed locally strong despite the worse primary
+  target: selected face/tetra boundary lDDT was
+  `0.7479618825018406` / `0.731723640114069`, and selected face/tetra
+  boundary contraction fraction was `0.6223886236548424` /
+  `0.6210166253149509`.
+- E100 interpretation: reject. The cell-to-residue MSA feedback closed a
+  missing route in the README schematic, but it dropped below the E99
+  step-10000 control (`0.3972`) and below E96/E97. The next candidate should
+  preserve the selected boundary-edge 1-cochain longer by using a
+  boundary-edge-to-residue coboundary feedback path rather than feeding a
+  collapsed face/tetra residue summary into MSA.
+- Copied E100 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e100_msa_feedback_from_e97_s10000_c256_m64/`
+  and copied the launch log to ignored `logs/e100_msa_feedback_from_e97.log`.
+  The local artifact pull excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  9500` to add the E100 row to `EXPERIMENT_RESULTS.md`, so inherited E97
+  history does not count as E100's best validation lDDT.

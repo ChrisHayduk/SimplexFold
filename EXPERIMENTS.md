@@ -72,7 +72,7 @@ stay out of the queue unless they supervise only the selected sparse complex.
 
 ### E100: Bidirectional Simplex-MSA Feedback
 
-Status: prepared locally for owned-Runpod launch after validation and commit.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E99 showed the selected face/tetra complex can keep becoming more
 geometrically coherent while final C-alpha lDDT stalls. That suggests a
@@ -91,21 +91,25 @@ Training can ramp the active contribution with
 static model-config override. This is a cochain communication change, not a
 new output-coordinate loss.
 
-Prepared gate: resume E97 from step 9500 to 10000 with the E97 final topology
-recipe fixed, allocate `--simplex-msa-feedback-scale 0.05`, and ramp
+Gate: resumed E97 from step 9500 to 10000 with the E97 final topology recipe
+fixed, allocated `--simplex-msa-feedback-scale 0.05`, and ramped
 `--simplex-msa-feedback-runtime-scale 0.0` to `0.05` over steps 9500-10000.
-Use `--max-parameters 3261974`; targeted local tests and an explicit
-parameter audit count the E100 module set at `3,225,090` parameters, leaving
-`36,884` parameters of headroom under the AF2-medium +5% budget.
+The returned run used `3,225,090` parameters, leaving `36,884` parameters of
+headroom under the AF2-medium +5% budget.
 
-Decision rule: keep only if step 10000 improves over the E99 step-10000
-control (`val_lddt_ca=0.3972`) and does not degrade selected-boundary
-diagnostics. A result merely matching the E99 continuation is not enough for
-a 30,000-step spend.
+Result: reject. E100 returned `val_lddt_ca=0.3936`, FoldScore `0.3887`,
+`val_ca_drmsd=9.9696`, and predicted/true C-alpha radius
+`11.8377 / 15.4034` at step 10000. This is below the E99 step-10000 control
+(`0.3972`), E99 final (`0.4003`), E97 (`0.4036`), and E96 (`0.4043`).
+Selected face/tetra boundary lDDT remained high at `0.7480` / `0.7317`, so
+the failure is not that the selected complex lost local boundary quality. The
+more likely bottleneck is that collapsing the selected face/tetra cochains
+directly into a residue MSA summary is too blunt. Do not continue this exact
+route to 30,000 steps.
 
-### E101 Contingency: Boundary-Edge Coboundary MSA Feedback
+### E101: Boundary-Edge Coboundary MSA Feedback
 
-Status: idea only; do not launch while E100 is active.
+Status: next candidate after E100 returned negative.
 
 Hypothesis: if E100 does not improve primary lDDT, the failure may be that a
 collapsed face/tetra-to-residue summary is too blunt. The selected boundary
@@ -120,10 +124,9 @@ summary into `c_m` and add it only to the target MSA row under a small runtime
 ramp. This should be implemented as an alternative to, or very lightweight
 extension of, E100 so the exact module set remains under AF2-medium +5%.
 
-Decision rule: only prepare after E100 returns. Keep the same E97/E100
-controls and compare against E99 step 10000, E96, and E97. Reject if it only
-improves global/FoldScore geometry while local C-alpha lDDT remains near the
-E99 plateau.
+Decision rule: keep the same E97/E100 controls and compare against E99 step
+10000, E100, E96, and E97. Reject if it only improves global/FoldScore
+geometry while local C-alpha lDDT remains near the E99/E100 plateau.
 
 ### E83: Fixed Sparse Cell Continuation
 

@@ -1,43 +1,32 @@
-## Current Plan: E100 Bidirectional Simplex-MSA Feedback
+## Current Plan: E101 Boundary-Edge Coboundary MSA Feedback
 
-E99 is the key negative control for the next move. It continued the strongest
-E97 topology-construction branch past 10,000 steps and returned
-`val_lddt_ca=0.4003`, below E96's `0.4043` at step 9000 and E97's `0.4036`
-at step 9500. The selected complex kept improving in isolation, with
-face/tetra boundary lDDT `0.7574` / `0.7386`, but that cleaner complex did
-not translate into better final C-alpha lDDT. This argues against spending on
-a blind 30,000-step continuation of the current lineage.
+E99 and E100 now form the key negative controls for the next move. E99
+continued the strongest E97 topology-construction branch past 10,000 steps
+and returned `val_lddt_ca=0.4003`, below E96's `0.4043` at step 9000 and
+E97's `0.4036` at step 9500. E100 then added the missing
+face/tetra-to-target-MSA route from the README's `M <-> Z <-> F <-> U`
+schematic and returned `val_lddt_ca=0.3936` at step 10000. The selected
+complex remains locally coherent, with E100 face/tetra boundary lDDT
+`0.7480` / `0.7317`, but the collapsed cell-to-residue MSA feedback lowered
+the primary target.
 
-The next architecture change should therefore alter the cochain communication
-route, not the output-side loss. The README schematic says
-`M <-> Z <-> F <-> U`, but the live model only has a low-rank
-`MSA -> face` path plus selected face/tetra readouts into pair and single
-states. E100 adds the missing reverse direction: selected face/tetra cochain
-messages are reduced to a residue-level 0-simplex readout, projected into
-`c_m`, and added back to the target MSA row. This gives later Evoformer blocks
-a direct way to consume topology-derived residue evidence instead of leaving
-the simplex signal mostly downstream of the MSA trunk.
+The next architecture change should keep the topology-to-trunk idea but
+preserve boundary-edge incidence longer. Instead of reducing selected
+face/tetra cochains directly to residue summaries, E101 should aggregate the
+selected boundary-edge readout as a 1-cochain into incident residues via a
+coboundary-style 1-to-0 map, then project that residue signal into the target
+MSA row under a small runtime ramp. This stays within the SimplexFold
+motivation: the trunk receives information from the explicit selected
+2-/3-cell complex through its boundary 1-skeleton, not from a generic
+coordinate or all-pairs lDDT loss.
 
-The first gate should be short and controlled. Resume the E97 checkpoint from
-step 9500, allocate `simplex_msa_feedback_scale=0.05`, and ramp the runtime
-feedback contribution from `0.0` to `0.05` over the next 500 optimizer steps.
-Keep E97's final topology settings fixed: fixed `24/48` sparse cells,
-degree penalty `0.75`, outer-edge-supported cell scoring `0.25`, symmetric
-boundary readout, incidence-normalized transport, selected-boundary
-realization losses, and edge-frame runtime scale `0.0125`. Compare the
-step-10000 result against E99's step-10000 control (`val_lddt_ca=0.3972`) and
-against the E96/E97 local peak. Keep only if the feedback route preserves or
-improves primary C-alpha lDDT while retaining selected-boundary diagnostics.
-
-If E100 fails cleanly, the next topology-native fallback should stay in the
-same communication-family rather than jump to a new loss. The live adapter
-already writes selected face/tetra states into pair edges and residue singles,
-and E100 adds a cell-to-residue MSA route. The still-missing route is an
-explicit boundary-edge-to-residue coboundary path: aggregate selected
-boundary-edge readouts as a 1-cochain into each incident residue and feed that
-0-cochain summary into the target MSA row. This would preserve directed
-incidence and test whether edge-local simplex geometry, rather than only
-cell-reduced residue summaries, is the signal the trunk needs.
+The E101 gate should be short and controlled. Resume the E97 checkpoint from
+step 9500 to step 10000, keep E97/E100 topology settings fixed, and replace
+or gate the E100 cell-summary MSA feedback with boundary-edge coboundary MSA
+feedback. Compare against E99 step 10000 (`val_lddt_ca=0.3972`), E100
+(`0.3936`), and the E96/E97 local peak. Keep only if the boundary-edge route
+recovers primary C-alpha lDDT while retaining selected-boundary diagnostics
+and staying under the AF2-medium +5% parameter ceiling.
 
 ## Historical Plan Context
 
