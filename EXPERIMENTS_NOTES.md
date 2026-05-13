@@ -4729,6 +4729,9 @@
   reported `4 passed`; E111 launch-style parameter audit with the E110
   selected-complex recipe and `simplex_structure_pair_readout_scale=0.05`
   counted `3,154,242` parameters under the `3,261,974` AF2-medium +5% cap.
+- E111 broader focused validation:
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_simplex.py::test_simplicial_adapter_can_emit_structure_readout_from_selected_cells tests/test_simplex.py::test_simplicial_adapter_can_emit_pair_only_structure_readout tests/test_trainer.py::test_simplicial_structure_readout_adds_no_parameters tests/test_trainer.py::test_simplicial_structure_pair_readout_adds_no_parameters tests/test_trainer.py::test_simplicial_structure_readout_forward_keeps_internal_tensors_private tests/test_trainer.py::test_simplicial_structure_pair_readout_forward_uses_private_pair_cochain tests/test_trainer.py::test_simplicial_boundary_cochain_recycling_changes_only_recycled_cycles tests/test_trainer.py::test_metric_gated_boundary_cochain_recycling_suppresses_uncertain_recycled_cochains tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`
+  reported `11 passed`.
 - E110 health poll at `2026-05-13T17:27:56Z`: PID `4513` remained active, GPU
   utilization sampled at `32%` with `13491 MiB` allocated, `results.json` was
   still absent, and history still had 14 rows ending at E106 step 6500.
