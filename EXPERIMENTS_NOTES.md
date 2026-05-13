@@ -4186,3 +4186,39 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   to E103, keeping the owned-pod-only restriction and the rule that the
   heartbeat must not launch follow-up experiments automatically.
+- E103 live poll at `2026-05-13T09:44:29Z` on owned pod `o1dy17ouv8w5mz`:
+  Python PID `18770` was still active after about 37 minutes with GPU memory
+  at `14259 MiB`, but `results.json` was absent and the artifact directory
+  still contained only `run_metadata.json` and the inherited
+  `history_full_msa_to_face.json`. The history remained at 20 rows ending
+  with E97 step 9500 (`val_lddt_ca=0.4035918414592743`), so E103 has not
+  returned a result and must remain out of `EXPERIMENT_RESULTS.md` for now.
+- Implemented E104 locally as `simplex_boundary_metric_gate_scale`. The gate
+  reuses the existing selected face/tetra distance heads: per-boundary-edge
+  distance-logit entropy becomes a metric-confidence cochain, confident
+  selected boundary edges strengthen their pair-trunk transport, and uncertain
+  selected boundary edges are damped before incidence normalization/scatter.
+  This is topology-native because it acts only on boundary edges induced by
+  explicit model-selected 2-/3-cells and uses the complex's own metric heads;
+  it adds no parameters and no output-side lDDT/radius loss.
+- E104 validation so far:
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`;
+  targeted tests for boundary-metric confidence, adapter gating, CLI/config
+  plumbing, runtime override propagation, validation propagation, and
+  no-parameter budget behavior reported `8 passed`.
+- Broader local E104 validation:
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `175 passed`; `git diff --check` passed.
+- Intended E104 gate: do not launch while E103 is active. If E103 returns as
+  a reject or is stopped as a confirmed performance failure, resume the
+  strongest E96/E97-family checkpoint for a 500-step gate with the E97 sparse
+  complex recipe fixed and ramp
+  `--simplex-boundary-metric-gate-runtime-scale 0.0` to `0.25`. Compare
+  against E99 step 10000, E101, E99 final, E97, and E96; reject unless the
+  metric-confidence gate recovers primary C-alpha lDDT toward or above the
+  E96/E97 peak without selected-boundary diagnostic collapse.
+- E103 live poll after E104 validation: Python PID `18770` remained active
+  after about 51 minutes with GPU memory at `14259 MiB` and nonzero
+  utilization, but `results.json` was still absent and the history still
+  ended at the inherited E97 step-9500 row. This remains an in-flight run,
+  not a result.

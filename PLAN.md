@@ -1,4 +1,4 @@
-## Current Plan: E103 Sparse Boundary-Edge Pair Gate
+## Current Plan: E103 Running, E104 Prepared
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -49,6 +49,24 @@ counts `3,193,762` parameters, leaving `68,212` under the AF2-medium +5%
 ceiling. Reject unless it beats E101 and approaches or exceeds the E96/E97
 local peak on primary C-alpha lDDT without damaging selected-boundary
 diagnostics.
+
+While E103 runs, the next queued branch is E104: a selected-boundary
+metric-confidence gate. The idea is to use the existing face/tetra boundary
+distance heads as reliability estimates for each selected boundary edge. Edges
+whose explicit 2-/3-cell distance distribution is confident get stronger
+cochain transport into the pair trunk; uncertain selected edges are damped.
+This is still a simplicial/topological change because the gate is computed
+only on boundary edges of model-selected faces/tetras and uses the complex's
+own metric cochains. It adds no parameters and should load the E97/E103
+checkpoint lineage without fresh tensors.
+
+Do not launch E104 until E103 either returns or is stopped as a confirmed
+performance failure. The first E104 gate should resume the strongest available
+E96/E97/E103-family checkpoint to the next 500-step validation point with the
+E97 sparse-complex recipe fixed, ramping
+`--simplex-boundary-metric-gate-runtime-scale 0.0 -> 0.25`. Reject unless it
+beats the E99/E101 near-10k controls and approaches or exceeds E96/E97 on
+primary C-alpha lDDT while preserving selected-boundary diagnostics.
 
 ## Historical Plan Context
 

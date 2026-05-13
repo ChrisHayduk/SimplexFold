@@ -267,6 +267,40 @@ routes disabled, and E102 dense pair feedback disabled. The inherited history
 currently has 20 rows, ending at the E97 step-9500 row
 `val_lddt_ca=0.4035918414592743`; no E103 result has returned yet.
 
+### E104 Idea: Selected-Boundary Metric-Confidence Gate
+
+Status: implemented locally and queued; do not launch while E103 is running.
+
+Hypothesis: E99-E103 suggest the selected face/tetra complex can maintain
+high selected-boundary lDDT while global C-alpha lDDT stalls near `0.40`.
+The bottleneck may be not the selected complex's local metric quality, but
+how uniformly its boundary-edge messages are allowed to write into the pair
+trunk. The existing face/tetra distance heads already estimate each selected
+cell's boundary metric; their entropy can act as a reliability cochain.
+
+Mechanism: add `simplex_boundary_metric_gate_scale`. For each selected
+face/tetra boundary edge, compute entropy-normalized confidence from the
+corresponding simplex distance logits. The boundary-edge update is damped
+when the selected cell's metric distribution is uncertain and strengthened
+when it is confident, before incidence normalization and scatter into pair
+space. This adds no parameters: it reuses the already-supervised simplex
+distance heads and changes only boundary-edge transport inside the selected
+2-/3-cell complex.
+
+Gate: resume the strongest available E96/E97/E103-family checkpoint to the
+next 500-step validation point with the E97 topology recipe fixed, keep
+E100/E101 MSA feedback, E102 dense pair feedback, and E103 learned pair gate
+disabled unless E103 itself returns as a keep. Ramp
+`--simplex-boundary-metric-gate-runtime-scale 0.0` to `0.25` across the
+gate. Reject unless primary `val_lddt_ca` beats the E99/E101 near-10k controls
+and approaches or exceeds the E96/E97 local peak without selected-boundary
+diagnostic collapse.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+- Targeted E104/plumbing tests: `8 passed`
+
 ### E83: Fixed Sparse Cell Continuation
 
 Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.

@@ -229,6 +229,36 @@ def _masked_symmetric_kl(
     return loss.sum(dim=reduce_dims) / mask.sum(dim=reduce_dims).clamp_min(1.0)
 
 
+def boundary_metric_confidence(distance_logits: torch.Tensor) -> torch.Tensor:
+    """Estimate per-boundary-edge metric confidence from simplex distance heads."""
+
+    if distance_logits.numel() == 0:
+        return distance_logits.new_empty(distance_logits.shape[:-1])
+    probs = torch.nn.functional.softmax(distance_logits.float(), dim=-1)
+    entropy = -(probs * probs.clamp_min(1e-8).log()).sum(dim=-1)
+    max_entropy = torch.log(distance_logits.new_tensor(float(distance_logits.shape[-1])).float()).clamp_min(1e-6)
+    confidence = 1.0 - entropy / max_entropy
+    return confidence.clamp(0.0, 1.0).to(distance_logits.dtype)
+
+
+def apply_boundary_metric_gate(
+    edge_update: torch.Tensor,
+    distance_logits: torch.Tensor,
+    edge_mask: torch.Tensor,
+    *,
+    scale: float,
+) -> torch.Tensor:
+    """Gate selected boundary-edge transport by the cell's own metric confidence."""
+
+    strength = min(max(float(scale), 0.0), 1.0)
+    if strength == 0.0 or edge_update.numel() == 0:
+        return edge_update
+    confidence = boundary_metric_confidence(distance_logits)
+    gate = 1.0 + strength * (2.0 * confidence - 1.0)
+    masked_gate = torch.where(edge_mask > 0, gate, torch.ones_like(gate))
+    return edge_update * masked_gate[..., None].to(edge_update.dtype)
+
+
 def _selected_boundary_lddt_loss(
     pred_distances: torch.Tensor,
     true_distances: torch.Tensor,
@@ -1271,6 +1301,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.boundary_msa_feedback_scale = float(getattr(config, "simplex_boundary_msa_feedback_scale", 0.0))
         self.boundary_pair_feedback_scale = float(getattr(config, "simplex_boundary_pair_feedback_scale", 0.0))
         self.boundary_pair_gate_scale = float(getattr(config, "simplex_boundary_pair_gate_scale", 0.0))
+        self.boundary_metric_gate_scale = float(getattr(config, "simplex_boundary_metric_gate_scale", 0.0))
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
         self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
@@ -1435,6 +1466,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_msa_feedback_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_pair_feedback_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_pair_gate_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_metric_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
@@ -1501,6 +1533,12 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_boundary_pair_gate_scale_override is not None:
             boundary_pair_gate_scale = max(
                 float(simplex_boundary_pair_gate_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
+        boundary_metric_gate_scale = self.boundary_metric_gate_scale
+        if simplex_boundary_metric_gate_scale_override is not None:
+            boundary_metric_gate_scale = max(
+                float(simplex_boundary_metric_gate_scale_override.detach().float().cpu().item()),
                 0.0,
             )
         local_neighbor_k = self.local_neighbor_k
@@ -1756,6 +1794,18 @@ class SimplicialAdapter(torch.nn.Module):
                 * face_edge_update
                 * face_edge_mask[..., None]
             )
+        if boundary_metric_gate_scale > 0.0:
+            face_distance_logits = self.auxiliary_heads.face_distances(face_state).reshape(
+                *face_state.shape[:-1],
+                3,
+                self.auxiliary_heads.n_dist_bins,
+            )
+            face_edge_update = apply_boundary_metric_gate(
+                face_edge_update,
+                face_distance_logits,
+                face_edge_mask,
+                scale=boundary_metric_gate_scale,
+            )
         if self.boundary_incidence_normalization > 0.0:
             face_edge_update = face_edge_update * boundary_incidence_weights(
                 face_edge_indices,
@@ -1853,6 +1903,18 @@ class SimplicialAdapter(torch.nn.Module):
                     * torch.tanh(self.boundary_pair_gate(torch.cat([tet_edge_update, tet_edge_pair_state], dim=-1)))
                     * tet_edge_update
                     * tet_edge_mask[..., None]
+                )
+            if boundary_metric_gate_scale > 0.0:
+                tet_distance_logits = self.auxiliary_heads.tetra_distances(tetra_state).reshape(
+                    *tetra_state.shape[:-1],
+                    6,
+                    self.auxiliary_heads.n_dist_bins,
+                )
+                tet_edge_update = apply_boundary_metric_gate(
+                    tet_edge_update,
+                    tet_distance_logits,
+                    tet_edge_mask,
+                    scale=boundary_metric_gate_scale,
                 )
             if self.boundary_incidence_normalization > 0.0:
                 tet_edge_update = tet_edge_update * boundary_incidence_weights(

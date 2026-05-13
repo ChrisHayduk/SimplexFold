@@ -5,9 +5,11 @@ from minalphafold.simplex import (
     SimplexGeometryLoss,
     SimplexTopology,
     SimplicialAdapter,
+    apply_boundary_metric_gate,
     _boundary_degree_weights,
     _cell_outer_edge_support,
     boundary_incidence_weights,
+    boundary_metric_confidence,
     build_simplex_topology,
     cell_outer_edge_context,
     coface_degree_attenuate_pair_readout,
@@ -75,6 +77,7 @@ class SimplexConfig:
     simplex_boundary_msa_feedback_scale = 0.0
     simplex_boundary_pair_feedback_scale = 0.0
     simplex_boundary_pair_gate_scale = 0.0
+    simplex_boundary_metric_gate_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
     simplex_outer_edge_context_scale = 0.0
     simplex_hodge_face_update_scale = 0.0
@@ -1342,6 +1345,81 @@ def test_simplicial_adapter_can_pair_gate_sparse_boundary_edges():
         simplex_boundary_pair_gate_scale_override=pair.new_tensor(0.25),
     )
 
+    assert not torch.allclose(on_pair[0], off_pair[0])
+    assert torch.all(on_pair[1, 4:] == 0)
+    assert torch.all(on_pair[1, :, 4:] == 0)
+
+
+def test_boundary_metric_confidence_gate_uses_distance_head_entropy():
+    uniform_logits = torch.zeros(1, 2, 3, 4)
+    peaked_logits = uniform_logits.clone()
+    peaked_logits[..., 0] = 12.0
+
+    uniform_confidence = boundary_metric_confidence(uniform_logits)
+    peaked_confidence = boundary_metric_confidence(peaked_logits)
+
+    assert torch.allclose(uniform_confidence, torch.zeros_like(uniform_confidence), atol=1e-6)
+    assert torch.all(peaked_confidence > 0.99)
+
+    edge_update = torch.ones(1, 2, 3, 5)
+    edge_mask = torch.tensor([[[1.0, 0.0, 1.0], [0.0, 1.0, 1.0]]])
+    gated_uniform = apply_boundary_metric_gate(edge_update, uniform_logits, edge_mask, scale=0.5)
+    gated_peaked = apply_boundary_metric_gate(edge_update, peaked_logits, edge_mask, scale=0.5)
+    expanded_mask = edge_mask[..., None].expand_as(edge_update)
+
+    assert torch.allclose(
+        gated_uniform[expanded_mask > 0],
+        torch.full_like(gated_uniform[expanded_mask > 0], 0.5),
+    )
+    assert torch.allclose(gated_uniform[expanded_mask <= 0], edge_update[expanded_mask <= 0])
+    assert torch.all(gated_peaked[expanded_mask > 0] > edge_update[expanded_mask > 0])
+
+
+def test_simplicial_adapter_metric_gate_scales_selected_boundary_edges_without_new_parameters():
+    class BoundaryMetricGateConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class BoundaryMetricGateEnabledConfig(BoundaryMetricGateConfig):
+        simplex_boundary_metric_gate_scale = 0.25
+
+    torch.manual_seed(17)
+    off_adapter = SimplicialAdapter(BoundaryMetricGateConfig()).eval()
+    torch.manual_seed(17)
+    on_adapter = SimplicialAdapter(BoundaryMetricGateEnabledConfig()).eval()
+    pair = torch.randn(2, 6, 6, BoundaryMetricGateConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(2, 6, BoundaryMetricGateConfig.c_s)
+    seq_mask = torch.tensor(
+        [
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0, 0.0],
+        ]
+    )
+    pair_mask = seq_mask[:, :, None] * seq_mask[:, None, :]
+
+    off_params = sum(p.numel() for p in off_adapter.parameters())
+    on_params = sum(p.numel() for p in on_adapter.parameters())
+    off_pair, _, _ = on_adapter(
+        pair,
+        single,
+        seq_mask=seq_mask,
+        pair_mask=pair_mask,
+        simplex_boundary_metric_gate_scale_override=pair.new_tensor(0.0),
+    )
+    on_pair, _, _ = on_adapter(
+        pair,
+        single,
+        seq_mask=seq_mask,
+        pair_mask=pair_mask,
+        simplex_boundary_metric_gate_scale_override=pair.new_tensor(0.25),
+    )
+
+    assert on_params == off_params
     assert not torch.allclose(on_pair[0], off_pair[0])
     assert torch.all(on_pair[1, 4:] == 0)
     assert torch.all(on_pair[1, :, 4:] == 0)

@@ -143,6 +143,7 @@ class ModelConfig:
     simplex_boundary_msa_feedback_scale: float = 0.0
     simplex_boundary_pair_feedback_scale: float = 0.0
     simplex_boundary_pair_gate_scale: float = 0.0
+    simplex_boundary_metric_gate_scale: float = 0.0
     simplex_outer_edge_update_scale: float = 0.0
     simplex_outer_edge_context_scale: float = 0.0
     simplex_hodge_face_update_scale: float = 0.0
