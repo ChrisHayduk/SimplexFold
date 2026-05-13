@@ -348,17 +348,23 @@ boundary lDDT stayed at `0.7355` / `0.7193`, and contraction fractions were
 useful as an annealed curriculum into E96, but holding it for another gate
 overdrives local C-alpha agreement.
 
-The active Runpod gate is E97: return to topology construction by resuming the
-E96 checkpoint, ramping an outer-edge-supported selected-cell score from `0.0`
-to `0.25`, and ramping the partial directed boundary readout from `0.25` to
-`0.0`. Keep the fixed `24/48` sparse caps, degree-penalized selected cells,
-selected-boundary realization losses, edge-frame messages, and
-incidence-normalized boundary transport. The change under test is a handoff
-from boundary-readout pressure to selected-complex construction: which
-face/tetra cochains exist, not a generic coordinate loss. The remote launch
-audit counted `3,154,242` parameters, under the `3,261,974` AF2-medium +5%
-ceiling, and startup resumed E96 at step 9000/examples 72000 with 1244
-matching tensors and 0 new/missing tensors.
+E97 returned a useful but not decisive stabilization result. It resumed E96,
+ramped an outer-edge-supported selected-cell score from `0.0` to `0.25`, and
+ramped the partial directed boundary readout from `0.25` to `0.0`. It reached
+`val_lddt_ca=0.4036`, just below E96's `0.4043`, while improving FoldScore to
+`0.3867`, dRMSD to `9.7492`, and predicted/true C-alpha radius to
+`11.7951 / 15.4034`. Selected face/tetra boundary lDDT rose to
+`0.7488` / `0.7318`, and outer-edge active fractions were `1.0` / `1.0`.
+This supports the topology-construction handoff as a stabilizer, but not yet
+as a new primary-lDDT leader.
+
+The current state does not yet justify a 30,000-step confirmation spend as if
+the `0.7` target were likely. The strongest branch has moved from roughly
+`0.348` at step 1000 to `0.404` by step 9000-9500, and recent topology-native
+changes mostly trade within a narrow `0.39-0.404` band. Before spending on a
+long run, the next work should either find a branch whose short gates show a
+clearer slope in primary C-alpha lDDT or run a deliberately diagnostic longer
+continuation with the expectation that it may falsify the current branch.
 
 The current 2026-05-12 full reread of the saved PDFs reinforces the E79-E81
 direction and the E96 interpretation. The right lesson is not to add another

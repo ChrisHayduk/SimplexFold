@@ -3838,3 +3838,27 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   to E97, keeping the same owned-pod-only restriction and the rule that the
   heartbeat must not launch follow-up experiments automatically.
+- E97 returned on owned pod `o1dy17ouv8w5mz`: step 9500
+  `val_lddt_ca=0.4035918414592743`, FoldScore `0.38672325760126114`,
+  `val_ca_drmsd=9.74921926856041`, predicted/true C-alpha radius
+  `11.79511296749115 / 15.403406739234924`, `3,154,242` parameters, and
+  `stopped_early=False`. The schedule ramped outer-edge cell scoring from
+  `0.0` to `0.25` and boundary-readout directionality from `0.25` to `0.0`.
+- E97 topology diagnostics: selected face/tetra boundary lDDT
+  `0.7487891465425491` / `0.7318084016442299`, contraction fractions
+  `0.5646614767611027` / `0.5655763633549213`, and face/tetra outer-edge
+  active fractions `1.0` / `1.0`.
+- E97 interpretation: near-keep but not a new primary-lDDT leader. It fell
+  just below E96's `0.4043184444308281` primary lDDT, but recovered almost all
+  of E96's local lDDT after E98's regression and improved FoldScore, dRMSD,
+  predicted radius, and selected-boundary lDDT. This supports the
+  topology-construction handoff as stabilizing, but not as evidence that the
+  current branch is likely to reach `0.7` by 30,000 steps.
+- Copied E97 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e97_outer_edge_score_handoff_from_e96_s9500_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e97_outer_edge_score_handoff_from_e96.log`. The local artifact pull
+  excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  9000` to add the E97 row to `EXPERIMENT_RESULTS.md`, so inherited E96
+  history does not count as E97's best validation lDDT.

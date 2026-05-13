@@ -786,7 +786,7 @@ of continuing boundary-readout pressure.
 
 ### E97 Candidate: Outer-Edge-Supported Cell Scoring After E96
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E96 tests whether directed boundary readout should be relaxed as
 a cochain-routing curriculum. If that still underperforms E87, the next
@@ -830,6 +830,17 @@ started a fresh optimizer. The log path is
 `/workspace/SimplexFold/logs/e97_outer_edge_score_handoff_from_e96.log`, and
 the artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e97_outer_edge_score_handoff_from_e96_s9500_c256_m64/`.
+
+Result: near-keep, but below the primary E96 leader. E97 reached
+`val_lddt_ca=0.4036`, FoldScore `0.3867`, `val_ca_drmsd=9.7492`, and
+predicted/true C-alpha radius `11.7951 / 15.4034`, with `3,154,242`
+parameters and no early stop. It did not beat E96's `0.4043` primary lDDT,
+so it is not a new leader, but it recovered almost all of E96's local lDDT
+while beating E96 on FoldScore and dRMSD and beating E98 by a wide margin.
+Selected face/tetra boundary lDDT improved to `0.7488` / `0.7318`, and
+outer-edge active fractions were `1.0` / `1.0`. This supports the topology
+construction handoff as a real stabilizer, but not yet as evidence that the
+current branch can reach `0.7` by 30,000 steps.
 
 ## Experiment Queue
 
