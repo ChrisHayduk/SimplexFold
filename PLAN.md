@@ -143,6 +143,12 @@ and begins to recover toward the E96/E97 band; otherwise leave the structure
 bias route and return to selected-cell construction or earlier pair-trunk
 cochain routing.
 
+E112 is now launched on the owned Runpod pod. Remote startup confirmed the
+step-6500 E106 resume, `1244` matching tensors loaded, `0` new/missing tensors
+initialized, and a launch-style parameter count of `3,154,242` under the
+`3,261,974` cap. Treat it as in flight until returned artifacts pass remote
+and local coherence checks.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

@@ -678,7 +678,7 @@ do not spend 30k on this scale.
 
 ### E112 Idea: Half-Scale Pair-Only Boundary-Cochain Structure Bias
 
-Status: queued after E111 rejection.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
 
 Hypothesis: E111's selected-boundary pair readout stayed topologically
 well-formed but slightly over-coupled the structure module. A half-scale
@@ -690,6 +690,16 @@ Gate: launch the same 500-step E106-to-7000 gate as E111, but set
 `--simplex-structure-pair-readout-scale 0.025`. Keep only if primary
 `val_lddt_ca` beats E106's `0.3929`; treat it as a possible 30k candidate only
 if it also moves toward the E96/E97 leader band.
+
+Launch: E112 is running as
+`e112_half_pair_only_structure_cochain_from_e106_s7000_c256_m64` on owned
+Runpod pod `o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit
+`e07d71c`, no active benchmark process was present, the E106 checkpoint was
+present, py_compile passed for the model, adapter, trainer, and runner modules,
+and the launch-style parameter audit counted `3,154,242` parameters under the
+`3,261,974` cap. Startup health confirmed PID `6212`, clean artifact path
+creation, step-6500 resume from E106, `1244` matching tensors loaded, `0`
+new/missing tensors initialized, and a fresh optimizer.
 
 ### E83: Fixed Sparse Cell Continuation
 

@@ -4852,3 +4852,23 @@
   and dRMSD. Queue E112 as the only remaining structure-bias calibration:
   rerun from the verified E106 checkpoint with
   `simplex_structure_pair_readout_scale=0.025`.
+- E112 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` to commit `e07d71c`; verified no active benchmark
+  process; py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/model.py`, `minalphafold/model_config.py`,
+  `minalphafold/trainer.py`, and `scripts/run_nanofold_public_benchmarks.py`;
+  verified the E106 resume checkpoint; launch-style parameter audit counted
+  `3,154,242` parameters under the `3,261,974` cap with
+  `simplex_structure_pair_readout_scale=0.025`.
+- E112 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e112_half_pair_only_structure_cochain_from_e106_s7000_c256_m64`, log
+  `/workspace/SimplexFold/logs/e112_half_pair_only_structure_cochain_from_e106.log`,
+  and PID file
+  `/workspace/SimplexFold/logs/e112_half_pair_only_structure_cochain_from_e106.pid`.
+  Startup at `2026-05-13T19:20:41Z` showed PID `6212`, clean artifact
+  creation, train/val counts `10000/1000`, resume from E106 at step
+  6500/examples 52000, `1244` matching tensors loaded, and `0` new/missing
+  tensors initialized with a fresh optimizer.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E112, preserving the
+  owned-pod-only rule for pod `o1dy17ouv8w5mz`, the 30-minute interval, and the
+  no-automatic-follow-up-launch rule.
