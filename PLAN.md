@@ -149,6 +149,12 @@ pair-trunk communication curriculum, but holding a strong directed signal
 overdrives local C-alpha agreement. Keep E113 only if it beats E106 and starts
 recovering toward the E96/E97 band.
 
+E113 is now launched on the owned Runpod pod. Remote startup confirmed the
+step-6500 E106 resume, `1244` matching tensors loaded, `0` new/missing tensors
+initialized, and a launch-style parameter count of `3,154,242` under the
+`3,261,974` cap. Treat it as in flight until returned artifacts pass remote
+and local coherence checks.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

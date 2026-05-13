@@ -4897,3 +4897,25 @@
   small FoldScore recovery over E111. Leave the structure-bias route and queue
   E113: directed boundary-readout annealing from the verified E106 checkpoint,
   with cochain recycling released to `0.0` and no structure pair bias.
+- E113 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` to commit `9d2b23c`; verified no active benchmark
+  process; py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/model.py`, `minalphafold/model_config.py`,
+  `minalphafold/trainer.py`, and `scripts/run_nanofold_public_benchmarks.py`;
+  verified the E106 resume checkpoint; launch-style parameter audit counted
+  `3,154,242` parameters under the `3,261,974` cap with directed boundary
+  readout enabled.
+- E113 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e113_anneal_directed_boundary_from_e106_s7000_c256_m64`, log
+  `/workspace/SimplexFold/logs/e113_anneal_directed_boundary_from_e106.log`,
+  and PID file
+  `/workspace/SimplexFold/logs/e113_anneal_directed_boundary_from_e106.pid`.
+  Startup at `2026-05-13T20:17:41Z` showed PID `6887`, clean artifact
+  creation, train/val counts `10000/1000`, resume from E106 at step
+  6500/examples 52000, `1244` matching tensors loaded, and `0` new/missing
+  tensors initialized with a fresh optimizer. Directionality is annealed from
+  `0.5` to `0.25` over steps 6500-7000, with cochain recycling released to
+  `0.0` and structure pair readout disabled.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E113, preserving the
+  owned-pod-only rule for pod `o1dy17ouv8w5mz`, the 30-minute interval, and the
+  no-automatic-follow-up-launch rule.

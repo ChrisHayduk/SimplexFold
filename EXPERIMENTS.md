@@ -711,7 +711,7 @@ E111 on primary C-alpha lDDT, so leave this structure-bias route.
 
 ### E113 Idea: Directed Boundary-Readout Rewarm From E106
 
-Status: queued after E112 rejection.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
 
 Hypothesis: E96 remains the best primary-lDDT result because it treated
 directed source/target boundary readout as an annealed cochain-routing
@@ -728,6 +728,16 @@ incidence into pair features, adds no parameters, and adds no output-side loss.
 Gate: keep only if primary `val_lddt_ca` beats E106's `0.3929`; treat it as a
 possible 30k candidate only if it also moves back toward the E96/E97 leader
 band.
+
+Launch: E113 is running as
+`e113_anneal_directed_boundary_from_e106_s7000_c256_m64` on owned Runpod pod
+`o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `9d2b23c`, no
+active benchmark process was present, the E106 checkpoint was present,
+py_compile passed for the model, adapter, trainer, and runner modules, and the
+launch-style parameter audit counted `3,154,242` parameters under the
+`3,261,974` cap. Startup health confirmed PID `6887`, clean artifact path
+creation, step-6500 resume from E106, `1244` matching tensors loaded, `0`
+new/missing tensors initialized, and a fresh optimizer.
 
 ### E83: Fixed Sparse Cell Continuation
 
