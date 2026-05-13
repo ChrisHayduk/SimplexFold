@@ -5057,3 +5057,9 @@
   both passed. Launch-style parameter audit for the E113/E115 sparse recipe
   plus global context counted `3,201,970` parameters under the `3,261,974`
   cap.
+- E115 health poll at `2026-05-13T22:50:42Z`: PID `8296` remained active
+  after about `22:40` elapsed, GPU memory was still allocated, `results.json`,
+  `results.csv`, and `eval_details_full_msa_to_face.csv` were absent, and
+  history still had 15 rows ending at the inherited E113 step-7000 row. Do not
+  launch E116 or touch the remote checkout until E115 either returns coherent
+  results or shows a real failure.
