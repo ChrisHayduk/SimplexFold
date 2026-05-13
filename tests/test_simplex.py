@@ -15,6 +15,7 @@ from minalphafold.simplex import (
     face_outer_edge_delta,
     face_tetra_coboundary_delta,
     face_geometry_features,
+    scatter_directed_edges_to_residue,
     segment_cell_indices,
     segment_geometry_features,
     tetra_edge_frame_features,
@@ -71,6 +72,7 @@ class SimplexConfig:
     simplex_single_transition_n = 2
     simplex_structure_readout_scale = 0.0
     simplex_msa_feedback_scale = 0.0
+    simplex_boundary_msa_feedback_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
     simplex_outer_edge_context_scale = 0.0
     simplex_hodge_face_update_scale = 0.0
@@ -1204,6 +1206,52 @@ def test_simplicial_adapter_can_project_selected_cell_readout_to_msa_feedback():
 
     torch.manual_seed(4)
     cfg = FeedbackConfig()
+    adapter = SimplicialAdapter(cfg)
+    pair = torch.randn(2, 6, 6, cfg.c_z)
+    single = torch.randn(2, 6, cfg.c_s)
+    seq_mask = torch.tensor(
+        [
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0, 0.0],
+        ]
+    )
+    pair_mask = seq_mask[:, :, None] * seq_mask[:, None, :]
+
+    _, _, aux = adapter(pair, single, seq_mask=seq_mask, pair_mask=pair_mask)
+
+    assert aux["simplex_msa_feedback"].shape == (2, 6, cfg.c_m)
+    assert not torch.allclose(aux["simplex_msa_feedback"][0], torch.zeros_like(aux["simplex_msa_feedback"][0]))
+    assert torch.all(aux["simplex_msa_feedback"][1, 4:] == 0)
+
+
+def test_directed_boundary_edges_scatter_to_source_and_target_residues():
+    updates = torch.tensor([[[[1.0, 2.0], [3.0, 4.0]]]])
+    edge_indices = torch.tensor([[[[0, 1], [1, 2]]]])
+    edge_mask = torch.tensor([[[1.0, 1.0]]])
+
+    source_delta, source_counts, target_delta, target_counts = scatter_directed_edges_to_residue(
+        updates,
+        edge_indices,
+        num_residues=3,
+        edge_mask=edge_mask,
+    )
+
+    assert torch.allclose(source_delta[0, 0], torch.tensor([1.0, 2.0]))
+    assert torch.allclose(source_delta[0, 1], torch.tensor([3.0, 4.0]))
+    assert torch.allclose(source_delta[0, 2], torch.zeros(2))
+    assert torch.allclose(target_delta[0, 0], torch.zeros(2))
+    assert torch.allclose(target_delta[0, 1], torch.tensor([1.0, 2.0]))
+    assert torch.allclose(target_delta[0, 2], torch.tensor([3.0, 4.0]))
+    assert torch.allclose(source_counts.squeeze(-1), torch.tensor([[1.0, 1.0, 0.0]]))
+    assert torch.allclose(target_counts.squeeze(-1), torch.tensor([[0.0, 1.0, 1.0]]))
+
+
+def test_simplicial_adapter_can_project_boundary_edge_coboundary_to_msa_feedback():
+    class BoundaryFeedbackConfig(SimplexConfig):
+        simplex_boundary_msa_feedback_scale = 0.25
+
+    torch.manual_seed(14)
+    cfg = BoundaryFeedbackConfig()
     adapter = SimplicialAdapter(cfg)
     pair = torch.randn(2, 6, 6, cfg.c_z)
     single = torch.randn(2, 6, cfg.c_s)

@@ -109,7 +109,7 @@ route to 30,000 steps.
 
 ### E101: Boundary-Edge Coboundary MSA Feedback
 
-Status: next candidate after E100 returned negative.
+Status: implemented locally; ready for owned-Runpod launch after commit/push.
 
 Hypothesis: if E100 does not improve primary lDDT, the failure may be that a
 collapsed face/tetra-to-residue summary is too blunt. The selected boundary
@@ -117,16 +117,25 @@ edges already carry local distance, incidence, and orientation information
 through the simplex-to-pair path. A 1-cochain-to-0-cochain feedback route may
 give the MSA trunk a cleaner topology-native signal.
 
-Mechanism sketch: after the selected face/tetra boundary-edge readout is
-computed, aggregate outgoing and incoming selected boundary-edge messages per
-residue with incidence masks. Project the resulting edge-coboundary residue
-summary into `c_m` and add it only to the target MSA row under a small runtime
-ramp. This should be implemented as an alternative to, or very lightweight
-extension of, E100 so the exact module set remains under AF2-medium +5%.
+Mechanism: add `simplex_boundary_msa_feedback_scale`. After selected
+face/tetra boundary-edge updates are computed, scatter each directed
+boundary-edge message into two residue channels: source-residue outgoing
+1-cochain evidence and target-residue incoming 1-cochain evidence. Concatenate
+those incidence-aware residue summaries, project them from `2 * c_z` to
+`c_m`, and add the result only to the target MSA row through the existing
+runtime MSA-feedback ramp. This is an alternative to E100's collapsed
+cell-to-residue feedback module, so E101 can allocate only the boundary-edge
+feedback path. The exact E101 launch module set is `3,206,722` parameters,
+leaving `55,252` under the AF2-medium +5% ceiling.
 
 Decision rule: keep the same E97/E100 controls and compare against E99 step
 10000, E100, E96, and E97. Reject if it only improves global/FoldScore
 geometry while local C-alpha lDDT remains near the E99/E100 plateau.
+
+Validation:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
 ### E83: Fixed Sparse Cell Continuation
 

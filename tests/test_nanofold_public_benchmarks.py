@@ -380,6 +380,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "500",
             "--simplex-msa-feedback-scale",
             "0.25",
+            "--simplex-boundary-msa-feedback-scale",
+            "0.125",
             "--simplex-msa-feedback-runtime-scale",
             "0.0",
             "--simplex-msa-feedback-runtime-scale-final",
@@ -473,6 +475,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_segment_cell_runtime_scale_ramp_start_step == 3000
     assert args.simplex_segment_cell_runtime_scale_ramp_steps == 500
     assert args.simplex_msa_feedback_scale == 0.25
+    assert args.simplex_boundary_msa_feedback_scale == 0.125
     assert args.simplex_msa_feedback_runtime_scale == 0.0
     assert args.simplex_msa_feedback_runtime_scale_final == 0.05
     assert args.simplex_msa_feedback_runtime_scale_ramp_start_step == 3000
@@ -510,6 +513,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_boundary_incidence_normalization == 1.0
     assert cfg.simplex_boundary_readout_directionality == 0.5
     assert cfg.simplex_msa_feedback_scale == 0.25
+    assert cfg.simplex_boundary_msa_feedback_scale == 0.125
     assert cfg.simplex_face_top_k == 24
     assert cfg.simplex_tetra_top_k == 48
     assert cfg.simplex_cell_score_degree_penalty == 0.75

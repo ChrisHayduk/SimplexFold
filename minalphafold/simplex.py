@@ -814,6 +814,31 @@ def scatter_to_single(
     return delta, counts
 
 
+def scatter_directed_edges_to_residue(
+    updates: torch.Tensor,
+    edge_indices: torch.Tensor,
+    *,
+    num_residues: int,
+    edge_mask: Optional[torch.Tensor] = None,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Scatter directed boundary-edge messages into source and target residues."""
+
+    c_edge = updates.shape[-1]
+    source_delta, source_counts = scatter_to_single(
+        updates,
+        edge_indices[..., 0],
+        single_shape=(updates.shape[0], int(num_residues), c_edge),
+        residue_mask=edge_mask,
+    )
+    target_delta, target_counts = scatter_to_single(
+        updates,
+        edge_indices[..., 1],
+        single_shape=(updates.shape[0], int(num_residues), c_edge),
+        residue_mask=edge_mask,
+    )
+    return source_delta, source_counts, target_delta, target_counts
+
+
 def face_outer_edge_delta(
     face_state: torch.Tensor,
     face_indices: torch.Tensor,
@@ -1243,6 +1268,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.single_update_scale = float(getattr(config, "simplex_single_update_scale", 1.0))
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
         self.msa_feedback_scale = float(getattr(config, "simplex_msa_feedback_scale", 0.0))
+        self.boundary_msa_feedback_scale = float(getattr(config, "simplex_boundary_msa_feedback_scale", 0.0))
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
         self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
@@ -1294,6 +1320,8 @@ class SimplicialAdapter(torch.nn.Module):
         self.single_norm = torch.nn.LayerNorm(config.c_s)
         if self.msa_feedback_scale > 0.0:
             self.single_to_msa_feedback = SimplexMLP(config.c_s, self.hidden_dim, config.c_m)
+        if self.boundary_msa_feedback_scale > 0.0:
+            self.boundary_to_msa_feedback = SimplexMLP(2 * config.c_z, self.hidden_dim, config.c_m)
         self.auxiliary_heads = SimplexAuxiliaryHeads(config)
         if self.outer_edge_context_scale > 0.0:
             self.face_outer_edge_context = SimplexMLP(
@@ -1445,11 +1473,16 @@ class SimplicialAdapter(torch.nn.Module):
                 0.0,
             )
         msa_feedback_scale = self.msa_feedback_scale
+        boundary_msa_feedback_scale = self.boundary_msa_feedback_scale
         if simplex_msa_feedback_scale_override is not None:
-            msa_feedback_scale = max(
+            feedback_runtime_scale = max(
                 float(simplex_msa_feedback_scale_override.detach().float().cpu().item()),
                 0.0,
             )
+            if self.msa_feedback_scale > 0.0:
+                msa_feedback_scale = feedback_runtime_scale
+            if self.boundary_msa_feedback_scale > 0.0:
+                boundary_msa_feedback_scale = feedback_runtime_scale
         local_neighbor_k = self.local_neighbor_k
         if simplex_local_neighbor_k_override is not None:
             local_neighbor_k = int(
@@ -1702,6 +1735,22 @@ class SimplicialAdapter(torch.nn.Module):
                 num_residues=pair.shape[1],
                 strength=self.boundary_incidence_normalization,
             )[..., None]
+        boundary_source_delta = pair.new_zeros(pair.shape[0], pair.shape[1], self.c_z)
+        boundary_source_counts = pair.new_zeros(pair.shape[0], pair.shape[1], 1)
+        boundary_target_delta = pair.new_zeros(pair.shape[0], pair.shape[1], self.c_z)
+        boundary_target_counts = pair.new_zeros(pair.shape[0], pair.shape[1], 1)
+        if self.boundary_msa_feedback_scale > 0.0:
+            (
+                boundary_source_delta,
+                boundary_source_counts,
+                boundary_target_delta,
+                boundary_target_counts,
+            ) = scatter_directed_edges_to_residue(
+                face_edge_update,
+                face_edge_indices,
+                num_residues=pair.shape[1],
+                edge_mask=face_edge_mask,
+            )
         pair_delta, pair_counts = scatter_to_pair(
             face_edge_update,
             face_edge_indices,
@@ -1775,6 +1824,22 @@ class SimplicialAdapter(torch.nn.Module):
             )
             pair_delta = pair_delta + tet_pair_delta
             pair_counts = pair_counts + tet_pair_counts
+            if self.boundary_msa_feedback_scale > 0.0:
+                (
+                    tet_boundary_source_delta,
+                    tet_boundary_source_counts,
+                    tet_boundary_target_delta,
+                    tet_boundary_target_counts,
+                ) = scatter_directed_edges_to_residue(
+                    tet_edge_update,
+                    tet_edge_indices,
+                    num_residues=pair.shape[1],
+                    edge_mask=tet_edge_mask,
+                )
+                boundary_source_delta = boundary_source_delta + tet_boundary_source_delta
+                boundary_source_counts = boundary_source_counts + tet_boundary_source_counts
+                boundary_target_delta = boundary_target_delta + tet_boundary_target_delta
+                boundary_target_counts = boundary_target_counts + tet_boundary_target_counts
             if boundary_readout_directionality > 0.0:
                 directed_tet_pair_delta, directed_tet_pair_counts = scatter_to_pair(
                     tet_edge_update,
@@ -1836,6 +1901,16 @@ class SimplicialAdapter(torch.nn.Module):
             msa_feedback = self.dropout(msa_feedback_scale * self.single_to_msa_feedback(single_readout))
             if seq_mask is not None:
                 msa_feedback = msa_feedback * seq_mask[..., None]
+        if self.boundary_msa_feedback_scale > 0.0 and boundary_msa_feedback_scale > 0.0:
+            boundary_source_readout = boundary_source_delta / boundary_source_counts.clamp_min(1.0)
+            boundary_target_readout = boundary_target_delta / boundary_target_counts.clamp_min(1.0)
+            boundary_readout = torch.cat([boundary_source_readout, boundary_target_readout], dim=-1)
+            boundary_feedback = self.dropout(
+                boundary_msa_feedback_scale * self.boundary_to_msa_feedback(boundary_readout)
+            )
+            if seq_mask is not None:
+                boundary_feedback = boundary_feedback * seq_mask[..., None]
+            msa_feedback = boundary_feedback if msa_feedback is None else msa_feedback + boundary_feedback
         single = single + self.dropout(single_update_scale * single_readout)
         if seq_mask is not None:
             single = single * seq_mask[..., None]

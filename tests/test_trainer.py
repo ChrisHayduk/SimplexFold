@@ -578,6 +578,24 @@ def test_simplicial_msa_feedback_stays_within_medium_budget():
     assert feedback_params <= int(af2_params * 1.05)
 
 
+def test_simplicial_boundary_msa_feedback_stays_within_medium_budget():
+    af2_medium = replace(load_model_config("medium"), use_simplicial_evoformer=False)
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    feedback_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_boundary_msa_feedback_scale=0.05,
+    )
+
+    af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    feedback_params = sum(parameter.numel() for parameter in AlphaFold2(feedback_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert feedback_params > simplex_params
+    assert feedback_params <= int(af2_params * 1.05)
+
+
 def test_simplicial_hodge_face_update_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     hodge_medium = replace(

@@ -20,13 +20,15 @@ motivation: the trunk receives information from the explicit selected
 2-/3-cell complex through its boundary 1-skeleton, not from a generic
 coordinate or all-pairs lDDT loss.
 
+E101 is now implemented locally as `simplex_boundary_msa_feedback_scale`.
 The E101 gate should be short and controlled. Resume the E97 checkpoint from
-step 9500 to step 10000, keep E97/E100 topology settings fixed, and replace
-or gate the E100 cell-summary MSA feedback with boundary-edge coboundary MSA
-feedback. Compare against E99 step 10000 (`val_lddt_ca=0.3972`), E100
-(`0.3936`), and the E96/E97 local peak. Keep only if the boundary-edge route
-recovers primary C-alpha lDDT while retaining selected-boundary diagnostics
-and staying under the AF2-medium +5% parameter ceiling.
+step 9500 to step 10000, keep E97/E100 topology settings fixed, and allocate
+only the boundary-edge coboundary MSA-feedback module, not the E100
+cell-summary feedback module. The exact E101 launch module set counts
+`3,206,722` parameters, leaving `55,252` under the AF2-medium +5% ceiling.
+Compare against E99 step 10000 (`val_lddt_ca=0.3972`), E100 (`0.3936`), and
+the E96/E97 local peak. Keep only if the boundary-edge route recovers primary
+C-alpha lDDT while retaining selected-boundary diagnostics.
 
 ## Historical Plan Context
 

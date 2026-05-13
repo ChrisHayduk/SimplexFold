@@ -958,6 +958,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
     for field, value in (
         ("simplex_structure_readout_scale", args.simplex_structure_readout_scale),
         ("simplex_msa_feedback_scale", args.simplex_msa_feedback_scale),
+        ("simplex_boundary_msa_feedback_scale", args.simplex_boundary_msa_feedback_scale),
         ("simplex_outer_edge_update_scale", args.simplex_outer_edge_update_scale),
         ("simplex_outer_edge_context_scale", args.simplex_outer_edge_context_scale),
         ("simplex_hodge_face_update_scale", args.simplex_hodge_face_update_scale),
@@ -1700,6 +1701,9 @@ def _train_variant(
         "simplex_msa_feedback_scale": (
             float(getattr(model_config, "simplex_msa_feedback_scale", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_boundary_msa_feedback_scale": (
+            float(getattr(model_config, "simplex_boundary_msa_feedback_scale", 0.0)) if use_simplicial else 0.0
+        ),
         "simplex_outer_edge_update_scale": (
             float(getattr(model_config, "simplex_outer_edge_update_scale", 0.0)) if use_simplicial else 0.0
         ),
@@ -2207,6 +2211,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the model config scale for selected simplex cochain feedback into the target MSA row.",
+    )
+    parser.add_argument(
+        "--simplex-boundary-msa-feedback-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for directed boundary-edge coboundary feedback into the target MSA row.",
     )
     parser.add_argument(
         "--simplex-msa-feedback-runtime-scale",
@@ -2740,6 +2750,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_msa_feedback_runtime_scale_ramp_steps": args.simplex_msa_feedback_runtime_scale_ramp_steps,
         "simplex_structure_readout_scale": args.simplex_structure_readout_scale,
         "simplex_msa_feedback_scale": args.simplex_msa_feedback_scale,
+        "simplex_boundary_msa_feedback_scale": args.simplex_boundary_msa_feedback_scale,
         "simplex_outer_edge_update_scale": args.simplex_outer_edge_update_scale,
         "simplex_outer_edge_context_scale": args.simplex_outer_edge_context_scale,
         "simplex_hodge_face_update_scale": args.simplex_hodge_face_update_scale,

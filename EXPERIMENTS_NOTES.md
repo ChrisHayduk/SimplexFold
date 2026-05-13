@@ -4013,3 +4013,20 @@
 - Used `scripts/format_experiment_result_row.py` with `--start-after-step
   9500` to add the E100 row to `EXPERIMENT_RESULTS.md`, so inherited E97
   history does not count as E100's best validation lDDT.
+- Implemented E101 locally as `simplex_boundary_msa_feedback_scale`. The path
+  scatters selected boundary-edge updates into source-residue and
+  target-residue channels, concatenates the directed 1-cochain-to-0-cochain
+  residue summaries, projects them from `2 * c_z` to `c_m`, and feeds them
+  through the existing target-MSA feedback hook.
+- E101 is topology-native by construction: it does not add an output metric
+  loss and does not supervise all residue pairs. It preserves the selected
+  face/tetra boundary 1-skeleton longer than E100 before communicating with
+  the MSA trunk.
+- E101 validation passed locally:
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`;
+  targeted E101/E100 tests reported `7 passed`; and
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `168 passed`.
+- Exact E101 launch-module parameter audit with E97 edge-frame messages
+  allocated counted `3,206,722` parameters versus AF2-medium `3,106,642`,
+  leaving `55,252` under the +5% ceiling `3,261,974`.
