@@ -4326,3 +4326,16 @@
   `results.json` / `results.csv` absent, and `history_full_msa_to_face.json`
   unchanged since `2026-05-13T10:14:09Z` with 20 rows ending at E97 step 9500.
   Treat E104 as still in flight rather than returned.
+- E104 returned on owned pod `o1dy17ouv8w5mz` at `2026-05-13T11:11Z` and was
+  pulled locally from
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e104_boundary_metric_gate_from_e97_s10000_c256_m64/`
+  into the matching local artifact directory, excluding checkpoints. Local
+  coherence checks passed across `results.json`, `results.csv`, and
+  `history_full_msa_to_face.json`: one returned row, completed step 10000,
+  `parameters=3154242`, `val_lddt_ca=0.39564882032573223`,
+  `val_foldscore=0.38540054485201836`, `val_ca_drmsd=10.1848464012146`, and
+  C-alpha Rg `11.31956136226654 / 15.403406739234924`. Reject E104: the
+  selected face/tetra boundary lDDT diagnostics are high
+  (`0.7246271595358849` / `0.7071636132895947`), but primary C-alpha lDDT is
+  below E96, E97, E99, E101, and E103, so the metric gate did not convert local
+  simplex boundary quality into a better global fold.
