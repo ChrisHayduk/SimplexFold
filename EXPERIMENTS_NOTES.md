@@ -4049,3 +4049,32 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   to E101, keeping the owned-pod-only restriction and the rule that the
   heartbeat must not launch follow-up experiments automatically.
+- E101 returned on owned pod `o1dy17ouv8w5mz` at step 10000 with effective
+  batch size `8`, `3,206,722` parameters, `stopped_early=False`, and
+  `val_lddt_ca=0.39977212622761726`. FoldScore was
+  `0.3867220859974623`, `val_ca_drmsd=9.934351950883865`, and
+  predicted/true C-alpha radius was
+  `11.70958662033081 / 15.403406739234924`.
+- E101 topology diagnostics remained strong: selected face/tetra boundary
+  lDDT was `0.7555434443056583` / `0.7378766611218452`, boundary length MAE
+  was `1.0114886984229088` / `1.1146406307816505`, and selected face/tetra
+  contraction fraction was `0.6162960529327393` /
+  `0.6145038418471813`.
+- E101 interpretation: reject as a 30,000-step spend candidate. It improves
+  over E100 and the E99 step-10000 control, but remains below E99 final,
+  E97, and E96. Boundary-edge coboundary feedback is better justified than
+  E100's collapsed cell-summary feedback, but target-MSA feedback does not
+  look like the route that will break the current `0.40` C-alpha lDDT band.
+- Copied E101 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e101_boundary_msa_feedback_from_e97_s10000_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e101_boundary_msa_feedback_from_e97.log`. The local artifact pull
+  excluded checkpoint directories.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  9500` to add the E101 row to `EXPERIMENT_RESULTS.md`, so inherited E97
+  history does not count as E101's best validation lDDT.
+- 30,000-step candidate assessment after E101: no current branch has earned
+  that spend. E96/E97 are the best available lineage, but E99/E100/E101 give
+  three near-10k controls that stay near `0.40`; reaching `0.7` by 30,000
+  would require a much stronger late-training lDDT slope than any current
+  continuation has shown.

@@ -109,7 +109,7 @@ route to 30,000 steps.
 
 ### E101: Boundary-Edge Coboundary MSA Feedback
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: if E100 does not improve primary lDDT, the failure may be that a
 collapsed face/tetra-to-residue summary is too blunt. The selected boundary
@@ -137,7 +137,7 @@ Validation:
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 
-Launch: E101 is running as
+Launch: E101 ran as
 `e101_boundary_msa_feedback_from_e97_s10000_c256_m64`, resuming the E97
 checkpoint from step 9500 to step 10000 with fixed E97 topology settings,
 `--simplex-boundary-msa-feedback-scale 0.05`, and the existing runtime
@@ -146,6 +146,37 @@ feedback ramp from `0.0` to `0.05` over steps 9500-10000. Remote log path is
 artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e101_boundary_msa_feedback_from_e97_s10000_c256_m64/`,
 and Python PID is `17228`.
+
+Result: reject as a 30,000-step spend candidate, but keep as a useful
+diagnostic. E101 returned at step 10000 with effective batch size `8`,
+`3,206,722` parameters, `stopped_early=False`, `val_lddt_ca=0.3998`,
+FoldScore `0.3867`, `val_ca_drmsd=9.9344`, and predicted/true C-alpha radius
+`11.7096 / 15.4034`. This improves over E100 and the E99 step-10000 control,
+but remains below E99 final (`0.4003`), E97 (`0.4036`), and E96 (`0.4043`).
+Selected face/tetra boundary lDDT stayed strong at `0.7555` / `0.7379`,
+which supports the view that boundary-edge incidence is a better
+topology-native carrier than E100's collapsed cell summary. The missing piece
+is not local selected-complex quality; it is how that cochain evidence changes
+the main pair/structure trunk. The next idea should route directed
+boundary-edge evidence into pair/edge bias or gating rather than another MSA
+feedback variant.
+
+### E102 Idea: Boundary-Edge Pair Feedback
+
+Status: idea only; not launched.
+
+Hypothesis: E101 preserved the selected boundary 1-skeleton longer than E100
+and recovered part of the lost primary lDDT, but target-MSA feedback still
+failed to beat the E96/E97 leaders. The selected complex may need to affect
+the pair tensor directly, because pair geometry is where AF2-style triangle
+updates and the structure module consume residue-residue constraints.
+
+Mechanism sketch: aggregate selected directed boundary-edge cochains into a
+pair-shaped residual or gate, normalized by boundary-edge reuse and incidence
+degree, then add it to `Z_ij` before downstream trunk/structure updates. This
+would keep the change inside the SimplexFold thesis: explicit face/tetra
+states communicate back through their boundary 1-skeleton into the edge
+representation, rather than adding a generic output lDDT or radius loss.
 
 ### E83: Fixed Sparse Cell Continuation
 

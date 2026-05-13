@@ -1,34 +1,28 @@
-## Current Plan: E101 Boundary-Edge Coboundary MSA Feedback
+## Current Plan: No 30k Spend Until a New Slope Appears
 
-E99 and E100 now form the key negative controls for the next move. E99
-continued the strongest E97 topology-construction branch past 10,000 steps
-and returned `val_lddt_ca=0.4003`, below E96's `0.4043` at step 9000 and
-E97's `0.4036` at step 9500. E100 then added the missing
-face/tetra-to-target-MSA route from the README's `M <-> Z <-> F <-> U`
-schematic and returned `val_lddt_ca=0.3936` at step 10000. The selected
-complex remains locally coherent, with E100 face/tetra boundary lDDT
-`0.7480` / `0.7317`, but the collapsed cell-to-residue MSA feedback lowered
-the primary target.
+E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
+The E97 branch nearly matched it while improving FoldScore and dRMSD, but
+the first evidence across the 10,000-step boundary is not encouraging: E99
+continued E97 to step 10500 and returned `0.4003`, E100 returned `0.3936`,
+and E101 returned `0.3998` at step 10000. These runs show that the current
+E96/E97 lineage is not obviously undertrained; it is locally plateaued in
+the `0.40` lDDT band.
 
-The next architecture change should keep the topology-to-trunk idea but
-preserve boundary-edge incidence longer. Instead of reducing selected
-face/tetra cochains directly to residue summaries, E101 should aggregate the
-selected boundary-edge readout as a 1-cochain into incident residues via a
-coboundary-style 1-to-0 map, then project that residue signal into the target
-MSA row under a small runtime ramp. This stays within the SimplexFold
-motivation: the trunk receives information from the explicit selected
-2-/3-cell complex through its boundary 1-skeleton, not from a generic
-coordinate or all-pairs lDDT loss.
+Do not spend a full 30,000-step confirmation on E96, E97, E99, E100, or E101
+as-is. To reach `0.7` from the current best near `0.404`, the model would
+need roughly `+0.296` validation C-alpha lDDT over the remaining 21,000
+steps after E96. That requires a much stronger late-training slope than the
+recent topology branches have shown, and E99/E101 already provide negative
+controls just beyond 10,000 steps.
 
-E101 is now implemented locally as `simplex_boundary_msa_feedback_scale`.
-The E101 gate should be short and controlled. Resume the E97 checkpoint from
-step 9500 to step 10000, keep E97/E100 topology settings fixed, and allocate
-only the boundary-edge coboundary MSA-feedback module, not the E100
-cell-summary feedback module. The exact E101 launch module set counts
-`3,206,722` parameters, leaving `55,252` under the AF2-medium +5% ceiling.
-Compare against E99 step 10000 (`val_lddt_ca=0.3972`), E100 (`0.3936`), and
-the E96/E97 local peak. Keep only if the boundary-edge route recovers primary
-C-alpha lDDT while retaining selected-boundary diagnostics.
+The next branch should stay topology-native but move the feedback target back
+toward the pair/edge trunk rather than the target MSA row. E100 showed that
+collapsed cell-to-residue MSA feedback is too blunt; E101 showed that
+preserving directed boundary-edge incidence helps relative to E100 but still
+does not beat the E96/E97 leaders. The next candidate should therefore use
+selected boundary-edge cochains as incidence-aware pair/edge bias or gating,
+so the explicit face/tetra complex changes how pair geometry is updated
+before structure readout instead of asking MSA feedback to carry that signal.
 
 ## Historical Plan Context
 
