@@ -4970,3 +4970,25 @@
   E106 on primary C-alpha lDDT (`0.395872812718153` versus
   `0.3929199054837227`) but remains below E96/E97 and worsens dRMSD. Launch
   E114 from the E113 checkpoint rather than spending 30k on E113 as-is.
+- E114 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` to commit `221df89`; verified no active benchmark
+  process; py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/model.py`, `minalphafold/model_config.py`,
+  `minalphafold/trainer.py`, and `scripts/run_nanofold_public_benchmarks.py`;
+  verified the E113 resume checkpoint; launch-style parameter audit counted
+  `3,154,242` parameters under the `3,261,974` cap with
+  `simplex_cell_score_segment_weight=0.25`.
+- E114 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e114_segment_supported_filtration_from_e113_s7500_c256_m64`, log
+  `/workspace/SimplexFold/logs/e114_segment_supported_filtration_from_e113.log`,
+  and PID file
+  `/workspace/SimplexFold/logs/e114_segment_supported_filtration_from_e113.pid`.
+  Startup showed PID `7698`, clean artifact creation, resume from E113 at step
+  7000/examples 56000, `1244` matching tensors loaded, and `0` new/missing
+  tensors initialized with a fresh optimizer. A first health poll confirmed
+  the metadata records `steps=7500`,
+  `simplex_cell_score_segment_weight=0.25`, directed boundary readout held at
+  `0.25`, `max_parameters=3261974`, and no result files yet.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E114, preserving the
+  owned-pod-only rule for pod `o1dy17ouv8w5mz`, the 30-minute interval, and the
+  no-automatic-follow-up-launch rule.

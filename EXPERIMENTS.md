@@ -72,7 +72,7 @@ stay out of the queue unless they supervise only the selected sparse complex.
 
 ### E114 Idea: Segment-Supported Sparse-Cell Filtration
 
-Status: implemented locally; queued to launch from the returned E113 checkpoint.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
 
 Hypothesis: E104-E113 show that the selected face/tetra complex can learn
 strong local boundary metrics without consistently improving global C-alpha
@@ -106,6 +106,19 @@ Validation so far:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py::test_cell_score_segment_weight_prefers_sequence_supported_cells tests/test_trainer.py::test_simplicial_cell_segment_score_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+
+Launch: E114 is running as
+`e114_segment_supported_filtration_from_e113_s7500_c256_m64` on owned Runpod
+pod `o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `221df89`,
+no active benchmark process was present, the E113 checkpoint was present,
+py_compile passed for the model, adapter, trainer, and runner modules, and the
+launch-style parameter audit counted `3,154,242` parameters under the
+`3,261,974` cap. Startup health confirmed PID `7698`, clean artifact path
+creation, step-7000 resume from E113, `1244` matching tensors loaded, `0`
+new/missing tensors initialized, and a fresh optimizer. E114 holds E113's
+directed boundary readout at `0.25` and adds
+`--simplex-cell-score-segment-weight 0.25`.
 
 ### E100: Bidirectional Simplex-MSA Feedback
 

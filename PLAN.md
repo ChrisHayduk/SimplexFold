@@ -161,6 +161,12 @@ which only fits if edge-frame messages are disabled. Launch E114 from the E113
 checkpoint as a short Runpod gate and compare primarily against E113/E106, with
 E96 remaining the global leader.
 
+E114 is now launched on the owned Runpod pod from the E113 step-7000
+checkpoint to step 7500 with `simplex_cell_score_segment_weight=0.25`. Remote
+startup confirmed clean resume from E113, `1244` matching tensors loaded,
+`0` new/missing tensors initialized, and launch-style parameter audit
+`3,154,242 <= 3,261,974`.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
