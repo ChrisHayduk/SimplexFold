@@ -155,6 +155,7 @@ class ModelConfig:
     simplex_boundary_message_degree_attenuation: float = 0.0
     simplex_boundary_incidence_normalization: float = 0.0
     simplex_boundary_readout_directionality: float = 0.0
+    simplex_global_context_scale: float = 0.0
     simplex_segment_cell_scale: float = 0.0
     simplex_segment_radius: int = 4
     simplex_c_segment: int = 12

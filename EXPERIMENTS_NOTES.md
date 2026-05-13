@@ -5038,3 +5038,22 @@
 - Retargeted heartbeat `check-simplexfold-e57-runpod` to E115, preserving the
   owned-pod-only rule for pod `o1dy17ouv8w5mz`, the 30-minute interval, and the
   no-automatic-follow-up-launch rule.
+- E115 health poll at `2026-05-13T22:41:18Z`: PID `8296` remained active on
+  the owned pod, `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv` were still absent, and history remained
+  at the inherited E113 step-7000 row (`val_lddt_ca=0.395872812718153`).
+- Implemented the queued E116 global selected-complex context candidate
+  locally while E115 runs. The new `simplex_global_context_scale` path pools
+  active face/tetra cochains into a protein-level selected-complex summary and
+  routes that summary back into active face/tetra states before boundary-edge
+  readout. This is a topology-native architecture change rather than an
+  output-side metric loss.
+- E116 local validation so far: `python -m py_compile minalphafold/simplex.py
+  minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py` and
+  `python -m pytest
+  tests/test_simplex.py::test_global_context_adapter_routes_selected_complex_summary_back_to_cells
+  tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget
+  tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  both passed. Launch-style parameter audit for the E113/E115 sparse recipe
+  plus global context counted `3,201,970` parameters under the `3,261,974`
+  cap.

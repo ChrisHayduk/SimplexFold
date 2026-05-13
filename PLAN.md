@@ -1,4 +1,4 @@
-## Current Plan: E115 E113 Continuation Control
+## Current Plan: E115 Control, Then E116 Global Selected-Complex Context
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -181,6 +181,25 @@ E115 is now launched on the owned Runpod pod. Remote startup confirmed clean
 resume from E113 at step 7000, `1244` matching tensors loaded, `0` new/missing
 tensors initialized, `simplex_cell_score_segment_weight` unset, and
 launch-style parameter audit `3,154,242 <= 3,261,974`.
+
+While E115 runs, prepare E116 as a stronger topology-native branch rather than
+another local filtration tweak. The motivation is the same failure pattern seen
+from E96 through E115: selected face/tetra boundary diagnostics can become
+strong while global C-alpha assembly remains near `0.40`. E116 therefore adds
+`simplex_global_context_scale`, a selected-complex global cochain: each
+SimplicialAdapter pools only active face and tetra states into a protein-level
+summary, then routes that summary back into the active face/tetra cells before
+their boundary-edge readout. This keeps the intervention inside the README's
+`Z_ij <-> F_ijk <-> U_ijkl` view; it is not an output-side lDDT, radius, or
+all-pairs distance loss.
+
+The E116 launch-style parameter audit for the E113/E115 sparse recipe plus
+global context is `3,201,970`, still under the AF2-medium +5% cap of
+`3,261,974`. If E115 remains near E113, launch E116 from the E115/E113
+checkpoint as the next short Runpod gate. If E115 also falls sharply, use E116
+as a recovery-branch test only if no stronger retained checkpoint is available,
+and do not interpret it as evidence for spending 30,000 steps unless it breaks
+out of the `0.40` band.
 
 ## Historical Plan Context
 

@@ -91,6 +91,7 @@ class SimplexConfig:
     simplex_boundary_message_degree_attenuation = 0.0
     simplex_boundary_incidence_normalization = 0.0
     simplex_boundary_readout_directionality = 0.0
+    simplex_global_context_scale = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
     simplex_c_segment = 8
@@ -628,6 +629,46 @@ def test_outer_edge_context_adapter_scale_changes_outputs_with_budgeted_paramete
 
     assert on_params > off_params
     assert on_params - off_params < 10_000
+    assert not torch.allclose(on_pair, off_pair)
+    assert not torch.allclose(on_single, off_single)
+
+
+def test_global_context_adapter_routes_selected_complex_summary_back_to_cells():
+    class GlobalContextConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class GlobalContextEnabledConfig(GlobalContextConfig):
+        simplex_global_context_scale = 0.25
+
+    torch.manual_seed(44)
+    off_adapter = SimplicialAdapter(GlobalContextConfig()).eval()
+    torch.manual_seed(44)
+    on_adapter = SimplicialAdapter(GlobalContextEnabledConfig()).eval()
+    with torch.no_grad():
+        on_adapter.global_to_face.linear_2.weight.fill_(0.02)
+        on_adapter.global_to_face.linear_2.bias.copy_(
+            torch.linspace(-0.03, 0.03, GlobalContextConfig.simplex_c_face)
+        )
+        on_adapter.global_to_tetra.linear_2.weight.fill_(0.02)
+        on_adapter.global_to_tetra.linear_2.bias.copy_(
+            torch.linspace(-0.02, 0.02, GlobalContextConfig.simplex_c_tetra)
+        )
+    pair = torch.randn(1, 5, 5, GlobalContextConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, GlobalContextConfig.c_s)
+
+    off_params = sum(p.numel() for p in off_adapter.parameters())
+    on_params = sum(p.numel() for p in on_adapter.parameters())
+    off_pair, off_single, _ = off_adapter(pair, single)
+    on_pair, on_single, _ = on_adapter(pair, single)
+
+    assert on_params > off_params
+    assert on_params - off_params < 5_000
     assert not torch.allclose(on_pair, off_pair)
     assert not torch.allclose(on_single, off_single)
 

@@ -463,6 +463,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "1.0",
             "--simplex-boundary-readout-directionality",
             "0.5",
+            "--simplex-global-context-scale",
+            "0.125",
             "--simplex-face-boundary-lddt-weight-final",
             "0.025",
             "--simplex-tetra-boundary-lddt-weight-final",
@@ -575,6 +577,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_boundary_message_degree_attenuation == 0.5
     assert args.simplex_boundary_incidence_normalization == 1.0
     assert args.simplex_boundary_readout_directionality == 0.5
+    assert args.simplex_global_context_scale == 0.125
     assert args.simplex_face_boundary_lddt_weight_final == 0.025
     assert args.simplex_tetra_boundary_lddt_weight_final == 0.025
     assert args.simplex_boundary_lddt_ramp_start_step == 3500
@@ -601,6 +604,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_boundary_message_degree_attenuation == 0.5
     assert cfg.simplex_boundary_incidence_normalization == 1.0
     assert cfg.simplex_boundary_readout_directionality == 0.5
+    assert cfg.simplex_global_context_scale == 0.125
     assert cfg.simplex_structure_pair_readout_scale == 0.125
     assert cfg.simplex_msa_feedback_scale == 0.25
     assert cfg.simplex_boundary_msa_feedback_scale == 0.125

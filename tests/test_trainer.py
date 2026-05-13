@@ -930,6 +930,33 @@ def test_simplicial_boundary_readout_directionality_adds_no_parameters():
     assert directed_params == simplex_params
 
 
+def test_simplicial_global_context_stays_inside_af2_medium_budget():
+    af2_medium = replace(load_model_config("medium"), use_simplicial_evoformer=False)
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    global_context_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_face_top_k=24,
+        simplex_tetra_top_k=48,
+        simplex_cell_score_degree_penalty=0.75,
+        simplex_cell_score_outer_edge_weight=0.25,
+        simplex_edge_frame_message_scale=0.025,
+        simplex_boundary_readout_directionality=0.25,
+        simplex_boundary_incidence_normalization=1.0,
+        simplex_boundary_cochain_recycling_scale=0.10,
+        simplex_global_context_scale=0.10,
+    )
+
+    af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    global_context_params = sum(parameter.numel() for parameter in AlphaFold2(global_context_medium).parameters())
+
+    assert af2_params == 3_106_642
+    assert simplex_params == 3_106_690
+    assert global_context_params == 3_201_970
+    assert global_context_params <= int(af2_params * 1.05)
+
+
 def test_simplicial_cell_dropout_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     dropout_medium = replace(

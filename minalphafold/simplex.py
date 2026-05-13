@@ -1217,6 +1217,17 @@ def cell_outer_edge_context(
     return edge_context.sum(dim=(-3, -2)) / count[..., None]
 
 
+def masked_cell_mean(state: torch.Tensor, mask: torch.Tensor, channels: int) -> torch.Tensor:
+    """Pool selected cell cochains into one protein-level cochain per batch item."""
+
+    if state.numel() == 0:
+        return state.new_zeros((state.shape[0], int(channels)))
+    weights = mask.to(state.dtype)[..., None]
+    total = (state * weights).sum(dim=(1, 2))
+    count = weights.sum(dim=(1, 2)).clamp_min(1.0)
+    return total / count
+
+
 FACE_EDGE_FRAME_DIM = 10
 TETRA_EDGE_FRAME_DIM = 18
 SEGMENT_GEOMETRY_DIM = 4
@@ -1557,6 +1568,7 @@ class SimplicialAdapter(torch.nn.Module):
             max(float(getattr(config, "simplex_boundary_readout_directionality", 0.0)), 0.0),
             1.0,
         )
+        self.global_context_scale = float(getattr(config, "simplex_global_context_scale", 0.0))
         self.segment_cell_scale = float(getattr(config, "simplex_segment_cell_scale", 0.0))
         self.segment_radius = int(getattr(config, "simplex_segment_radius", 4))
 
@@ -1624,6 +1636,21 @@ class SimplicialAdapter(torch.nn.Module):
                     self.c_tetra + TETRA_EDGE_FRAME_DIM,
                     self.hidden_dim,
                     self.c_z,
+                )
+        if self.global_context_scale > 0.0:
+            global_dim = self.c_face + self.c_tetra
+            self.global_to_face = SimplexMLP(
+                self.c_face + global_dim,
+                self.hidden_dim,
+                self.c_face,
+                final_init="final",
+            )
+            if self.use_tetra:
+                self.global_to_tetra = SimplexMLP(
+                    self.c_tetra + global_dim,
+                    self.hidden_dim,
+                    self.c_tetra,
+                    final_init="final",
                 )
         if self.segment_cell_scale > 0.0:
             self.segment_init = SimplexMLP(
@@ -2015,6 +2042,14 @@ class SimplicialAdapter(torch.nn.Module):
             face_state = face_state + self.dropout(face_delta_scattered / face_counts.clamp_min(1.0))
             face_state = face_state * topology.face_mask[..., None]
 
+        if self.global_context_scale > 0.0:
+            face_state, tetra_state = self._apply_global_context(
+                face_state,
+                topology.face_mask,
+                tetra_state,
+                topology.tetra_mask,
+            )
+
         face_edge_update = self.face_to_edge(face_state).reshape(*face_state.shape[:-1], 3, self.c_z)
         if edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0:
             face_opposite_indices = torch.stack([k, j, i], dim=-1)
@@ -2306,6 +2341,40 @@ class SimplicialAdapter(torch.nn.Module):
         if boundary_pair_feedback is not None:
             aux["simplex_boundary_pair_feedback"] = boundary_pair_feedback
         return pair, single, aux
+
+    def _apply_global_context(
+        self,
+        face_state: torch.Tensor,
+        face_mask: torch.Tensor,
+        tetra_state: torch.Tensor,
+        tetra_mask: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Route a protein-level selected-complex summary back into active cells."""
+
+        face_mean = masked_cell_mean(face_state, face_mask, self.c_face)
+        tetra_mean = masked_cell_mean(tetra_state, tetra_mask, self.c_tetra)
+        global_context = torch.cat([face_mean, tetra_mean], dim=-1)
+        face_context = global_context[:, None, None, :].expand(*face_state.shape[:-1], -1)
+        face_msg = self.global_to_face(torch.cat([face_state, face_context], dim=-1))
+        face_state = face_state + self.dropout(
+            self.global_context_scale
+            * torch.sigmoid(self.face_gate(face_state))
+            * face_msg
+            * face_mask[..., None]
+        )
+        face_state = face_state * face_mask[..., None]
+
+        if tetra_state.numel() > 0 and self.use_tetra:
+            tetra_context = global_context[:, None, None, :].expand(*tetra_state.shape[:-1], -1)
+            tetra_msg = self.global_to_tetra(torch.cat([tetra_state, tetra_context], dim=-1))
+            tetra_state = tetra_state + self.dropout(
+                self.global_context_scale
+                * torch.sigmoid(self.tetra_gate(tetra_state))
+                * tetra_msg
+                * tetra_mask[..., None]
+            )
+            tetra_state = tetra_state * tetra_mask[..., None]
+        return face_state, tetra_state
 
     def _segment_pass(
         self,

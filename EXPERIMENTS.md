@@ -162,6 +162,54 @@ creation, step-7000 resume from E113, `1244` matching tensors loaded, `0`
 new/missing tensors initialized, a fresh optimizer, and no
 `simplex_cell_score_segment_weight` override.
 
+### E116 Idea: Global Selected-Complex Context
+
+Status: implemented locally; queued behind the E115 control result.
+
+Hypothesis: E96-E115 repeatedly show good local selected-complex geometry but
+weak global C-alpha assembly. Selected face/tetra boundary lDDT can exceed
+`0.7` while primary chain lDDT stays around `0.40`, which suggests the missing
+piece is not another local boundary metric or output-side coordinate loss. The
+explicit complex needs a way to share protein-level context while still
+returning information through the selected cells and their boundary edges.
+
+Mechanism: add `simplex_global_context_scale`. Inside each SimplicialAdapter,
+pool only active face and tetra cochain states into one protein-level selected
+complex summary per example. Concatenate that summary back onto each active
+face/tetra state and pass it through small zero-final MLPs before the
+face/tetra-to-boundary-edge readout. This creates a rank-mixing global cochain
+path:
+
+```text
+selected F_ijk and U_ijkl -> global selected-complex cochain
+                           -> active F_ijk / U_ijkl
+                           -> selected boundary edges Z_ij
+```
+
+It is still a simplicial architecture change because the global summary is
+constructed from explicit selected higher-rank cells and can influence the
+main trunk only by returning through those cells. It is not a generic C-alpha
+lDDT, radius, or all-pairs distance loss.
+
+Gate: after E115 returns, resume the best compatible E113/E115 checkpoint for
+a short Runpod gate with the E113/E115 selected sparse complex fixed:
+`--simplex-face-top-k 24`, `--simplex-tetra-top-k 48`,
+`--simplex-cell-score-degree-penalty 0.75`,
+`--simplex-cell-score-outer-edge-weight 0.25`, edge-frame message allocation,
+directed boundary readout at `0.25`, boundary incidence normalization `1.0`,
+and `--simplex-global-context-scale 0.10`. Compare primarily against E115,
+E113, E106, and the global E96 leader. Treat it as a real 30k candidate only
+if it leaves the `0.40` lDDT band and improves the local-to-global translation
+diagnostics.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_global_context_adapter_routes_selected_complex_summary_back_to_cells tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+
+Parameter audit: the E113/E115 launch-style module set plus global context
+counts `3,201,970` parameters, under the AF2-medium +5% cap of `3,261,974`.
+
 ### E100: Bidirectional Simplex-MSA Feedback
 
 Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
