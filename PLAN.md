@@ -1,4 +1,4 @@
-## Current Plan: E105a Metric Recycling, Then E106 Cochain Recycling
+## Current Plan: E106 Cochain Recycling, Then E108 Continuation
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -78,27 +78,35 @@ It improves the retained E72/E73/E74/E76 recovery band but remains below the
 E96 primary leader, so it is a recovery handoff rather than a 30k candidate by
 itself.
 
-The active branch is E106: selected-boundary cochain
-recycling. E104 showed that local face/tetra boundary metrics can be strong
-without improving global C-alpha lDDT, and E105/E105a tests recycling only the
-distance-distribution view of that selected 1-skeleton. E106 recycles the
-learned selected-boundary pair cochain itself: the existing simplex
-face/tetra-to-boundary readout is detached, masked to valid residue pairs, and
-added to `z_prev` between AF2 recycle cycles. This keeps the intervention in
-the README's simplex view because persistent rank-2/rank-3 cells influence the
-next pair-trunk pass through their boundary 1-cochain. It adds no parameters
-and no new loss. Use the E105a checkpoint for a short 500-step gate and ramp
-the runtime cochain recycling scale from `0.0` to a small value such as `0.10`.
-E106 is running on the owned Runpod pod `o1dy17ouv8w5mz` from the verified
-E105a checkpoint to step 6500.
+E106 tested selected-boundary cochain recycling. E104 showed that local
+face/tetra boundary metrics can be strong without improving global C-alpha
+lDDT, and E105/E105a tested recycling only the distance-distribution view of
+that selected 1-skeleton. E106 recycles the learned selected-boundary pair
+cochain itself: the existing simplex face/tetra-to-boundary readout is
+detached, masked to valid residue pairs, and added to `z_prev` between AF2
+recycle cycles. This keeps the intervention in the README's simplex view
+because persistent rank-2/rank-3 cells influence the next pair-trunk pass
+through their boundary 1-cochain. It adds no parameters and no new loss.
 
-If E106 fails to improve primary C-alpha lDDT, the prepared fallback is E107:
-metric-gated selected-boundary cochain recycling. It keeps the E106
-inter-cycle cochain memory path but gates the recycled boundary cochain by the
-simplex face/tetra distance-head confidence before adding it to `z_prev`.
-This tests whether E106 is hurt by recycling uncertain selected-cell cochains;
-it is still an inter-cycle topological cochain-memory change, adds no
-parameters, and adds no output loss.
+E106 returned at step 6500 with `val_lddt_ca=0.3929`, FoldScore `0.3777`,
+`val_ca_drmsd=10.3279`, and predicted/true C-alpha radius
+`11.2713 / 15.4034`. This improves E105a's `0.3894` C-alpha lDDT and also
+improves FoldScore, dRMSD, and expansion, so the cochain-memory route is not
+an immediate reject. It remains below E96's `0.4043`, so it is still a
+recovery-branch signal rather than a 30k candidate by itself.
+
+The next branch is E108: continue E106 from the verified step-6500 checkpoint
+to step 7000 with the same selected-complex recipe and selected-boundary
+cochain recycling held at `0.10`. This is a clean slope test: if cochain
+memory continues climbing, keep the route alive; if it stalls or regresses,
+fall back to E107's metric-gated cochain recycling.
+
+The prepared fallback remains E107: metric-gated selected-boundary cochain
+recycling. It keeps the E106 inter-cycle cochain memory path but gates the
+recycled boundary cochain by the simplex face/tetra distance-head confidence
+before adding it to `z_prev`. This tests whether recycling uncertain selected
+cell cochains is the problem; it is still an inter-cycle topological
+cochain-memory change, adds no parameters, and adds no output loss.
 
 ## Historical Plan Context
 

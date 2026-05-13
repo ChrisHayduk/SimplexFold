@@ -398,7 +398,7 @@ Validation so far:
 
 ### E106 Idea: Selected-Boundary Cochain Recycling
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned; keep as recovery-branch evidence and continue once as E108.
 
 Hypothesis: E104 showed that selected face/tetra boundary lDDT can exceed
 `0.7` locally while full-chain C-alpha lDDT remains near `0.4`. E105a asks
@@ -426,13 +426,21 @@ and `--simplex-boundary-cochain-recycling-runtime-scale-ramp-steps 500`.
 Reject unless primary `val_lddt_ca` improves, not just FoldScore or selected
 boundary diagnostics.
 
-Launch: E106 is running as
+Launch: E106 ran as
 `e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64`. The remote
 checkout was fast-forwarded to commit `54a6635`, remote py_compile and CLI
 flag checks passed, the E105a checkpoint was present, and the E106 launch-style
 parameter audit counted `3,154,242` parameters under the `3,261,974` cap. Main
-Python PID is `2175`; log path is
+Python PID was `2175`; log path was
 `/workspace/SimplexFold/logs/e106_boundary_cochain_recycling_from_e105a.log`.
+
+Result: keep as recovery-branch evidence, but not as a primary 30k candidate.
+E106 returned at step 6500 with `val_lddt_ca=0.3929`, FoldScore `0.3777`,
+`val_ca_drmsd=10.3279`, and predicted/true C-alpha radius
+`11.2713 / 15.4034`. It improves E105a's `0.3894` C-alpha lDDT and also
+improves FoldScore, dRMSD, and expansion. It remains below E96's `0.4043`, so
+continue one clean cochain-memory gate from the E106 checkpoint before
+deciding whether to use the E107 metric-gated fallback.
 
 Validation so far:
 
@@ -441,10 +449,33 @@ Validation so far:
   `simplex_boundary_cochain_recycling_scale=0.10`: `3,154,242` parameters,
   below the AF2-medium +5% cap of `3,261,974`.
 
+### E108 Idea: Continue Selected-Boundary Cochain Recycling
+
+Status: queued for launch from the verified E106 step-6500 checkpoint.
+
+Hypothesis: E106 improved E105a on primary C-alpha lDDT, FoldScore, dRMSD,
+and C-alpha expansion, so the selected-boundary cochain memory may be useful.
+Before introducing E107's confidence gate, test whether the same cochain
+memory keeps climbing when held fixed for one more 500-step gate.
+
+Mechanism: no new code and no new loss. Resume E106 from the step-6500
+checkpoint, keep the same selected face/tetra complex, keep metric recycling
+disabled, and hold `simplex_boundary_cochain_recycling_scale=0.10` instead of
+ramping it. The only active intervention remains inter-cycle recycling of the
+learned selected-boundary 1-cochain into `z_prev`.
+
+Gate: run to step 7000 under run name
+`e108_boundary_cochain_recycling_continue_from_e106_s7000_c256_m64`.
+Keep it only if primary `val_lddt_ca` improves over E106's `0.3929`; treat a
+small but coherent improvement with better dRMSD/Rg as evidence to continue the
+cochain-memory route, but require a much stronger slope before any 30k spend.
+If E108 stalls or regresses, launch E107 from the best verified cochain-memory
+checkpoint.
+
 ### E107 Idea: Metric-Gated Boundary Cochain Recycling
 
-Status: implemented locally and queued only if E106 returns below E105a on
-primary C-alpha lDDT. Do not launch while E106 is in flight.
+Status: implemented locally and queued if the E106/E108 cochain-memory route
+stalls or regresses.
 
 Hypothesis: E106 recycles the learned selected-boundary pair cochain directly
 into the next AF2 cycle. If that helps, continue the cochain-memory route. If

@@ -4505,3 +4505,22 @@
   at `46%` with `13491 MiB` allocated, so the earlier `0%` sample looks like
   a transient idle point rather than enough evidence of a stall. Continue
   monitoring E106 as an active in-flight gate.
+- E106 returned on owned pod `o1dy17ouv8w5mz` at `2026-05-13T13:49:59Z`.
+  Remote coherence passed across `results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, and `run_metadata.json`: one result row,
+  one CSV row, 14 history rows ending at step 6500, `parameters=3154242`
+  under the `3261974` cap, and `stopped_early=False`. Metrics:
+  `val_lddt_ca=0.3929199054837227`, FoldScore `0.377660034224391`,
+  `val_ca_drmsd=10.327910900115967`, and C-alpha Rg
+  `11.27131199836731 / 15.403406739234924`.
+- Pulled E106 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64/`
+  and verified local coherence against the same step, parameter count, lDDT,
+  FoldScore, dRMSD, and Rg values. The remote checkpoint
+  `checkpoints/full_msa_to_face_latest.pt` exists for continuation.
+- E106 decision: keep as recovery-branch evidence, not as a primary 30k spend.
+  It improves E105a on primary C-alpha lDDT (`0.3894216101616621` to
+  `0.3929199054837227`), FoldScore, dRMSD, and expansion, but remains below
+  E96's `0.4043184444308281`. Queue E108 as a clean continuation from the E106
+  checkpoint with cochain recycling held at `0.10`; reserve E107's metric gate
+  for a stall or regression in the cochain-memory route.
