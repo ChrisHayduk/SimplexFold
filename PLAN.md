@@ -134,6 +134,12 @@ only as a controlled pair bias for IPA. Launch it from the better verified
 E106 checkpoint, not the weaker E110 checkpoint, and keep it only if primary
 C-alpha lDDT improves over E106 and E110.
 
+E111 is now launched on the owned Runpod pod from the verified E106 checkpoint.
+Remote startup confirmed the step-6500 resume, `1244` matching tensors loaded,
+`0` new/missing tensors initialized, and a launch-style parameter count of
+`3,154,242` under the `3,261,974` cap. Treat it as an in-flight first gate
+until returned artifacts pass remote and local coherence checks.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

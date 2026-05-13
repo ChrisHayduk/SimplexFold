@@ -602,7 +602,7 @@ primary `val_lddt_ca` improves over E106's `0.3929`; if it only beats
 E107/E108/E109, record it as evidence that residual cochain memory is harmful
 but do not continue this family without a stronger architectural change.
 
-Launch: E110 is running as
+Launch: E110 ran as
 `e110_cochain_recycling_release_from_e106_s7000_c256_m64`. The remote checkout
 was fast-forwarded to `9359d30`, no active benchmark process was present, the
 E106 checkpoint was present, remote py_compile passed, and the E110
@@ -622,8 +622,7 @@ cochain-memory schedule family and use the better E106 checkpoint for E111.
 
 ### E111 Idea: Pair-Only Boundary-Cochain Structure Bias
 
-Status: implemented locally and queued for launch from the verified E106
-checkpoint.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
 
 Hypothesis: E33/E34/E51/E67/E68 showed that broad simplex structure readout
 can perturb the residue and pair streams enough to hurt primary C-alpha lDDT.
@@ -657,6 +656,16 @@ Validation:
 - E111 launch-style parameter audit with the E110 selected-complex recipe and
   `simplex_structure_pair_readout_scale=0.05`: `3,154,242` parameters, under
   the `3,261,974` AF2-medium +5% cap.
+
+Launch: E111 is running as
+`e111_pair_only_structure_cochain_from_e106_s7000_c256_m64` on owned Runpod pod
+`o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `a17b4c3`,
+py_compile passed for the model, adapter, trainer, and runner modules, the
+E106 checkpoint was present, and the launch-style parameter audit again counted
+`3,154,242` parameters under the `3,261,974` cap. Startup health confirmed PID
+`5411`, clean artifact path creation, step-6500 resume from E106, `1244`
+matching tensors loaded, `0` new/missing tensors initialized, and a fresh
+optimizer.
 
 ### E83: Fixed Sparse Cell Continuation
 

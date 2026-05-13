@@ -4796,3 +4796,33 @@
   E107/E108/E109 on primary C-alpha lDDT. The cochain-memory schedule family
   is not the next 30k candidate; launch E111 from the better verified E106
   checkpoint rather than from E110.
+- E111 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` to commit `a17b4c3`; py_compile passed for
+  `minalphafold/simplex.py`, `minalphafold/model.py`,
+  `minalphafold/model_config.py`, `minalphafold/trainer.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; verified the E106 resume
+  checkpoint at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64/checkpoints/full_msa_to_face_latest.pt`.
+- E111 launch-style parameter audit counted `3,154,242` parameters under the
+  `3,261,974` cap with the selected-complex module set and
+  `simplex_structure_pair_readout_scale=0.05`.
+- E111 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e111_pair_only_structure_cochain_from_e106_s7000_c256_m64`, log
+  `/workspace/SimplexFold/logs/e111_pair_only_structure_cochain_from_e106.log`,
+  and PID file
+  `/workspace/SimplexFold/logs/e111_pair_only_structure_cochain_from_e106.pid`.
+  The run resumes the verified E106 checkpoint at step 6500 with cochain
+  recycling released to `0.0`, `simplex_structure_pair_readout_scale=0.05`,
+  crop 256, MSA depth 64, four cycles, and effective batch size 8.
+- E111 startup health poll at `2026-05-13T18:20:11Z`: PID `5411` was active,
+  the log showed clean artifact creation, train/val counts `10000/1000`,
+  resume from E106 at step 6500/examples 52000, `1244` matching tensors loaded,
+  and `0` new/missing tensors initialized with a fresh optimizer.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E111, preserving the
+  owned-pod-only rule for pod `o1dy17ouv8w5mz`, the 30-minute interval, and the
+  no-automatic-follow-up-launch rule.
+- E111 follow-up health poll at `2026-05-13T18:22:09Z`: PID `5411` remained
+  active after about 2.2 minutes with process state `Rl`, GPU memory
+  `11719 MiB` allocated, `results.json` and `results.csv` absent, and history
+  still at the inherited E106 step-6500 row. Continue treating E111 as in
+  flight.
