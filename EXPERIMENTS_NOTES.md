@@ -4925,3 +4925,18 @@
   still at the inherited E106 step-6500 row, and no failure trace visible in
   the startup log. Continue waiting for the step-7000 write point without
   changing the remote checkout.
+- E113 follow-up health poll at `2026-05-13T21:00:15Z`: PID `6887` remained
+  active after about 42.1 minutes with process state `Sl`, GPU memory
+  `13689 MiB` allocated, `results.json` and `results.csv` absent, history
+  still at the inherited E106 step-6500 row, and no failure trace visible.
+  Continue waiting.
+- While E113 runs, audited the next latent segment-cell branch against the
+  AF2-medium +5% cap (`3,261,974`). With the current selected sparse-complex
+  settings, latent contiguous segment cochains fit only if the learned
+  edge-frame message modules are disabled: `c_segment=12`,
+  `simplex_segment_cell_scale=0.05`, and edge-frame disabled gives
+  `3,234,450` parameters, but even `c_segment=1` with edge-frame enabled gives
+  `3,274,830`, which exceeds the cap. If E113 fails, the segment-cell route is
+  still topology-native, but it must be framed as a trade of local
+  edge-frame scalarization for persistent contiguous 1-/2-dimensional
+  segment cochains rather than as a stacked add-on.
