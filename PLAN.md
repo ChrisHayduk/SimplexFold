@@ -1,4 +1,4 @@
-## Current Plan: E111 Pair-Only Boundary-Cochain Structure Bias
+## Current Plan: E112 Half-Scale Pair-Only Boundary-Cochain Bias
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -125,20 +125,23 @@ E106, E107, E108, and E109 on primary C-alpha lDDT. The failure is therefore
 not just residual cochain memory at validation; the current cochain-recycling
 family is not a 30k candidate.
 
-The active fallback is E111: an RMS-normalized pair-only structure-module
-readout from the selected boundary 1-cochain. This is the topology-native
-alternative after the E106-E110 cochain-memory family. Unlike the broad
-structure-readout runs, E111 should not inject simplex 0-cochain residue
-updates directly; it should let the explicit face/tetra boundary cochain act
-only as a controlled pair bias for IPA. Launch it from the better verified
-E106 checkpoint, not the weaker E110 checkpoint, and keep it only if primary
-C-alpha lDDT improves over E106 and E110.
+E111 tested an RMS-normalized pair-only structure-module readout from the
+selected boundary 1-cochain. It returned `val_lddt_ca=0.3920`, FoldScore
+`0.3759`, `val_ca_drmsd=10.4197`, and predicted/true C-alpha radius
+`11.3424 / 15.4034`. Reject E111 as a primary branch: it recovered most of
+E110's release-to-zero drop, but it remained below E106's `0.3929` on primary
+C-alpha lDDT and also softened FoldScore and dRMSD. The local selected-boundary
+diagnostics stayed strong, so the failure is not loss of the explicit complex;
+the structure-module pair bias is likely too strong or still aimed too late in
+the trunk.
 
-E111 is now launched on the owned Runpod pod from the verified E106 checkpoint.
-Remote startup confirmed the step-6500 resume, `1244` matching tensors loaded,
-`0` new/missing tensors initialized, and a launch-style parameter count of
-`3,154,242` under the `3,261,974` cap. Treat it as an in-flight first gate
-until returned artifacts pass remote and local coherence checks.
+The active fallback is E112: rerun the same topology-native pair-only
+structure bias from the verified E106 checkpoint at half scale
+(`simplex_structure_pair_readout_scale=0.025`). This is a narrow calibration
+gate, not a 30k candidate yet. Keep it only if primary C-alpha lDDT beats E106
+and begins to recover toward the E96/E97 band; otherwise leave the structure
+bias route and return to selected-cell construction or earlier pair-trunk
+cochain routing.
 
 ## Historical Plan Context
 

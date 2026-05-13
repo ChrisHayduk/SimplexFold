@@ -4832,3 +4832,23 @@
   still at the inherited E106 step-6500 row, and the log still showing only
   clean startup/resume lines. Continue waiting for the step-7000 write point
   without changing the remote checkout.
+- E111 returned on owned pod `o1dy17ouv8w5mz`. Remote coherence passed across
+  `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, and `run_metadata.json`: one result
+  row, one CSV row, 15 history rows ending at step 7000, 16 eval-detail rows,
+  `completed_steps=7000`, `parameters=3154242` under the `3261974` cap,
+  `effective_batch_size=8`, and `stopped_early=False`. Metrics:
+  `val_lddt_ca=0.39201722107827663`, FoldScore `0.37592183239758015`,
+  `val_ca_drmsd=10.419719159603119`, and C-alpha Rg
+  `11.342422276735306 / 15.403406739234924`.
+- Pulled E111 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e111_pair_only_structure_cochain_from_e106_s7000_c256_m64/`
+  and verified local coherence against the same step, parameter count,
+  effective batch size, stopped-early flag, lDDT, FoldScore, dRMSD, Rg, and
+  eval-detail row count values.
+- E111 decision: reject. The pair-only selected-boundary cochain structure bias
+  recovered most of E110's release-to-zero drop but stayed below E106
+  (`0.39201722107827663` versus `0.3929199054837227`) and softened FoldScore
+  and dRMSD. Queue E112 as the only remaining structure-bias calibration:
+  rerun from the verified E106 checkpoint with
+  `simplex_structure_pair_readout_scale=0.025`.

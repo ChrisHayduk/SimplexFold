@@ -622,7 +622,7 @@ cochain-memory schedule family and use the better E106 checkpoint for E111.
 
 ### E111 Idea: Pair-Only Boundary-Cochain Structure Bias
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
+Status: returned and rejected; queue only a half-scale calibration gate.
 
 Hypothesis: E33/E34/E51/E67/E68 showed that broad simplex structure readout
 can perturb the residue and pair streams enough to hurt primary C-alpha lDDT.
@@ -666,6 +666,30 @@ E106 checkpoint was present, and the launch-style parameter audit again counted
 `5411`, clean artifact path creation, step-6500 resume from E106, `1244`
 matching tensors loaded, `0` new/missing tensors initialized, and a fresh
 optimizer.
+
+Result: reject. E111 returned at step 7000 with `val_lddt_ca=0.3920`,
+FoldScore `0.3759`, `val_ca_drmsd=10.4197`, and C-alpha Rg
+`11.3424 / 15.4034`. Remote and local coherence passed: one result row, one
+CSV row, 15 history rows ending at step 7000, 16 eval-detail rows,
+`parameters=3,154,242` under the `3,261,974` cap, `effective_batch_size=8`,
+and `stopped_early=False`. It recovered most of E110's release-to-zero drop
+but stayed below E106 on the primary target and softened FoldScore/dRMSD, so
+do not spend 30k on this scale.
+
+### E112 Idea: Half-Scale Pair-Only Boundary-Cochain Structure Bias
+
+Status: queued after E111 rejection.
+
+Hypothesis: E111's selected-boundary pair readout stayed topologically
+well-formed but slightly over-coupled the structure module. A half-scale
+readout keeps the README-native route, where face/tetra boundary 1-cochains
+act as a controlled IPA pair bias, while reducing late-stage perturbation of
+the pair representation.
+
+Gate: launch the same 500-step E106-to-7000 gate as E111, but set
+`--simplex-structure-pair-readout-scale 0.025`. Keep only if primary
+`val_lddt_ca` beats E106's `0.3929`; treat it as a possible 30k candidate only
+if it also moves toward the E96/E97 leader band.
 
 ### E83: Fixed Sparse Cell Continuation
 
