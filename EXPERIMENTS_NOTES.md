@@ -4940,3 +4940,15 @@
   still topology-native, but it must be framed as a trade of local
   edge-frame scalarization for persistent contiguous 1-/2-dimensional
   segment cochains rather than as a stacked add-on.
+- Prepared E114 locally as a zero-parameter alternative to learned latent
+  segment cells: `simplex_cell_score_segment_weight` rewards candidate
+  selected face/tetra cells whose boundary edges are supported by contiguous
+  sequence-segment cochains before the existing face/tetra top-k mask. This
+  preserves the successful edge-frame/directed-incidence modules while still
+  changing the active simplicial complex. Initial validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_cell_score_segment_weight_prefers_sequence_supported_cells tests/test_trainer.py::test_simplicial_cell_segment_score_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  reported `3 passed`.
+- Broader local validation for E114 also passed:
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `188 passed`.

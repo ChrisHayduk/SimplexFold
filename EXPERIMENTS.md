@@ -70,6 +70,43 @@ stay out of the queue unless they supervise only the selected sparse complex.
 
 ## Paper-Informed Backlog
 
+### E114 Idea: Segment-Supported Sparse-Cell Filtration
+
+Status: implemented locally; do not launch until E113 returns.
+
+Hypothesis: E104-E113 show that the selected face/tetra complex can learn
+strong local boundary metrics without consistently improving global C-alpha
+lDDT. The local-to-global bridge may need a cleaner filtration before message
+passing rather than another downstream readout. Contiguous sequence segments
+are natural 1-dimensional protein subcomplexes: turns, helices, strands, and
+short backbone neighborhoods all impose local geometric constraints that
+should shape which higher-rank cells are kept.
+
+Mechanism: add zero-parameter `simplex_cell_score_segment_weight`. During
+face/tetra top-k selection, each candidate cell receives a small score bonus
+when its boundary edges are supported by local sequence segments under
+`simplex_segment_radius`. This changes the active sparse complex, so the
+persistent face/tetra cochains are biased toward cells whose boundaries are
+compatible with contiguous backbone subcomplexes. It is not a generic C-alpha
+lDDT or radius loss. It also avoids the parameter-budget problem found for
+the learned latent segment-cell module: with current sparse-complex settings,
+learned segment cells plus edge-frame messages exceed the AF2-medium +5% cap,
+while this selector adds no parameters and can keep edge-frame/directed
+boundary readout available.
+
+Gate if E113 fails: resume the strongest retained E106/E113-compatible
+checkpoint for a 500-step Runpod gate, keep the selected sparse complex
+(`--simplex-face-top-k 24`, `--simplex-tetra-top-k 48`,
+`--simplex-cell-score-degree-penalty 0.75`), keep half-scale edge-frame
+messages, set `--simplex-cell-score-segment-weight 0.125` or `0.25`, and
+compare against E106/E113 on primary `val_lddt_ca` plus selected-boundary
+lDDT, boundary length error, contraction fraction, and boundary-edge reuse.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_cell_score_segment_weight_prefers_sequence_supported_cells tests/test_trainer.py::test_simplicial_cell_segment_score_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+
 ### E100: Bidirectional Simplex-MSA Feedback
 
 Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.

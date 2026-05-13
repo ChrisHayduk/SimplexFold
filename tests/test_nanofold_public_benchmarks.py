@@ -493,6 +493,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.75",
             "--simplex-cell-score-outer-edge-weight",
             "0.25",
+            "--simplex-cell-score-segment-weight",
+            "0.125",
             "--simplex-cell-score-outer-edge-weight-final",
             "0.5",
             "--simplex-cell-score-outer-edge-weight-ramp-start-step",
@@ -588,6 +590,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_tetra_top_k_ramp_steps == 500
     assert args.simplex_cell_score_degree_penalty == 0.75
     assert args.simplex_cell_score_outer_edge_weight == 0.25
+    assert args.simplex_cell_score_segment_weight == 0.125
     assert args.simplex_cell_score_outer_edge_weight_final == 0.5
     assert args.simplex_cell_score_outer_edge_weight_ramp_start_step == 3500
     assert args.simplex_cell_score_outer_edge_weight_ramp_steps == 500
@@ -611,6 +614,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_tetra_top_k == 48
     assert cfg.simplex_cell_score_degree_penalty == 0.75
     assert cfg.simplex_cell_score_outer_edge_weight == 0.25
+    assert cfg.simplex_cell_score_segment_weight == 0.125
 
 
 def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():

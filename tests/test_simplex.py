@@ -8,6 +8,7 @@ from minalphafold.simplex import (
     apply_boundary_metric_gate,
     _boundary_degree_weights,
     _cell_outer_edge_support,
+    _cell_segment_support,
     boundary_incidence_weights,
     boundary_metric_confidence,
     build_simplex_topology,
@@ -73,6 +74,7 @@ class SimplexConfig:
     simplex_volume_scale = 1000.0
     simplex_dropout = 0.0
     simplex_cell_dropout = 0.0
+    simplex_cell_score_segment_weight = 0.0
     simplex_single_transition_n = 2
     simplex_structure_readout_scale = 0.0
     simplex_structure_pair_readout_scale = 0.0
@@ -291,6 +293,54 @@ def test_cell_score_outer_edge_weight_prefers_context_supported_cells():
     )
     assert base_face == (0, 1, 2)
     assert supported_face == (0, 1, 3)
+
+
+def test_cell_score_segment_weight_prefers_sequence_supported_cells():
+    score = torch.zeros((1, 6, 6), dtype=torch.float32)
+    for a, b, value in (
+        (0, 1, 10.0),
+        (0, 2, 9.0),
+        (0, 5, 8.0),
+        (1, 2, 3.0),
+        (1, 5, 9.0),
+        (2, 5, 0.5),
+    ):
+        score[:, a, b] = value
+        score[:, b, a] = value
+
+    base_topology = build_simplex_topology(
+        score,
+        neighbor_k=3,
+        local_radius=-1,
+        local_bias=0.0,
+        long_min_sep=-1,
+        geometry_distance_weight=0.0,
+        face_top_k=1,
+    )
+    segment_topology = build_simplex_topology(
+        score,
+        neighbor_k=3,
+        local_radius=-1,
+        local_bias=0.0,
+        long_min_sep=-1,
+        geometry_distance_weight=0.0,
+        face_top_k=1,
+        cell_score_segment_weight=10.0,
+        segment_radius=2,
+    )
+
+    support = _cell_segment_support(
+        base_topology.face_indices,
+        torch.ones_like(base_topology.face_mask),
+        radius=2,
+    )
+    assert support[0, 0, 0] > support[0, 0, 1]
+    base_face = tuple(base_topology.face_indices[0, 0][base_topology.face_mask[0, 0] > 0][0].tolist())
+    segment_face = tuple(
+        segment_topology.face_indices[0, 0][segment_topology.face_mask[0, 0] > 0][0].tolist()
+    )
+    assert base_face == (0, 1, 5)
+    assert segment_face == (0, 1, 2)
 
 
 def test_simplicial_adapter_runtime_cell_topk_override_caps_active_cells():

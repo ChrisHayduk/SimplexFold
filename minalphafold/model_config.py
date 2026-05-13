@@ -164,3 +164,4 @@ class ModelConfig:
     simplex_tetra_top_k: int = 0
     simplex_cell_score_degree_penalty: float = 0.0
     simplex_cell_score_outer_edge_weight: float = 0.0
+    simplex_cell_score_segment_weight: float = 0.0

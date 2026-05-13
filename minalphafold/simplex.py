@@ -116,6 +116,28 @@ def _cell_outer_edge_support(
     return torch.log1p(support) / denom
 
 
+def _cell_segment_support(
+    cell_indices: torch.Tensor,
+    cell_mask: torch.Tensor,
+    *,
+    radius: int,
+) -> torch.Tensor:
+    """Score cells by how much their boundary lives inside local sequence segments."""
+
+    if cell_indices.numel() == 0 or cell_mask.numel() == 0:
+        return cell_mask.new_zeros(cell_mask.shape)
+    segment_radius = max(int(radius), 1)
+    separations = torch.abs(cell_indices[..., :, None] - cell_indices[..., None, :]).to(cell_mask.dtype)
+    cell_rank = int(cell_indices.shape[-1])
+    boundary_mask = torch.triu(
+        torch.ones((cell_rank, cell_rank), device=cell_indices.device, dtype=cell_mask.dtype),
+        diagonal=1,
+    )
+    segment_support = torch.exp(-separations / float(segment_radius)) * boundary_mask
+    denom = boundary_mask.sum().clamp_min(1.0)
+    return segment_support.sum(dim=(-2, -1)) / denom * cell_mask.to(cell_mask.dtype)
+
+
 def rbf(values: torch.Tensor, *, n_bins: int, max_value: float) -> torch.Tensor:
     """Radial basis encoding on the last implicit scalar dimension."""
 
@@ -419,6 +441,8 @@ def build_simplex_topology(
     tetra_top_k: int = 0,
     cell_score_degree_penalty: float = 0.0,
     cell_score_outer_edge_weight: float = 0.0,
+    cell_score_segment_weight: float = 0.0,
+    segment_radius: int = 4,
 ) -> SimplexTopology:
     """Select top-k neighbors and expand them into anchored faces/tetrahedra.
 
@@ -531,6 +555,12 @@ def build_simplex_topology(
                 face_mask,
                 nbr_idx,
             )
+        if cell_score_segment_weight != 0.0 and face_top_k > 0:
+            face_cell_score = face_cell_score + float(cell_score_segment_weight) * _cell_segment_support(
+                face_indices,
+                face_mask,
+                radius=segment_radius,
+            )
         face_mask = _topk_cell_mask(face_mask, face_cell_score, face_top_k)
 
     if tetra_combos.numel() == 0:
@@ -564,6 +594,12 @@ def build_simplex_topology(
                 tetra_indices,
                 tetra_mask,
                 nbr_idx,
+            )
+        if cell_score_segment_weight != 0.0 and tetra_top_k > 0:
+            tetra_cell_score = tetra_cell_score + float(cell_score_segment_weight) * _cell_segment_support(
+                tetra_indices,
+                tetra_mask,
+                radius=segment_radius,
             )
         tetra_mask = _topk_cell_mask(tetra_mask, tetra_cell_score, tetra_top_k)
 
@@ -1485,6 +1521,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.tetra_top_k = int(getattr(config, "simplex_tetra_top_k", 0))
         self.cell_score_degree_penalty = float(getattr(config, "simplex_cell_score_degree_penalty", 0.0))
         self.cell_score_outer_edge_weight = float(getattr(config, "simplex_cell_score_outer_edge_weight", 0.0))
+        self.cell_score_segment_weight = float(getattr(config, "simplex_cell_score_segment_weight", 0.0))
         self.rbf_bins = int(getattr(config, "simplex_rbf_bins", 8))
         self.sequence_max = float(getattr(config, "simplex_sequence_max", 64.0))
         self.distance_max = float(getattr(config, "simplex_distance_max", 32.0))
@@ -1816,6 +1853,8 @@ class SimplicialAdapter(torch.nn.Module):
                 tetra_top_k=tetra_top_k,
                 cell_score_degree_penalty=self.cell_score_degree_penalty,
                 cell_score_outer_edge_weight=cell_score_outer_edge_weight,
+                cell_score_segment_weight=self.cell_score_segment_weight,
+                segment_radius=self.segment_radius,
             )
         topology = self._apply_cell_dropout(topology)
 

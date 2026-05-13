@@ -155,6 +155,18 @@ initialized, and a launch-style parameter count of `3,154,242` under the
 `3,261,974` cap. Treat it as in flight until returned artifacts pass remote
 and local coherence checks.
 
+If E113 does not beat E106, the next code-prepared branch is E114:
+segment-supported sparse-cell filtration. The branch stays in the README's
+simplicial/topological view by changing which selected face/tetra cells exist,
+not by adding an output-side metric loss. It adds a zero-parameter
+`simplex_cell_score_segment_weight` term to the face/tetra top-k scorer,
+rewarding candidate cells whose boundary edges are supported by contiguous
+sequence-segment cochains under `simplex_segment_radius`. This keeps the
+successful edge-frame and directed-incidence modules inside the AF2-medium +5%
+budget, unlike the parameterized latent segment-cell module, which only fits
+if edge-frame messages are disabled. Use E114 as a short Runpod gate from the
+best retained checkpoint only after E113 returns.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

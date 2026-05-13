@@ -994,6 +994,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_tetra_top_k", args.simplex_tetra_top_k),
         ("simplex_cell_score_degree_penalty", args.simplex_cell_score_degree_penalty),
         ("simplex_cell_score_outer_edge_weight", args.simplex_cell_score_outer_edge_weight),
+        ("simplex_cell_score_segment_weight", args.simplex_cell_score_segment_weight),
     ):
         if value is not None:
             overrides[field] = value
@@ -1806,6 +1807,9 @@ def _train_variant(
         "simplex_cell_score_outer_edge_weight": (
             float(getattr(model_config, "simplex_cell_score_outer_edge_weight", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_cell_score_segment_weight": (
+            float(getattr(model_config, "simplex_cell_score_segment_weight", 0.0)) if use_simplicial else 0.0
+        ),
         "simplex_boundary_closure_weight": (
             float(getattr(model_config, "simplex_boundary_closure_weight", 0.0)) if use_simplicial else 0.0
         ),
@@ -2006,6 +2010,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_tetra_top_k_ramp_steps",
         "simplex_cell_score_degree_penalty",
         "simplex_cell_score_outer_edge_weight",
+        "simplex_cell_score_segment_weight",
         "simplex_cell_score_outer_edge_weight_final",
         "simplex_cell_score_outer_edge_weight_ramp_start_step",
         "simplex_cell_score_outer_edge_weight_ramp_steps",
@@ -2642,6 +2647,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Reward candidate face/tetra cells with selected outer-edge support before top-k masking.",
     )
+    parser.add_argument(
+        "--simplex-cell-score-segment-weight",
+        type=float,
+        default=None,
+        help="Reward candidate face/tetra cells whose boundary edges are supported by local sequence segments.",
+    )
     parser.add_argument("--simplex-cell-score-outer-edge-weight-final", type=float, default=None)
     parser.add_argument("--simplex-cell-score-outer-edge-weight-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-cell-score-outer-edge-weight-ramp-steps", type=int, default=1)
@@ -3137,6 +3148,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_tetra_top_k_ramp_steps": args.simplex_tetra_top_k_ramp_steps,
         "simplex_cell_score_degree_penalty": args.simplex_cell_score_degree_penalty,
         "simplex_cell_score_outer_edge_weight": args.simplex_cell_score_outer_edge_weight,
+        "simplex_cell_score_segment_weight": args.simplex_cell_score_segment_weight,
         "simplex_cell_score_outer_edge_weight_final": args.simplex_cell_score_outer_edge_weight_final,
         "simplex_cell_score_outer_edge_weight_ramp_start_step": (
             args.simplex_cell_score_outer_edge_weight_ramp_start_step
