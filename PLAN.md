@@ -1,4 +1,4 @@
-## Current Plan: E112 Half-Scale Pair-Only Boundary-Cochain Bias
+## Current Plan: E113 Directed Boundary-Readout Rewarm
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -135,19 +135,19 @@ diagnostics stayed strong, so the failure is not loss of the explicit complex;
 the structure-module pair bias is likely too strong or still aimed too late in
 the trunk.
 
-The active fallback is E112: rerun the same topology-native pair-only
-structure bias from the verified E106 checkpoint at half scale
-(`simplex_structure_pair_readout_scale=0.025`). This is a narrow calibration
-gate, not a 30k candidate yet. Keep it only if primary C-alpha lDDT beats E106
-and begins to recover toward the E96/E97 band; otherwise leave the structure
-bias route and return to selected-cell construction or earlier pair-trunk
-cochain routing.
+E112 tested the same pair-only structure bias at half scale. It returned
+`val_lddt_ca=0.3873`, FoldScore `0.3793`, `val_ca_drmsd=10.3890`, and
+predicted/true C-alpha radius `11.5702 / 15.4034`. Reject E112: lowering the
+structure-module pair bias worsened primary C-alpha lDDT below both E106 and
+E111. The structure-bias route is therefore not the next 30k candidate.
 
-E112 is now launched on the owned Runpod pod. Remote startup confirmed the
-step-6500 E106 resume, `1244` matching tensors loaded, `0` new/missing tensors
-initialized, and a launch-style parameter count of `3,154,242` under the
-`3,261,974` cap. Treat it as in flight until returned artifacts pass remote
-and local coherence checks.
+The active fallback is E113: reintroduce directed boundary readout from the
+verified E106 checkpoint and anneal it from `0.5` to `0.25` over the
+6500-7000 gate. This returns to the topology-native E96 lesson: source/target
+incidence in selected face/tetra boundary cochains can be useful as a
+pair-trunk communication curriculum, but holding a strong directed signal
+overdrives local C-alpha agreement. Keep E113 only if it beats E106 and starts
+recovering toward the E96/E97 band.
 
 ## Historical Plan Context
 

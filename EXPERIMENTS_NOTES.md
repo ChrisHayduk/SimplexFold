@@ -4878,3 +4878,22 @@
   still at the inherited E106 step-6500 row, and the log still showing clean
   startup/resume lines only. Continue waiting for the step-7000 write point
   without changing the remote checkout.
+- E112 returned on owned pod `o1dy17ouv8w5mz`. Remote coherence passed across
+  `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, and `run_metadata.json`: one result
+  row, one CSV row, 15 history rows ending at step 7000, 16 eval-detail rows,
+  `completed_steps=7000`, `parameters=3154242` under the `3261974` cap,
+  `effective_batch_size=8`, and `stopped_early=False`. Metrics:
+  `val_lddt_ca=0.38734209537506104`, FoldScore `0.3793369084596634`,
+  `val_ca_drmsd=10.389029681682587`, and C-alpha Rg
+  `11.570150882005692 / 15.403406739234924`.
+- Pulled E112 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e112_half_pair_only_structure_cochain_from_e106_s7000_c256_m64/`
+  and verified local coherence against the same step, parameter count,
+  effective batch size, stopped-early flag, lDDT, FoldScore, dRMSD, Rg, and
+  eval-detail row count values.
+- E112 decision: reject. The half-scale pair-only selected-boundary cochain
+  structure bias fell below E106 and E111 on primary C-alpha lDDT, despite a
+  small FoldScore recovery over E111. Leave the structure-bias route and queue
+  E113: directed boundary-readout annealing from the verified E106 checkpoint,
+  with cochain recycling released to `0.0` and no structure pair bias.

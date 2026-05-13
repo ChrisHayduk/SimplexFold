@@ -678,7 +678,7 @@ do not spend 30k on this scale.
 
 ### E112 Idea: Half-Scale Pair-Only Boundary-Cochain Structure Bias
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
+Status: returned and rejected; leave the structure-bias route.
 
 Hypothesis: E111's selected-boundary pair readout stayed topologically
 well-formed but slightly over-coupled the structure module. A half-scale
@@ -700,6 +700,34 @@ and the launch-style parameter audit counted `3,154,242` parameters under the
 `3,261,974` cap. Startup health confirmed PID `6212`, clean artifact path
 creation, step-6500 resume from E106, `1244` matching tensors loaded, `0`
 new/missing tensors initialized, and a fresh optimizer.
+
+Result: reject. E112 returned at step 7000 with `val_lddt_ca=0.3873`,
+FoldScore `0.3793`, `val_ca_drmsd=10.3890`, and C-alpha Rg
+`11.5702 / 15.4034`. Remote and local coherence passed: one result row, one
+CSV row, 15 history rows ending at step 7000, 16 eval-detail rows,
+`parameters=3,154,242` under the `3,261,974` cap, `effective_batch_size=8`,
+and `stopped_early=False`. The half-scale structure bias fell below E106 and
+E111 on primary C-alpha lDDT, so leave this structure-bias route.
+
+### E113 Idea: Directed Boundary-Readout Rewarm From E106
+
+Status: queued after E112 rejection.
+
+Hypothesis: E96 remains the best primary-lDDT result because it treated
+directed source/target boundary readout as an annealed cochain-routing
+curriculum, not as a permanent strong signal. E113 tests whether that lesson
+transfers to the retained E106 checkpoint after the cochain-memory and
+structure-bias routes failed.
+
+Mechanism: resume E106 from step 6500 to 7000 with the selected-complex recipe,
+cochain recycling released to `0.0`, no pair-only structure bias, and
+`simplex_boundary_readout_directionality` annealed from `0.5` to `0.25`.
+This changes how selected face/tetra boundary 1-cochains write source/target
+incidence into pair features, adds no parameters, and adds no output-side loss.
+
+Gate: keep only if primary `val_lddt_ca` beats E106's `0.3929`; treat it as a
+possible 30k candidate only if it also moves back toward the E96/E97 leader
+band.
 
 ### E83: Fixed Sparse Cell Continuation
 
