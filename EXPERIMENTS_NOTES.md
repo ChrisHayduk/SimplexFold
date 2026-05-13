@@ -4316,3 +4316,8 @@
   resume the E97 step-9500 checkpoint to step 10000 with E97 topology settings
   fixed and only ramp soft selected-boundary metric recycling from `0.0` to
   `0.10` over steps 9500-10000.
+- E104 delayed live poll at `2026-05-13T10:57:25Z`: Python PID `19749` was
+  still active after about 43 minutes, `results.json` was absent, and
+  `history_full_msa_to_face.json` still had 20 rows ending at E97 step 9500
+  (`val_lddt_ca=0.4035918414592743`). No returned artifact exists yet, so
+  `EXPERIMENT_RESULTS.md` remains unchanged.
