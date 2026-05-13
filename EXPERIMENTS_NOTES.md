@@ -4826,3 +4826,9 @@
   `11719 MiB` allocated, `results.json` and `results.csv` absent, and history
   still at the inherited E106 step-6500 row. Continue treating E111 as in
   flight.
+- E111 mid-run health poll at `2026-05-13T18:45:11Z`: PID `5411` remained
+  active after about 25.1 minutes with process state `Sl`, GPU memory
+  `13511 MiB` allocated, `results.json` and `results.csv` absent, history
+  still at the inherited E106 step-6500 row, and the log still showing only
+  clean startup/resume lines. Continue waiting for the step-7000 write point
+  without changing the remote checkout.
