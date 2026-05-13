@@ -4312,3 +4312,7 @@
   `history_full_msa_to_face.json`, and the history still ended at E97 step
   9500 (`val_lddt_ca=0.4035918414592743`). Keep E104 out of
   `EXPERIMENT_RESULTS.md` until it returns and passes coherence checks.
+- E105 launch recipe is now explicit in `EXPERIMENTS.md`: if E104 rejects,
+  resume the E97 step-9500 checkpoint to step 10000 with E97 topology settings
+  fixed and only ramp soft selected-boundary metric recycling from `0.0` to
+  `0.10` over steps 9500-10000.

@@ -323,9 +323,9 @@ still ending at the inherited E97 step-9500 row.
 
 ### E105 Idea: Selected-Boundary Metric Recycling
 
-Status: implemented and committed as `55d7392`; runtime-ramp plumbing is being
-prepared while E104 remains in flight. Do not launch while E104 is still
-running unless we explicitly decide to run parallel confirmation pods.
+Status: implemented, ramped, and refined through `927bf01`; E104 remains in
+flight. Do not launch while E104 is still running unless we explicitly decide
+to run parallel confirmation pods.
 
 Hypothesis: E99-E104 test ways for selected boundary cochains to write into
 the current pair trunk, but the recycling loop still only carries the final
@@ -351,10 +351,24 @@ anneal of the recycling cochain memory, for example
 10000, E101, E103, E104, E97, and E96. Reject unless it improves primary
 C-alpha lDDT, not just FoldScore/dRMSD.
 
+Queued launch recipe: use run name
+`e105_boundary_metric_recycling_from_e97_s10000_c256_m64`, resume the E97
+checkpoint at step 9500 with `--resume-model-weights-only`, keep the E97
+selected-complex recipe fixed (`face/tetra top-k 24/48`, degree penalty
+`0.75`, outer-edge score `0.25`, edge-frame runtime scale `0.0125`,
+geometry-distance weight `0.025`), keep E100/E101/E102/E103/E104 feedback and
+gating routes disabled, and add only the recycling-memory schedule:
+`--simplex-boundary-metric-recycling-runtime-scale 0.0`,
+`--simplex-boundary-metric-recycling-runtime-scale-final 0.10`,
+`--simplex-boundary-metric-recycling-runtime-scale-ramp-start-step 9500`, and
+`--simplex-boundary-metric-recycling-runtime-scale-ramp-steps 500`.
+
 Validation so far:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/model.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
 - Focused E105 tests for sparse recycling-bin scatter, no-new-parameter budget behavior, cycle-specific forward behavior, and CLI/config override plumbing: `4 passed`
+- Runtime-ramp plumbing tests: `5 passed`
+- Soft metric-recycling projection tests: `3 passed`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `178 passed`
 - E105 launch-style module set with E97 topology settings and
   `simplex_boundary_metric_recycling_scale=0.1`: `3,154,242` parameters,
