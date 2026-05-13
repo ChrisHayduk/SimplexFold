@@ -4684,3 +4684,30 @@
   improves FoldScore over E106, but primary C-alpha lDDT remains below E106
   (`0.39087833277881145` versus `0.3929199054837227`). Queue E110 as the
   limiting release-to-zero ablation from the better verified E106 checkpoint.
+- E110 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` to commit `9359d30`, verified that no active
+  benchmark process was present, verified the E106 checkpoint at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  ran remote py_compile for model/adapter/trainer/runner files, and audited
+  the E110 launch-style module set at `3,154,242` parameters under the
+  `3,261,974` AF2-medium +5% cap.
+- E110 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e110_cochain_recycling_release_from_e106_s7000_c256_m64`, PID `4513`,
+  log `/workspace/SimplexFold/logs/e110_cochain_recycling_release_from_e106.log`,
+  and artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e110_cochain_recycling_release_from_e106_s7000_c256_m64/`.
+  It resumes the E106 checkpoint at step 6500/examples 52000 with
+  `--resume-model-weights-only`, keeps the E106 selected-complex recipe fixed,
+  disables metric gating, and anneals selected-boundary cochain recycling from
+  `0.10` to `0.0` over steps 6500-7000. Startup showed `1244` matching
+  tensors loaded and `0` new/missing tensors initialized.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E110, preserving
+  owned-pod-only scope and the rule that the heartbeat must not launch
+  follow-up experiments automatically.
+- E110 startup health poll at `2026-05-13T17:17:23Z`: PID `4513` was active,
+  `results.json` was absent, and the inherited history had 14 rows ending at
+  E106 step 6500 (`val_lddt_ca=0.3929199054837227`, FoldScore
+  `0.377660034224391`, `val_ca_drmsd=10.327910900115967`, C-alpha Rg
+  `11.27131199836731 / 15.403406739234924`). Continue to treat E110 as an
+  active in-flight gate; do not add it to `EXPERIMENT_RESULTS.md` until final
+  artifacts return and pass coherence checks.

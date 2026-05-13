@@ -581,7 +581,7 @@ FoldScore over E106, but primary C-alpha lDDT remains below E106's `0.3929`.
 
 ### E110 Idea: Release Selected-Boundary Cochain Recycling To Zero
 
-Status: queued for launch from the verified E106 step-6500 checkpoint.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
 
 Hypothesis: E106's improvement may come from the ramped cochain signal acting
 as a transient scaffold for the pair trunk, while any residual cochain memory
@@ -601,6 +601,14 @@ Gate: run to step 7000 under run name
 primary `val_lddt_ca` improves over E106's `0.3929`; if it only beats
 E107/E108/E109, record it as evidence that residual cochain memory is harmful
 but do not continue this family without a stronger architectural change.
+
+Launch: E110 is running as
+`e110_cochain_recycling_release_from_e106_s7000_c256_m64`. The remote checkout
+was fast-forwarded to `9359d30`, no active benchmark process was present, the
+E106 checkpoint was present, remote py_compile passed, and the E110
+launch-style parameter audit counted `3,154,242` parameters under the
+`3,261,974` cap. It resumed the E106 checkpoint at step 6500/examples 52000
+with `1244` matching tensors loaded and `0` new/missing tensors initialized.
 
 ### E83: Fixed Sparse Cell Continuation
 

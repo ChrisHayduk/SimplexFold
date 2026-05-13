@@ -124,6 +124,9 @@ cochain should act only as a transient topological scaffold: resume E106 and
 anneal selected-boundary cochain recycling from `0.10` to `0.0` over steps
 6500-7000. This still uses the simplex boundary 1-cochain as inter-cycle
 memory during the transition, adds no parameters, and adds no output loss.
+E110 is now launched on the owned Runpod pod; keep monitoring it as an
+in-flight gate and do not add it to the final results table until returned
+artifacts pass remote and local coherence checks.
 
 ## Historical Plan Context
 
