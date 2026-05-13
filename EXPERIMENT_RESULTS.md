@@ -1,9 +1,9 @@
 # SimplexFold Experiment Results
 
-Last updated: 2026-05-12.
+Last updated: 2026-05-13.
 
-Best validation C-alpha lDDT so far: **E87**, `val_lddt_ca=0.3992` at step
-8500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E96**, `val_lddt_ca=0.4043` at step
+9000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
