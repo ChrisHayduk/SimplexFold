@@ -177,6 +177,11 @@ E115 stays near E113 while E114 remains low, segment support is the culprit; if
 E115 also falls, the E113 recovery branch itself is not stable enough for
 another local-filtration tweak.
 
+E115 is now launched on the owned Runpod pod. Remote startup confirmed clean
+resume from E113 at step 7000, `1244` matching tensors loaded, `0` new/missing
+tensors initialized, `simplex_cell_score_segment_weight` unset, and
+launch-style parameter audit `3,154,242 <= 3,261,974`.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

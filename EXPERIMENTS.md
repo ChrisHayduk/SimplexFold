@@ -134,7 +134,7 @@ scale.
 
 ### E115 Idea: No-Segment E113 Continuation Control
 
-Status: queued to launch from the returned E113 checkpoint.
+Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
 
 Hypothesis: E114's primary-lDDT collapse could be caused by the new
 segment-supported cell scorer, or it could be an ordinary continuation
@@ -150,6 +150,17 @@ Gate: compare against E113 and E114. If E115 stays near E113 while E114 stays
 low, reject segment-supported filtration and consider only a much weaker or
 scheduled variant. If E115 also falls below E106, stop spending short gates on
 the E113 recovery lineage.
+
+Launch: E115 is running as
+`e115_no_segment_control_from_e113_s7500_c256_m64` on owned Runpod pod
+`o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `2ccb433`, no
+active benchmark process was present, the E113 checkpoint was present,
+py_compile passed for the model, adapter, trainer, and runner modules, and the
+launch-style parameter audit counted `3,154,242` parameters under the
+`3,261,974` cap. Startup health confirmed PID `8296`, clean artifact path
+creation, step-7000 resume from E113, `1244` matching tensors loaded, `0`
+new/missing tensors initialized, a fresh optimizer, and no
+`simplex_cell_score_segment_weight` override.
 
 ### E100: Bidirectional Simplex-MSA Feedback
 

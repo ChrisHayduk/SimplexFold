@@ -5017,3 +5017,24 @@
   lDDT fell sharply below E113 and E106. Launch E115 as a no-segment
   continuation control from the same E113 checkpoint before trying a weaker
   segment-support scale.
+- E115 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` to commit `2ccb433`; verified no active benchmark
+  process; py_compile passed for `minalphafold/simplex.py`,
+  `minalphafold/model.py`, `minalphafold/model_config.py`,
+  `minalphafold/trainer.py`, and `scripts/run_nanofold_public_benchmarks.py`;
+  verified the E113 resume checkpoint; launch-style parameter audit counted
+  `3,154,242` parameters under the `3,261,974` cap with segment-supported
+  scoring disabled.
+- E115 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e115_no_segment_control_from_e113_s7500_c256_m64`, log
+  `/workspace/SimplexFold/logs/e115_no_segment_control_from_e113.log`, and PID
+  file `/workspace/SimplexFold/logs/e115_no_segment_control_from_e113.pid`.
+  Startup showed PID `8296`, clean artifact creation, resume from E113 at step
+  7000/examples 56000, `1244` matching tensors loaded, and `0` new/missing
+  tensors initialized with a fresh optimizer. A first health poll confirmed
+  metadata records `steps=7500`, `max_parameters=3261974`, directed boundary
+  readout held at `0.25`, `simplex_cell_score_segment_weight=None`, and no
+  result files yet.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E115, preserving the
+  owned-pod-only rule for pod `o1dy17ouv8w5mz`, the 30-minute interval, and the
+  no-automatic-follow-up-launch rule.
