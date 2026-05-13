@@ -4662,3 +4662,25 @@
   allocated, `results.json` and `results.csv` were still absent, and history
   still had 14 rows ending at E106 step 6500. Continue to treat E109 as an
   active in-flight gate; heartbeat monitoring is retargeted to this run.
+- E109 health poll at `2026-05-13T16:57:35Z`: PID `3943` remained active after
+  about 51.3 minutes, GPU utilization sampled at `27%` with `13491 MiB`
+  allocated, `results.json` and `results.csv` were still absent, and history
+  still had 14 rows ending at E106 step 6500. Continue to treat E109 as in
+  flight.
+- E109 returned on owned pod `o1dy17ouv8w5mz` at `2026-05-13T17:08:05Z`.
+  Remote coherence passed across `results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, and `run_metadata.json`: one result row,
+  one CSV row, 15 history rows ending at step 7000, `parameters=3154242`
+  under the `3261974` cap, and `stopped_early=False`. Metrics:
+  `val_lddt_ca=0.39087833277881145`, FoldScore `0.3797789867967367`,
+  `val_ca_drmsd=10.329187154769897`, and C-alpha Rg
+  `11.550284147262573 / 15.403406739234924`.
+- Pulled E109 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e109_cochain_recycling_anneal_down_from_e106_s7000_c256_m64/`
+  and verified local coherence against the same step, parameter count, lDDT,
+  FoldScore, dRMSD, and Rg values.
+- E109 decision: partial recovery but reject as a continuation candidate.
+  Annealing cochain memory from `0.10` to `0.025` improves over E107/E108 and
+  improves FoldScore over E106, but primary C-alpha lDDT remains below E106
+  (`0.39087833277881145` versus `0.3929199054837227`). Queue E110 as the
+  limiting release-to-zero ablation from the better verified E106 checkpoint.

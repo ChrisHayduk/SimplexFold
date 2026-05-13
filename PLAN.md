@@ -1,4 +1,4 @@
-## Current Plan: E109 Cochain-Memory Anneal-Down
+## Current Plan: E110 Cochain-Memory Full Release
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -110,15 +110,20 @@ verified E106 checkpoint. It returned `val_lddt_ca=0.3868`, FoldScore
 below both E106 and E108, so the failure is not simply that uncertain selected
 cell cochains were recycled too strongly.
 
-The active fallback is E109: cochain-memory anneal-down from the verified E106
-checkpoint. E106 improved while ramping cochain recycling from `0.0` to
-`0.10`, but E108 and E107 both regressed when the memory remained strongly
-active to step 7000. E109 tests whether the cochain signal is useful as a
-transient topological scaffold but harmful as a persistent constraint: resume
-E106 and anneal selected-boundary cochain recycling from `0.10` down to `0.025`
-over steps 6500-7000. This still uses the simplex boundary 1-cochain as
-inter-cycle memory, adds no parameters, and adds no output loss. E109 is
-running on the owned Runpod pod `o1dy17ouv8w5mz`.
+E109 tested cochain-memory anneal-down from the verified E106 checkpoint. It
+returned `val_lddt_ca=0.3909`, FoldScore `0.3798`, `val_ca_drmsd=10.3292`,
+and predicted/true C-alpha radius `11.5503 / 15.4034`. This partially
+recovered the E107/E108 regression and improved FoldScore over E106, but it
+still did not beat E106 on primary C-alpha lDDT.
+
+The active fallback is E110: full cochain-memory release from the verified
+E106 checkpoint. E106 improved while ramping cochain recycling from `0.0` to
+`0.10`, but every continuation with residual cochain memory through step 7000
+has regressed on primary C-alpha lDDT. E110 tests whether the selected-boundary
+cochain should act only as a transient topological scaffold: resume E106 and
+anneal selected-boundary cochain recycling from `0.10` to `0.0` over steps
+6500-7000. This still uses the simplex boundary 1-cochain as inter-cycle
+memory during the transition, adds no parameters, and adds no output loss.
 
 ## Historical Plan Context
 

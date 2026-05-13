@@ -541,7 +541,7 @@ Validation so far:
 
 ### E109 Idea: Anneal Down Selected-Boundary Cochain Recycling
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned; partial recovery but below E106, so launch E110 full release.
 
 Hypothesis: E106 improved E105a while the selected-boundary cochain memory was
 ramped from `0.0` to `0.10`, but E108 and E107 both regressed by step 7000
@@ -563,15 +563,44 @@ primary `val_lddt_ca` improves over E106's `0.3929`; if it lands between E108
 and E106, record it as evidence that annealing helps but still does not justify
 a longer spend.
 
-Launch: E109 is running as
+Launch: E109 ran as
 `e109_cochain_recycling_anneal_down_from_e106_s7000_c256_m64`. The remote
 checkout was fast-forwarded to commit `b064c68`, no active benchmark process
 was present, the E106 checkpoint was present, remote py_compile passed, and the
 E109 launch-style parameter audit counted `3,154,242` parameters under the
 `3,261,974` cap. It resumed the E106 checkpoint at step 6500/examples 52000
 with `1244` matching model tensors and `0` new/missing tensors. Main Python
-PID is `3943`; log path is
+PID was `3943`; log path was
 `/workspace/SimplexFold/logs/e109_cochain_recycling_anneal_down_from_e106.log`.
+
+Result: reject as a continuation candidate, but keep the diagnostic. E109
+returned at step 7000 with `val_lddt_ca=0.3909`, FoldScore `0.3798`,
+`val_ca_drmsd=10.3292`, and predicted/true C-alpha radius
+`11.5503 / 15.4034`. Annealing down to `0.025` beats E107/E108 and improves
+FoldScore over E106, but primary C-alpha lDDT remains below E106's `0.3929`.
+
+### E110 Idea: Release Selected-Boundary Cochain Recycling To Zero
+
+Status: queued for launch from the verified E106 step-6500 checkpoint.
+
+Hypothesis: E106's improvement may come from the ramped cochain signal acting
+as a transient scaffold for the pair trunk, while any residual cochain memory
+at the next validation point pulls refinement away from the global C-alpha
+objective. E109 suggests weaker residual memory is better than held/gated
+memory, but not enough. E110 tests the limiting case: use the topological
+cochain during the transition, then fully release it by validation.
+
+Mechanism: no new code, no new parameters, and no new loss. Resume the
+verified E106 checkpoint, keep the selected-complex recipe fixed, disable
+metric confidence gating, and use the runtime cochain-memory schedule to
+anneal `simplex_boundary_cochain_recycling_scale` from `0.10` to `0.0` over
+steps 6500-7000.
+
+Gate: run to step 7000 under run name
+`e110_cochain_recycling_release_from_e106_s7000_c256_m64`. Keep it only if
+primary `val_lddt_ca` improves over E106's `0.3929`; if it only beats
+E107/E108/E109, record it as evidence that residual cochain memory is harmful
+but do not continue this family without a stronger architectural change.
 
 ### E83: Fixed Sparse Cell Continuation
 
