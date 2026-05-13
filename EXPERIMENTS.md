@@ -323,9 +323,9 @@ still ending at the inherited E97 step-9500 row.
 
 ### E105 Idea: Selected-Boundary Metric Recycling
 
-Status: implemented locally and queued behind E104; do not launch while E104
-is still in flight unless we explicitly decide to run parallel confirmation
-pods.
+Status: implemented and committed as `55d7392`; runtime-ramp plumbing is being
+prepared while E104 remains in flight. Do not launch while E104 is still
+running unless we explicitly decide to run parallel confirmation pods.
 
 Hypothesis: E99-E104 test ways for selected boundary cochains to write into
 the current pair trunk, but the recycling loop still only carries the final
@@ -343,10 +343,13 @@ through the existing `recycle_linear_d` projection before adding it to
 inter-cycle cochain memory, not the loss or final coordinate readout.
 
 Gate: if E104 returns as a reject, resume the E97/E104 lineage to the next
-500-step validation point with E97 topology settings fixed and set
-`--simplex-boundary-metric-recycling-scale` to a small value first, likely
-`0.05` or `0.10`. Compare against E99 step 10000, E101, E103, E104, E97, and
-E96. Reject unless it improves primary C-alpha lDDT, not just FoldScore/dRMSD.
+500-step validation point with E97 topology settings fixed. Prefer a runtime
+anneal of the recycling cochain memory, for example
+`--simplex-boundary-metric-recycling-runtime-scale 0.0` to
+`--simplex-boundary-metric-recycling-runtime-scale-final 0.10` over steps
+9500-10000, rather than an abrupt static turn-on. Compare against E99 step
+10000, E101, E103, E104, E97, and E96. Reject unless it improves primary
+C-alpha lDDT, not just FoldScore/dRMSD.
 
 Validation so far:
 

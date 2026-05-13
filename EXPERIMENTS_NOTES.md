@@ -4289,3 +4289,14 @@
   parameter audit with E97 topology settings and
   `simplex_boundary_metric_recycling_scale=0.1` counted `3,154,242`
   parameters, under the AF2-medium +5% ceiling.
+- E104 live poll at `2026-05-13T10:36Z`: Python PID `19749` was still active
+  after about 22 minutes on the owned pod, GPU memory remained allocated at
+  `14365 MiB`, and `results.json` was absent. The history still ended at the
+  inherited E97 step-9500 row, so E104 remains in flight and stays out of
+  `EXPERIMENT_RESULTS.md`.
+- E105 follow-up plumbing: add a runtime schedule for
+  `simplex_boundary_metric_recycling_scale` before launching it. This keeps
+  the same topology-native inter-cycle cochain-memory mechanism but lets a
+  resumed E97-family checkpoint ramp selected boundary metric recycling from
+  `0.0` to a small value over the 500-step gate instead of switching it on
+  abruptly.

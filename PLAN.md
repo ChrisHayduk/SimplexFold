@@ -78,7 +78,9 @@ evidence only onto the selected boundary 1-skeleton, and adds it as a
 no-new-parameter bias to `z_prev` for the next recycle cycle. This is not a
 new output loss; it changes the inter-cycle cochain memory so explicit
 higher-rank metric states can influence the next pair-trunk pass before the
-structure module.
+structure module. Use the runtime recycling-scale ramp rather than an abrupt
+static turn-on when resuming from E97: start at `0.0` and ramp to `0.05` or
+`0.10` over the 500-step gate.
 
 ## Historical Plan Context
 

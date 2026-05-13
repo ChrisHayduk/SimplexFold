@@ -65,6 +65,7 @@ from minalphafold.trainer import (  # noqa: E402
     set_optimizer_learning_rate,
     set_seed,
     simplex_boundary_metric_gate_runtime_scale_at_step,
+    simplex_boundary_metric_recycling_runtime_scale_at_step,
     simplex_boundary_pair_feedback_runtime_scale_at_step,
     simplex_boundary_pair_gate_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
@@ -646,6 +647,7 @@ def _evaluate(
                         use_simplex_boundary_pair_feedback_runtime_scale=True,
                         use_simplex_boundary_pair_gate_runtime_scale=True,
                         use_simplex_boundary_metric_gate_runtime_scale=True,
+                        use_simplex_boundary_metric_recycling_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
                         use_simplex_geometry_distance_weight=True,
                         use_simplex_cell_top_k=True,
@@ -1207,6 +1209,10 @@ def _train_variant(
             training_config,
             step,
         )
+        simplex_boundary_metric_recycling_runtime_scale = simplex_boundary_metric_recycling_runtime_scale_at_step(
+            training_config,
+            step,
+        )
         simplex_local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
         simplex_geometry_distance_weight = simplex_geometry_distance_weight_at_step(training_config, step)
         simplex_face_top_k = simplex_face_top_k_at_step(training_config, step)
@@ -1241,6 +1247,7 @@ def _train_variant(
                         use_simplex_boundary_pair_feedback_runtime_scale=True,
                         use_simplex_boundary_pair_gate_runtime_scale=True,
                         use_simplex_boundary_metric_gate_runtime_scale=True,
+                        use_simplex_boundary_metric_recycling_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
                         use_simplex_geometry_distance_weight=True,
                         use_simplex_cell_top_k=True,
@@ -1397,6 +1404,11 @@ def _train_variant(
                     float("nan")
                     if simplex_boundary_metric_gate_runtime_scale is None
                     else simplex_boundary_metric_gate_runtime_scale
+                ),
+                "simplex_boundary_metric_recycling_runtime_scale": (
+                    float("nan")
+                    if simplex_boundary_metric_recycling_runtime_scale is None
+                    else simplex_boundary_metric_recycling_runtime_scale
                 ),
                 "simplex_local_neighbor_k": (
                     float("nan") if simplex_local_neighbor_k is None else simplex_local_neighbor_k
@@ -1684,6 +1696,18 @@ def _train_variant(
         ),
         "simplex_boundary_metric_gate_runtime_scale_ramp_steps": (
             training_config.simplex_boundary_metric_gate_runtime_scale_ramp_steps
+        ),
+        "simplex_boundary_metric_recycling_runtime_scale": (
+            training_config.simplex_boundary_metric_recycling_runtime_scale
+        ),
+        "simplex_boundary_metric_recycling_runtime_scale_final": (
+            training_config.simplex_boundary_metric_recycling_runtime_scale_final
+        ),
+        "simplex_boundary_metric_recycling_runtime_scale_ramp_start_step": (
+            training_config.simplex_boundary_metric_recycling_runtime_scale_ramp_start_step
+        ),
+        "simplex_boundary_metric_recycling_runtime_scale_ramp_steps": (
+            training_config.simplex_boundary_metric_recycling_runtime_scale_ramp_steps
         ),
         "simplex_local_neighbor_k": training_config.simplex_local_neighbor_k,
         "simplex_local_neighbor_k_final": training_config.simplex_local_neighbor_k_final,
@@ -2368,6 +2392,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-boundary-metric-gate-runtime-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-boundary-metric-gate-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
+        "--simplex-boundary-metric-recycling-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for recycling selected simplex boundary distance evidence.",
+    )
+    parser.add_argument("--simplex-boundary-metric-recycling-runtime-scale-final", type=float, default=None)
+    parser.add_argument(
+        "--simplex-boundary-metric-recycling-runtime-scale-ramp-start-step",
+        type=int,
+        default=None,
+    )
+    parser.add_argument("--simplex-boundary-metric-recycling-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-outer-edge-update-scale",
         type=float,
         default=None,
@@ -2735,6 +2772,16 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_boundary_metric_gate_runtime_scale_ramp_steps=(
             args.simplex_boundary_metric_gate_runtime_scale_ramp_steps
         ),
+        simplex_boundary_metric_recycling_runtime_scale=args.simplex_boundary_metric_recycling_runtime_scale,
+        simplex_boundary_metric_recycling_runtime_scale_final=(
+            args.simplex_boundary_metric_recycling_runtime_scale_final
+        ),
+        simplex_boundary_metric_recycling_runtime_scale_ramp_start_step=(
+            args.simplex_boundary_metric_recycling_runtime_scale_ramp_start_step
+        ),
+        simplex_boundary_metric_recycling_runtime_scale_ramp_steps=(
+            args.simplex_boundary_metric_recycling_runtime_scale_ramp_steps
+        ),
         simplex_local_neighbor_k=args.simplex_local_neighbor_k,
         simplex_local_neighbor_k_final=args.simplex_local_neighbor_k_final,
         simplex_local_neighbor_k_ramp_start_step=args.simplex_local_neighbor_k_ramp_start_step,
@@ -2937,6 +2984,18 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         ),
         "simplex_boundary_metric_gate_runtime_scale_ramp_steps": (
             args.simplex_boundary_metric_gate_runtime_scale_ramp_steps
+        ),
+        "simplex_boundary_metric_recycling_runtime_scale": (
+            args.simplex_boundary_metric_recycling_runtime_scale
+        ),
+        "simplex_boundary_metric_recycling_runtime_scale_final": (
+            args.simplex_boundary_metric_recycling_runtime_scale_final
+        ),
+        "simplex_boundary_metric_recycling_runtime_scale_ramp_start_step": (
+            args.simplex_boundary_metric_recycling_runtime_scale_ramp_start_step
+        ),
+        "simplex_boundary_metric_recycling_runtime_scale_ramp_steps": (
+            args.simplex_boundary_metric_recycling_runtime_scale_ramp_steps
         ),
         "simplex_structure_readout_scale": args.simplex_structure_readout_scale,
         "simplex_msa_feedback_scale": args.simplex_msa_feedback_scale,
