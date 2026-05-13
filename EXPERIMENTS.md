@@ -786,7 +786,7 @@ of continuing boundary-readout pressure.
 
 ### E97 Candidate: Outer-Edge-Supported Cell Scoring After E96
 
-Status: next after E98 regression.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E96 tests whether directed boundary readout should be relaxed as
 a cochain-routing curriculum. If that still underperforms E87, the next
@@ -794,13 +794,14 @@ topology-native lever should return to construction of the selected complex:
 prefer candidate faces/tetras whose vertices have outgoing/incoming
 outer-edge neighborhoods, instead of adding more readout pressure.
 
-Mechanism: resume the strongest sparse checkpoint compatible with the E96
-result and keep fixed `24/48` caps, degree penalty `0.75`,
-incidence-normalized transport, selected-boundary realization losses, and
-edge-frame messages. Add a runtime-ramped
-`simplex_cell_score_outer_edge_weight`, for example `0.0 -> 0.25`, so
-outer-edge availability changes which rank-2/rank-3 cochains exist. This is
-complex construction, not a generic output loss.
+Mechanism: resume the E96 checkpoint and keep fixed `24/48` caps, degree
+penalty `0.75`, incidence-normalized transport, selected-boundary realization
+losses, and edge-frame messages. Ramp `simplex_cell_score_outer_edge_weight`
+from `0.0 -> 0.25` so outer-edge availability changes which rank-2/rank-3
+cochains exist, and ramp boundary-readout directionality from `0.25 -> 0.0`
+so the E96 directed-readout signal becomes starting checkpoint context rather
+than continued readout pressure. This is complex construction and cochain-route
+handoff, not a generic output loss.
 
 Budget audit: remote parameter count is unchanged at `3,154,242`, under the
 AF2-medium +5% ceiling `3,261,974`. Latent segment cells are not the immediate
@@ -812,6 +813,23 @@ checkpoint, where the audited parameter count was `3,234,450`.
 Decision rule: keep only if selected outer-edge availability improves without
 losing E86/E87 primary lDDT. Reject if it behaves like E95 by improving a
 global geometry metric while softening local C-alpha lDDT.
+
+Launch: E97 is running as
+`e97_outer_edge_score_handoff_from_e96_s9500_c256_m64`, Python PID `15048`,
+on the owned H100 pod. The remote checkout was fast-forwarded to commit
+`c34608e`, no active benchmark process was present, the E96 checkpoint was
+present, py_compile passed for the runner/model files, CLI help confirmed the
+outer-edge score, boundary-readout directionality, and `--max-parameters`
+flags, and the exact E97 parameter count was
+`3,154,242 <= 3,261,974`. Startup metadata recorded outer-edge cell scoring
+`0.0 -> 0.25`, boundary-readout directionality `0.25 -> 0.0`, fixed `24/48`
+caps, degree penalty `0.75`, edge-frame runtime scale `0.0125`, and
+`--max-parameters 3261974`; the runner resumed E96 at step 9000/examples
+72000, loaded 1244 matching tensors, initialized 0 new/missing tensors, and
+started a fresh optimizer. The log path is
+`/workspace/SimplexFold/logs/e97_outer_edge_score_handoff_from_e96.log`, and
+the artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e97_outer_edge_score_handoff_from_e96_s9500_c256_m64/`.
 
 ## Experiment Queue
 

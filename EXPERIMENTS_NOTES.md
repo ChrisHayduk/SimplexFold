@@ -3805,3 +3805,36 @@
 - Used `scripts/format_experiment_result_row.py` with `--start-after-step
   9000` to add the E98 row to `EXPERIMENT_RESULTS.md`, so inherited E96
   history does not count as E98's best validation lDDT.
+- E97 launch decision: resume the E96 checkpoint from step 9000 to 9500,
+  ramp `simplex_cell_score_outer_edge_weight` from `0.0` to `0.25`, and ramp
+  boundary-readout directionality from `0.25` to `0.0`. This is a handoff
+  from E96's directed boundary-readout curriculum toward selected-complex
+  construction, testing which face/tetra cochains exist rather than adding
+  another output-side coordinate objective.
+- Remote E97 preparation on owned pod `o1dy17ouv8w5mz`: the pod checkout was
+  clean at commit `7b0219a` and was fast-forwarded to pushed commit
+  `c34608e` before launch. No other Runpod instances were inspected or
+  managed.
+- E97 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E96 checkpoint present, remote py_compile passed for
+  `scripts/run_nanofold_public_benchmarks.py`, `minalphafold/simplex.py`,
+  `minalphafold/model_config.py`, and `minalphafold/trainer.py`; CLI help
+  confirmed support for outer-edge cell scoring, boundary-readout
+  directionality runtime flags, and `--max-parameters`; and the exact E97
+  instantiated module set counted `3,154,242` parameters, under the
+  AF2-medium +5% ceiling `3,261,974`.
+- E97 launched on owned pod `o1dy17ouv8w5mz` as
+  `e97_outer_edge_score_handoff_from_e96_s9500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e97_outer_edge_score_handoff_from_e96.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e97_outer_edge_score_handoff_from_e96_s9500_c256_m64/`,
+  and Python PID `15048`. Startup poll confirmed metadata exists,
+  `--max-parameters 3261974` is recorded, outer-edge cell scoring ramps
+  `0.0 -> 0.25` over steps 9000-9500, boundary-readout directionality ramps
+  `0.25 -> 0.0` over steps 9000-9500, fixed face/tetra caps are `24/48`,
+  degree penalty is `0.75`, edge-frame runtime scale is `0.0125`, and the
+  runner resumed E96 at step 9000/examples 72000 with 1244 matching model
+  tensors loaded and 0 new/missing tensors initialized.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  to E97, keeping the same owned-pod-only restriction and the rule that the
+  heartbeat must not launch follow-up experiments automatically.

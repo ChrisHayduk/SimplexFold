@@ -348,15 +348,17 @@ boundary lDDT stayed at `0.7355` / `0.7193`, and contraction fractions were
 useful as an annealed curriculum into E96, but holding it for another gate
 overdrives local C-alpha agreement.
 
-The active next gate should be E97: return to topology construction by
-resuming the E96 checkpoint and ramping an outer-edge-supported selected-cell
-score. Keep the fixed `24/48` sparse caps, degree-penalized selected cells,
-selected-boundary realization losses, edge-frame messages, incidence-normalized
-boundary transport, and partial directed boundary readout only as the starting
-checkpoint context. The change under test is which face/tetra cochains exist,
-not a generic coordinate loss. The already-run parameter audit showed this
-outer-edge scorer stays at `3,154,242` parameters, under the `3,261,974`
-AF2-medium +5% ceiling.
+The active Runpod gate is E97: return to topology construction by resuming the
+E96 checkpoint, ramping an outer-edge-supported selected-cell score from `0.0`
+to `0.25`, and ramping the partial directed boundary readout from `0.25` to
+`0.0`. Keep the fixed `24/48` sparse caps, degree-penalized selected cells,
+selected-boundary realization losses, edge-frame messages, and
+incidence-normalized boundary transport. The change under test is a handoff
+from boundary-readout pressure to selected-complex construction: which
+face/tetra cochains exist, not a generic coordinate loss. The remote launch
+audit counted `3,154,242` parameters, under the `3,261,974` AF2-medium +5%
+ceiling, and startup resumed E96 at step 9000/examples 72000 with 1244
+matching tensors and 0 new/missing tensors.
 
 The current 2026-05-12 full reread of the saved PDFs reinforces the E79-E81
 direction and the E96 interpretation. The right lesson is not to add another
