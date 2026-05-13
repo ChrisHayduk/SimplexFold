@@ -4484,3 +4484,7 @@
   `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m py_compile minalphafold/simplex.py minalphafold/model.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py && /Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
   reported `183 passed`. A launch-style parameter audit counted `3,154,242`
   parameters under the `3,261,974` cap.
+- E106 health poll at `2026-05-13T13:04:17Z`: PID `2175` was active after
+  about 10.5 minutes, GPU utilization was `30%` with `13491 MiB` allocated,
+  `results.json` and `results.csv` were absent, and history still had 13 rows
+  ending at E105a step 6000. Continue to treat E106 as in flight.
