@@ -4488,3 +4488,14 @@
   about 10.5 minutes, GPU utilization was `30%` with `13491 MiB` allocated,
   `results.json` and `results.csv` were absent, and history still had 13 rows
   ending at E105a step 6000. Continue to treat E106 as in flight.
+- E106 health poll at `2026-05-13T13:20:26Z`: PID `2175` was still active
+  after about 26.7 minutes. `results.json` and `results.csv` were still
+  absent; `history_full_msa_to_face.json` still had 13 rows ending at E105a
+  step 6000 (`val_lddt_ca=0.3894216101616621`, FoldScore
+  `0.37369451113045216`, `val_ca_drmsd=10.740996658802032`). A follow-up
+  process/GPU check at `2026-05-13T13:20:55Z` showed GPU utilization sampled
+  at `0%` with `13491 MiB` allocated while the Python process continued to use
+  CPU heavily and still held GPU file descriptors. The remote log still showed
+  only startup/resume lines, and the run directory file mtimes had not advanced
+  past startup. Treat E106 as in flight for now, but re-check promptly for
+  either a returned artifact or signs of a stalled training/evaluation loop.
