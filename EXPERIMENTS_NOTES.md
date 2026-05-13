@@ -4382,3 +4382,30 @@
 - Retargeted heartbeat `check-simplexfold-e57-runpod` to E105a, preserving the
   owned-pod-only scope and the rule that the heartbeat must not launch
   follow-up experiments automatically.
+- E105a live check at `2026-05-13T11:58:39Z`: owned pod `o1dy17ouv8w5mz`
+  still had PID `1307` active after about 7 minutes. `results.json` was
+  absent, `history_full_msa_to_face.json` still had 12 inherited rows ending
+  at E72 step 5500 (`val_lddt_ca=0.37177472934126854`), and the log still
+  showed only startup/resume lines. Keep E105a out of `EXPERIMENT_RESULTS.md`
+  until a returned artifact exists and passes remote/local coherence checks.
+- Implemented E106 locally as `simplex_boundary_cochain_recycling_scale`.
+  This complements E105: instead of recycling only selected boundary distance
+  distributions, it recycles the existing selected face/tetra boundary pair
+  cochain itself into `z_prev` between AF2 recycle cycles. The simplex adapter
+  exposes `simplex_structure_pair_readout` when cochain recycling is enabled,
+  but direct structure readout remains off unless
+  `simplex_structure_readout_scale` is set. No new parameters or losses are
+  added.
+- E106 validation so far:
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_boundary_cochain_recycling_adds_no_parameters tests/test_trainer.py::test_simplicial_boundary_cochain_recycling_changes_only_recycled_cycles tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`
+  reported `7 passed`. E106 is queued behind E105a and should not be launched
+  automatically while E105a is still running.
+- E106 parameter audit: AF2-medium baseline remains `3,106,642` parameters and
+  the +5% cap is `3,261,974`. The E106 launch-style module set with E105a
+  selected-complex settings and `simplex_boundary_cochain_recycling_scale=0.10`
+  counts `3,154,242` parameters, under cap.
+- E105a live check at `2026-05-13T12:11:31Z`: owned pod `o1dy17ouv8w5mz`
+  still had PID `1307` active after about 20 minutes. `results.json` was
+  absent, `history_full_msa_to_face.json` still had 12 inherited rows ending
+  at E72 step 5500 (`val_lddt_ca=0.37177472934126854`), and the log still
+  showed only startup/resume lines. Continue to treat E105a as in flight.

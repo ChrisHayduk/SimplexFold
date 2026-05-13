@@ -47,6 +47,7 @@ from minalphafold.trainer import (
     load_training_protocol,
     main,
     model_inputs_from_batch,
+    simplex_boundary_cochain_recycling_runtime_scale_at_step,
     simplex_boundary_metric_gate_runtime_scale_at_step,
     simplex_boundary_metric_recycling_runtime_scale_at_step,
     simplex_boundary_pair_feedback_runtime_scale_at_step,
@@ -95,6 +96,7 @@ def test_simplicial_runtime_overrides_reach_model_path():
         assert parameter in inspect.signature(SimplicialEvoformer.forward).parameters
         assert parameter in inspect.signature(SimplicialAdapter.forward).parameters
     assert "simplex_boundary_metric_recycling_scale_override" in inspect.signature(AlphaFold2.forward).parameters
+    assert "simplex_boundary_cochain_recycling_scale_override" in inspect.signature(AlphaFold2.forward).parameters
 
 
 def test_train_step_updates_model_parameters(tmp_path):
@@ -209,6 +211,10 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_boundary_metric_recycling_runtime_scale_final=0.1,
         simplex_boundary_metric_recycling_runtime_scale_ramp_start_step=10,
         simplex_boundary_metric_recycling_runtime_scale_ramp_steps=10,
+        simplex_boundary_cochain_recycling_runtime_scale=0.0,
+        simplex_boundary_cochain_recycling_runtime_scale_final=0.1,
+        simplex_boundary_cochain_recycling_runtime_scale_ramp_start_step=10,
+        simplex_boundary_cochain_recycling_runtime_scale_ramp_steps=10,
         simplex_local_neighbor_k=4.0,
         simplex_local_neighbor_k_final=0.0,
         simplex_local_neighbor_k_ramp_start_step=10,
@@ -231,6 +237,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_boundary_pair_gate_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_boundary_metric_gate_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_boundary_metric_recycling_runtime_scale_at_step(training_config, 15) == 0.05
+    assert simplex_boundary_cochain_recycling_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_local_neighbor_k_at_step(training_config, 15) == 2.0
     assert simplex_cell_score_outer_edge_weight_at_step(training_config, 15) == 0.1
 
@@ -245,6 +252,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert "simplex_boundary_pair_gate_scale_override" not in eval_inputs
     assert "simplex_boundary_metric_gate_scale_override" not in eval_inputs
     assert "simplex_boundary_metric_recycling_scale_override" not in eval_inputs
+    assert "simplex_boundary_cochain_recycling_scale_override" not in eval_inputs
     assert "simplex_local_neighbor_k_override" not in eval_inputs
     assert "simplex_cell_score_outer_edge_weight_override" not in eval_inputs
 
@@ -261,6 +269,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
         use_simplex_boundary_pair_gate_runtime_scale=True,
         use_simplex_boundary_metric_gate_runtime_scale=True,
         use_simplex_boundary_metric_recycling_runtime_scale=True,
+        use_simplex_boundary_cochain_recycling_runtime_scale=True,
         use_simplex_local_neighbor_k=True,
         use_simplex_cell_top_k=True,
         step=15,
@@ -278,6 +287,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_boundary_pair_gate_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_boundary_metric_gate_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_boundary_metric_recycling_scale_override"], torch.tensor(0.05))
+    assert torch.allclose(train_inputs["simplex_boundary_cochain_recycling_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_local_neighbor_k_override"], torch.tensor(2.0))
     assert torch.allclose(train_inputs["simplex_cell_score_outer_edge_weight_override"], torch.tensor(0.1))
 
@@ -561,6 +571,17 @@ def test_simplicial_structure_readout_adds_no_parameters():
 def test_simplicial_boundary_metric_recycling_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     recycling_medium = replace(simplex_medium, simplex_boundary_metric_recycling_scale=0.25)
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    recycling_params = sum(parameter.numel() for parameter in AlphaFold2(recycling_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert recycling_params == simplex_params
+
+
+def test_simplicial_boundary_cochain_recycling_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    recycling_medium = replace(simplex_medium, simplex_boundary_cochain_recycling_scale=0.25)
 
     simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
     recycling_params = sum(parameter.numel() for parameter in AlphaFold2(recycling_medium).parameters())
@@ -1026,6 +1047,66 @@ def test_simplicial_boundary_metric_recycling_changes_only_recycled_cycles():
             n_cycles=2,
         )
 
+    assert torch.allclose(base_one_cycle["pair_representation"], recycling_one_cycle["pair_representation"])
+    assert not torch.allclose(base_two_cycles["pair_representation"], recycling_two_cycles["pair_representation"])
+
+
+def test_simplicial_boundary_cochain_recycling_changes_only_recycled_cycles():
+    torch.manual_seed(10)
+    base_config = replace(load_model_config("tiny"), simplex_boundary_cochain_recycling_scale=0.0)
+    recycling_config = replace(load_model_config("tiny"), simplex_boundary_cochain_recycling_scale=0.5)
+    base_model = AlphaFold2(base_config)
+    recycling_model = AlphaFold2(recycling_config)
+    recycling_model.load_state_dict(base_model.state_dict())
+    base_model.eval()
+    recycling_model.eval()
+
+    target_feat = torch.zeros(1, 5, 22)
+    residue_index = torch.arange(5).reshape(1, 5)
+    msa_feat = torch.zeros(1, 2, 5, 49)
+    extra_msa_feat = torch.zeros(1, 0, 5, 25)
+    template_pair_feat = torch.zeros(1, 0, 5, 5, 88)
+    aatype = torch.zeros(1, 5, dtype=torch.long)
+
+    with torch.no_grad():
+        base_one_cycle = base_model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=1,
+        )
+        recycling_one_cycle = recycling_model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=1,
+        )
+        base_two_cycles = base_model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=2,
+        )
+        recycling_two_cycles = recycling_model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=2,
+        )
+
+    assert "simplex_structure_pair_readout" not in recycling_one_cycle
     assert torch.allclose(base_one_cycle["pair_representation"], recycling_one_cycle["pair_representation"])
     assert not torch.allclose(base_two_cycles["pair_representation"], recycling_two_cycles["pair_representation"])
 

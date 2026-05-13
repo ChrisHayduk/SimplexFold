@@ -56,6 +56,9 @@ class AlphaFold2(torch.nn.Module):
         self.simplex_boundary_metric_recycling_scale = float(
             getattr(config, "simplex_boundary_metric_recycling_scale", 0.0)
         )
+        self.simplex_boundary_cochain_recycling_scale = float(
+            getattr(config, "simplex_boundary_cochain_recycling_scale", 0.0)
+        )
         simplex_every_n = max(int(getattr(config, "simplex_every_n_blocks", 1)), 1)
         if self.use_simplicial_evoformer:
             self.evoformer_blocks = torch.nn.ModuleList(
@@ -220,6 +223,7 @@ class AlphaFold2(torch.nn.Module):
             simplex_boundary_pair_gate_scale_override: torch.Tensor | None = None,
             simplex_boundary_metric_gate_scale_override: torch.Tensor | None = None,
             simplex_boundary_metric_recycling_scale_override: torch.Tensor | None = None,
+            simplex_boundary_cochain_recycling_scale_override: torch.Tensor | None = None,
             simplex_local_neighbor_k_override: torch.Tensor | None = None,
             simplex_geometry_distance_weight_override: torch.Tensor | None = None,
             simplex_face_top_k_override: torch.Tensor | None = None,
@@ -244,6 +248,12 @@ class AlphaFold2(torch.nn.Module):
         if simplex_boundary_metric_recycling_scale_override is not None:
             simplex_boundary_metric_recycling_scale = max(
                 float(simplex_boundary_metric_recycling_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
+        simplex_boundary_cochain_recycling_scale = self.simplex_boundary_cochain_recycling_scale
+        if simplex_boundary_cochain_recycling_scale_override is not None:
+            simplex_boundary_cochain_recycling_scale = max(
+                float(simplex_boundary_cochain_recycling_scale_override.detach().float().cpu().item()),
                 0.0,
             )
 
@@ -615,6 +625,15 @@ class AlphaFold2(torch.nn.Module):
                     simplex_recycle_bias = simplex_recycle_bias * simplex_recycle_mask.to(dtype=pair_repr.dtype)
                     simplex_recycle_bias = simplex_recycle_bias * pair_mask[..., None].to(dtype=pair_repr.dtype)
                     z_prev = z_prev + simplex_boundary_metric_recycling_scale * simplex_recycle_bias.detach()
+                if simplex_boundary_cochain_recycling_scale > 0.0 and simplex_aux_last is not None:
+                    simplex_pair_readout = simplex_aux_last.get("simplex_structure_pair_readout")
+                    if simplex_pair_readout is not None:
+                        simplex_cochain_bias = simplex_pair_readout.to(dtype=pair_repr.dtype)
+                        simplex_cochain_bias = simplex_cochain_bias * pair_mask[..., None].to(dtype=pair_repr.dtype)
+                        z_prev = (
+                            z_prev
+                            + simplex_boundary_cochain_recycling_scale * simplex_cochain_bias.detach()
+                        )
 
                 # Pseudo-β: Cα for glycine (atom14 index 1, since GLY has no Cβ),
                 # Cβ otherwise (atom14 index 4). Matches the pseudo-β convention

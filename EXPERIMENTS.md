@@ -388,6 +388,46 @@ Validation so far:
   `simplex_boundary_metric_recycling_scale=0.1`: `3,154,242` parameters,
   still under the AF2-medium +5% ceiling.
 
+### E106 Idea: Selected-Boundary Cochain Recycling
+
+Status: implemented locally and queued behind the in-flight E105a Runpod gate.
+Do not launch until E105a returns and its artifacts are handled.
+
+Hypothesis: E104 showed that selected face/tetra boundary lDDT can exceed
+`0.7` locally while full-chain C-alpha lDDT remains near `0.4`. E105a asks
+whether recycling the selected boundary metric distribution helps the next AF2
+cycle. E106 is the complementary topological test: recycle the learned
+selected-boundary pair cochain itself, preserving the richer cochain features
+instead of reducing them to distance bins.
+
+Mechanism: add `simplex_boundary_cochain_recycling_scale` and matching runtime
+schedule fields. When enabled, the simplex adapter exposes the existing
+selected face/tetra boundary pair readout even when direct structure readout
+is disabled. Between recycle cycles, `AlphaFold2` detaches that readout, masks
+it to valid residue pairs, and adds it to `z_prev` before the next Evoformer
+pass. This is inter-cycle cochain memory: it does not add parameters, does not
+add a new loss, and does not inject simplex readout directly into the current
+structure module.
+
+Gate: after E105a returns, run a 500-step recovery gate from the strongest
+retained compatible checkpoint. If E105a improves over E72/E73/E74/E76, use
+the E105a checkpoint. Otherwise use E72 again only as a diagnostic. Keep the
+E105a selected-complex recipe fixed and add only:
+`--simplex-boundary-cochain-recycling-scale 0.10`,
+`--simplex-boundary-cochain-recycling-runtime-scale 0.0`,
+`--simplex-boundary-cochain-recycling-runtime-scale-final 0.10`,
+`--simplex-boundary-cochain-recycling-runtime-scale-ramp-start-step <start>`,
+and `--simplex-boundary-cochain-recycling-runtime-scale-ramp-steps 500`.
+Reject unless primary `val_lddt_ca` improves, not just FoldScore or selected
+boundary diagnostics.
+
+Validation so far:
+
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_simplicial_boundary_cochain_recycling_adds_no_parameters tests/test_trainer.py::test_simplicial_boundary_cochain_recycling_changes_only_recycled_cycles tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `7 passed`
+- E106 launch-style module set with the E105a selected-complex settings and
+  `simplex_boundary_cochain_recycling_scale=0.10`: `3,154,242` parameters,
+  below the AF2-medium +5% cap of `3,261,974`.
+
 ### E83: Fixed Sparse Cell Continuation
 
 Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.

@@ -91,6 +91,19 @@ topology-native mechanism, comparing against E72/E73/E74/E76 rather than the
 E96-E104 plateau set. If it improves primary C-alpha lDDT, rebuild a stronger
 lineage; if it does not, do not spend toward 30k on recycling alone.
 
+Next prepared branch after E105a returns is E106: selected-boundary cochain
+recycling. E104 showed that local face/tetra boundary metrics can be strong
+without improving global C-alpha lDDT, and E105/E105a tests recycling only the
+distance-distribution view of that selected 1-skeleton. E106 recycles the
+learned selected-boundary pair cochain itself: the existing simplex
+face/tetra-to-boundary readout is detached, masked to valid residue pairs, and
+added to `z_prev` between AF2 recycle cycles. This keeps the intervention in
+the README's simplex view because persistent rank-2/rank-3 cells influence the
+next pair-trunk pass through their boundary 1-cochain. It adds no parameters
+and no new loss. Queue it only after E105a returns; use a short 500-step gate
+from the best retained compatible checkpoint and ramp the runtime cochain
+recycling scale from `0.0` to a small value such as `0.05` or `0.10`.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
