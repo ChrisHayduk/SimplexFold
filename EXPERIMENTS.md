@@ -217,7 +217,7 @@ checkpoint or result row was written, so it must not be added to
 
 ### E103 Idea: Sparse Boundary-Edge Pair Gate
 
-Status: implemented locally and validated; not launched yet.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E102 tests the right feedback target but applies the boundary
 cochain lift densely over all `L x L` pairs, which may be too expensive for
@@ -249,6 +249,23 @@ Validation so far:
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
 - Targeted E103/plumbing tests: `7 passed`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `172 passed`
+
+Launch: E103 is running as
+`e103_sparse_boundary_pair_gate_from_e97_s10000_c256_m64`, resuming the E97
+checkpoint from step 9500 to step 10000 with fixed E97 topology settings,
+`--simplex-boundary-pair-gate-scale 0.05`, and a runtime ramp from `0.0` to
+`0.025` over steps 9500-10000. Remote log path is
+`/workspace/SimplexFold/logs/e103_sparse_boundary_pair_gate_from_e97.log`,
+remote artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e103_sparse_boundary_pair_gate_from_e97_s10000_c256_m64/`,
+and Python PID is `18770`.
+
+Startup poll: `run_metadata.json` records `--max-parameters 3261974`,
+`simplex_boundary_pair_gate_scale=0.05`, the runtime ramp
+`0.0 -> 0.025` from step 9500 over 500 steps, E100/E101 MSA-feedback
+routes disabled, and E102 dense pair feedback disabled. The inherited history
+currently has 20 rows, ending at the E97 step-9500 row
+`val_lddt_ca=0.4035918414592743`; no E103 result has returned yet.
 
 ### E83: Fixed Sparse Cell Continuation
 

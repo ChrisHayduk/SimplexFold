@@ -41,13 +41,14 @@ architecture change, not an output-side lDDT hack: higher-order cells alter
 pair geometry through their boundary edges, while computation stays on the
 sparse selected complex.
 
-The E103 gate should resume E97 from step 9500 to 10000, keep the E97/E101
-topology settings fixed, allocate the sparse boundary-pair gate module at
-`0.05`, and ramp the active gate from `0.0` to `0.025` over steps
-9500-10000. The exact launch module set counts `3,193,762` parameters,
-leaving `68,212` under the AF2-medium +5% ceiling. Reject unless it beats
-E101 and approaches or exceeds the E96/E97 local peak on primary C-alpha lDDT
-without damaging selected-boundary diagnostics.
+E103 is now running on the owned Runpod pod from the E97 checkpoint at step
+9500 to step 10000. It keeps the E97/E101 topology settings fixed, allocates
+the sparse boundary-pair gate module at `0.05`, and ramps the active gate
+from `0.0` to `0.025` over steps 9500-10000. The exact launch module set
+counts `3,193,762` parameters, leaving `68,212` under the AF2-medium +5%
+ceiling. Reject unless it beats E101 and approaches or exceeds the E96/E97
+local peak on primary C-alpha lDDT without damaging selected-boundary
+diagnostics.
 
 ## Historical Plan Context
 

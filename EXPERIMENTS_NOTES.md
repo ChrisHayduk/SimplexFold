@@ -4164,3 +4164,25 @@
   steps 9500-10000. Keep E100/E101 MSA-feedback routes and E102 dense
   pair-feedback disabled, then compare against E99 step 10000, E101, E99
   final, E97, and E96.
+- Remote E103 preparation on owned pod `o1dy17ouv8w5mz`: no active benchmark
+  process was present, the pod checkout fast-forwarded to commit `cf511b8`,
+  remote py_compile passed for the runner/model files, CLI help confirmed
+  support for `--simplex-boundary-pair-gate-*`, the E97 checkpoint was
+  present, and the exact E103 module set counted `3,193,762` parameters
+  under the AF2-medium +5% ceiling `3,261,974`.
+- E103 launched on owned pod `o1dy17ouv8w5mz` as
+  `e103_sparse_boundary_pair_gate_from_e97_s10000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e103_sparse_boundary_pair_gate_from_e97.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e103_sparse_boundary_pair_gate_from_e97_s10000_c256_m64/`,
+  and Python PID `18770`. Startup poll confirmed `run_metadata.json` exists,
+  `--max-parameters 3261974` is recorded, the sparse boundary-pair gate
+  allocates at `0.05` and ramps from `0.0` to `0.025` over steps 9500-10000,
+  E100/E101 MSA-feedback routes are disabled, E102 dense pair feedback is
+  disabled, fixed face/tetra caps are `24/48`, degree penalty is `0.75`,
+  edge-frame runtime scale is `0.0125`, and the runner resumed E97 at step
+  9500/examples 76000 with 1244 matching model tensors loaded and 24 new
+  sparse-gate tensors initialized.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  to E103, keeping the owned-pod-only restriction and the rule that the
+  heartbeat must not launch follow-up experiments automatically.
