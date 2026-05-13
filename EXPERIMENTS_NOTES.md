@@ -4754,3 +4754,8 @@
   utilization sampled at `55%` with `13491 MiB` allocated, `results.json` and
   `results.csv` absent, and history still at E106 step 6500. Continue treating
   E110 as an active first post-resume gate.
+- E110 health poll at `2026-05-13T17:36:55Z`: PID `4513` remained active after
+  about 20.7 minutes, process state `Rl` with high CPU activity, GPU
+  utilization sampled at `33%` with `13491 MiB` allocated, `results.json` and
+  `results.csv` absent, and history still at E106 step 6500. Continue
+  monitoring; no remote checkout changes while the process is active.
