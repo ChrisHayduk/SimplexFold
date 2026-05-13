@@ -213,6 +213,7 @@ class AlphaFold2(torch.nn.Module):
             simplex_segment_cell_scale_override: torch.Tensor | None = None,
             simplex_msa_feedback_scale_override: torch.Tensor | None = None,
             simplex_boundary_pair_feedback_scale_override: torch.Tensor | None = None,
+            simplex_boundary_pair_gate_scale_override: torch.Tensor | None = None,
             simplex_local_neighbor_k_override: torch.Tensor | None = None,
             simplex_geometry_distance_weight_override: torch.Tensor | None = None,
             simplex_face_top_k_override: torch.Tensor | None = None,
@@ -419,6 +420,9 @@ class AlphaFold2(torch.nn.Module):
                                         simplex_boundary_pair_feedback_scale_override=(
                                             simplex_boundary_pair_feedback_scale_override
                                         ),
+                                        simplex_boundary_pair_gate_scale_override=(
+                                            simplex_boundary_pair_gate_scale_override
+                                        ),
                                         simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
                                         simplex_geometry_distance_weight_override=(
                                             simplex_geometry_distance_weight_override
@@ -462,6 +466,9 @@ class AlphaFold2(torch.nn.Module):
                                     simplex_msa_feedback_scale_override=simplex_msa_feedback_scale_override,
                                     simplex_boundary_pair_feedback_scale_override=(
                                         simplex_boundary_pair_feedback_scale_override
+                                    ),
+                                    simplex_boundary_pair_gate_scale_override=(
+                                        simplex_boundary_pair_gate_scale_override
                                     ),
                                     simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
                                     simplex_geometry_distance_weight_override=(

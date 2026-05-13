@@ -6,6 +6,7 @@ from minalphafold.trainer import (
     load_model_config,
     model_inputs_from_batch,
     simplex_boundary_pair_feedback_runtime_scale_at_step,
+    simplex_boundary_pair_gate_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
     simplex_cell_score_outer_edge_weight_at_step,
     simplex_edge_frame_message_runtime_scale_at_step,
@@ -385,6 +386,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.125",
             "--simplex-boundary-pair-feedback-scale",
             "0.0625",
+            "--simplex-boundary-pair-gate-scale",
+            "0.03125",
             "--simplex-msa-feedback-runtime-scale",
             "0.0",
             "--simplex-msa-feedback-runtime-scale-final",
@@ -400,6 +403,14 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "--simplex-boundary-pair-feedback-runtime-scale-ramp-start-step",
             "3000",
             "--simplex-boundary-pair-feedback-runtime-scale-ramp-steps",
+            "500",
+            "--simplex-boundary-pair-gate-runtime-scale",
+            "0.0",
+            "--simplex-boundary-pair-gate-runtime-scale-final",
+            "0.025",
+            "--simplex-boundary-pair-gate-runtime-scale-ramp-start-step",
+            "3000",
+            "--simplex-boundary-pair-gate-runtime-scale-ramp-steps",
             "500",
             "--simplex-geometry-distance-weight",
             "0.1",
@@ -488,6 +499,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_msa_feedback_scale == 0.25
     assert args.simplex_boundary_msa_feedback_scale == 0.125
     assert args.simplex_boundary_pair_feedback_scale == 0.0625
+    assert args.simplex_boundary_pair_gate_scale == 0.03125
     assert args.simplex_msa_feedback_runtime_scale == 0.0
     assert args.simplex_msa_feedback_runtime_scale_final == 0.05
     assert args.simplex_msa_feedback_runtime_scale_ramp_start_step == 3000
@@ -496,6 +508,10 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_boundary_pair_feedback_runtime_scale_final == 0.025
     assert args.simplex_boundary_pair_feedback_runtime_scale_ramp_start_step == 3000
     assert args.simplex_boundary_pair_feedback_runtime_scale_ramp_steps == 500
+    assert args.simplex_boundary_pair_gate_runtime_scale == 0.0
+    assert args.simplex_boundary_pair_gate_runtime_scale_final == 0.025
+    assert args.simplex_boundary_pair_gate_runtime_scale_ramp_start_step == 3000
+    assert args.simplex_boundary_pair_gate_runtime_scale_ramp_steps == 500
     assert args.simplex_geometry_distance_weight == 0.1
     assert args.simplex_geometry_distance_weight_final == 0.025
     assert args.simplex_geometry_distance_weight_ramp_start_step == 3000
@@ -531,6 +547,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_msa_feedback_scale == 0.25
     assert cfg.simplex_boundary_msa_feedback_scale == 0.125
     assert cfg.simplex_boundary_pair_feedback_scale == 0.0625
+    assert cfg.simplex_boundary_pair_gate_scale == 0.03125
     assert cfg.simplex_face_top_k == 24
     assert cfg.simplex_tetra_top_k == 48
     assert cfg.simplex_cell_score_degree_penalty == 0.75
@@ -575,6 +592,10 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         simplex_boundary_pair_feedback_runtime_scale_final=0.025,
         simplex_boundary_pair_feedback_runtime_scale_ramp_start_step=3000,
         simplex_boundary_pair_feedback_runtime_scale_ramp_steps=500,
+        simplex_boundary_pair_gate_runtime_scale=0.0,
+        simplex_boundary_pair_gate_runtime_scale_final=0.025,
+        simplex_boundary_pair_gate_runtime_scale_ramp_start_step=3000,
+        simplex_boundary_pair_gate_runtime_scale_ramp_steps=500,
         simplex_geometry_distance_weight=0.1,
         simplex_geometry_distance_weight_final=0.025,
         simplex_geometry_distance_weight_ramp_start_step=3000,
@@ -634,6 +655,9 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert simplex_boundary_pair_feedback_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_boundary_pair_feedback_runtime_scale_at_step(cfg, 3250) == 0.0125
     assert simplex_boundary_pair_feedback_runtime_scale_at_step(cfg, 3500) == 0.025
+    assert simplex_boundary_pair_gate_runtime_scale_at_step(cfg, 3000) == 0.0
+    assert simplex_boundary_pair_gate_runtime_scale_at_step(cfg, 3250) == 0.0125
+    assert simplex_boundary_pair_gate_runtime_scale_at_step(cfg, 3500) == 0.025
     assert simplex_geometry_distance_weight_at_step(cfg, 3000) == 0.1
     assert simplex_geometry_distance_weight_at_step(cfg, 3250) == 0.0625
     assert abs(simplex_geometry_distance_weight_at_step(cfg, 3500) - 0.025) < 1e-9
@@ -657,6 +681,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         use_simplex_segment_cell_runtime_scale=True,
         use_simplex_msa_feedback_runtime_scale=True,
         use_simplex_boundary_pair_feedback_runtime_scale=True,
+        use_simplex_boundary_pair_gate_runtime_scale=True,
         use_simplex_geometry_distance_weight=True,
         use_simplex_cell_top_k=True,
         step=3250,
@@ -671,6 +696,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert torch.isclose(inputs["simplex_segment_cell_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_msa_feedback_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_boundary_pair_feedback_scale_override"], torch.tensor(0.0125))
+    assert torch.isclose(inputs["simplex_boundary_pair_gate_scale_override"], torch.tensor(0.0125))
     assert torch.isclose(inputs["simplex_geometry_distance_weight_override"], torch.tensor(0.0625))
     assert torch.isclose(inputs["simplex_face_top_k_override"], torch.tensor(12.0))
     assert torch.isclose(inputs["simplex_tetra_top_k_override"], torch.tensor(24.0))
@@ -718,6 +744,10 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
         simplex_boundary_pair_feedback_runtime_scale_final=0.025,
         simplex_boundary_pair_feedback_runtime_scale_ramp_start_step=3000,
         simplex_boundary_pair_feedback_runtime_scale_ramp_steps=500,
+        simplex_boundary_pair_gate_runtime_scale=0.0,
+        simplex_boundary_pair_gate_runtime_scale_final=0.025,
+        simplex_boundary_pair_gate_runtime_scale_ramp_start_step=3000,
+        simplex_boundary_pair_gate_runtime_scale_ramp_steps=500,
         simplex_geometry_distance_weight=0.1,
         simplex_geometry_distance_weight_final=0.025,
         simplex_geometry_distance_weight_ramp_start_step=3000,
@@ -785,6 +815,7 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
     assert torch.isclose(model.kwargs["simplex_segment_cell_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_msa_feedback_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_boundary_pair_feedback_scale_override"], torch.tensor(0.0125))
+    assert torch.isclose(model.kwargs["simplex_boundary_pair_gate_scale_override"], torch.tensor(0.0125))
     assert torch.isclose(model.kwargs["simplex_geometry_distance_weight_override"], torch.tensor(0.0625))
     assert torch.isclose(model.kwargs["simplex_face_top_k_override"], torch.tensor(12.0))
     assert torch.isclose(model.kwargs["simplex_tetra_top_k_override"], torch.tensor(24.0))

@@ -257,6 +257,10 @@ class TrainingConfig:
     simplex_boundary_pair_feedback_runtime_scale_final: float | None = None
     simplex_boundary_pair_feedback_runtime_scale_ramp_start_step: int | None = None
     simplex_boundary_pair_feedback_runtime_scale_ramp_steps: int = 1
+    simplex_boundary_pair_gate_runtime_scale: float | None = None
+    simplex_boundary_pair_gate_runtime_scale_final: float | None = None
+    simplex_boundary_pair_gate_runtime_scale_ramp_start_step: int | None = None
+    simplex_boundary_pair_gate_runtime_scale_ramp_steps: int = 1
     simplex_local_neighbor_k: float | None = None
     simplex_local_neighbor_k_final: float | None = None
     simplex_local_neighbor_k_ramp_start_step: int | None = None
@@ -1027,6 +1031,23 @@ def simplex_boundary_pair_feedback_runtime_scale_at_step(
     )
 
 
+def simplex_boundary_pair_gate_runtime_scale_at_step(
+    training_config: TrainingConfig,
+    step: int | None,
+) -> float | None:
+    if training_config.simplex_boundary_pair_gate_runtime_scale is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_boundary_pair_gate_runtime_scale)
+    return _ramped_value(
+        training_config.simplex_boundary_pair_gate_runtime_scale,
+        training_config.simplex_boundary_pair_gate_runtime_scale_final,
+        step=step,
+        start_step=training_config.simplex_boundary_pair_gate_runtime_scale_ramp_start_step,
+        ramp_steps=training_config.simplex_boundary_pair_gate_runtime_scale_ramp_steps,
+    )
+
+
 def simplex_local_neighbor_k_at_step(training_config: TrainingConfig, step: int | None) -> float | None:
     if training_config.simplex_local_neighbor_k is None:
         return None
@@ -1113,6 +1134,7 @@ def model_inputs_from_batch(
     use_simplex_segment_cell_runtime_scale: bool = False,
     use_simplex_msa_feedback_runtime_scale: bool = False,
     use_simplex_boundary_pair_feedback_runtime_scale: bool = False,
+    use_simplex_boundary_pair_gate_runtime_scale: bool = False,
     use_simplex_local_neighbor_k: bool = False,
     use_simplex_geometry_distance_weight: bool = False,
     use_simplex_cell_top_k: bool = False,
@@ -1195,6 +1217,11 @@ def model_inputs_from_batch(
     if use_simplex_boundary_pair_feedback_runtime_scale and boundary_pair_feedback_scale is not None:
         inputs["simplex_boundary_pair_feedback_scale_override"] = batch["target_feat"].new_tensor(
             float(boundary_pair_feedback_scale)
+        )
+    boundary_pair_gate_scale = simplex_boundary_pair_gate_runtime_scale_at_step(training_config, step)
+    if use_simplex_boundary_pair_gate_runtime_scale and boundary_pair_gate_scale is not None:
+        inputs["simplex_boundary_pair_gate_scale_override"] = batch["target_feat"].new_tensor(
+            float(boundary_pair_gate_scale)
         )
     local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
     if use_simplex_local_neighbor_k and local_neighbor_k is not None:
@@ -1321,6 +1348,7 @@ def train_step(
             use_simplex_segment_cell_runtime_scale=True,
             use_simplex_msa_feedback_runtime_scale=True,
             use_simplex_boundary_pair_feedback_runtime_scale=True,
+            use_simplex_boundary_pair_gate_runtime_scale=True,
             use_simplex_local_neighbor_k=True,
             use_simplex_geometry_distance_weight=True,
             use_simplex_cell_top_k=True,
@@ -1658,6 +1686,7 @@ def fit(
                     use_simplex_segment_cell_runtime_scale=True,
                     use_simplex_msa_feedback_runtime_scale=True,
                     use_simplex_boundary_pair_feedback_runtime_scale=True,
+                    use_simplex_boundary_pair_gate_runtime_scale=True,
                     use_simplex_local_neighbor_k=True,
                     use_simplex_geometry_distance_weight=True,
                     use_simplex_cell_top_k=True,
@@ -2094,6 +2123,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-boundary-pair-feedback-runtime-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-boundary-pair-feedback-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
+        "--simplex-boundary-pair-gate-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for sparse boundary-edge pair-gated messages.",
+    )
+    parser.add_argument("--simplex-boundary-pair-gate-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-boundary-pair-gate-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-boundary-pair-gate-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-local-neighbor-k",
         type=float,
         default=None,
@@ -2281,6 +2319,14 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         ),
         simplex_boundary_pair_feedback_runtime_scale_ramp_steps=(
             args.simplex_boundary_pair_feedback_runtime_scale_ramp_steps
+        ),
+        simplex_boundary_pair_gate_runtime_scale=args.simplex_boundary_pair_gate_runtime_scale,
+        simplex_boundary_pair_gate_runtime_scale_final=args.simplex_boundary_pair_gate_runtime_scale_final,
+        simplex_boundary_pair_gate_runtime_scale_ramp_start_step=(
+            args.simplex_boundary_pair_gate_runtime_scale_ramp_start_step
+        ),
+        simplex_boundary_pair_gate_runtime_scale_ramp_steps=(
+            args.simplex_boundary_pair_gate_runtime_scale_ramp_steps
         ),
         simplex_local_neighbor_k=args.simplex_local_neighbor_k,
         simplex_local_neighbor_k_final=args.simplex_local_neighbor_k_final,

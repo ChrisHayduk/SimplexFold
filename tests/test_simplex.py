@@ -74,6 +74,7 @@ class SimplexConfig:
     simplex_msa_feedback_scale = 0.0
     simplex_boundary_msa_feedback_scale = 0.0
     simplex_boundary_pair_feedback_scale = 0.0
+    simplex_boundary_pair_gate_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
     simplex_outer_edge_context_scale = 0.0
     simplex_hodge_face_update_scale = 0.0
@@ -1307,6 +1308,43 @@ def test_simplicial_adapter_can_lift_boundary_edge_coboundary_to_pair_feedback()
     assert not torch.allclose(on_pair[0], off_pair[0])
     assert torch.all(aux["simplex_boundary_pair_feedback"][1, 4:] == 0)
     assert torch.all(aux["simplex_boundary_pair_feedback"][1, :, 4:] == 0)
+
+
+def test_simplicial_adapter_can_pair_gate_sparse_boundary_edges():
+    class BoundaryPairGateConfig(SimplexConfig):
+        simplex_boundary_pair_gate_scale = 0.25
+
+    torch.manual_seed(16)
+    cfg = BoundaryPairGateConfig()
+    adapter = SimplicialAdapter(cfg).eval()
+    pair = torch.randn(2, 6, 6, cfg.c_z)
+    single = torch.randn(2, 6, cfg.c_s)
+    seq_mask = torch.tensor(
+        [
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0, 0.0],
+        ]
+    )
+    pair_mask = seq_mask[:, :, None] * seq_mask[:, None, :]
+
+    off_pair, _, _ = adapter(
+        pair,
+        single,
+        seq_mask=seq_mask,
+        pair_mask=pair_mask,
+        simplex_boundary_pair_gate_scale_override=pair.new_tensor(0.0),
+    )
+    on_pair, _, _ = adapter(
+        pair,
+        single,
+        seq_mask=seq_mask,
+        pair_mask=pair_mask,
+        simplex_boundary_pair_gate_scale_override=pair.new_tensor(0.25),
+    )
+
+    assert not torch.allclose(on_pair[0], off_pair[0])
+    assert torch.all(on_pair[1, 4:] == 0)
+    assert torch.all(on_pair[1, :, 4:] == 0)
 
 
 def test_optional_low_rank_msa_to_face_path_runs():

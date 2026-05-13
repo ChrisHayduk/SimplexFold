@@ -65,6 +65,7 @@ from minalphafold.trainer import (  # noqa: E402
     set_optimizer_learning_rate,
     set_seed,
     simplex_boundary_pair_feedback_runtime_scale_at_step,
+    simplex_boundary_pair_gate_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
     simplex_cell_score_outer_edge_weight_at_step,
     simplex_edge_frame_message_runtime_scale_at_step,
@@ -642,6 +643,7 @@ def _evaluate(
                         use_simplex_segment_cell_runtime_scale=True,
                         use_simplex_msa_feedback_runtime_scale=True,
                         use_simplex_boundary_pair_feedback_runtime_scale=True,
+                        use_simplex_boundary_pair_gate_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
                         use_simplex_geometry_distance_weight=True,
                         use_simplex_cell_top_k=True,
@@ -962,6 +964,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_msa_feedback_scale", args.simplex_msa_feedback_scale),
         ("simplex_boundary_msa_feedback_scale", args.simplex_boundary_msa_feedback_scale),
         ("simplex_boundary_pair_feedback_scale", args.simplex_boundary_pair_feedback_scale),
+        ("simplex_boundary_pair_gate_scale", args.simplex_boundary_pair_gate_scale),
         ("simplex_outer_edge_update_scale", args.simplex_outer_edge_update_scale),
         ("simplex_outer_edge_context_scale", args.simplex_outer_edge_context_scale),
         ("simplex_hodge_face_update_scale", args.simplex_hodge_face_update_scale),
@@ -1192,6 +1195,10 @@ def _train_variant(
             training_config,
             step,
         )
+        simplex_boundary_pair_gate_runtime_scale = simplex_boundary_pair_gate_runtime_scale_at_step(
+            training_config,
+            step,
+        )
         simplex_local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
         simplex_geometry_distance_weight = simplex_geometry_distance_weight_at_step(training_config, step)
         simplex_face_top_k = simplex_face_top_k_at_step(training_config, step)
@@ -1224,6 +1231,7 @@ def _train_variant(
                         use_simplex_segment_cell_runtime_scale=True,
                         use_simplex_msa_feedback_runtime_scale=True,
                         use_simplex_boundary_pair_feedback_runtime_scale=True,
+                        use_simplex_boundary_pair_gate_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
                         use_simplex_geometry_distance_weight=True,
                         use_simplex_cell_top_k=True,
@@ -1370,6 +1378,11 @@ def _train_variant(
                     float("nan")
                     if simplex_boundary_pair_feedback_runtime_scale is None
                     else simplex_boundary_pair_feedback_runtime_scale
+                ),
+                "simplex_boundary_pair_gate_runtime_scale": (
+                    float("nan")
+                    if simplex_boundary_pair_gate_runtime_scale is None
+                    else simplex_boundary_pair_gate_runtime_scale
                 ),
                 "simplex_local_neighbor_k": (
                     float("nan") if simplex_local_neighbor_k is None else simplex_local_neighbor_k
@@ -1638,6 +1651,16 @@ def _train_variant(
         "simplex_boundary_pair_feedback_runtime_scale_ramp_steps": (
             training_config.simplex_boundary_pair_feedback_runtime_scale_ramp_steps
         ),
+        "simplex_boundary_pair_gate_runtime_scale": training_config.simplex_boundary_pair_gate_runtime_scale,
+        "simplex_boundary_pair_gate_runtime_scale_final": (
+            training_config.simplex_boundary_pair_gate_runtime_scale_final
+        ),
+        "simplex_boundary_pair_gate_runtime_scale_ramp_start_step": (
+            training_config.simplex_boundary_pair_gate_runtime_scale_ramp_start_step
+        ),
+        "simplex_boundary_pair_gate_runtime_scale_ramp_steps": (
+            training_config.simplex_boundary_pair_gate_runtime_scale_ramp_steps
+        ),
         "simplex_local_neighbor_k": training_config.simplex_local_neighbor_k,
         "simplex_local_neighbor_k_final": training_config.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": training_config.simplex_local_neighbor_k_ramp_start_step,
@@ -1731,6 +1754,9 @@ def _train_variant(
         ),
         "simplex_boundary_pair_feedback_scale": (
             float(getattr(model_config, "simplex_boundary_pair_feedback_scale", 0.0)) if use_simplicial else 0.0
+        ),
+        "simplex_boundary_pair_gate_scale": (
+            float(getattr(model_config, "simplex_boundary_pair_gate_scale", 0.0)) if use_simplicial else 0.0
         ),
         "simplex_outer_edge_update_scale": (
             float(getattr(model_config, "simplex_outer_edge_update_scale", 0.0)) if use_simplicial else 0.0
@@ -1938,6 +1964,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_msa_feedback_scale",
         "simplex_boundary_msa_feedback_scale",
         "simplex_boundary_pair_feedback_scale",
+        "simplex_boundary_pair_gate_scale",
         "simplex_outer_edge_update_scale",
         "simplex_outer_edge_context_scale",
         "simplex_hodge_face_update_scale",
@@ -2255,6 +2282,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the model config scale for directed boundary-edge coboundary feedback into pair/edge states.",
     )
     parser.add_argument(
+        "--simplex-boundary-pair-gate-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for pair-conditioned gates on sparse boundary-edge cochains.",
+    )
+    parser.add_argument(
         "--simplex-msa-feedback-runtime-scale",
         type=float,
         default=None,
@@ -2272,6 +2305,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-boundary-pair-feedback-runtime-scale-final", type=float, default=None)
     parser.add_argument("--simplex-boundary-pair-feedback-runtime-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-boundary-pair-feedback-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-boundary-pair-gate-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for pair-conditioned gates on sparse boundary-edge cochains.",
+    )
+    parser.add_argument("--simplex-boundary-pair-gate-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-boundary-pair-gate-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-boundary-pair-gate-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
         "--simplex-outer-edge-update-scale",
         type=float,
@@ -2624,6 +2666,14 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_boundary_pair_feedback_runtime_scale_ramp_steps=(
             args.simplex_boundary_pair_feedback_runtime_scale_ramp_steps
         ),
+        simplex_boundary_pair_gate_runtime_scale=args.simplex_boundary_pair_gate_runtime_scale,
+        simplex_boundary_pair_gate_runtime_scale_final=args.simplex_boundary_pair_gate_runtime_scale_final,
+        simplex_boundary_pair_gate_runtime_scale_ramp_start_step=(
+            args.simplex_boundary_pair_gate_runtime_scale_ramp_start_step
+        ),
+        simplex_boundary_pair_gate_runtime_scale_ramp_steps=(
+            args.simplex_boundary_pair_gate_runtime_scale_ramp_steps
+        ),
         simplex_local_neighbor_k=args.simplex_local_neighbor_k,
         simplex_local_neighbor_k_final=args.simplex_local_neighbor_k_final,
         simplex_local_neighbor_k_ramp_start_step=args.simplex_local_neighbor_k_ramp_start_step,
@@ -2811,10 +2861,19 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_boundary_pair_feedback_runtime_scale_ramp_steps": (
             args.simplex_boundary_pair_feedback_runtime_scale_ramp_steps
         ),
+        "simplex_boundary_pair_gate_runtime_scale": args.simplex_boundary_pair_gate_runtime_scale,
+        "simplex_boundary_pair_gate_runtime_scale_final": args.simplex_boundary_pair_gate_runtime_scale_final,
+        "simplex_boundary_pair_gate_runtime_scale_ramp_start_step": (
+            args.simplex_boundary_pair_gate_runtime_scale_ramp_start_step
+        ),
+        "simplex_boundary_pair_gate_runtime_scale_ramp_steps": (
+            args.simplex_boundary_pair_gate_runtime_scale_ramp_steps
+        ),
         "simplex_structure_readout_scale": args.simplex_structure_readout_scale,
         "simplex_msa_feedback_scale": args.simplex_msa_feedback_scale,
         "simplex_boundary_msa_feedback_scale": args.simplex_boundary_msa_feedback_scale,
         "simplex_boundary_pair_feedback_scale": args.simplex_boundary_pair_feedback_scale,
+        "simplex_boundary_pair_gate_scale": args.simplex_boundary_pair_gate_scale,
         "simplex_outer_edge_update_scale": args.simplex_outer_edge_update_scale,
         "simplex_outer_edge_context_scale": args.simplex_outer_edge_context_scale,
         "simplex_hodge_face_update_scale": args.simplex_hodge_face_update_scale,

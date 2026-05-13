@@ -1270,6 +1270,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.msa_feedback_scale = float(getattr(config, "simplex_msa_feedback_scale", 0.0))
         self.boundary_msa_feedback_scale = float(getattr(config, "simplex_boundary_msa_feedback_scale", 0.0))
         self.boundary_pair_feedback_scale = float(getattr(config, "simplex_boundary_pair_feedback_scale", 0.0))
+        self.boundary_pair_gate_scale = float(getattr(config, "simplex_boundary_pair_gate_scale", 0.0))
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
         self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
@@ -1325,6 +1326,8 @@ class SimplicialAdapter(torch.nn.Module):
             self.boundary_to_msa_feedback = SimplexMLP(2 * config.c_z, self.hidden_dim, config.c_m)
         if self.boundary_pair_feedback_scale > 0.0:
             self.boundary_to_pair_feedback = SimplexMLP(3 * config.c_z, self.hidden_dim, config.c_z)
+        if self.boundary_pair_gate_scale > 0.0:
+            self.boundary_pair_gate = SimplexMLP(2 * config.c_z, self.hidden_dim, config.c_z)
         self.auxiliary_heads = SimplexAuxiliaryHeads(config)
         if self.outer_edge_context_scale > 0.0:
             self.face_outer_edge_context = SimplexMLP(
@@ -1431,6 +1434,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
         simplex_msa_feedback_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_pair_feedback_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_pair_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
@@ -1491,6 +1495,12 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_boundary_pair_feedback_scale_override is not None:
             boundary_pair_feedback_scale = max(
                 float(simplex_boundary_pair_feedback_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
+        boundary_pair_gate_scale = self.boundary_pair_gate_scale
+        if simplex_boundary_pair_gate_scale_override is not None:
+            boundary_pair_gate_scale = max(
+                float(simplex_boundary_pair_gate_scale_override.detach().float().cpu().item()),
                 0.0,
             )
         local_neighbor_k = self.local_neighbor_k
@@ -1738,6 +1748,14 @@ class SimplicialAdapter(torch.nn.Module):
             face_edge_update = face_edge_update + edge_frame_message_scale * self.face_edge_frame_to_edge(
                 torch.cat([face_edge_state, face_frame_features], dim=-1)
             )
+        if self.boundary_pair_gate_scale > 0.0 and boundary_pair_gate_scale > 0.0:
+            face_edge_pair_state = torch.stack([z_ij, z_ik, z_jk], dim=-2)
+            face_edge_update = face_edge_update + self.dropout(
+                boundary_pair_gate_scale
+                * torch.tanh(self.boundary_pair_gate(torch.cat([face_edge_update, face_edge_pair_state], dim=-1)))
+                * face_edge_update
+                * face_edge_mask[..., None]
+            )
         if self.boundary_incidence_normalization > 0.0:
             face_edge_update = face_edge_update * boundary_incidence_weights(
                 face_edge_indices,
@@ -1817,6 +1835,24 @@ class SimplicialAdapter(torch.nn.Module):
                 tetra_edge_state = tetra_state[..., None, :].expand(*tet_edge_indices.shape[:-1], self.c_tetra)
                 tet_edge_update = tet_edge_update + edge_frame_message_scale * self.tetra_edge_frame_to_edge(
                     torch.cat([tetra_edge_state, tet_frame_features], dim=-1)
+                )
+            if self.boundary_pair_gate_scale > 0.0 and boundary_pair_gate_scale > 0.0:
+                tet_edge_pair_state = torch.stack(
+                    [
+                        gather_pair(pair, tet_i, tet_j),
+                        gather_pair(pair, tet_i, tet_k),
+                        gather_pair(pair, tet_i, tet_l),
+                        gather_pair(pair, tet_j, tet_k),
+                        gather_pair(pair, tet_j, tet_l),
+                        gather_pair(pair, tet_k, tet_l),
+                    ],
+                    dim=-2,
+                )
+                tet_edge_update = tet_edge_update + self.dropout(
+                    boundary_pair_gate_scale
+                    * torch.tanh(self.boundary_pair_gate(torch.cat([tet_edge_update, tet_edge_pair_state], dim=-1)))
+                    * tet_edge_update
+                    * tet_edge_mask[..., None]
                 )
             if self.boundary_incidence_normalization > 0.0:
                 tet_edge_update = tet_edge_update * boundary_incidence_weights(

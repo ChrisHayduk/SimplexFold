@@ -1,4 +1,4 @@
-## Current Plan: E102 Boundary-Edge Pair Feedback
+## Current Plan: E103 Sparse Boundary-Edge Pair Gate
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -24,19 +24,28 @@ selected boundary-edge cochains as incidence-aware pair/edge bias or gating,
 so the explicit face/tetra complex changes how pair geometry is updated
 before structure readout instead of asking MSA feedback to carry that signal.
 
-E102 implements that test as `simplex_boundary_pair_feedback_scale`. It
-aggregates selected directed boundary-edge updates into outgoing and incoming
-residue cochains, lifts those endpoint summaries back to pair space, and
-projects `[Z_ij, outgoing_i, incoming_j]` into a residual pair update. This
-keeps the change within the README view: explicit face/tetra states
-communicate back through their boundary 1-skeleton into the edge
-representation. It is not an output-side metric hack.
+E102 tested that pair/edge feedback target by lifting selected boundary-edge
+cochains densely back to all `L x L` pairs. It was stopped as a performance
+failure before returning a new result: after roughly 42 minutes on the owned
+H100 pod it had not produced a new history row beyond the inherited E97
+step-9500 row, and `results.json` was absent. Do not add E102 to
+`EXPERIMENT_RESULTS.md`; it is an aborted implementation diagnostic, not a
+completed experiment.
 
-The E102 gate should resume E97 from step 9500 to 10000, keep the E97/E101
-topology settings fixed, allocate the boundary-pair feedback module at
-`0.05`, and ramp the active feedback from `0.0` to `0.025` over steps
-9500-10000. The exact launch module set counts `3,206,882` parameters,
-leaving `55,092` under the AF2-medium +5% ceiling. Reject unless it beats
+E103 keeps E102's topological claim but removes the dense all-pairs lift. It
+adds `simplex_boundary_pair_gate_scale`: each selected boundary-edge cochain
+induced by explicit face/tetra cells is modulated by a learned gate conditioned
+on that same edge's current pair state `Z_ab` before the edge update is
+scattered back through the selected 1-skeleton. This is still a simplicial
+architecture change, not an output-side lDDT hack: higher-order cells alter
+pair geometry through their boundary edges, while computation stays on the
+sparse selected complex.
+
+The E103 gate should resume E97 from step 9500 to 10000, keep the E97/E101
+topology settings fixed, allocate the sparse boundary-pair gate module at
+`0.05`, and ramp the active gate from `0.0` to `0.025` over steps
+9500-10000. The exact launch module set counts `3,193,762` parameters,
+leaving `68,212` under the AF2-medium +5% ceiling. Reject unless it beats
 E101 and approaches or exceeds the E96/E97 local peak on primary C-alpha lDDT
 without damaging selected-boundary diagnostics.
 

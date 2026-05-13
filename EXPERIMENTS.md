@@ -163,7 +163,8 @@ feedback variant.
 
 ### E102 Idea: Boundary-Edge Pair Feedback
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: stopped on owned Runpod pod `o1dy17ouv8w5mz` as an aborted
+performance diagnostic; no returned result.
 
 Hypothesis: E101 preserved the selected boundary 1-skeleton longer than E100
 and recovered part of the lost primary lDDT, but target-MSA feedback still
@@ -196,7 +197,7 @@ Validation so far:
 - Targeted E102/plumbing tests: `7 passed`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `170 passed`
 
-Launch: E102 is running as
+Launch: E102 launched as
 `e102_boundary_pair_feedback_from_e97_s10000_c256_m64`, resuming the E97
 checkpoint from step 9500 to step 10000 with fixed E97 topology settings,
 `--simplex-boundary-pair-feedback-scale 0.05`, and a runtime ramp from
@@ -204,30 +205,50 @@ checkpoint from step 9500 to step 10000 with fixed E97 topology settings,
 `/workspace/SimplexFold/logs/e102_boundary_pair_feedback_from_e97.log`,
 remote artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e102_boundary_pair_feedback_from_e97_s10000_c256_m64/`,
-and Python PID is `17897`.
+and Python PID was `17897`.
 
-Live note: after about 42 minutes on the owned H100 pod, E102 was still
+Stop note: after about 42 minutes on the owned H100 pod, E102 was still
 active but had not reached the next logged history row beyond the inherited
 E97 step-9500 row, and `results.json` was still absent. This suggests the
 dense all-pairs boundary-cochain lift is substantially more expensive than
-the earlier sparse boundary routes. Let it finish if practical, but treat
-runtime as part of the result.
+the earlier sparse boundary routes. It was terminated before any new
+checkpoint or result row was written, so it must not be added to
+`EXPERIMENT_RESULTS.md`.
 
 ### E103 Idea: Sparse Boundary-Edge Pair Gate
 
-Status: idea only; not implemented or launched.
+Status: implemented locally and validated; not launched yet.
 
 Hypothesis: E102 tests the right feedback target but applies the boundary
 cochain lift densely over all `L x L` pairs, which may be too expensive for
 short gates at crop 256. A sparse route should keep the same topological
 claim while matching the cost profile of earlier successful branches.
 
-Mechanism sketch: condition each selected boundary-edge update on its current
-pair state before scattering, using a small MLP over `[Z_ab, boundary_msg_ab]`
-or a learned gate on the sparse boundary-edge message. This keeps feedback on
-the explicit selected 1-skeleton induced by face/tetra cells, avoids a dense
+Mechanism: add `simplex_boundary_pair_gate_scale`. For each selected
+face/tetra boundary edge, concatenate the current sparse boundary-edge cochain
+with the corresponding pair state `Z_ab`, pass it through a learned
+pair-conditioned gate, and use that gate to modulate the boundary-edge update
+before incidence normalization and scatter. This keeps feedback on the
+explicit selected 1-skeleton induced by face/tetra cells, avoids E102's dense
 pair lift, and still lets the higher-order complex change pair geometry
 before the pair transition.
+
+Gate: resume E97 from step 9500 to step 10000 with fixed E97 topology
+settings, allocate `--simplex-boundary-pair-gate-scale 0.05`, and ramp
+`--simplex-boundary-pair-gate-runtime-scale 0.0` to `0.025` over steps
+9500-10000. The exact launch module set counts `3,193,762` parameters,
+leaving `68,212` under the AF2-medium +5% ceiling. Keep E100/E101
+MSA-feedback modules and E102 dense pair feedback disabled. Compare to E99
+step 10000 (`0.3972`), E101 (`0.3998`), E99 final (`0.4003`), E97
+(`0.4036`), and E96 (`0.4043`). Reject unless the sparse pair gate recovers
+primary lDDT toward or above the E96/E97 peak while keeping selected
+face/tetra boundary lDDT near the E101 band.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- Targeted E103/plumbing tests: `7 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `172 passed`
 
 ### E83: Fixed Sparse Cell Continuation
 

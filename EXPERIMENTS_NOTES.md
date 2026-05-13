@@ -4136,3 +4136,31 @@
   not return cleanly, the next topology-native branch should keep the same
   pair-feedback target but make the route sparse by conditioning selected
   boundary-edge updates on their current pair states before scatter.
+- E102 was stopped on the owned pod before any new checkpoint, history row, or
+  `results.json` was produced. The remote process tree for bash PID `17895`
+  and Python PID `17897` was terminated, and the log ended with `Terminated`.
+  This remains an aborted performance diagnostic, not a completed result, so
+  `EXPERIMENT_RESULTS.md` should continue to omit E102.
+- Implemented E103 locally as `simplex_boundary_pair_gate_scale`. The sparse
+  route keeps E102's pair/edge feedback target but avoids the dense `L x L`
+  lift: selected face/tetra boundary-edge cochains are concatenated with their
+  current pair state `Z_ab`, passed through a learned `tanh` gate, and used to
+  modulate the sparse boundary-edge update before incidence normalization and
+  scatter. This keeps the change inside the README's explicit selected
+  face/tetra complex and its boundary 1-skeleton.
+- E103 validation so far:
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  targeted tests for sparse gate behavior, CLI plumbing, runtime overrides,
+  validation propagation, and parameter budget reported `7 passed`.
+- Broader local E103 validation:
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `172 passed`.
+- Exact E103 launch-module parameter audit with E97 settings plus sparse
+  boundary pair gate counted `3,193,762` parameters versus AF2-medium
+  `3,106,642`, leaving `68,212` under the +5% ceiling `3,261,974`.
+- Intended E103 gate: resume E97 from step 9500 to 10000, keep E97 topology
+  settings fixed, allocate `--simplex-boundary-pair-gate-scale 0.05`, and
+  ramp `--simplex-boundary-pair-gate-runtime-scale 0.0` to `0.025` over
+  steps 9500-10000. Keep E100/E101 MSA-feedback routes and E102 dense
+  pair-feedback disabled, then compare against E99 step 10000, E101, E99
+  final, E97, and E96.
