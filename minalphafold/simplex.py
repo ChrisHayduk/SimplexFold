@@ -1269,6 +1269,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
         self.msa_feedback_scale = float(getattr(config, "simplex_msa_feedback_scale", 0.0))
         self.boundary_msa_feedback_scale = float(getattr(config, "simplex_boundary_msa_feedback_scale", 0.0))
+        self.boundary_pair_feedback_scale = float(getattr(config, "simplex_boundary_pair_feedback_scale", 0.0))
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
         self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
@@ -1322,6 +1323,8 @@ class SimplicialAdapter(torch.nn.Module):
             self.single_to_msa_feedback = SimplexMLP(config.c_s, self.hidden_dim, config.c_m)
         if self.boundary_msa_feedback_scale > 0.0:
             self.boundary_to_msa_feedback = SimplexMLP(2 * config.c_z, self.hidden_dim, config.c_m)
+        if self.boundary_pair_feedback_scale > 0.0:
+            self.boundary_to_pair_feedback = SimplexMLP(3 * config.c_z, self.hidden_dim, config.c_z)
         self.auxiliary_heads = SimplexAuxiliaryHeads(config)
         if self.outer_edge_context_scale > 0.0:
             self.face_outer_edge_context = SimplexMLP(
@@ -1427,6 +1430,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
         simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
         simplex_msa_feedback_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_pair_feedback_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
@@ -1483,6 +1487,12 @@ class SimplicialAdapter(torch.nn.Module):
                 msa_feedback_scale = feedback_runtime_scale
             if self.boundary_msa_feedback_scale > 0.0:
                 boundary_msa_feedback_scale = feedback_runtime_scale
+        boundary_pair_feedback_scale = self.boundary_pair_feedback_scale
+        if simplex_boundary_pair_feedback_scale_override is not None:
+            boundary_pair_feedback_scale = max(
+                float(simplex_boundary_pair_feedback_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
         local_neighbor_k = self.local_neighbor_k
         if simplex_local_neighbor_k_override is not None:
             local_neighbor_k = int(
@@ -1739,7 +1749,7 @@ class SimplicialAdapter(torch.nn.Module):
         boundary_source_counts = pair.new_zeros(pair.shape[0], pair.shape[1], 1)
         boundary_target_delta = pair.new_zeros(pair.shape[0], pair.shape[1], self.c_z)
         boundary_target_counts = pair.new_zeros(pair.shape[0], pair.shape[1], 1)
-        if self.boundary_msa_feedback_scale > 0.0:
+        if self.boundary_msa_feedback_scale > 0.0 or self.boundary_pair_feedback_scale > 0.0:
             (
                 boundary_source_delta,
                 boundary_source_counts,
@@ -1824,7 +1834,7 @@ class SimplicialAdapter(torch.nn.Module):
             )
             pair_delta = pair_delta + tet_pair_delta
             pair_counts = pair_counts + tet_pair_counts
-            if self.boundary_msa_feedback_scale > 0.0:
+            if self.boundary_msa_feedback_scale > 0.0 or self.boundary_pair_feedback_scale > 0.0:
                 (
                     tet_boundary_source_delta,
                     tet_boundary_source_counts,
@@ -1867,6 +1877,21 @@ class SimplicialAdapter(torch.nn.Module):
         pair = pair + self.dropout(pair_update_scale * pair_readout)
         if pair_mask is not None:
             pair = pair * pair_mask[..., None]
+        boundary_pair_feedback: torch.Tensor | None = None
+        if self.boundary_pair_feedback_scale > 0.0 and boundary_pair_feedback_scale > 0.0:
+            boundary_source_readout = boundary_source_delta / boundary_source_counts.clamp_min(1.0)
+            boundary_target_readout = boundary_target_delta / boundary_target_counts.clamp_min(1.0)
+            source_pair = boundary_source_readout[:, :, None, :].expand(-1, -1, pair.shape[2], -1)
+            target_pair = boundary_target_readout[:, None, :, :].expand(-1, pair.shape[1], -1, -1)
+            boundary_pair_input = torch.cat([pair, source_pair, target_pair], dim=-1)
+            boundary_pair_feedback = self.dropout(
+                boundary_pair_feedback_scale * self.boundary_to_pair_feedback(boundary_pair_input)
+            )
+            if pair_mask is not None:
+                boundary_pair_feedback = boundary_pair_feedback * pair_mask[..., None]
+            pair = pair + boundary_pair_feedback
+            if pair_mask is not None:
+                pair = pair * pair_mask[..., None]
 
         face_single_update = self.face_to_single(face_state).reshape(*face_state.shape[:-1], 3, self.c_s)
         face_residue_indices = torch.stack([i, j, k], dim=-1)
@@ -1932,6 +1957,8 @@ class SimplicialAdapter(torch.nn.Module):
             aux["simplex_structure_single_readout"] = single_readout
         if msa_feedback is not None:
             aux["simplex_msa_feedback"] = msa_feedback
+        if boundary_pair_feedback is not None:
+            aux["simplex_boundary_pair_feedback"] = boundary_pair_feedback
         return pair, single, aux
 
     def _segment_pass(

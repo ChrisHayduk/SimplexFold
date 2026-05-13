@@ -47,6 +47,7 @@ from minalphafold.trainer import (
     load_training_protocol,
     main,
     model_inputs_from_batch,
+    simplex_boundary_pair_feedback_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
     simplex_cell_score_outer_edge_weight_at_step,
     save_checkpoint,
@@ -83,6 +84,7 @@ def test_simplicial_runtime_overrides_reach_model_path():
     for parameter in (
         "simplex_cell_score_outer_edge_weight_override",
         "simplex_msa_feedback_scale_override",
+        "simplex_boundary_pair_feedback_scale_override",
     ):
         assert parameter in inspect.signature(AlphaFold2.forward).parameters
         assert parameter in inspect.signature(SimplicialEvoformer.forward).parameters
@@ -185,6 +187,10 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_msa_feedback_runtime_scale_final=0.1,
         simplex_msa_feedback_runtime_scale_ramp_start_step=10,
         simplex_msa_feedback_runtime_scale_ramp_steps=10,
+        simplex_boundary_pair_feedback_runtime_scale=0.0,
+        simplex_boundary_pair_feedback_runtime_scale_final=0.1,
+        simplex_boundary_pair_feedback_runtime_scale_ramp_start_step=10,
+        simplex_boundary_pair_feedback_runtime_scale_ramp_steps=10,
         simplex_local_neighbor_k=4.0,
         simplex_local_neighbor_k_final=0.0,
         simplex_local_neighbor_k_ramp_start_step=10,
@@ -203,6 +209,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, 15) == 0.25
     assert simplex_segment_cell_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_msa_feedback_runtime_scale_at_step(training_config, 15) == 0.05
+    assert simplex_boundary_pair_feedback_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_local_neighbor_k_at_step(training_config, 15) == 2.0
     assert simplex_cell_score_outer_edge_weight_at_step(training_config, 15) == 0.1
 
@@ -213,6 +220,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert "simplex_boundary_readout_directionality_override" not in eval_inputs
     assert "simplex_segment_cell_scale_override" not in eval_inputs
     assert "simplex_msa_feedback_scale_override" not in eval_inputs
+    assert "simplex_boundary_pair_feedback_scale_override" not in eval_inputs
     assert "simplex_local_neighbor_k_override" not in eval_inputs
     assert "simplex_cell_score_outer_edge_weight_override" not in eval_inputs
 
@@ -225,6 +233,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
         use_simplex_boundary_readout_directionality_runtime_scale=True,
         use_simplex_segment_cell_runtime_scale=True,
         use_simplex_msa_feedback_runtime_scale=True,
+        use_simplex_boundary_pair_feedback_runtime_scale=True,
         use_simplex_local_neighbor_k=True,
         use_simplex_cell_top_k=True,
         step=15,
@@ -238,6 +247,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
     assert torch.allclose(train_inputs["simplex_segment_cell_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_msa_feedback_scale_override"], torch.tensor(0.05))
+    assert torch.allclose(train_inputs["simplex_boundary_pair_feedback_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_local_neighbor_k_override"], torch.tensor(2.0))
     assert torch.allclose(train_inputs["simplex_cell_score_outer_edge_weight_override"], torch.tensor(0.1))
 
@@ -585,6 +595,24 @@ def test_simplicial_boundary_msa_feedback_stays_within_medium_budget():
         simplex_medium,
         simplex_use_msa_to_face=True,
         simplex_boundary_msa_feedback_scale=0.05,
+    )
+
+    af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    feedback_params = sum(parameter.numel() for parameter in AlphaFold2(feedback_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert feedback_params > simplex_params
+    assert feedback_params <= int(af2_params * 1.05)
+
+
+def test_simplicial_boundary_pair_feedback_stays_within_medium_budget():
+    af2_medium = replace(load_model_config("medium"), use_simplicial_evoformer=False)
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    feedback_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_boundary_pair_feedback_scale=0.05,
     )
 
     af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())

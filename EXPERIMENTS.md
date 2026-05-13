@@ -163,7 +163,7 @@ feedback variant.
 
 ### E102 Idea: Boundary-Edge Pair Feedback
 
-Status: idea only; not launched.
+Status: implemented locally; not launched yet.
 
 Hypothesis: E101 preserved the selected boundary 1-skeleton longer than E100
 and recovered part of the lost primary lDDT, but target-MSA feedback still
@@ -171,12 +171,30 @@ failed to beat the E96/E97 leaders. The selected complex may need to affect
 the pair tensor directly, because pair geometry is where AF2-style triangle
 updates and the structure module consume residue-residue constraints.
 
-Mechanism sketch: aggregate selected directed boundary-edge cochains into a
-pair-shaped residual or gate, normalized by boundary-edge reuse and incidence
-degree, then add it to `Z_ij` before downstream trunk/structure updates. This
-would keep the change inside the SimplexFold thesis: explicit face/tetra
-states communicate back through their boundary 1-skeleton into the edge
-representation, rather than adding a generic output lDDT or radius loss.
+Mechanism: add `simplex_boundary_pair_feedback_scale`. The adapter reuses the
+selected face/tetra boundary-edge updates, scatters them into outgoing
+source-residue and incoming target-residue cochains, and then lifts those
+endpoint summaries back into pair space as `[Z_ij, outgoing_i, incoming_j]`.
+A small MLP projects that incidence-aware tensor into a residual pair update.
+This is distinct from the existing sparse boundary scatter: it tests whether
+the selected boundary 1-cochain can bias broader pair geometry before the pair
+transition, while still using only the explicit selected cell complex.
+
+Gate: resume E97 from step 9500 to step 10000 with fixed E97 topology
+settings, allocate `--simplex-boundary-pair-feedback-scale 0.05`, and ramp
+`--simplex-boundary-pair-feedback-runtime-scale 0.0` to `0.025` over steps
+9500-10000. The exact launch module set counts `3,206,882` parameters,
+leaving `55,092` under the AF2-medium +5% ceiling. Keep E100/E101
+MSA-feedback modules disabled. Compare to E99 step 10000 (`0.3972`), E101
+(`0.3998`), E99 final (`0.4003`), E97 (`0.4036`), and E96 (`0.4043`). Reject
+unless the pair route recovers primary lDDT toward or above the E96/E97 peak
+while keeping selected face/tetra boundary lDDT near the E101 band.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- Targeted E102/plumbing tests: `7 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `170 passed`
 
 ### E83: Fixed Sparse Cell Continuation
 

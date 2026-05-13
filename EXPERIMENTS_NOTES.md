@@ -4078,3 +4078,28 @@
   three near-10k controls that stay near `0.40`; reaching `0.7` by 30,000
   would require a much stronger late-training lDDT slope than any current
   continuation has shown.
+- Implemented E102 locally as `simplex_boundary_pair_feedback_scale`. The
+  route aggregates selected directed boundary-edge updates into outgoing and
+  incoming residue cochains, lifts those endpoint summaries back to pair
+  space as `[Z_ij, outgoing_i, incoming_j]`, and applies a learned residual
+  pair update. This keeps the feedback target in the pair/edge trunk rather
+  than the target MSA row.
+- E102 is topology-native: it routes explicit face/tetra cell evidence
+  through the selected boundary 1-skeleton into `Z_ij`. It does not add an
+  output lDDT/radius loss or any supervision outside the model-selected sparse
+  complex.
+- E102 validation so far:
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  targeted tests for the pair-feedback route, CLI plumbing, runtime overrides,
+  and parameter budget reported `7 passed`.
+- Broader local E102 validation:
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `170 passed`; `git diff --check` passed.
+- Exact E102 launch-module parameter audit with E97 settings plus boundary
+  pair feedback counted `3,206,882` parameters versus AF2-medium `3,106,642`,
+  leaving `55,092` under the +5% ceiling `3,261,974`.
+- Intended E102 gate: resume E97 from step 9500 to 10000, keep E97 topology
+  settings fixed, allocate `--simplex-boundary-pair-feedback-scale 0.05`, and
+  ramp `--simplex-boundary-pair-feedback-runtime-scale 0.0` to `0.025` over
+  steps 9500-10000. Keep E100/E101 MSA-feedback routes disabled and compare
+  against E99 step 10000, E101, E99 final, E97, and E96.

@@ -1,4 +1,4 @@
-## Current Plan: No 30k Spend Until a New Slope Appears
+## Current Plan: E102 Boundary-Edge Pair Feedback
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -23,6 +23,22 @@ does not beat the E96/E97 leaders. The next candidate should therefore use
 selected boundary-edge cochains as incidence-aware pair/edge bias or gating,
 so the explicit face/tetra complex changes how pair geometry is updated
 before structure readout instead of asking MSA feedback to carry that signal.
+
+E102 implements that test as `simplex_boundary_pair_feedback_scale`. It
+aggregates selected directed boundary-edge updates into outgoing and incoming
+residue cochains, lifts those endpoint summaries back to pair space, and
+projects `[Z_ij, outgoing_i, incoming_j]` into a residual pair update. This
+keeps the change within the README view: explicit face/tetra states
+communicate back through their boundary 1-skeleton into the edge
+representation. It is not an output-side metric hack.
+
+The E102 gate should resume E97 from step 9500 to 10000, keep the E97/E101
+topology settings fixed, allocate the boundary-pair feedback module at
+`0.05`, and ramp the active feedback from `0.0` to `0.025` over steps
+9500-10000. The exact launch module set counts `3,206,882` parameters,
+leaving `55,092` under the AF2-medium +5% ceiling. Reject unless it beats
+E101 and approaches or exceeds the E96/E97 local peak on primary C-alpha lDDT
+without damaging selected-boundary diagnostics.
 
 ## Historical Plan Context
 
