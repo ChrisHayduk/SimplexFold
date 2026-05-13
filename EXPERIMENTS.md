@@ -451,7 +451,7 @@ Validation so far:
 
 ### E108 Idea: Continue Selected-Boundary Cochain Recycling
 
-Status: queued for launch from the verified E106 step-6500 checkpoint.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E106 improved E105a on primary C-alpha lDDT, FoldScore, dRMSD,
 and C-alpha expansion, so the selected-boundary cochain memory may be useful.
@@ -471,6 +471,16 @@ small but coherent improvement with better dRMSD/Rg as evidence to continue the
 cochain-memory route, but require a much stronger slope before any 30k spend.
 If E108 stalls or regresses, launch E107 from the best verified cochain-memory
 checkpoint.
+
+Launch: E108 is running as
+`e108_boundary_cochain_recycling_continue_from_e106_s7000_c256_m64`. The
+remote checkout was fast-forwarded to commit `56150c7`, no active benchmark
+process was present, the E106 checkpoint was present, remote py_compile passed,
+and the E108 launch-style parameter audit counted `3,154,242` parameters under
+the `3,261,974` cap. It resumed the E106 checkpoint at step 6500/examples
+52000 with `1244` matching model tensors and `0` new/missing tensors. Main
+Python PID is `2881`; log path is
+`/workspace/SimplexFold/logs/e108_boundary_cochain_recycling_continue_from_e106.log`.
 
 ### E107 Idea: Metric-Gated Boundary Cochain Recycling
 

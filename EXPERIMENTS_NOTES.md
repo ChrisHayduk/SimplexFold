@@ -4524,3 +4524,30 @@
   E96's `0.4043184444308281`. Queue E108 as a clean continuation from the E106
   checkpoint with cochain recycling held at `0.10`; reserve E107's metric gate
   for a stall or regression in the cochain-memory route.
+- E108 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` to commit `56150c7`, verified that no active
+  benchmark process was present, verified the E106 checkpoint at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  ran remote py_compile for model/adapter/trainer/runner files, and audited
+  the E108 launch-style module set at `3,154,242` parameters under the
+  `3,261,974` AF2-medium +5% cap.
+- E108 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e108_boundary_cochain_recycling_continue_from_e106_s7000_c256_m64`, PID
+  `2881`, log
+  `/workspace/SimplexFold/logs/e108_boundary_cochain_recycling_continue_from_e106.log`,
+  and artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e108_boundary_cochain_recycling_continue_from_e106_s7000_c256_m64/`.
+  It resumes the E106 checkpoint at step 6500/examples 52000 with
+  `--resume-model-weights-only`, keeps the E106 selected-complex recipe fixed,
+  disables metric recycling, and holds selected-boundary cochain recycling at
+  `0.10` instead of ramping it. Startup showed `1244` matching tensors loaded
+  and `0` new/missing tensors initialized.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E108, preserving
+  owned-pod-only scope and the rule that the heartbeat must not launch
+  follow-up experiments automatically.
+- E108 startup health poll at `2026-05-13T13:58:27Z`: PID `2881` was active
+  after about 1.75 minutes, GPU utilization was `29%` with `11699 MiB`
+  allocated, `results.json` and `results.csv` were absent, and the inherited
+  history had 14 rows ending at E106 step 6500
+  (`val_lddt_ca=0.3929199054837227`, FoldScore `0.377660034224391`,
+  `val_ca_drmsd=10.327910900115967`). Continue to treat E108 as in flight.

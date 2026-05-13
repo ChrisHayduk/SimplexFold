@@ -95,11 +95,12 @@ improves FoldScore, dRMSD, and expansion, so the cochain-memory route is not
 an immediate reject. It remains below E96's `0.4043`, so it is still a
 recovery-branch signal rather than a 30k candidate by itself.
 
-The next branch is E108: continue E106 from the verified step-6500 checkpoint
-to step 7000 with the same selected-complex recipe and selected-boundary
-cochain recycling held at `0.10`. This is a clean slope test: if cochain
-memory continues climbing, keep the route alive; if it stalls or regresses,
-fall back to E107's metric-gated cochain recycling.
+The active branch is E108: continue E106 from the verified step-6500
+checkpoint to step 7000 with the same selected-complex recipe and
+selected-boundary cochain recycling held at `0.10`. This is a clean slope
+test: if cochain memory continues climbing, keep the route alive; if it stalls
+or regresses, fall back to E107's metric-gated cochain recycling. E108 is
+running on the owned Runpod pod `o1dy17ouv8w5mz`.
 
 The prepared fallback remains E107: metric-gated selected-boundary cochain
 recycling. It keeps the E106 inter-cycle cochain memory path but gates the
