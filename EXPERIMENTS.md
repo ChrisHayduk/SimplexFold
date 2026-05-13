@@ -206,6 +206,29 @@ remote artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e102_boundary_pair_feedback_from_e97_s10000_c256_m64/`,
 and Python PID is `17897`.
 
+Live note: after about 42 minutes on the owned H100 pod, E102 was still
+active but had not reached the next logged history row beyond the inherited
+E97 step-9500 row, and `results.json` was still absent. This suggests the
+dense all-pairs boundary-cochain lift is substantially more expensive than
+the earlier sparse boundary routes. Let it finish if practical, but treat
+runtime as part of the result.
+
+### E103 Idea: Sparse Boundary-Edge Pair Gate
+
+Status: idea only; not implemented or launched.
+
+Hypothesis: E102 tests the right feedback target but applies the boundary
+cochain lift densely over all `L x L` pairs, which may be too expensive for
+short gates at crop 256. A sparse route should keep the same topological
+claim while matching the cost profile of earlier successful branches.
+
+Mechanism sketch: condition each selected boundary-edge update on its current
+pair state before scattering, using a small MLP over `[Z_ab, boundary_msg_ab]`
+or a learned gate on the sparse boundary-edge message. This keeps feedback on
+the explicit selected 1-skeleton induced by face/tetra cells, avoids a dense
+pair lift, and still lets the higher-order complex change pair geometry
+before the pair transition.
+
 ### E83: Fixed Sparse Cell Continuation
 
 Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.

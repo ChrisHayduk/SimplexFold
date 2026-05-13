@@ -4124,3 +4124,15 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   to E102, keeping the owned-pod-only restriction and the rule that the
   heartbeat must not launch follow-up experiments automatically.
+- E102 live performance check on owned pod `o1dy17ouv8w5mz`: after about
+  42 minutes, bash PID `17895` and Python PID `17897` were still active,
+  GPU memory was about `13.5GB`, and GPU utilization was nonzero, but
+  `results.json` was still absent. The local history file still had 20 rows
+  with the last row inherited from E97 at step 9500; no new step-10000 row or
+  checkpoint had landed yet.
+- E102 interpretation so far: this is not a returned result and should not be
+  added to `EXPERIMENT_RESULTS.md`, but the dense all-pairs boundary-cochain
+  lift is much slower than the earlier sparse boundary routes. If E102 does
+  not return cleanly, the next topology-native branch should keep the same
+  pair-feedback target but make the route sparse by conditioning selected
+  boundary-edge updates on their current pair states before scatter.
