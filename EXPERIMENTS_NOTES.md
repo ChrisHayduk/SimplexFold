@@ -4578,3 +4578,29 @@
   `0.38745662942528725`), FoldScore, and dRMSD. Launch E107 from the better
   verified E106 checkpoint to test whether metric confidence can suppress
   uncertain recycled boundary cochains.
+- E107 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` to commit `3250890`, verified that no active
+  benchmark process was present, verified the E106 checkpoint at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  ran remote py_compile for model/adapter/trainer/runner files, and audited
+  the E107 launch-style module set at `3,154,242` parameters under the
+  `3,261,974` AF2-medium +5% cap.
+- E107 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e107_metric_gated_cochain_recycling_from_e106_s7000_c256_m64`, PID `3424`,
+  log `/workspace/SimplexFold/logs/e107_metric_gated_cochain_recycling_from_e106.log`,
+  and artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e107_metric_gated_cochain_recycling_from_e106_s7000_c256_m64/`.
+  It resumes the E106 checkpoint at step 6500/examples 52000 with
+  `--resume-model-weights-only`, keeps the E106 selected-complex/cochain
+  recipe fixed, and adds only
+  `--simplex-boundary-cochain-recycling-metric-gate-scale 1.0`. Startup showed
+  `1244` matching tensors loaded and `0` new/missing tensors initialized.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E107, preserving
+  owned-pod-only scope and the rule that the heartbeat must not launch
+  follow-up experiments automatically.
+- E107 startup health poll at `2026-05-13T14:59:43Z`: PID `3424` was active
+  after about 1.35 minutes, GPU utilization was `60%` with `11695 MiB`
+  allocated, `results.json` and `results.csv` were absent, and the inherited
+  history had 14 rows ending at E106 step 6500
+  (`val_lddt_ca=0.3929199054837227`, FoldScore `0.377660034224391`,
+  `val_ca_drmsd=10.327910900115967`). Continue to treat E107 as in flight.

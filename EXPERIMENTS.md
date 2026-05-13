@@ -490,8 +490,7 @@ E106 step-6500 checkpoint rather than continuing E108.
 
 ### E107 Idea: Metric-Gated Boundary Cochain Recycling
 
-Status: implemented and queued for launch from the verified E106 step-6500
-checkpoint because E108 regressed.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E106 recycles the learned selected-boundary pair cochain directly
 into the next AF2 cycle. If that helps, continue the cochain-memory route. If
@@ -514,6 +513,16 @@ Gate: run a 500-step gate from the verified E106 step-6500 checkpoint to step
 `--simplex-boundary-cochain-recycling-metric-gate-scale 1.0`. Reject unless
 primary `val_lddt_ca` improves over E106's `0.3929`; a result that beats E108
 but not E106 is still evidence about gating but not a continuation candidate.
+
+Launch: E107 is running as
+`e107_metric_gated_cochain_recycling_from_e106_s7000_c256_m64`. The remote
+checkout was fast-forwarded to commit `3250890`, no active benchmark process
+was present, the E106 checkpoint was present, remote py_compile passed, and the
+E107 launch-style parameter audit counted `3,154,242` parameters under the
+`3,261,974` cap. It resumed the E106 checkpoint at step 6500/examples 52000
+with `1244` matching model tensors and `0` new/missing tensors. Main Python
+PID is `3424`; log path is
+`/workspace/SimplexFold/logs/e107_metric_gated_cochain_recycling_from_e106.log`.
 
 Validation so far:
 

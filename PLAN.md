@@ -109,7 +109,8 @@ cochain memory path but gates the recycled boundary cochain by the simplex
 face/tetra distance-head confidence before adding it to `z_prev`. This tests
 whether recycling uncertain selected cell cochains caused E108's regression;
 it is still an inter-cycle topological cochain-memory change, adds no
-parameters, and adds no output loss.
+parameters, and adds no output loss. E107 is running on the owned Runpod pod
+`o1dy17ouv8w5mz` to step 7000.
 
 ## Historical Plan Context
 
