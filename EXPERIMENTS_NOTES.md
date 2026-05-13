@@ -4321,3 +4321,8 @@
   `history_full_msa_to_face.json` still had 20 rows ending at E97 step 9500
   (`val_lddt_ca=0.4035918414592743`). No returned artifact exists yet, so
   `EXPERIMENT_RESULTS.md` remains unchanged.
+- E104 bounded watch from `2026-05-13T10:59:08Z` to
+  `2026-05-13T11:05:32Z`: four owned-pod polls all showed PID `19749` active,
+  `results.json` / `results.csv` absent, and `history_full_msa_to_face.json`
+  unchanged since `2026-05-13T10:14:09Z` with 20 rows ending at E97 step 9500.
+  Treat E104 as still in flight rather than returned.
