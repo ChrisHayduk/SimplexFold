@@ -72,7 +72,7 @@ stay out of the queue unless they supervise only the selected sparse complex.
 
 ### E114 Idea: Segment-Supported Sparse-Cell Filtration
 
-Status: implemented locally; do not launch until E113 returns.
+Status: implemented locally; queued to launch from the returned E113 checkpoint.
 
 Hypothesis: E104-E113 show that the selected face/tetra complex can learn
 strong local boundary metrics without consistently improving global C-alpha
@@ -94,12 +94,12 @@ learned segment cells plus edge-frame messages exceed the AF2-medium +5% cap,
 while this selector adds no parameters and can keep edge-frame/directed
 boundary readout available.
 
-Gate if E113 fails: resume the strongest retained E106/E113-compatible
-checkpoint for a 500-step Runpod gate, keep the selected sparse complex
+Gate: resume the returned E113 checkpoint for a 500-step Runpod gate, keep the selected sparse complex
 (`--simplex-face-top-k 24`, `--simplex-tetra-top-k 48`,
 `--simplex-cell-score-degree-penalty 0.75`), keep half-scale edge-frame
-messages, set `--simplex-cell-score-segment-weight 0.125` or `0.25`, and
-compare against E106/E113 on primary `val_lddt_ca` plus selected-boundary
+messages, hold the E113 directed-boundary readout handoff at `0.25`, set
+`--simplex-cell-score-segment-weight 0.125` or `0.25`, and compare against
+E106/E113 on primary `val_lddt_ca` plus selected-boundary
 lDDT, boundary length error, contraction fraction, and boundary-edge reuse.
 
 Validation so far:
@@ -748,7 +748,7 @@ E111 on primary C-alpha lDDT, so leave this structure-bias route.
 
 ### E113 Idea: Directed Boundary-Readout Rewarm From E106
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E96 remains the best primary-lDDT result because it treated
 directed source/target boundary readout as an annealed cochain-routing
@@ -775,6 +775,16 @@ launch-style parameter audit counted `3,154,242` parameters under the
 `3,261,974` cap. Startup health confirmed PID `6887`, clean artifact path
 creation, step-6500 resume from E106, `1244` matching tensors loaded, `0`
 new/missing tensors initialized, and a fresh optimizer.
+
+Result: keep as a recovery-branch handoff, not as a 30,000-step candidate.
+E113 returned at step 7000 with `val_lddt_ca=0.3959`, FoldScore `0.3775`,
+`val_ca_drmsd=10.6305`, and C-alpha Rg `11.1660 / 15.4034`. Remote and local
+coherence passed: one result row, one CSV row, 15 history rows ending at step
+7000, 16 eval-detail rows, `parameters=3,154,242` under the `3,261,974` cap,
+`effective_batch_size=8`, and `stopped_early=False`. The directed-incidence
+rewarm beat E106/E111/E112 on primary C-alpha lDDT, but it remains below
+E96/E97 and worsens dRMSD, so use its checkpoint for E114 rather than spending
+30k on E113 as-is.
 
 ### E83: Fixed Sparse Cell Continuation
 

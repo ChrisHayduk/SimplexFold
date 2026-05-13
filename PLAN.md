@@ -1,4 +1,4 @@
-## Current Plan: E113 Directed Boundary-Readout Rewarm
+## Current Plan: E114 Segment-Supported Filtration
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -141,31 +141,25 @@ predicted/true C-alpha radius `11.5702 / 15.4034`. Reject E112: lowering the
 structure-module pair bias worsened primary C-alpha lDDT below both E106 and
 E111. The structure-bias route is therefore not the next 30k candidate.
 
-The active fallback is E113: reintroduce directed boundary readout from the
-verified E106 checkpoint and anneal it from `0.5` to `0.25` over the
-6500-7000 gate. This returns to the topology-native E96 lesson: source/target
-incidence in selected face/tetra boundary cochains can be useful as a
-pair-trunk communication curriculum, but holding a strong directed signal
-overdrives local C-alpha agreement. Keep E113 only if it beats E106 and starts
-recovering toward the E96/E97 band.
+E113 reintroduced directed boundary readout from the verified E106 checkpoint
+and annealed it from `0.5` to `0.25` over the 6500-7000 gate. It returned
+`val_lddt_ca=0.3959`, FoldScore `0.3775`, `val_ca_drmsd=10.6305`, and
+predicted/true C-alpha radius `11.1660 / 15.4034`. Keep it as a
+recovery-branch handoff because it beats E106/E111/E112 on primary C-alpha
+lDDT, but do not treat it as a 30k candidate: it remains below the E96/E97
+band and worsens dRMSD.
 
-E113 is now launched on the owned Runpod pod. Remote startup confirmed the
-step-6500 E106 resume, `1244` matching tensors loaded, `0` new/missing tensors
-initialized, and a launch-style parameter count of `3,154,242` under the
-`3,261,974` cap. Treat it as in flight until returned artifacts pass remote
-and local coherence checks.
-
-If E113 does not beat E106, the next code-prepared branch is E114:
-segment-supported sparse-cell filtration. The branch stays in the README's
-simplicial/topological view by changing which selected face/tetra cells exist,
-not by adding an output-side metric loss. It adds a zero-parameter
-`simplex_cell_score_segment_weight` term to the face/tetra top-k scorer,
-rewarding candidate cells whose boundary edges are supported by contiguous
-sequence-segment cochains under `simplex_segment_radius`. This keeps the
-successful edge-frame and directed-incidence modules inside the AF2-medium +5%
-budget, unlike the parameterized latent segment-cell module, which only fits
-if edge-frame messages are disabled. Use E114 as a short Runpod gate from the
-best retained checkpoint only after E113 returns.
+The active next branch is E114: segment-supported sparse-cell filtration. The
+branch stays in the README's simplicial/topological view by changing which
+selected face/tetra cells exist, not by adding an output-side metric loss. It
+adds a zero-parameter `simplex_cell_score_segment_weight` term to the
+face/tetra top-k scorer, rewarding candidate cells whose boundary edges are
+supported by contiguous sequence-segment cochains under `simplex_segment_radius`.
+This keeps the successful edge-frame and directed-incidence modules inside the
+AF2-medium +5% budget, unlike the parameterized latent segment-cell module,
+which only fits if edge-frame messages are disabled. Launch E114 from the E113
+checkpoint as a short Runpod gate and compare primarily against E113/E106, with
+E96 remaining the global leader.
 
 ## Historical Plan Context
 

@@ -4952,3 +4952,21 @@
 - Broader local validation for E114 also passed:
   `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
   reported `188 passed`.
+- E113 returned on owned pod `o1dy17ouv8w5mz`. Remote coherence passed across
+  `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, and `run_metadata.json`: one result
+  row, one CSV row, 15 history rows ending at step 7000, 16 eval-detail rows,
+  `completed_steps=7000`, `parameters=3154242` under the `3261974` cap,
+  `effective_batch_size=8`, and `stopped_early=False`. Metrics:
+  `val_lddt_ca=0.395872812718153`, FoldScore `0.3774686213582754`,
+  `val_ca_drmsd=10.630483537912369`, and C-alpha Rg
+  `11.165981888771057 / 15.403406739234924`.
+- Pulled E113 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e113_anneal_directed_boundary_from_e106_s7000_c256_m64/`
+  and verified local coherence against the same step, parameter count,
+  effective batch size, stopped-early flag, lDDT, FoldScore, dRMSD, Rg, and
+  eval-detail row count values.
+- E113 decision: keep only as a recovery-branch handoff. It improves over
+  E106 on primary C-alpha lDDT (`0.395872812718153` versus
+  `0.3929199054837227`) but remains below E96/E97 and worsens dRMSD. Launch
+  E114 from the E113 checkpoint rather than spending 30k on E113 as-is.
