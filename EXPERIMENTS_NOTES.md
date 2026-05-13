@@ -3896,3 +3896,29 @@
 - Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
   to E99, keeping the same owned-pod-only restriction and the rule that the
   heartbeat must not launch follow-up experiments automatically.
+- E99 mid-run check on owned pod `o1dy17ouv8w5mz`: step 10000 reached
+  `val_lddt_ca=0.3972`, FoldScore `0.3872`, `val_ca_drmsd=9.8867`, and
+  predicted/true C-alpha radius `12.1938 / 15.4034`. This crossed the 10k
+  line but did not show the primary-lDDT slope needed for a 30k spend.
+- E99 returned on owned pod `o1dy17ouv8w5mz`: step 10500
+  `val_lddt_ca=0.4002871196717024`, FoldScore `0.38573700562119484`,
+  `val_ca_drmsd=10.15071052312851`, predicted/true C-alpha radius
+  `11.38073205947876 / 15.403406739234924`, `3,154,242` parameters, and
+  `stopped_early=False`. Fixed outer-edge cell scoring was `0.25`, and fixed
+  boundary-readout directionality runtime scale was `0.0`.
+- E99 topology diagnostics: selected face/tetra boundary lDDT
+  `0.7573754265904427` / `0.7386169098317623`, contraction fractions
+  `0.528986806049943` / `0.5271297451108694`, and face/tetra outer-edge
+  active fractions `1.0` / `1.0`.
+- E99 interpretation: reject as a continuation branch and as a 30k-spend
+  signal. The selected complex continued to become cleaner, but primary
+  C-alpha lDDT stayed below E96/E97 at both step 10000 and step 10500. The
+  next experiment should alter how selected higher-rank states affect the
+  residue/pair trunk instead of continuing the same lineage longer.
+- Copied E99 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e99_e97_continuation_s10500_c256_m64/`
+  and copied the launch log to ignored `logs/e99_e97_continuation.log`. The
+  local artifact pull excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  9500` to add the E99 row to `EXPERIMENT_RESULTS.md`, so inherited E97
+  history does not count as E99's best validation lDDT.

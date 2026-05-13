@@ -366,18 +366,17 @@ long run, the next work should either find a branch whose short gates show a
 clearer slope in primary C-alpha lDDT or run a deliberately diagnostic longer
 continuation with the expectation that it may falsify the current branch.
 
-The active Runpod gate is E99: a diagnostic E97 continuation past the
-10,000-step line, not a 30,000-step confirmation. It resumes the E97
-checkpoint from step 9500 to 10500 with the final E97 topology settings fixed:
-outer-edge-supported cell scoring at `0.25`, boundary-readout directionality
-runtime scale at `0.0`, fixed `24/48` sparse caps, degree penalty `0.75`,
-selected-boundary realization losses, edge-frame runtime scale `0.0125`, and
-incidence-normalized transport. Keep it only if the post-9500 validation
-trajectory clearly moves above E96/E97 on primary C-alpha lDDT while retaining
-the better FoldScore/dRMSD signal. Remote launch preflight counted
-`3,154,242` parameters under the `3,261,974` ceiling, and startup resumed E97
-at step 9500/examples 76000 with 1244 matching tensors and 0 new/missing
-tensors.
+E99 rejected the simple continuation hypothesis. It continued E97 past the
+10,000-step line with final E97 topology settings fixed and reached
+`val_lddt_ca=0.3972` at step 10000 and `0.4003` at step 10500, below both E96
+and E97. FoldScore stayed near the local best at `0.3857`, but dRMSD worsened
+to `10.1507` and predicted/true C-alpha radius returned to
+`11.3807 / 15.4034`. The selected complex itself kept improving:
+face/tetra boundary lDDT reached `0.7574` / `0.7386`, and contraction
+fractions fell to `0.5290` / `0.5271`. This falsifies the idea that the
+current E96/E97 lineage only needed to cross 10,000 steps before taking off.
+The next experiment should change how selected higher-rank states affect the
+residue/pair trunk, rather than continuing the same lineage longer.
 
 The current 2026-05-12 full reread of the saved PDFs reinforces the E79-E81
 direction and the E96 interpretation. The right lesson is not to add another

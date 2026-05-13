@@ -844,7 +844,7 @@ current branch can reach `0.7` by 30,000 steps.
 
 ### E99 Candidate: Diagnostic E97 Continuation Past 10k
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E97 recovered almost all of E96's primary lDDT while improving
 FoldScore, dRMSD, predicted radius, and selected-boundary lDDT. That makes it
@@ -881,6 +881,18 @@ started a fresh optimizer. The log path is
 `/workspace/SimplexFold/logs/e99_e97_continuation.log`, and the artifact path
 is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e99_e97_continuation_s10500_c256_m64/`.
+
+Result: reject as a continuation branch and as a 30k-spend signal. E99 reached
+step 10000 at `val_lddt_ca=0.3972`, then step 10500 at
+`val_lddt_ca=0.4003`, FoldScore `0.3857`, `val_ca_drmsd=10.1507`, and
+predicted/true C-alpha radius `11.3807 / 15.4034`, with `3,154,242`
+parameters and no early stop. Selected-complex diagnostics still improved:
+face/tetra boundary lDDT reached `0.7574` / `0.7386`, and contraction
+fractions fell to `0.5290` / `0.5271`. That separation is the key result:
+the selected complex continues to become cleaner while primary C-alpha lDDT
+does not climb. Do not launch a blind 30,000-step confirmation from this
+lineage; return to architecture changes that alter how selected higher-rank
+states affect the residue/pair trunk.
 
 ## Experiment Queue
 
