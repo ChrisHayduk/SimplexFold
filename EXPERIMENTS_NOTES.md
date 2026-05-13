@@ -3950,3 +3950,26 @@
   `--simplex-msa-feedback-runtime-scale 0.0 -> 0.05` over steps 9500-10000,
   keep the E97 final topology recipe fixed, and compare against E99's
   step-10000 control (`val_lddt_ca=0.3972`) before spending on any longer run.
+- Remote E100 preparation on owned pod `o1dy17ouv8w5mz`: the pod checkout was
+  clean at commit `a77ec81` and was fast-forwarded to pushed commit
+  `7530c12`. No other Runpod instances were inspected or managed.
+- E100 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active benchmark
+  process was running, E97 checkpoint was present, remote py_compile passed
+  for `minalphafold/simplex.py`, `minalphafold/evoformer.py`,
+  `minalphafold/model.py`, `minalphafold/model_config.py`,
+  `minalphafold/trainer.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; CLI help confirmed support for
+  MSA-feedback runtime flags and `--max-parameters`; and the exact E100
+  module set counted `3,225,090` parameters, under the AF2-medium +5% ceiling
+  `3,261,974`.
+- E100 launched on owned pod `o1dy17ouv8w5mz` as
+  `e100_msa_feedback_from_e97_s10000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e100_msa_feedback_from_e97.log`, artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e100_msa_feedback_from_e97_s10000_c256_m64/`,
+  and Python PID `16247`. Startup poll confirmed the process is active and
+  the runner resumed E97 at step 9500/examples 76000, loaded 1244 matching
+  model tensors, initialized 24 new/missing feedback tensors, and started a
+  fresh optimizer.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  to E100, keeping the owned-pod-only restriction and the rule that the
+  heartbeat must not launch follow-up experiments automatically.
