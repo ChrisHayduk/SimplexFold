@@ -4711,3 +4711,7 @@
   `11.27131199836731 / 15.403406739234924`). Continue to treat E110 as an
   active in-flight gate; do not add it to `EXPERIMENT_RESULTS.md` until final
   artifacts return and pass coherence checks.
+- E110 follow-up health poll at `2026-05-13T17:18:53Z`: PID `4513` remained
+  active, GPU utilization sampled at `3%` with `11699 MiB` allocated,
+  `results.json` was still absent, and history still had 14 rows ending at
+  E106 step 6500. Continue to treat E110 as in flight.
