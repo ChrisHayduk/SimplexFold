@@ -82,6 +82,15 @@ structure module. Use the runtime recycling-scale ramp rather than an abrupt
 static turn-on when resuming from E97: start at `0.0` and ramp to `0.05` or
 `0.10` over the 500-step gate.
 
+Checkpoint caveat for the immediate E105 gate: E104 artifacts were pulled with
+checkpoint directories excluded, and restarting the zero-volume Runpod pod
+cleared `/workspace`, so the E97/E96-family checkpoint is no longer available
+locally or remotely. The strongest retained compatible checkpoint is E72 at
+step 5500. Launch E105a from E72 to step 6000 as a recovery gate for the same
+topology-native mechanism, comparing against E72/E73/E74/E76 rather than the
+E96-E104 plateau set. If it improves primary C-alpha lDDT, rebuild a stronger
+lineage; if it does not, do not spend toward 30k on recycling alone.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

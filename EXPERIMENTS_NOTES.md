@@ -4342,3 +4342,12 @@
 - Stopped the owned Runpod pod `o1dy17ouv8w5mz` after the E104 artifacts were
   pulled and locally verified. Runpod reported desired status `EXITED` with
   last status change `2026-05-13T11:13:05Z`.
+- Restarted the owned pod `o1dy17ouv8w5mz` at `2026-05-13T11:15:21Z` to
+  prepare E105, but the zero-volume pod came back with an empty `/workspace`
+  except for `.cache`; `/workspace/SimplexFold` and the E97 checkpoint were no
+  longer present. Local searches found no retained E97/E96/E87/E81 checkpoint;
+  the strongest retained compatible local checkpoint is E72
+  (`e72_edge_frame0025_from_e71_s5500_c256_m64`, step 5500,
+  `val_lddt_ca=0.37177472934126854`). Pivot the immediate recycling-memory
+  probe to E105a from E72 to step 6000, and compare it against E72/E73/E74/E76
+  rather than the later E96-E104 plateau family.

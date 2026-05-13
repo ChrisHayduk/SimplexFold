@@ -323,9 +323,8 @@ still ending at the inherited E97 step-9500 row.
 
 ### E105 Idea: Selected-Boundary Metric Recycling
 
-Status: implemented, ramped, and refined through `927bf01`; E104 remains in
-flight. Do not launch while E104 is still running unless we explicitly decide
-to run parallel confirmation pods.
+Status: implemented, ramped, and refined through `927bf01`. E104 returned as a
+primary-lDDT reject, so the mechanism is ready for a short Runpod gate.
 
 Hypothesis: E99-E104 test ways for selected boundary cochains to write into
 the current pair trunk, but the recycling loop still only carries the final
@@ -362,6 +361,21 @@ gating routes disabled, and add only the recycling-memory schedule:
 `--simplex-boundary-metric-recycling-runtime-scale-final 0.10`,
 `--simplex-boundary-metric-recycling-runtime-scale-ramp-start-step 9500`, and
 `--simplex-boundary-metric-recycling-runtime-scale-ramp-steps 500`.
+
+E105a checkpoint-recovery gate: after E104 was pulled without checkpoints and
+the stopped zero-volume Runpod workspace did not persist, the E97 checkpoint
+was no longer available locally or remotely. Use the strongest retained
+compatible checkpoint, E72 at step 5500, and run the same recycling-memory
+mechanism to step 6000 under run name
+`e105a_boundary_metric_recycling_from_e72_s6000_c256_m64`. Keep the same
+selected-complex recipe intended for E105 where compatible (`face/tetra top-k
+24/48`, degree penalty `0.75`, outer-edge score `0.25`, edge-frame runtime
+scale `0.0125`, geometry-distance weight `0.025`), disable the E100-E104
+feedback/gating routes, and ramp
+`--simplex-boundary-metric-recycling-runtime-scale 0.0` to
+`--simplex-boundary-metric-recycling-runtime-scale-final 0.10` over steps
+5500-6000. Compare this recovery gate against E72, E73, E74, and E76 rather
+than against E96-E104; reject unless it improves primary C-alpha lDDT.
 
 Validation so far:
 
