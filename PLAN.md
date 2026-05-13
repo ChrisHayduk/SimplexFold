@@ -366,6 +366,19 @@ long run, the next work should either find a branch whose short gates show a
 clearer slope in primary C-alpha lDDT or run a deliberately diagnostic longer
 continuation with the expectation that it may falsify the current branch.
 
+The active Runpod gate is E99: a diagnostic E97 continuation past the
+10,000-step line, not a 30,000-step confirmation. It resumes the E97
+checkpoint from step 9500 to 10500 with the final E97 topology settings fixed:
+outer-edge-supported cell scoring at `0.25`, boundary-readout directionality
+runtime scale at `0.0`, fixed `24/48` sparse caps, degree penalty `0.75`,
+selected-boundary realization losses, edge-frame runtime scale `0.0125`, and
+incidence-normalized transport. Keep it only if the post-9500 validation
+trajectory clearly moves above E96/E97 on primary C-alpha lDDT while retaining
+the better FoldScore/dRMSD signal. Remote launch preflight counted
+`3,154,242` parameters under the `3,261,974` ceiling, and startup resumed E97
+at step 9500/examples 76000 with 1244 matching tensors and 0 new/missing
+tensors.
+
 The current 2026-05-12 full reread of the saved PDFs reinforces the E79-E81
 direction and the E96 interpretation. The right lesson is not to add another
 generic coordinate objective; it is to treat directed incidence as a

@@ -3862,3 +3862,37 @@
 - Used `scripts/format_experiment_result_row.py` with `--start-after-step
   9000` to add the E97 row to `EXPERIMENT_RESULTS.md`, so inherited E96
   history does not count as E97's best validation lDDT.
+- E99 launch decision: run a diagnostic continuation of the E97 checkpoint
+  from step 9500 to 10500 with the E97 final topology settings fixed:
+  outer-edge-supported cell scoring at `0.25`, boundary-readout directionality
+  runtime scale at `0.0`, fixed `24/48` sparse caps, degree penalty `0.75`,
+  selected-boundary realization losses, edge-frame runtime scale `0.0125`,
+  and incidence-normalized transport. This is not a 30,000-step confirmation;
+  it tests whether the topology-construction handoff has any slope past
+  10,000 steps before spending on a long run.
+- Remote E99 preparation on owned pod `o1dy17ouv8w5mz`: the pod checkout was
+  clean at commit `c34608e` and was fast-forwarded to pushed commit
+  `a77ec81` before launch. No other Runpod instances were inspected or
+  managed.
+- E99 prelaunch checks on owned pod `o1dy17ouv8w5mz`: no active Python
+  benchmark process, E97 checkpoint present, remote py_compile passed for
+  `scripts/run_nanofold_public_benchmarks.py`, `minalphafold/simplex.py`,
+  `minalphafold/model_config.py`, and `minalphafold/trainer.py`; CLI help
+  confirmed support for outer-edge cell scoring, boundary-readout
+  directionality runtime flags, and `--max-parameters`; and the exact E99
+  instantiated module set counted `3,154,242` parameters, under the
+  AF2-medium +5% ceiling `3,261,974`.
+- E99 launched on owned pod `o1dy17ouv8w5mz` as
+  `e99_e97_continuation_s10500_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e99_e97_continuation.log`, artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e99_e97_continuation_s10500_c256_m64/`,
+  and Python PID `15625`. Startup poll confirmed metadata exists,
+  `--max-parameters 3261974` is recorded, fixed outer-edge cell scoring is
+  `0.25`, boundary-readout directionality and runtime scale are both `0.0`,
+  fixed face/tetra caps are `24/48`, degree penalty is `0.75`, edge-frame
+  runtime scale is `0.0125`, and the runner resumed E97 at step
+  9500/examples 76000 with 1244 matching model tensors loaded and 0
+  new/missing tensors initialized.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  to E99, keeping the same owned-pod-only restriction and the rule that the
+  heartbeat must not launch follow-up experiments automatically.

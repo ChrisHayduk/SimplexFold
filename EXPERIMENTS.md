@@ -842,6 +842,46 @@ outer-edge active fractions were `1.0` / `1.0`. This supports the topology
 construction handoff as a real stabilizer, but not yet as evidence that the
 current branch can reach `0.7` by 30,000 steps.
 
+### E99 Candidate: Diagnostic E97 Continuation Past 10k
+
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E97 recovered almost all of E96's primary lDDT while improving
+FoldScore, dRMSD, predicted radius, and selected-boundary lDDT. That makes it
+the best current diagnostic branch, but not a 30k confirmation candidate. A
+short continuation past 10,000 steps can test whether the topology-construction
+handoff has a real upward slope or merely sits on the same `0.40` plateau.
+
+Mechanism: resume the E97 checkpoint from step 9500 to 10500 with the E97
+final topology settings fixed: `simplex_cell_score_outer_edge_weight=0.25`,
+boundary-readout directionality runtime scale `0.0`, fixed `24/48` sparse
+caps, degree penalty `0.75`, selected-boundary realization losses,
+edge-frame runtime scale `0.0125`, and incidence-normalized transport. This
+does not add a new loss or module. It is a diagnostic continuation of the
+selected-complex construction handoff.
+
+Decision rule: keep only if the post-9500 validation trajectory shows clear
+primary C-alpha lDDT movement above E96/E97, ideally with FoldScore/dRMSD and
+selected-boundary diagnostics staying strong. If it remains near `0.40` or
+falls, treat the E96/E97 lineage as plateaued and return to architecture
+changes rather than launching a blind 30,000-step confirmation.
+
+Launch: E99 is running as `e99_e97_continuation_s10500_c256_m64`, Python PID
+`15625`, on the owned H100 pod. The remote checkout was fast-forwarded to
+commit `a77ec81`, no active benchmark process was present, the E97 checkpoint
+was present, py_compile passed for the runner/model files, CLI help confirmed
+the outer-edge score, boundary-readout directionality, and `--max-parameters`
+flags, and the exact E99 parameter count was
+`3,154,242 <= 3,261,974`. Startup metadata recorded fixed outer-edge cell
+scoring `0.25`, fixed boundary-readout directionality `0.0`, fixed `24/48`
+caps, degree penalty `0.75`, edge-frame runtime scale `0.0125`, and
+`--max-parameters 3261974`; the runner resumed E97 at step 9500/examples
+76000, loaded 1244 matching tensors, initialized 0 new/missing tensors, and
+started a fresh optimizer. The log path is
+`/workspace/SimplexFold/logs/e99_e97_continuation.log`, and the artifact path
+is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e99_e97_continuation_s10500_c256_m64/`.
+
 ## Experiment Queue
 
 ### E00: Matched Short-Run Baseline
