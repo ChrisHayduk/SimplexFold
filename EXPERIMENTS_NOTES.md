@@ -4551,3 +4551,8 @@
   history had 14 rows ending at E106 step 6500
   (`val_lddt_ca=0.3929199054837227`, FoldScore `0.377660034224391`,
   `val_ca_drmsd=10.327910900115967`). Continue to treat E108 as in flight.
+- E108 health poll at `2026-05-13T14:10:09Z`: PID `2881` remained active after
+  about 13.5 minutes, GPU utilization sampled at `11%` with `13491 MiB`
+  allocated, `results.json` and `results.csv` were still absent, and history
+  still had 14 rows ending at E106 step 6500. Continue to treat E108 as an
+  active in-flight gate.
