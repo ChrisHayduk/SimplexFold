@@ -4030,3 +4030,22 @@
 - Exact E101 launch-module parameter audit with E97 edge-frame messages
   allocated counted `3,206,722` parameters versus AF2-medium `3,106,642`,
   leaving `55,252` under the +5% ceiling `3,261,974`.
+- Remote E101 preparation on owned pod `o1dy17ouv8w5mz`: the pod checkout
+  fast-forwarded to commit `9a28688`, remote py_compile passed for
+  `minalphafold/simplex.py`, `minalphafold/model_config.py`, and
+  `scripts/run_nanofold_public_benchmarks.py`; CLI help confirmed support for
+  `--simplex-boundary-msa-feedback-scale`; the E97 checkpoint was present; and
+  the exact E101 module set counted `3,206,722` parameters, under the
+  AF2-medium +5% ceiling `3,261,974`.
+- E101 launched on owned pod `o1dy17ouv8w5mz` as
+  `e101_boundary_msa_feedback_from_e97_s10000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e101_boundary_msa_feedback_from_e97.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e101_boundary_msa_feedback_from_e97_s10000_c256_m64/`,
+  and Python PID `17228`. Startup poll confirmed the process is active and
+  the runner resumed E97 at step 9500/examples 76000, loaded 1244 matching
+  model tensors, initialized 24 new/missing boundary-feedback tensors, and
+  started a fresh optimizer.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  to E101, keeping the owned-pod-only restriction and the rule that the
+  heartbeat must not launch follow-up experiments automatically.

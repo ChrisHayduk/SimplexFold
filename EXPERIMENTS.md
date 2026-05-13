@@ -109,7 +109,7 @@ route to 30,000 steps.
 
 ### E101: Boundary-Edge Coboundary MSA Feedback
 
-Status: implemented locally; ready for owned-Runpod launch after commit/push.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: if E100 does not improve primary lDDT, the failure may be that a
 collapsed face/tetra-to-residue summary is too blunt. The selected boundary
@@ -136,6 +136,16 @@ Validation:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+
+Launch: E101 is running as
+`e101_boundary_msa_feedback_from_e97_s10000_c256_m64`, resuming the E97
+checkpoint from step 9500 to step 10000 with fixed E97 topology settings,
+`--simplex-boundary-msa-feedback-scale 0.05`, and the existing runtime
+feedback ramp from `0.0` to `0.05` over steps 9500-10000. Remote log path is
+`/workspace/SimplexFold/logs/e101_boundary_msa_feedback_from_e97.log`, remote
+artifact path is
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e101_boundary_msa_feedback_from_e97_s10000_c256_m64/`,
+and Python PID is `17228`.
 
 ### E83: Fixed Sparse Cell Continuation
 
