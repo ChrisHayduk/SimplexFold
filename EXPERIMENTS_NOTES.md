@@ -4351,3 +4351,34 @@
   `val_lddt_ca=0.37177472934126854`). Pivot the immediate recycling-memory
   probe to E105a from E72 to step 6000, and compare it against E72/E73/E74/E76
   rather than the later E96-E104 plateau family.
+- E105a remote staging on owned pod `o1dy17ouv8w5mz`: SSH moved to
+  `root@103.207.149.82 -p 12578` after restart. The pod was restaged from
+  scratch by cloning SimplexFold branch
+  `codex/simplexfold-topology-e07-boundary-coordinate` at commit `33f4776`,
+  cloning nanoFold-Competition at commit `96afc84`, creating
+  `/workspace/venv` with system site packages, and installing SimplexFold
+  editable there. Public data staging used only `processed_features`,
+  `processed_labels`, and public manifests `train.txt`, `val.txt`, and
+  `all.txt`; a first tar attempt created macOS `._*` sidecars and was
+  discarded, then restaged with `COPYFILE_DISABLE=1 tar --no-xattrs`. Final
+  audit before launch: features/labels `11000/11000`, sidecars `0`, manifests
+  `10000/1000/11000`, E72 checkpoint present at 34 MB, py_compile passed for
+  runner/model files, CLI help exposed the metric-recycling flags and
+  `--max-parameters`, FoldScore import worked, and the E105a module set counted
+  `3,154,242` parameters under the `3,261,974` cap.
+- E105a launched on owned pod `o1dy17ouv8w5mz` at `2026-05-13T11:51Z` with run
+  name `e105a_boundary_metric_recycling_from_e72_s6000_c256_m64`, log
+  `/workspace/SimplexFold/logs/e105a_boundary_metric_recycling_from_e72.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e105a_boundary_metric_recycling_from_e72_s6000_c256_m64/`,
+  and PID `1307`. It resumes the E72 checkpoint at step 5500/examples 44000
+  with `--resume-model-weights-only`, keeps the E97-style selected-complex
+  recipe fixed, and ramps selected-boundary metric recycling from `0.0` to
+  `0.10` over steps 5500-6000. Startup and health poll at
+  `2026-05-13T11:52:33Z` showed PID `1307` active, GPU memory `4723 MiB`, GPU
+  utilization `44%`, `run_metadata.json` and inherited
+  `history_full_msa_to_face.json` present, and a clean resume with `1244`
+  matching tensors loaded and `0` new/missing tensors initialized.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E105a, preserving the
+  owned-pod-only scope and the rule that the heartbeat must not launch
+  follow-up experiments automatically.
