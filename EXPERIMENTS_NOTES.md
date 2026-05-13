@@ -4657,3 +4657,8 @@
   history had 14 rows ending at E106 step 6500
   (`val_lddt_ca=0.3929199054837227`, FoldScore `0.377660034224391`,
   `val_ca_drmsd=10.327910900115967`). Continue to treat E109 as in flight.
+- E109 health poll at `2026-05-13T16:40:10Z`: PID `3943` remained active after
+  about 33.8 minutes, GPU utilization sampled at `1%` with `13491 MiB`
+  allocated, `results.json` and `results.csv` were still absent, and history
+  still had 14 rows ending at E106 step 6500. Continue to treat E109 as an
+  active in-flight gate; heartbeat monitoring is retargeted to this run.
