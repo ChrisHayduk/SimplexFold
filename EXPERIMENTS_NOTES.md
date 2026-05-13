@@ -4409,3 +4409,8 @@
   absent, `history_full_msa_to_face.json` still had 12 inherited rows ending
   at E72 step 5500 (`val_lddt_ca=0.37177472934126854`), and the log still
   showed only startup/resume lines. Continue to treat E105a as in flight.
+- E105a live check at `2026-05-13T12:13:33Z`: PID `1307` was still active
+  after about 22 minutes on the owned pod. `results.json` and `results.csv`
+  were absent, the history still ended at E72 step 5500 with
+  `val_lddt_ca=0.37177472934126854` and FoldScore `0.3721824511885643`, and
+  the log still only showed startup/resume lines.

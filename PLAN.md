@@ -1,4 +1,4 @@
-## Current Plan: E104 Selected-Boundary Metric-Confidence Gate
+## Current Plan: E105a Metric Recycling, Then E106 Cochain Recycling
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -48,30 +48,17 @@ and E101 on the target C-alpha lDDT. This is useful evidence that direct
 learned pair-conditioned boundary-edge modulation is not the missing 30k
 candidate.
 
-The next branch is E104: a selected-boundary metric-confidence gate. The idea
-is to use the existing face/tetra boundary distance heads as reliability
-estimates for each selected boundary edge. Edges whose explicit 2-/3-cell
-distance distribution is confident get stronger cochain transport into the
-pair trunk; uncertain selected edges are damped. This is still a
-simplicial/topological change because the gate is computed only on boundary
-edges of model-selected faces/tetras and uses the complex's own metric
-cochains. It adds no parameters and should load the E97 lineage without fresh
-tensors.
+E104 tested a selected-boundary metric-confidence gate and is now rejected:
+it returned `val_lddt_ca=0.3956`, below E96, E97, E99, E101, and E103,
+despite strong selected face/tetra boundary lDDT (`0.7246` / `0.7072`).
+That result sharpens the diagnosis: the explicit simplex complex can learn
+local boundary metrics, but those local metrics are not yet being assembled
+into a better full-chain C-alpha geometry.
 
-E104 is now running on the owned Runpod pod `o1dy17ouv8w5mz`. It resumes E97
-from step 9500 to step 10000 with the E97 sparse-complex recipe fixed,
-E100/E101 MSA feedback disabled, E102 dense pair feedback disabled, and E103
-learned pair gate disabled. It ramps
-`--simplex-boundary-metric-gate-runtime-scale 0.0 -> 0.25` over steps
-9500-10000. Reject unless it beats the E99/E101 near-10k controls and
-approaches or exceeds E96/E97 on primary C-alpha lDDT while preserving
-selected-boundary diagnostics. Do not add E104 to `EXPERIMENT_RESULTS.md`
-until `results.json` has returned and passed remote/local coherence checks.
-
-If E104 returns below the E96/E97 local peak, the next prepared branch is E105:
-selected-boundary metric recycling. The plateau evidence suggests that the
-selected complex learns reasonable local boundary geometry, but the main
-trunk only recycles the final coordinate prediction. E105 reuses the existing
+The active Runpod branch is E105a: selected-boundary metric recycling. The
+plateau evidence suggests that the selected complex learns reasonable local
+boundary geometry, but the main trunk only recycles the final coordinate
+prediction. E105/E105a reuses the existing
 face/tetra distance heads, maps their selected boundary-edge distance
 distributions softly into the AF2 recycling distance-bin basis, scatters that
 evidence only onto the selected boundary 1-skeleton, and adds it as a
@@ -82,14 +69,15 @@ structure module. Use the runtime recycling-scale ramp rather than an abrupt
 static turn-on when resuming from E97: start at `0.0` and ramp to `0.05` or
 `0.10` over the 500-step gate.
 
-Checkpoint caveat for the immediate E105 gate: E104 artifacts were pulled with
-checkpoint directories excluded, and restarting the zero-volume Runpod pod
-cleared `/workspace`, so the E97/E96-family checkpoint is no longer available
-locally or remotely. The strongest retained compatible checkpoint is E72 at
-step 5500. Launch E105a from E72 to step 6000 as a recovery gate for the same
-topology-native mechanism, comparing against E72/E73/E74/E76 rather than the
-E96-E104 plateau set. If it improves primary C-alpha lDDT, rebuild a stronger
-lineage; if it does not, do not spend toward 30k on recycling alone.
+Checkpoint caveat: E104 artifacts were pulled with checkpoint directories
+excluded, and restarting the zero-volume Runpod pod cleared `/workspace`, so
+the E97/E96-family checkpoint is no longer available locally or remotely.
+The strongest retained compatible checkpoint is E72 at step 5500. E105a is
+currently running from E72 to step 6000 on the owned Runpod pod
+`o1dy17ouv8w5mz` as a recovery gate for the same topology-native mechanism.
+Compare it against E72/E73/E74/E76 rather than the E96-E104 plateau set. If it
+improves primary C-alpha lDDT, rebuild a stronger lineage; if it does not, do
+not spend toward 30k on recycling alone.
 
 Next prepared branch after E105a returns is E106: selected-boundary cochain
 recycling. E104 showed that local face/tetra boundary metrics can be strong
