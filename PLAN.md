@@ -117,7 +117,8 @@ active to step 7000. E109 tests whether the cochain signal is useful as a
 transient topological scaffold but harmful as a persistent constraint: resume
 E106 and anneal selected-boundary cochain recycling from `0.10` down to `0.025`
 over steps 6500-7000. This still uses the simplex boundary 1-cochain as
-inter-cycle memory, adds no parameters, and adds no output loss.
+inter-cycle memory, adds no parameters, and adds no output loss. E109 is
+running on the owned Runpod pod `o1dy17ouv8w5mz`.
 
 ## Historical Plan Context
 

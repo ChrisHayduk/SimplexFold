@@ -541,7 +541,7 @@ Validation so far:
 
 ### E109 Idea: Anneal Down Selected-Boundary Cochain Recycling
 
-Status: queued for launch from the verified E106 step-6500 checkpoint.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E106 improved E105a while the selected-boundary cochain memory was
 ramped from `0.0` to `0.10`, but E108 and E107 both regressed by step 7000
@@ -562,6 +562,16 @@ Gate: run to step 7000 under run name
 primary `val_lddt_ca` improves over E106's `0.3929`; if it lands between E108
 and E106, record it as evidence that annealing helps but still does not justify
 a longer spend.
+
+Launch: E109 is running as
+`e109_cochain_recycling_anneal_down_from_e106_s7000_c256_m64`. The remote
+checkout was fast-forwarded to commit `b064c68`, no active benchmark process
+was present, the E106 checkpoint was present, remote py_compile passed, and the
+E109 launch-style parameter audit counted `3,154,242` parameters under the
+`3,261,974` cap. It resumed the E106 checkpoint at step 6500/examples 52000
+with `1244` matching model tensors and `0` new/missing tensors. Main Python
+PID is `3943`; log path is
+`/workspace/SimplexFold/logs/e109_cochain_recycling_anneal_down_from_e106.log`.
 
 ### E83: Fixed Sparse Cell Continuation
 

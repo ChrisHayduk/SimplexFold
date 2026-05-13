@@ -4631,3 +4631,29 @@
   below E108, with worse FoldScore and dRMSD. The next gate should not hold or
   confidence-gate strong cochain memory; queue E109 to anneal the cochain
   memory down from the better verified E106 checkpoint.
+- E109 remote staging on owned pod `o1dy17ouv8w5mz`: fast-forwarded
+  `/workspace/SimplexFold` to commit `b064c68`, verified that no active
+  benchmark process was present, verified the E106 checkpoint at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e106_boundary_cochain_recycling_from_e105a_s6500_c256_m64/checkpoints/full_msa_to_face_latest.pt`,
+  ran remote py_compile for model/adapter/trainer/runner files, and audited
+  the E109 launch-style module set at `3,154,242` parameters under the
+  `3,261,974` AF2-medium +5% cap.
+- E109 launched on owned pod `o1dy17ouv8w5mz` with run name
+  `e109_cochain_recycling_anneal_down_from_e106_s7000_c256_m64`, PID `3943`,
+  log `/workspace/SimplexFold/logs/e109_cochain_recycling_anneal_down_from_e106.log`,
+  and artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e109_cochain_recycling_anneal_down_from_e106_s7000_c256_m64/`.
+  It resumes the E106 checkpoint at step 6500/examples 52000 with
+  `--resume-model-weights-only`, keeps the E106 selected-complex recipe fixed,
+  disables metric gating, and anneals selected-boundary cochain recycling from
+  `0.10` to `0.025` over steps 6500-7000. Startup showed `1244` matching
+  tensors loaded and `0` new/missing tensors initialized.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E109, preserving
+  owned-pod-only scope and the rule that the heartbeat must not launch
+  follow-up experiments automatically.
+- E109 startup health poll at `2026-05-13T16:07:34Z`: PID `3943` was active
+  after about 1.25 minutes, GPU utilization was `45%` with `8195 MiB`
+  allocated, `results.json` and `results.csv` were absent, and the inherited
+  history had 14 rows ending at E106 step 6500
+  (`val_lddt_ca=0.3929199054837227`, FoldScore `0.377660034224391`,
+  `val_ca_drmsd=10.327910900115967`). Continue to treat E109 as in flight.
