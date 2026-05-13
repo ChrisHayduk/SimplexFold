@@ -3979,3 +3979,8 @@
   resume with 1244 matching tensors loaded and 24 new/missing feedback tensors
   initialized. This matches the expected quiet training window before the
   step-10000 validation.
+- While E100 runs, inspected the remaining simplex communication routes and
+  recorded a contingency idea in `EXPERIMENTS.md`: boundary-edge coboundary
+  MSA feedback. This would aggregate selected 1-cochain boundary-edge
+  messages into incident residues before target-MSA feedback. It is an idea
+  only; do not implement or launch while E100 is active.

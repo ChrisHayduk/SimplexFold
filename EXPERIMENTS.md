@@ -103,6 +103,28 @@ control (`val_lddt_ca=0.3972`) and does not degrade selected-boundary
 diagnostics. A result merely matching the E99 continuation is not enough for
 a 30,000-step spend.
 
+### E101 Contingency: Boundary-Edge Coboundary MSA Feedback
+
+Status: idea only; do not launch while E100 is active.
+
+Hypothesis: if E100 does not improve primary lDDT, the failure may be that a
+collapsed face/tetra-to-residue summary is too blunt. The selected boundary
+edges already carry local distance, incidence, and orientation information
+through the simplex-to-pair path. A 1-cochain-to-0-cochain feedback route may
+give the MSA trunk a cleaner topology-native signal.
+
+Mechanism sketch: after the selected face/tetra boundary-edge readout is
+computed, aggregate outgoing and incoming selected boundary-edge messages per
+residue with incidence masks. Project the resulting edge-coboundary residue
+summary into `c_m` and add it only to the target MSA row under a small runtime
+ramp. This should be implemented as an alternative to, or very lightweight
+extension of, E100 so the exact module set remains under AF2-medium +5%.
+
+Decision rule: only prepare after E100 returns. Keep the same E97/E100
+controls and compare against E99 step 10000, E96, and E97. Reject if it only
+improves global/FoldScore geometry while local C-alpha lDDT remains near the
+E99 plateau.
+
 ### E83: Fixed Sparse Cell Continuation
 
 Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.

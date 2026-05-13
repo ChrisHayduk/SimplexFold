@@ -29,6 +29,16 @@ step-10000 result against E99's step-10000 control (`val_lddt_ca=0.3972`) and
 against the E96/E97 local peak. Keep only if the feedback route preserves or
 improves primary C-alpha lDDT while retaining selected-boundary diagnostics.
 
+If E100 fails cleanly, the next topology-native fallback should stay in the
+same communication-family rather than jump to a new loss. The live adapter
+already writes selected face/tetra states into pair edges and residue singles,
+and E100 adds a cell-to-residue MSA route. The still-missing route is an
+explicit boundary-edge-to-residue coboundary path: aggregate selected
+boundary-edge readouts as a 1-cochain into each incident residue and feed that
+0-cochain summary into the target MSA row. This would preserve directed
+incidence and test whether edge-local simplex geometry, rather than only
+cell-reduced residue summaries, is the signal the trunk needs.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
