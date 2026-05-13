@@ -4732,3 +4732,9 @@
 - E110 health poll at `2026-05-13T17:27:56Z`: PID `4513` remained active, GPU
   utilization sampled at `32%` with `13491 MiB` allocated, `results.json` was
   still absent, and history still had 14 rows ending at E106 step 6500.
+- E110 process-detail poll at `2026-05-13T17:29:41Z`: PID `4513` remained
+  active after about 13.3 minutes with process state `Rl`, high CPU activity,
+  and GPU memory still allocated. The E110 log still contained only the clean
+  E106 resume/startup lines, and recent files were limited to
+  `run_metadata.json` plus inherited `history_full_msa_to_face.json`. Treat
+  this as an active first 500-step gate rather than a returned run.
