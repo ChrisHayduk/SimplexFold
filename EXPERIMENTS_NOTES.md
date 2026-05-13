@@ -4774,3 +4774,7 @@
   utilization sampled at `37%` with `13491 MiB` allocated, `results.json` and
   `results.csv` absent, and history still at E106 step 6500. Continue treating
   E110 as in flight.
+- E110 health poll at `2026-05-13T18:00:38Z`: PID `4513` remained active after
+  about 44.4 minutes, process state `Sl` with high CPU activity, GPU
+  utilization sampled at `56%` with `13491 MiB` allocated, `results.json` and
+  `results.csv` absent, and history still at E106 step 6500.
