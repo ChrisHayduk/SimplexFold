@@ -72,7 +72,7 @@ stay out of the queue unless they supervise only the selected sparse complex.
 
 ### E114 Idea: Segment-Supported Sparse-Cell Filtration
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E104-E113 show that the selected face/tetra complex can learn
 strong local boundary metrics without consistently improving global C-alpha
@@ -119,6 +119,37 @@ creation, step-7000 resume from E113, `1244` matching tensors loaded, `0`
 new/missing tensors initialized, and a fresh optimizer. E114 holds E113's
 directed boundary readout at `0.25` and adds
 `--simplex-cell-score-segment-weight 0.25`.
+
+Result: reject as a primary branch. E114 returned at step 7500 with
+`val_lddt_ca=0.3814`, FoldScore `0.3793`, `val_ca_drmsd=10.6123`, and
+C-alpha Rg `11.8583 / 15.4034`. Remote and local coherence passed: one result
+row, one CSV row, 16 history rows ending at step 7500, 16 eval-detail rows,
+`parameters=3,154,242` under the `3,261,974` cap, `effective_batch_size=8`,
+`simplex_cell_score_segment_weight=0.25`, and `stopped_early=False`.
+Segment-supported scoring improved FoldScore/dRMSD, expansion, and selected
+boundary contraction versus E113, but primary C-alpha lDDT fell sharply and
+selected-boundary lDDT/length softened. Run E115 as a no-segment continuation
+control from the same E113 checkpoint before trying a weaker segment-support
+scale.
+
+### E115 Idea: No-Segment E113 Continuation Control
+
+Status: queued to launch from the returned E113 checkpoint.
+
+Hypothesis: E114's primary-lDDT collapse could be caused by the new
+segment-supported cell scorer, or it could be an ordinary continuation
+regression from the E113 checkpoint. A matched no-segment continuation from
+E113 to step 7500 isolates that effect.
+
+Mechanism: resume E113 from step 7000 to 7500 with the E114 recipe but leave
+`simplex_cell_score_segment_weight=0.0`. This is a diagnostic control rather
+than a new architecture branch; it tests whether the existing directed
+boundary-readout recovery branch remains stable when held at `0.25`.
+
+Gate: compare against E113 and E114. If E115 stays near E113 while E114 stays
+low, reject segment-supported filtration and consider only a much weaker or
+scheduled variant. If E115 also falls below E106, stop spending short gates on
+the E113 recovery lineage.
 
 ### E100: Bidirectional Simplex-MSA Feedback
 

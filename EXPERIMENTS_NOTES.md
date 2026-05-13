@@ -4997,3 +4997,23 @@
   `results.json` and `results.csv` absent, and history still at the inherited
   E113 step-7000 row. Continue waiting for the step-7500 validation write
   without changing the remote checkout.
+- E114 returned on owned pod `o1dy17ouv8w5mz`. Remote coherence passed across
+  `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, and `run_metadata.json`: one result
+  row, one CSV row, 16 history rows ending at step 7500, 16 eval-detail rows,
+  `completed_steps=7500`, `parameters=3154242` under the `3261974` cap,
+  `effective_batch_size=8`, `simplex_cell_score_segment_weight=0.25`, and
+  `stopped_early=False`. Metrics: `val_lddt_ca=0.381430733948946`, FoldScore
+  `0.37934823520481586`, `val_ca_drmsd=10.612294971942902`, and C-alpha Rg
+  `11.858259320259094 / 15.403406739234924`.
+- Pulled E114 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e114_segment_supported_filtration_from_e113_s7500_c256_m64/`
+  and verified local coherence against the same step, parameter count,
+  effective batch size, stopped-early flag, segment-support weight, lDDT,
+  FoldScore, dRMSD, Rg, and eval-detail row count values.
+- E114 decision: reject. Segment-supported filtration improved FoldScore
+  (`0.3793` versus E113 `0.3775`), dRMSD (`10.6123` versus `10.6305`),
+  C-alpha expansion, and selected-boundary contraction, but primary C-alpha
+  lDDT fell sharply below E113 and E106. Launch E115 as a no-segment
+  continuation control from the same E113 checkpoint before trying a weaker
+  segment-support scale.

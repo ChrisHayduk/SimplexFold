@@ -1,4 +1,4 @@
-## Current Plan: E114 Segment-Supported Filtration
+## Current Plan: E115 E113 Continuation Control
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -161,11 +161,21 @@ which only fits if edge-frame messages are disabled. Launch E114 from the E113
 checkpoint as a short Runpod gate and compare primarily against E113/E106, with
 E96 remaining the global leader.
 
-E114 is now launched on the owned Runpod pod from the E113 step-7000
-checkpoint to step 7500 with `simplex_cell_score_segment_weight=0.25`. Remote
-startup confirmed clean resume from E113, `1244` matching tensors loaded,
-`0` new/missing tensors initialized, and launch-style parameter audit
-`3,154,242 <= 3,261,974`.
+E114 launched from the E113 step-7000 checkpoint to step 7500 with
+`simplex_cell_score_segment_weight=0.25`. It returned `val_lddt_ca=0.3814`,
+FoldScore `0.3793`, `val_ca_drmsd=10.6123`, and predicted/true C-alpha radius
+`11.8583 / 15.4034`. Reject E114 as a primary branch: segment-supported
+filtration improved FoldScore, dRMSD, expansion, and contraction, but it
+damaged primary C-alpha lDDT and softened selected-boundary lDDT/length
+diagnostics.
+
+Before trying a weaker segment-support weight, run E115 as the clean
+continuation control from the same E113 checkpoint to step 7500 with
+`simplex_cell_score_segment_weight=0.0`. This separates a general E113
+continuation regression from a segment-filtration-specific regression. If
+E115 stays near E113 while E114 remains low, segment support is the culprit; if
+E115 also falls, the E113 recovery branch itself is not stable enough for
+another local-filtration tweak.
 
 ## Historical Plan Context
 
