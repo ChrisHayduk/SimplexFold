@@ -4715,3 +4715,17 @@
   active, GPU utilization sampled at `3%` with `11699 MiB` allocated,
   `results.json` was still absent, and history still had 14 rows ending at
   E106 step 6500. Continue to treat E110 as in flight.
+- Implemented E111 locally as `simplex_structure_pair_readout_scale`, queued
+  but not launched while E110 is running. The route is a pair-only
+  structure-module bias from the selected boundary 1-cochain: the simplex
+  adapter emits `simplex_structure_pair_readout` without broad
+  `simplex_structure_readout_scale`, and `AlphaFold2` RMS-normalizes that
+  cochain before adding it only to the pair representation consumed by IPA.
+  This intentionally avoids a new loss, direct coordinate supervision, residue
+  0-cochain structure readout, or persistent cochain recycle state.
+- E111 validation so far:
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m py_compile minalphafold/model.py minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`;
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_simplex.py::test_simplicial_adapter_can_emit_pair_only_structure_readout tests/test_trainer.py::test_simplicial_structure_pair_readout_adds_no_parameters tests/test_trainer.py::test_simplicial_structure_pair_readout_forward_uses_private_pair_cochain tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  reported `4 passed`; E111 launch-style parameter audit with the E110
+  selected-complex recipe and `simplex_structure_pair_readout_scale=0.05`
+  counted `3,154,242` parameters under the `3,261,974` AF2-medium +5% cap.

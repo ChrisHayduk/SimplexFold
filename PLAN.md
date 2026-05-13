@@ -128,6 +128,15 @@ E110 is now launched on the owned Runpod pod; keep monitoring it as an
 in-flight gate and do not add it to the final results table until returned
 artifacts pass remote and local coherence checks.
 
+While E110 runs, prepare but do not launch E111: an RMS-normalized
+pair-only structure-module readout from the selected boundary 1-cochain.
+This is the topology-native alternative if E110 confirms that residual
+inter-cycle cochain memory is harmful. Unlike the broad structure-readout
+runs, E111 should not inject simplex 0-cochain residue updates directly; it
+should let the explicit face/tetra boundary cochain act only as a controlled
+pair bias for IPA. Keep it queued until E110 returns, then choose the best
+verified E106/E110 checkpoint as the handoff.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

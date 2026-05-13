@@ -967,6 +967,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
     overrides: dict[str, Any] = {}
     for field, value in (
         ("simplex_structure_readout_scale", args.simplex_structure_readout_scale),
+        ("simplex_structure_pair_readout_scale", args.simplex_structure_pair_readout_scale),
         ("simplex_msa_feedback_scale", args.simplex_msa_feedback_scale),
         ("simplex_boundary_msa_feedback_scale", args.simplex_boundary_msa_feedback_scale),
         ("simplex_boundary_pair_feedback_scale", args.simplex_boundary_pair_feedback_scale),
@@ -1823,6 +1824,9 @@ def _train_variant(
         "simplex_structure_readout_scale": (
             float(getattr(model_config, "simplex_structure_readout_scale", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_structure_pair_readout_scale": (
+            float(getattr(model_config, "simplex_structure_pair_readout_scale", 0.0)) if use_simplicial else 0.0
+        ),
         "simplex_msa_feedback_scale": (
             float(getattr(model_config, "simplex_msa_feedback_scale", 0.0)) if use_simplicial else 0.0
         ),
@@ -2060,6 +2064,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_pair_update_scale",
         "simplex_single_update_scale",
         "simplex_structure_readout_scale",
+        "simplex_structure_pair_readout_scale",
         "simplex_msa_feedback_scale",
         "simplex_boundary_msa_feedback_scale",
         "simplex_boundary_pair_feedback_scale",
@@ -2365,6 +2370,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the model config scale for simplex readouts into the structure module.",
+    )
+    parser.add_argument(
+        "--simplex-structure-pair-readout-scale",
+        type=float,
+        default=None,
+        help=(
+            "Override the model config scale for RMS-normalized selected boundary-cochain pair "
+            "readout into the structure module pair bias."
+        ),
     )
     parser.add_argument(
         "--simplex-msa-feedback-scale",
@@ -3092,6 +3106,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
             args.simplex_boundary_cochain_recycling_runtime_scale_ramp_steps
         ),
         "simplex_structure_readout_scale": args.simplex_structure_readout_scale,
+        "simplex_structure_pair_readout_scale": args.simplex_structure_pair_readout_scale,
         "simplex_msa_feedback_scale": args.simplex_msa_feedback_scale,
         "simplex_boundary_msa_feedback_scale": args.simplex_boundary_msa_feedback_scale,
         "simplex_boundary_pair_feedback_scale": args.simplex_boundary_pair_feedback_scale,

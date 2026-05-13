@@ -11,6 +11,12 @@ from .heads import DistogramHead, PLDDTHead, MaskedMSAHead, TMScoreHead, Experim
 from .simplex import simplex_boundary_metric_confidence_map, simplex_boundary_metric_recycling_bins
 from .utils import recycling_distance_bin
 
+
+def _rms_normalize_last_dim(x: torch.Tensor) -> torch.Tensor:
+    denom = torch.sqrt(torch.mean(x.float() * x.float(), dim=-1, keepdim=True).clamp_min(1e-6))
+    return x / denom.to(dtype=x.dtype)
+
+
 class AlphaFold2(torch.nn.Module):
     """Top-level AlphaFold2 model (Algorithm 2).
 
@@ -53,6 +59,9 @@ class AlphaFold2(torch.nn.Module):
         super().__init__()
         self.use_simplicial_evoformer = bool(getattr(config, "use_simplicial_evoformer", False))
         self.simplex_structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
+        self.simplex_structure_pair_readout_scale = float(
+            getattr(config, "simplex_structure_pair_readout_scale", 0.0)
+        )
         self.simplex_boundary_metric_recycling_scale = float(
             getattr(config, "simplex_boundary_metric_recycling_scale", 0.0)
         )
@@ -538,10 +547,19 @@ class AlphaFold2(torch.nn.Module):
                     single_rep_accum = single_rep_accum + msa_repr[:, 0, :, :]
                     structure_single_accum = structure_single_accum + single_repr
                     pair_repr_accum = pair_repr_accum + pair_repr
-                    if self.simplex_structure_readout_scale > 0.0 and simplex_aux_current is not None:
-                        simplex_single_readout = simplex_aux_current.get("simplex_structure_single_readout")
-                        if simplex_single_readout is not None:
-                            simplex_structure_single_accum = simplex_structure_single_accum + simplex_single_readout
+                    if (
+                        (
+                            self.simplex_structure_readout_scale > 0.0
+                            or self.simplex_structure_pair_readout_scale > 0.0
+                        )
+                        and simplex_aux_current is not None
+                    ):
+                        if self.simplex_structure_readout_scale > 0.0:
+                            simplex_single_readout = simplex_aux_current.get("simplex_structure_single_readout")
+                            if simplex_single_readout is not None:
+                                simplex_structure_single_accum = (
+                                    simplex_structure_single_accum + simplex_single_readout
+                                )
                         simplex_pair_readout = simplex_aux_current.get("simplex_structure_pair_readout")
                         if simplex_pair_readout is not None:
                             simplex_structure_pair_accum = simplex_structure_pair_accum + simplex_pair_readout
@@ -564,6 +582,11 @@ class AlphaFold2(torch.nn.Module):
                     single_rep = single_rep + readout_scale * (simplex_structure_single_accum / n_ensemble)
                     pair_repr = pair_repr + readout_scale * (simplex_structure_pair_accum / n_ensemble)
                     single_rep = single_rep * seq_mask[..., None]
+                    pair_repr = pair_repr * pair_mask[..., None]
+                if self.simplex_structure_pair_readout_scale > 0.0:
+                    pair_readout = _rms_normalize_last_dim(simplex_structure_pair_accum / n_ensemble)
+                    pair_readout = pair_readout * pair_mask[..., None]
+                    pair_repr = pair_repr + self.simplex_structure_pair_readout_scale * pair_readout
                     pair_repr = pair_repr * pair_mask[..., None]
 
                 # Algorithm 2 line 21: StructureModule consumes (ŝ_i, ẑ_ij).

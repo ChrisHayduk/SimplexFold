@@ -383,6 +383,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "3000",
             "--simplex-segment-cell-runtime-scale-ramp-steps",
             "500",
+            "--simplex-structure-pair-readout-scale",
+            "0.125",
             "--simplex-msa-feedback-scale",
             "0.25",
             "--simplex-boundary-msa-feedback-scale",
@@ -531,6 +533,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_segment_cell_runtime_scale_final == 0.05
     assert args.simplex_segment_cell_runtime_scale_ramp_start_step == 3000
     assert args.simplex_segment_cell_runtime_scale_ramp_steps == 500
+    assert args.simplex_structure_pair_readout_scale == 0.125
     assert args.simplex_msa_feedback_scale == 0.25
     assert args.simplex_boundary_msa_feedback_scale == 0.125
     assert args.simplex_boundary_pair_feedback_scale == 0.0625
@@ -595,6 +598,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_boundary_message_degree_attenuation == 0.5
     assert cfg.simplex_boundary_incidence_normalization == 1.0
     assert cfg.simplex_boundary_readout_directionality == 0.5
+    assert cfg.simplex_structure_pair_readout_scale == 0.125
     assert cfg.simplex_msa_feedback_scale == 0.25
     assert cfg.simplex_boundary_msa_feedback_scale == 0.125
     assert cfg.simplex_boundary_pair_feedback_scale == 0.0625

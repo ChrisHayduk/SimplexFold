@@ -1495,6 +1495,9 @@ class SimplicialAdapter(torch.nn.Module):
         self.pair_update_scale = float(getattr(config, "simplex_pair_update_scale", 1.0))
         self.single_update_scale = float(getattr(config, "simplex_single_update_scale", 1.0))
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
+        self.structure_pair_readout_scale = float(
+            getattr(config, "simplex_structure_pair_readout_scale", 0.0)
+        )
         self.msa_feedback_scale = float(getattr(config, "simplex_msa_feedback_scale", 0.0))
         self.boundary_msa_feedback_scale = float(getattr(config, "simplex_boundary_msa_feedback_scale", 0.0))
         self.boundary_pair_feedback_scale = float(getattr(config, "simplex_boundary_pair_feedback_scale", 0.0))
@@ -2251,7 +2254,11 @@ class SimplicialAdapter(torch.nn.Module):
                 "simplex_neighbor_indices": topology.nbr_idx,
             }
         )
-        if self.structure_readout_scale > 0.0 or self.boundary_cochain_recycling_scale > 0.0:
+        if (
+            self.structure_readout_scale > 0.0
+            or self.structure_pair_readout_scale > 0.0
+            or self.boundary_cochain_recycling_scale > 0.0
+        ):
             aux["simplex_structure_pair_readout"] = pair_readout
         if self.structure_readout_scale > 0.0:
             aux["simplex_structure_single_readout"] = single_readout

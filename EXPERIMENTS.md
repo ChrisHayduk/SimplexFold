@@ -610,6 +610,42 @@ launch-style parameter audit counted `3,154,242` parameters under the
 `3,261,974` cap. It resumed the E106 checkpoint at step 6500/examples 52000
 with `1244` matching tensors loaded and `0` new/missing tensors initialized.
 
+### E111 Idea: Pair-Only Boundary-Cochain Structure Bias
+
+Status: implemented locally and queued; do not launch while E110 is in flight.
+
+Hypothesis: E33/E34/E51/E67/E68 showed that broad simplex structure readout
+can perturb the residue and pair streams enough to hurt primary C-alpha lDDT.
+E104-E109 then showed that selected boundary cochains can have high local
+metric quality or useful transient recycle effects without reliably improving
+global assembly. E111 threads those lessons together: expose the selected
+face/tetra boundary 1-cochain only as a small, RMS-normalized pair bias for
+the structure module's IPA pair representation, rather than as a raw trunk
+residual, residue readout, new coordinate loss, or persistent recycle state.
+
+Mechanism: add `simplex_structure_pair_readout_scale`. When enabled, the
+simplex adapter emits the selected boundary-edge pair readout even when broad
+`simplex_structure_readout_scale` is disabled. `AlphaFold2` accumulates that
+pair cochain across ensemble samples, RMS-normalizes it along channels, masks
+invalid residue pairs, and adds it only to the pair representation consumed by
+the structure module. This adds no parameters and no output loss; it changes
+how explicit higher-order cell cochains bias final backbone assembly.
+
+Gate: after E110 returns, launch a 500-step gate from the best verified E106
+or E110 checkpoint with the E110 selected-complex/release recipe plus
+`--simplex-structure-pair-readout-scale 0.05`. Keep it only if primary
+`val_lddt_ca` improves over the chosen checkpoint and over E110; do not treat
+it as a 30k candidate unless it also recovers toward or above the E96/E97
+leader band.
+
+Validation:
+
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m py_compile minalphafold/model.py minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_simplex.py::test_simplicial_adapter_can_emit_pair_only_structure_readout tests/test_trainer.py::test_simplicial_structure_pair_readout_adds_no_parameters tests/test_trainer.py::test_simplicial_structure_pair_readout_forward_uses_private_pair_cochain tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `4 passed`
+- E111 launch-style parameter audit with the E110 selected-complex recipe and
+  `simplex_structure_pair_readout_scale=0.05`: `3,154,242` parameters, under
+  the `3,261,974` AF2-medium +5% cap.
+
 ### E83: Fixed Sparse Cell Continuation
 
 Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.

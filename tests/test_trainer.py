@@ -568,6 +568,17 @@ def test_simplicial_structure_readout_adds_no_parameters():
     assert readout_params == simplex_params
 
 
+def test_simplicial_structure_pair_readout_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    readout_medium = replace(simplex_medium, simplex_structure_pair_readout_scale=0.25)
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    readout_params = sum(parameter.numel() for parameter in AlphaFold2(readout_medium).parameters())
+
+    assert simplex_params == 3_106_690
+    assert readout_params == simplex_params
+
+
 def test_simplicial_boundary_metric_recycling_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     recycling_medium = replace(simplex_medium, simplex_boundary_metric_recycling_scale=0.25)
@@ -1005,6 +1016,51 @@ def test_simplicial_structure_readout_forward_keeps_internal_tensors_private():
     assert outputs["atom14_coords"].shape == (1, 4, 14, 3)
     assert "simplex_structure_single_readout" not in outputs
     assert "simplex_structure_pair_readout" not in outputs
+
+
+def test_simplicial_structure_pair_readout_forward_uses_private_pair_cochain():
+    torch.manual_seed(23)
+    base_config = replace(load_model_config("tiny"), simplex_structure_pair_readout_scale=0.0)
+    readout_config = replace(load_model_config("tiny"), simplex_structure_pair_readout_scale=0.25)
+    base_model = AlphaFold2(base_config)
+    readout_model = AlphaFold2(readout_config)
+    readout_model.load_state_dict(base_model.state_dict())
+    base_model.eval()
+    readout_model.eval()
+
+    target_feat = torch.randn(1, 5, 22)
+    residue_index = torch.arange(5).reshape(1, 5)
+    msa_feat = torch.randn(1, 2, 5, 49)
+    extra_msa_feat = torch.zeros(1, 0, 5, 25)
+    template_pair_feat = torch.zeros(1, 0, 5, 5, 88)
+    aatype = torch.zeros(1, 5, dtype=torch.long)
+
+    with torch.no_grad():
+        base_outputs = base_model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=1,
+        )
+        readout_outputs = readout_model(
+            target_feat,
+            residue_index,
+            msa_feat,
+            extra_msa_feat,
+            template_pair_feat,
+            aatype,
+            n_cycles=1,
+        )
+
+    assert "simplex_structure_pair_readout" not in readout_outputs
+    assert "simplex_structure_single_readout" not in readout_outputs
+    assert not torch.allclose(
+        readout_outputs["pair_representation"],
+        base_outputs["pair_representation"],
+    )
 
 
 def test_simplicial_boundary_metric_recycling_changes_only_recycled_cycles():

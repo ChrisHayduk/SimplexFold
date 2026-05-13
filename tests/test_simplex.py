@@ -75,6 +75,7 @@ class SimplexConfig:
     simplex_cell_dropout = 0.0
     simplex_single_transition_n = 2
     simplex_structure_readout_scale = 0.0
+    simplex_structure_pair_readout_scale = 0.0
     simplex_msa_feedback_scale = 0.0
     simplex_boundary_msa_feedback_scale = 0.0
     simplex_boundary_pair_feedback_scale = 0.0
@@ -1206,6 +1207,23 @@ def test_simplicial_adapter_can_emit_structure_readout_from_selected_cells():
     assert torch.all(aux["simplex_structure_single_readout"][1, 4:] == 0)
     assert torch.all(aux["simplex_structure_pair_readout"][1, 4:, :, :] == 0)
     assert torch.all(aux["simplex_structure_pair_readout"][1, :, 4:, :] == 0)
+
+
+def test_simplicial_adapter_can_emit_pair_only_structure_readout():
+    class PairReadoutConfig(SimplexConfig):
+        simplex_structure_pair_readout_scale = 0.25
+
+    torch.manual_seed(31)
+    cfg = PairReadoutConfig()
+    adapter = SimplicialAdapter(cfg)
+    pair = torch.randn(1, 6, 6, cfg.c_z)
+    single = torch.randn(1, 6, cfg.c_s)
+
+    _, _, aux = adapter(pair, single)
+
+    assert aux["simplex_structure_pair_readout"].shape == pair.shape
+    assert "simplex_structure_single_readout" not in aux
+    assert not torch.allclose(aux["simplex_structure_pair_readout"], torch.zeros_like(pair))
 
 
 def test_simplex_boundary_metric_recycling_bins_scatter_selected_boundary_edges():
