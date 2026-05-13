@@ -3984,3 +3984,9 @@
   MSA feedback. This would aggregate selected 1-cochain boundary-edge
   messages into incident residues before target-MSA feedback. It is an idea
   only; do not implement or launch while E100 is active.
+- E100 live health check at `2026-05-13T05:36:20Z` on owned pod
+  `o1dy17ouv8w5mz`: Python PID `16247` was still active after about 15
+  minutes, H100 utilization was nonzero (`30%`) with `13.5GB` allocated, and
+  `run_metadata.json` plus `history_full_msa_to_face.json` were present.
+  `results.json` and step-10000 checkpoints were not present yet, so the run
+  remains in progress rather than returned.
