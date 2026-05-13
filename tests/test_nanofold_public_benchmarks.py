@@ -391,6 +391,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.03125",
             "--simplex-boundary-metric-gate-scale",
             "0.5",
+            "--simplex-boundary-metric-recycling-scale",
+            "0.125",
             "--simplex-msa-feedback-runtime-scale",
             "0.0",
             "--simplex-msa-feedback-runtime-scale-final",
@@ -512,6 +514,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_boundary_pair_feedback_scale == 0.0625
     assert args.simplex_boundary_pair_gate_scale == 0.03125
     assert args.simplex_boundary_metric_gate_scale == 0.5
+    assert args.simplex_boundary_metric_recycling_scale == 0.125
     assert args.simplex_msa_feedback_runtime_scale == 0.0
     assert args.simplex_msa_feedback_runtime_scale_final == 0.05
     assert args.simplex_msa_feedback_runtime_scale_ramp_start_step == 3000
@@ -565,6 +568,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_boundary_pair_feedback_scale == 0.0625
     assert cfg.simplex_boundary_pair_gate_scale == 0.03125
     assert cfg.simplex_boundary_metric_gate_scale == 0.5
+    assert cfg.simplex_boundary_metric_recycling_scale == 0.125
     assert cfg.simplex_face_top_k == 24
     assert cfg.simplex_tetra_top_k == 48
     assert cfg.simplex_cell_score_degree_penalty == 0.75

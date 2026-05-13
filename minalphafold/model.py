@@ -8,6 +8,7 @@ from .structure_module import StructureModule
 from .initialization import init_gate_linear, init_linear, zero_linear
 from .embedders import InputEmbedder, TemplatePair, TemplatePointwiseAttention, ExtraMsaStack
 from .heads import DistogramHead, PLDDTHead, MaskedMSAHead, TMScoreHead, ExperimentallyResolvedHead
+from .simplex import simplex_boundary_metric_recycling_bins
 from .utils import recycling_distance_bin
 
 class AlphaFold2(torch.nn.Module):
@@ -52,6 +53,9 @@ class AlphaFold2(torch.nn.Module):
         super().__init__()
         self.use_simplicial_evoformer = bool(getattr(config, "use_simplicial_evoformer", False))
         self.simplex_structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
+        self.simplex_boundary_metric_recycling_scale = float(
+            getattr(config, "simplex_boundary_metric_recycling_scale", 0.0)
+        )
         simplex_every_n = max(int(getattr(config, "simplex_every_n_blocks", 1)), 1)
         if self.use_simplicial_evoformer:
             self.evoformer_blocks = torch.nn.ModuleList(
@@ -215,6 +219,7 @@ class AlphaFold2(torch.nn.Module):
             simplex_boundary_pair_feedback_scale_override: torch.Tensor | None = None,
             simplex_boundary_pair_gate_scale_override: torch.Tensor | None = None,
             simplex_boundary_metric_gate_scale_override: torch.Tensor | None = None,
+            simplex_boundary_metric_recycling_scale_override: torch.Tensor | None = None,
             simplex_local_neighbor_k_override: torch.Tensor | None = None,
             simplex_geometry_distance_weight_override: torch.Tensor | None = None,
             simplex_face_top_k_override: torch.Tensor | None = None,
@@ -235,6 +240,12 @@ class AlphaFold2(torch.nn.Module):
             n_cycles = int(torch.randint(1, n_cycles + 1, (1,), device=target_feat.device).item())
         self.last_n_cycles = int(n_cycles)
         self.last_n_ensemble = int(n_ensemble)
+        simplex_boundary_metric_recycling_scale = self.simplex_boundary_metric_recycling_scale
+        if simplex_boundary_metric_recycling_scale_override is not None:
+            simplex_boundary_metric_recycling_scale = max(
+                float(simplex_boundary_metric_recycling_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
 
         outer_grad = torch.is_grad_enabled()
 
@@ -594,6 +605,16 @@ class AlphaFold2(torch.nn.Module):
                 # for backward.
                 single_rep_prev = msa_first_row.detach()
                 z_prev = pair_repr.detach()
+                if simplex_boundary_metric_recycling_scale > 0.0 and simplex_aux_last is not None:
+                    simplex_recycle_bins, simplex_recycle_mask = simplex_boundary_metric_recycling_bins(
+                        simplex_aux_last,
+                        num_residues=N_res,
+                        n_recycle_bins=15,
+                    )
+                    simplex_recycle_bias = self.recycle_linear_d(simplex_recycle_bins.to(dtype=pair_repr.dtype))
+                    simplex_recycle_bias = simplex_recycle_bias * simplex_recycle_mask.to(dtype=pair_repr.dtype)
+                    simplex_recycle_bias = simplex_recycle_bias * pair_mask[..., None].to(dtype=pair_repr.dtype)
+                    z_prev = z_prev + simplex_boundary_metric_recycling_scale * simplex_recycle_bias.detach()
 
                 # Pseudo-β: Cα for glycine (atom14 index 1, since GLY has no Cβ),
                 # Cβ otherwise (atom14 index 4). Matches the pseudo-β convention

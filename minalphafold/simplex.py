@@ -759,6 +759,118 @@ def scatter_to_pair(
     return delta.reshape(b, l, l, c_z), counts.reshape(b, l, l, 1)
 
 
+def _distance_logits_to_recycling_bins(
+    logits: torch.Tensor,
+    *,
+    n_recycle_bins: int,
+    dist_min: float = 2.0,
+    dist_max: float = 22.0,
+    recycle_min: float = 3.375,
+    recycle_bin_width: float = 1.25,
+) -> torch.Tensor:
+    """Map selected-cell distance logits to AF2-style recycling-bin evidence."""
+
+    if logits.numel() == 0:
+        return logits.new_empty(*logits.shape[:-1], n_recycle_bins)
+    n_dist_bins = int(logits.shape[-1])
+    dist_centers = torch.linspace(
+        float(dist_min),
+        float(dist_max),
+        n_dist_bins,
+        device=logits.device,
+        dtype=logits.dtype,
+    )
+    probs = torch.softmax(logits, dim=-1)
+    expected_distance = torch.sum(probs * dist_centers, dim=-1)
+    recycle_centers = float(recycle_min) + float(recycle_bin_width) * torch.arange(
+        n_recycle_bins,
+        device=logits.device,
+        dtype=logits.dtype,
+    )
+    recycle_idx = torch.argmin(torch.abs(expected_distance[..., None] - recycle_centers), dim=-1)
+    return torch.nn.functional.one_hot(recycle_idx, n_recycle_bins).to(dtype=logits.dtype)
+
+
+def simplex_boundary_metric_recycling_bins(
+    aux: dict[str, torch.Tensor],
+    *,
+    num_residues: int,
+    n_recycle_bins: int = 15,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Scatter selected face/tetra boundary metric cochains into recycling bins."""
+
+    face_indices = aux.get("simplex_face_indices")
+    if face_indices is None:
+        raise KeyError("simplex_face_indices")
+    b = int(face_indices.shape[0])
+    device = face_indices.device
+    face_logits = aux.get("simplex_face_distance_logits")
+    tetra_logits = aux.get("simplex_tetra_distance_logits")
+    dtype_source = face_logits if face_logits is not None else tetra_logits
+    dtype = dtype_source.dtype if dtype_source is not None else torch.float32
+    metric_sum = torch.zeros((b, num_residues, num_residues, n_recycle_bins), device=device, dtype=dtype)
+    metric_counts = torch.zeros((b, num_residues, num_residues, 1), device=device, dtype=dtype)
+
+    face_mask = aux.get("simplex_face_mask")
+    if face_logits is not None and face_mask is not None and face_indices.numel() > 0:
+        i, j, k = face_indices.unbind(dim=-1)
+        face_edges = torch.stack(
+            [
+                torch.stack([i, j], dim=-1),
+                torch.stack([i, k], dim=-1),
+                torch.stack([j, k], dim=-1),
+            ],
+            dim=-2,
+        )
+        face_bins = _distance_logits_to_recycling_bins(face_logits, n_recycle_bins=n_recycle_bins)
+        face_edge_mask = face_mask[..., None].expand_as(face_edges[..., 0]).to(dtype)
+        face_delta, face_counts = scatter_to_pair(
+            face_bins,
+            face_edges,
+            pair_shape=tuple(metric_sum.shape),  # type: ignore[arg-type]
+            edge_mask=face_edge_mask,
+            include_reverse=True,
+        )
+        metric_sum = metric_sum + face_delta
+        metric_counts = metric_counts + face_counts
+
+    tetra_indices = aux.get("simplex_tetra_indices")
+    tetra_mask = aux.get("simplex_tetra_mask")
+    if (
+        tetra_indices is not None
+        and tetra_logits is not None
+        and tetra_mask is not None
+        and tetra_indices.numel() > 0
+    ):
+        i, j, k, l = tetra_indices.unbind(dim=-1)
+        tetra_edges = torch.stack(
+            [
+                torch.stack([i, j], dim=-1),
+                torch.stack([i, k], dim=-1),
+                torch.stack([i, l], dim=-1),
+                torch.stack([j, k], dim=-1),
+                torch.stack([j, l], dim=-1),
+                torch.stack([k, l], dim=-1),
+            ],
+            dim=-2,
+        )
+        tetra_bins = _distance_logits_to_recycling_bins(tetra_logits, n_recycle_bins=n_recycle_bins)
+        tetra_edge_mask = tetra_mask[..., None].expand_as(tetra_edges[..., 0]).to(dtype)
+        tetra_delta, tetra_counts = scatter_to_pair(
+            tetra_bins,
+            tetra_edges,
+            pair_shape=tuple(metric_sum.shape),  # type: ignore[arg-type]
+            edge_mask=tetra_edge_mask,
+            include_reverse=True,
+        )
+        metric_sum = metric_sum + tetra_delta
+        metric_counts = metric_counts + tetra_counts
+
+    metric_mask = (metric_counts > 0).to(dtype)
+    metric_bins = metric_sum / metric_counts.clamp_min(1.0)
+    return metric_bins * metric_mask, metric_mask
+
+
 def coface_degree_attenuate_pair_readout(
     pair_readout: torch.Tensor,
     pair_counts: torch.Tensor,

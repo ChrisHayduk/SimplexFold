@@ -4268,3 +4268,24 @@
   20 rows ending with E97 step 9500 (`val_lddt_ca=0.4035918414592743`). E104
   is still in flight and must remain out of `EXPERIMENT_RESULTS.md` until it
   returns and passes remote/local coherence checks.
+- E104 live poll at `2026-05-13T10:28:32Z`: Python PID `19749` was still
+  active after about 14 minutes with GPU memory at `14365 MiB`, nonzero GPU
+  utilization, and `results.json` absent. The log still only shows startup and
+  resume lines, so E104 remains in flight.
+- Implemented E105 locally as `simplex_boundary_metric_recycling_scale`. The
+  path converts selected face/tetra boundary distance logits into AF2 recycling
+  distance-bin evidence, scatters that evidence only over selected boundary
+  edges, masks inactive pairs to zero, and reuses the existing
+  `recycle_linear_d` projection to bias `z_prev` for the next recycling cycle.
+  This is a topology-native inter-cycle cochain-memory change and adds no
+  parameters.
+- E105 validation so far:
+  `python -m py_compile minalphafold/simplex.py minalphafold/model.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`;
+  focused tests for sparse recycling-bin scatter, no-new-parameter budget
+  behavior, cycle-specific forward behavior, and CLI/config override plumbing
+  reported `4 passed`; the broader local slice
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `178 passed`; `git diff --check` passed. A launch-style E105
+  parameter audit with E97 topology settings and
+  `simplex_boundary_metric_recycling_scale=0.1` counted `3,154,242`
+  parameters, under the AF2-medium +5% ceiling.

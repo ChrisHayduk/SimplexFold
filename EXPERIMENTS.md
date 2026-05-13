@@ -321,6 +321,42 @@ ceiling. Python PID is `19749`. A status poll at `2026-05-13T10:19:03Z`
 showed the process alive, GPU active, `results.json` absent, and the history
 still ending at the inherited E97 step-9500 row.
 
+### E105 Idea: Selected-Boundary Metric Recycling
+
+Status: implemented locally and queued behind E104; do not launch while E104
+is still in flight unless we explicitly decide to run parallel confirmation
+pods.
+
+Hypothesis: E99-E104 test ways for selected boundary cochains to write into
+the current pair trunk, but the recycling loop still only carries the final
+structure-module coordinates into the next cycle. If selected face/tetra
+distance heads have learned useful local boundary metrics, those metric
+cochains should be recycled directly as sparse pair-distance evidence on the
+selected 1-skeleton.
+
+Mechanism: add `simplex_boundary_metric_recycling_scale`. The model converts
+existing selected face/tetra boundary distance logits into the 15-bin AF2
+recycling distance basis, scatters them symmetrically onto only the selected
+boundary edges, masks unselected pairs to zero, and feeds the sparse bin tensor
+through the existing `recycle_linear_d` projection before adding it to
+`z_prev` for the next recycle cycle. This adds no parameters and changes the
+inter-cycle cochain memory, not the loss or final coordinate readout.
+
+Gate: if E104 returns as a reject, resume the E97/E104 lineage to the next
+500-step validation point with E97 topology settings fixed and set
+`--simplex-boundary-metric-recycling-scale` to a small value first, likely
+`0.05` or `0.10`. Compare against E99 step 10000, E101, E103, E104, E97, and
+E96. Reject unless it improves primary C-alpha lDDT, not just FoldScore/dRMSD.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+- Focused E105 tests for sparse recycling-bin scatter, no-new-parameter budget behavior, cycle-specific forward behavior, and CLI/config override plumbing: `4 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `178 passed`
+- E105 launch-style module set with E97 topology settings and
+  `simplex_boundary_metric_recycling_scale=0.1`: `3,154,242` parameters,
+  still under the AF2-medium +5% ceiling.
+
 ### E83: Fixed Sparse Cell Continuation
 
 Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.

@@ -20,6 +20,7 @@ from minalphafold.simplex import (
     scatter_directed_edges_to_residue,
     segment_cell_indices,
     segment_geometry_features,
+    simplex_boundary_metric_recycling_bins,
     tetra_edge_frame_features,
     tetra_geometry_features,
 )
@@ -78,6 +79,7 @@ class SimplexConfig:
     simplex_boundary_pair_feedback_scale = 0.0
     simplex_boundary_pair_gate_scale = 0.0
     simplex_boundary_metric_gate_scale = 0.0
+    simplex_boundary_metric_recycling_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
     simplex_outer_edge_context_scale = 0.0
     simplex_hodge_face_update_scale = 0.0
@@ -1203,6 +1205,32 @@ def test_simplicial_adapter_can_emit_structure_readout_from_selected_cells():
     assert torch.all(aux["simplex_structure_single_readout"][1, 4:] == 0)
     assert torch.all(aux["simplex_structure_pair_readout"][1, 4:, :, :] == 0)
     assert torch.all(aux["simplex_structure_pair_readout"][1, :, 4:, :] == 0)
+
+
+def test_simplex_boundary_metric_recycling_bins_scatter_selected_boundary_edges():
+    face_indices = torch.tensor([[[[0, 1, 2]]]])
+    face_mask = torch.ones(1, 1, 1)
+    face_logits = torch.zeros(1, 1, 1, 3, 8)
+    aux = {
+        "simplex_face_indices": face_indices,
+        "simplex_face_mask": face_mask,
+        "simplex_face_distance_logits": face_logits,
+        "simplex_tetra_indices": torch.empty(1, 1, 0, 4, dtype=torch.long),
+        "simplex_tetra_mask": torch.empty(1, 1, 0),
+        "simplex_tetra_distance_logits": torch.empty(1, 1, 0, 6, 8),
+    }
+
+    bins, mask = simplex_boundary_metric_recycling_bins(aux, num_residues=4, n_recycle_bins=5)
+
+    assert bins.shape == (1, 4, 4, 5)
+    assert mask.shape == (1, 4, 4, 1)
+    for a, b in ((0, 1), (0, 2), (1, 2)):
+        assert mask[0, a, b, 0] == 1
+        assert mask[0, b, a, 0] == 1
+        assert torch.isclose(bins[0, a, b].sum(), torch.tensor(1.0))
+        assert torch.isclose(bins[0, b, a].sum(), torch.tensor(1.0))
+    assert mask[0, 0, 3, 0] == 0
+    assert torch.all(bins[0, 0, 3] == 0)
 
 
 def test_simplicial_adapter_can_project_selected_cell_readout_to_msa_feedback():

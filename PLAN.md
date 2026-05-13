@@ -68,6 +68,18 @@ approaches or exceeds E96/E97 on primary C-alpha lDDT while preserving
 selected-boundary diagnostics. Do not add E104 to `EXPERIMENT_RESULTS.md`
 until `results.json` has returned and passed remote/local coherence checks.
 
+If E104 returns below the E96/E97 local peak, the next prepared branch is E105:
+selected-boundary metric recycling. The plateau evidence suggests that the
+selected complex learns reasonable local boundary geometry, but the main
+trunk only recycles the final coordinate prediction. E105 reuses the existing
+face/tetra distance heads, maps their selected boundary-edge distance
+distributions into the AF2 recycling distance-bin basis, scatters that
+evidence only onto the selected boundary 1-skeleton, and adds it as a
+no-new-parameter bias to `z_prev` for the next recycle cycle. This is not a
+new output loss; it changes the inter-cycle cochain memory so explicit
+higher-rank metric states can influence the next pair-trunk pass before the
+structure module.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

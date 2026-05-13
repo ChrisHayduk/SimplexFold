@@ -968,6 +968,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_boundary_pair_feedback_scale", args.simplex_boundary_pair_feedback_scale),
         ("simplex_boundary_pair_gate_scale", args.simplex_boundary_pair_gate_scale),
         ("simplex_boundary_metric_gate_scale", args.simplex_boundary_metric_gate_scale),
+        ("simplex_boundary_metric_recycling_scale", args.simplex_boundary_metric_recycling_scale),
         ("simplex_outer_edge_update_scale", args.simplex_outer_edge_update_scale),
         ("simplex_outer_edge_context_scale", args.simplex_outer_edge_context_scale),
         ("simplex_hodge_face_update_scale", args.simplex_hodge_face_update_scale),
@@ -1784,6 +1785,11 @@ def _train_variant(
         "simplex_boundary_metric_gate_scale": (
             float(getattr(model_config, "simplex_boundary_metric_gate_scale", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_boundary_metric_recycling_scale": (
+            float(getattr(model_config, "simplex_boundary_metric_recycling_scale", 0.0))
+            if use_simplicial
+            else 0.0
+        ),
         "simplex_outer_edge_update_scale": (
             float(getattr(model_config, "simplex_outer_edge_update_scale", 0.0)) if use_simplicial else 0.0
         ),
@@ -2318,6 +2324,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the model config scale for distance-confidence gates on selected simplex boundary edges.",
+    )
+    parser.add_argument(
+        "--simplex-boundary-metric-recycling-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for recycling selected simplex boundary distance evidence.",
     )
     parser.add_argument(
         "--simplex-msa-feedback-runtime-scale",
@@ -2932,6 +2944,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_boundary_pair_feedback_scale": args.simplex_boundary_pair_feedback_scale,
         "simplex_boundary_pair_gate_scale": args.simplex_boundary_pair_gate_scale,
         "simplex_boundary_metric_gate_scale": args.simplex_boundary_metric_gate_scale,
+        "simplex_boundary_metric_recycling_scale": args.simplex_boundary_metric_recycling_scale,
         "simplex_outer_edge_update_scale": args.simplex_outer_edge_update_scale,
         "simplex_outer_edge_context_scale": args.simplex_outer_edge_context_scale,
         "simplex_hodge_face_update_scale": args.simplex_hodge_face_update_scale,
