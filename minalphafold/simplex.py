@@ -772,6 +772,8 @@ def _distance_logits_to_recycling_bins(
 
     if logits.numel() == 0:
         return logits.new_empty(*logits.shape[:-1], n_recycle_bins)
+    if n_recycle_bins <= 0:
+        raise ValueError("n_recycle_bins must be positive.")
     n_dist_bins = int(logits.shape[-1])
     dist_centers = torch.linspace(
         float(dist_min),
@@ -781,14 +783,19 @@ def _distance_logits_to_recycling_bins(
         dtype=logits.dtype,
     )
     probs = torch.softmax(logits, dim=-1)
-    expected_distance = torch.sum(probs * dist_centers, dim=-1)
-    recycle_centers = float(recycle_min) + float(recycle_bin_width) * torch.arange(
-        n_recycle_bins,
-        device=logits.device,
-        dtype=logits.dtype,
+    recycle_pos = ((dist_centers - float(recycle_min)) / float(recycle_bin_width)).clamp(
+        min=0.0,
+        max=float(n_recycle_bins - 1),
     )
-    recycle_idx = torch.argmin(torch.abs(expected_distance[..., None] - recycle_centers), dim=-1)
-    return torch.nn.functional.one_hot(recycle_idx, n_recycle_bins).to(dtype=logits.dtype)
+    lower_idx = torch.floor(recycle_pos).to(torch.long)
+    upper_idx = torch.ceil(recycle_pos).to(torch.long)
+    upper_weight = recycle_pos - lower_idx.to(logits.dtype)
+    lower_weight = 1.0 - upper_weight
+    dist_to_recycle = (
+        torch.nn.functional.one_hot(lower_idx, n_recycle_bins).to(dtype=logits.dtype) * lower_weight[:, None]
+        + torch.nn.functional.one_hot(upper_idx, n_recycle_bins).to(dtype=logits.dtype) * upper_weight[:, None]
+    )
+    return torch.matmul(probs, dist_to_recycle)
 
 
 def simplex_boundary_metric_recycling_bins(

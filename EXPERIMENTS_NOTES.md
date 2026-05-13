@@ -4300,3 +4300,8 @@
   resumed E97-family checkpoint ramp selected boundary metric recycling from
   `0.0` to a small value over the 500-step gate instead of switching it on
   abruptly.
+- E105 metric-cochain refinement: change the selected boundary metric
+  recycling projection from hard expected-distance binning to a soft projection
+  of the full face/tetra distance distribution into the AF2 recycling-bin
+  basis. This keeps uncertainty in the metric cochain memory instead of
+  collapsing every selected boundary edge to one nearest bin.

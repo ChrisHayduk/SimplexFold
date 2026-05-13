@@ -1229,6 +1229,7 @@ def test_simplex_boundary_metric_recycling_bins_scatter_selected_boundary_edges(
         assert mask[0, b, a, 0] == 1
         assert torch.isclose(bins[0, a, b].sum(), torch.tensor(1.0))
         assert torch.isclose(bins[0, b, a].sum(), torch.tensor(1.0))
+        assert torch.count_nonzero(bins[0, a, b] > 0.0) > 1
     assert mask[0, 0, 3, 0] == 0
     assert torch.all(bins[0, 0, 3] == 0)
 

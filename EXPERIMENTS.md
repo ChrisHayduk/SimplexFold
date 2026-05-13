@@ -334,13 +334,13 @@ distance heads have learned useful local boundary metrics, those metric
 cochains should be recycled directly as sparse pair-distance evidence on the
 selected 1-skeleton.
 
-Mechanism: add `simplex_boundary_metric_recycling_scale`. The model converts
-existing selected face/tetra boundary distance logits into the 15-bin AF2
-recycling distance basis, scatters them symmetrically onto only the selected
-boundary edges, masks unselected pairs to zero, and feeds the sparse bin tensor
-through the existing `recycle_linear_d` projection before adding it to
-`z_prev` for the next recycle cycle. This adds no parameters and changes the
-inter-cycle cochain memory, not the loss or final coordinate readout.
+Mechanism: add `simplex_boundary_metric_recycling_scale`. The model softly
+projects existing selected face/tetra boundary distance distributions into the
+15-bin AF2 recycling distance basis, scatters them symmetrically onto only the
+selected boundary edges, masks unselected pairs to zero, and feeds the sparse
+bin tensor through the existing `recycle_linear_d` projection before adding it
+to `z_prev` for the next recycle cycle. This adds no parameters and changes
+the inter-cycle cochain memory, not the loss or final coordinate readout.
 
 Gate: if E104 returns as a reject, resume the E97/E104 lineage to the next
 500-step validation point with E97 topology settings fixed. Prefer a runtime

@@ -73,7 +73,7 @@ selected-boundary metric recycling. The plateau evidence suggests that the
 selected complex learns reasonable local boundary geometry, but the main
 trunk only recycles the final coordinate prediction. E105 reuses the existing
 face/tetra distance heads, maps their selected boundary-edge distance
-distributions into the AF2 recycling distance-bin basis, scatters that
+distributions softly into the AF2 recycling distance-bin basis, scatters that
 evidence only onto the selected boundary 1-skeleton, and adds it as a
 no-new-parameter bias to `z_prev` for the next recycle cycle. This is not a
 new output loss; it changes the inter-cycle cochain memory so explicit
