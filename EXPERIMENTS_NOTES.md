@@ -4745,3 +4745,7 @@
   utilization sampled at `48%` with `13491 MiB` allocated, `results.json` and
   `results.csv` were absent, and history still had 14 rows ending at E106 step
   6500. Continue to treat E110 as in flight.
+- E110 health poll at `2026-05-13T17:33:36Z`: PID `4513` remained active after
+  about 17.3 minutes, process state `Rl` with high CPU activity, GPU memory
+  `13491 MiB`, `results.json` and `results.csv` absent, and history still at
+  the inherited E106 step-6500 row. Continue monitoring without intervention.
