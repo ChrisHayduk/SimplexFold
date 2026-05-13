@@ -4749,3 +4749,8 @@
   about 17.3 minutes, process state `Rl` with high CPU activity, GPU memory
   `13491 MiB`, `results.json` and `results.csv` absent, and history still at
   the inherited E106 step-6500 row. Continue monitoring without intervention.
+- E110 health poll at `2026-05-13T17:35:15Z`: PID `4513` remained active after
+  about 19.0 minutes, process state `Rl` with high CPU activity, GPU
+  utilization sampled at `55%` with `13491 MiB` allocated, `results.json` and
+  `results.csv` absent, and history still at E106 step 6500. Continue treating
+  E110 as an active first post-resume gate.
