@@ -3712,3 +3712,27 @@
   training slice rather than a failed run: GPU memory was allocated at about
   `13,513 MiB`, and five GPU samples showed utilization between `35%` and
   `83%`.
+- E96 returned on owned pod `o1dy17ouv8w5mz`: step 9000
+  `val_lddt_ca=0.4043184444308281`, FoldScore `0.38517895340919495`,
+  `val_ca_drmsd=10.197308748960495`, predicted/true C-alpha radius
+  `11.273331820964813 / 15.403406739234924`, `3,154,242` parameters, and
+  `stopped_early=False`. The final runtime boundary-readout directionality
+  was `0.25`.
+- E96 interpretation: keep as the new primary-lDDT leader. Annealing directed
+  boundary readout from `0.5` to `0.25` improved over E87's `0.3992` and
+  avoided E92's held-`0.5` regression. It also improved E87's FoldScore and
+  dRMSD, though predicted C-alpha radius remains under-expanded.
+- Copied E96 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e96_anneal_directed_boundary_from_e87_s9000_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e96_anneal_directed_boundary_from_e87.log`. The local artifact pull
+  excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  8500` to add the E96 row to `EXPERIMENT_RESULTS.md`, so inherited E87
+  history does not count as E96's best validation lDDT.
+- E98 launch decision: continue the E96 checkpoint from step 9000 to 9500
+  with boundary-readout directionality held at `0.25`, keeping the same
+  selected sparse complex, degree penalty, selected-boundary realization
+  losses, edge-frame message scale, and incidence-normalized transport. If
+  E98 regresses below E96, pivot to the queued zero-parameter
+  outer-edge-supported cell scorer.

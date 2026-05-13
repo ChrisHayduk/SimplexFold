@@ -689,7 +689,7 @@ local C-alpha objective, so stop combining those routes for now.
 
 ### E96 Candidate: Anneal Directed Boundary Readout After E87
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E87's directed source/target boundary readout produced the
 current tiny primary-lDDT best, but E92 showed that holding directionality at
@@ -710,7 +710,7 @@ Decision rule: keep only if E96 preserves or improves E87's primary
 `val_lddt_ca=0.3992` while avoiding E92's held-directionality regression.
 Reject if annealing directionality still falls below the E86/E87 band.
 
-Launch: E96 is running as
+Launch: E96 ran as
 `e96_anneal_directed_boundary_from_e87_s9000_c256_m64`, Python PID `13303`,
 on the owned H100 pod. A remote dirty working tree from earlier source syncs
 was preserved in a stash before fast-forwarding the checkout to commit
@@ -726,9 +726,40 @@ new/missing tensors, and started a fresh optimizer. The log path is
 the artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e96_anneal_directed_boundary_from_e87_s9000_c256_m64/`.
 
+Result: keep as the new primary-lDDT leader. E96 reached
+`val_lddt_ca=0.4043`, FoldScore `0.3852`, `val_ca_drmsd=10.1973`, and
+predicted/true C-alpha radius `11.2733 / 15.4034` with `3,154,242`
+parameters and no early stop. This improves E87's `0.3992` primary lDDT and
+also improves E87's FoldScore/dRMSD, while avoiding E92's held-directionality
+regression. The caveat is persistent under-expansion, so the next gate should
+test whether the partial directed-readout setting can continue climbing
+before changing the topology construction again.
+
+### E98 Candidate: Continue Partial Directed Boundary Readout
+
+Status: planned after E96.
+
+Hypothesis: E96 improved because directed incidence was relaxed from an
+over-strong `0.5` source/target boundary readout to a partial `0.25` setting.
+Holding that partial cochain-routing strength for one more short gate tests
+whether E96 found a better operating point rather than a one-checkpoint
+annealing artifact.
+
+Mechanism: resume the E96 checkpoint from step 9000 to 9500 with fixed
+`24/48` sparse caps, degree penalty `0.75`, selected-boundary realization
+losses, edge-frame message runtime scale `0.0125`, incidence-normalized
+boundary transport, and boundary-readout directionality held at `0.25`.
+This keeps the same selected complex and directed-incidence readout path; it
+adds no parameters and no generic output loss.
+
+Decision rule: keep if E98 preserves or improves E96's
+`val_lddt_ca=0.4043`. Reject if it falls back into the E86/E87/E92 band; in
+that case launch the queued E97 outer-edge-supported cell scorer as the next
+construction change.
+
 ### E97 Candidate: Outer-Edge-Supported Cell Scoring After E96
 
-Status: queued only if E96 regresses; do not launch while E96 is running.
+Status: queued only if E98 regresses; do not launch while E98 is running.
 
 Hypothesis: E96 tests whether directed boundary readout should be relaxed as
 a cochain-routing curriculum. If that still underperforms E87, the next

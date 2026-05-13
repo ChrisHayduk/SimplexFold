@@ -1,4 +1,4 @@
-## Current Plan: E96 Annealed Directed Boundary Readout
+## Current Plan: E98 Continue Annealed Directed Boundary Readout
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.
@@ -330,17 +330,22 @@ face/tetra boundary lDDT softened to `0.7295` / `0.7140`, so stacking the two
 communication routes improves one global geometry metric while interfering
 with local C-alpha agreement.
 
-The active Runpod gate is E96: treat E87's directed boundary readout as a
-curriculum rather than a permanent setting. It resumes E87 from step 8500 to
-9000 and ramps boundary-readout directionality down from `0.5` to `0.25`,
-while keeping the same fixed `24/48` sparse caps, degree-penalized selected
-cells, selected-boundary realization losses, edge-frame messages, and
-incidence-normalized boundary transport. E92 showed that holding
-directionality at `0.5` regresses; E96 tests whether partial relaxation keeps
-the useful directed-incidence signal without overdriving the pair tensor.
-The remote preflight counted `3,154,242` parameters under the `3,261,974`
-ceiling, and startup loaded 1244 matching E87 tensors with 0 new/missing
-tensors initialized.
+E96 is now the primary-lDDT leader. It treated E87's directed boundary readout
+as a curriculum rather than a permanent setting, resuming E87 from step 8500
+to 9000 and ramping boundary-readout directionality down from `0.5` to
+`0.25`. The result was `val_lddt_ca=0.4043`, FoldScore `0.3852`,
+`val_ca_drmsd=10.1973`, and predicted/true C-alpha radius
+`11.2733 / 15.4034` with `3,154,242` parameters. This beats E87's
+`0.3992` primary lDDT and avoids E92's held-`0.5` regression.
+
+The active next gate should be E98: continue the E96 checkpoint from step 9000
+to 9500 while holding the partial directed-readout setting at `0.25`. This is
+the cleanest slope test for the directed-incidence curriculum before changing
+the selected-complex construction again. Keep the fixed `24/48` sparse caps,
+degree-penalized selected cells, selected-boundary realization losses,
+edge-frame messages, and incidence-normalized boundary transport. Reject if
+E98 falls back below the E86/E87/E96 primary-lDDT band; if it regresses, use
+the already-budgeted E97 outer-edge-supported scorer fallback.
 
 The current 2026-05-12 full reread of the saved PDFs reinforces the E79-E81
 direction and the E96 interpretation. The right lesson is not to add another
@@ -349,13 +354,13 @@ cochain-routing curriculum and to measure whether that route helps the selected
 complex write useful edge information back into `Z_ij` without overdriving the
 pair tensor.
 
-If E96 regresses, the next launchable fallback should be outer-edge-supported
+If E98 regresses, the next launchable fallback should be outer-edge-supported
 cell scoring rather than latent segment cells. The remote parameter audit
-shows that an outer-edge scorer on the E87-style sparse/edge-frame setup stays
-at `3,154,242` parameters, while latent segment cells plus edge-frame modules
-exceed the `3,261,974` cap even with `simplex_c_segment=4`. Segment cells
-remain paper-aligned, but only as a separate no-edge-frame branch from a
-sparse checkpoint; they are not the immediate continuation of E96.
+shows that an outer-edge scorer on the E87/E96-style sparse/edge-frame setup
+stays at `3,154,242` parameters, while latent segment cells plus edge-frame
+modules exceed the `3,261,974` cap even with `simplex_c_segment=4`. Segment
+cells remain paper-aligned, but only as a separate no-edge-frame branch from a
+sparse checkpoint; they are not the immediate continuation of E96/E98.
 
 The 2026-05-12 full reread of the saved PDFs reinforces the E79-E81 direction.
 The TDL guide frames construction of the topological domain, intra-rank
