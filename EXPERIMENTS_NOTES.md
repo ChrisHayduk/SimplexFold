@@ -4339,3 +4339,6 @@
   (`0.7246271595358849` / `0.7071636132895947`), but primary C-alpha lDDT is
   below E96, E97, E99, E101, and E103, so the metric gate did not convert local
   simplex boundary quality into a better global fold.
+- Stopped the owned Runpod pod `o1dy17ouv8w5mz` after the E104 artifacts were
+  pulled and locally verified. Runpod reported desired status `EXITED` with
+  last status change `2026-05-13T11:13:05Z`.
