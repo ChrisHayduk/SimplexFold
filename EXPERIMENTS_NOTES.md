@@ -4992,3 +4992,8 @@
 - Retargeted heartbeat `check-simplexfold-e57-runpod` to E114, preserving the
   owned-pod-only rule for pod `o1dy17ouv8w5mz`, the 30-minute interval, and the
   no-automatic-follow-up-launch rule.
+- E114 mid-run health poll: PID `7698` remained active after about 30.3
+  minutes with process state `Sl`, GPU memory `13689 MiB` allocated,
+  `results.json` and `results.csv` absent, and history still at the inherited
+  E113 step-7000 row. Continue waiting for the step-7500 validation write
+  without changing the remote checkout.
