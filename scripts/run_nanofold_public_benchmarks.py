@@ -71,6 +71,7 @@ from minalphafold.trainer import (  # noqa: E402
     simplex_geometry_distance_weight_at_step,
     simplex_hodge_face_runtime_scale_at_step,
     simplex_local_neighbor_k_at_step,
+    simplex_msa_feedback_runtime_scale_at_step,
     simplex_outer_edge_context_runtime_scale_at_step,
     simplex_pair_update_runtime_scale_at_step,
     simplex_segment_cell_runtime_scale_at_step,
@@ -638,6 +639,7 @@ def _evaluate(
                         use_simplex_edge_frame_message_runtime_scale=True,
                         use_simplex_boundary_readout_directionality_runtime_scale=True,
                         use_simplex_segment_cell_runtime_scale=True,
+                        use_simplex_msa_feedback_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
                         use_simplex_geometry_distance_weight=True,
                         use_simplex_cell_top_k=True,
@@ -955,6 +957,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
     overrides: dict[str, Any] = {}
     for field, value in (
         ("simplex_structure_readout_scale", args.simplex_structure_readout_scale),
+        ("simplex_msa_feedback_scale", args.simplex_msa_feedback_scale),
         ("simplex_outer_edge_update_scale", args.simplex_outer_edge_update_scale),
         ("simplex_outer_edge_context_scale", args.simplex_outer_edge_context_scale),
         ("simplex_hodge_face_update_scale", args.simplex_hodge_face_update_scale),
@@ -1180,6 +1183,7 @@ def _train_variant(
         )
         simplex_hodge_face_runtime_scale = simplex_hodge_face_runtime_scale_at_step(training_config, step)
         simplex_segment_cell_runtime_scale = simplex_segment_cell_runtime_scale_at_step(training_config, step)
+        simplex_msa_feedback_runtime_scale = simplex_msa_feedback_runtime_scale_at_step(training_config, step)
         simplex_local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
         simplex_geometry_distance_weight = simplex_geometry_distance_weight_at_step(training_config, step)
         simplex_face_top_k = simplex_face_top_k_at_step(training_config, step)
@@ -1210,6 +1214,7 @@ def _train_variant(
                         use_simplex_edge_frame_message_runtime_scale=True,
                         use_simplex_boundary_readout_directionality_runtime_scale=True,
                         use_simplex_segment_cell_runtime_scale=True,
+                        use_simplex_msa_feedback_runtime_scale=True,
                         use_simplex_local_neighbor_k=True,
                         use_simplex_geometry_distance_weight=True,
                         use_simplex_cell_top_k=True,
@@ -1346,6 +1351,11 @@ def _train_variant(
                     float("nan")
                     if simplex_segment_cell_runtime_scale is None
                     else simplex_segment_cell_runtime_scale
+                ),
+                "simplex_msa_feedback_runtime_scale": (
+                    float("nan")
+                    if simplex_msa_feedback_runtime_scale is None
+                    else simplex_msa_feedback_runtime_scale
                 ),
                 "simplex_local_neighbor_k": (
                     float("nan") if simplex_local_neighbor_k is None else simplex_local_neighbor_k
@@ -1594,6 +1604,14 @@ def _train_variant(
         "simplex_segment_cell_runtime_scale_ramp_steps": (
             training_config.simplex_segment_cell_runtime_scale_ramp_steps
         ),
+        "simplex_msa_feedback_runtime_scale": training_config.simplex_msa_feedback_runtime_scale,
+        "simplex_msa_feedback_runtime_scale_final": training_config.simplex_msa_feedback_runtime_scale_final,
+        "simplex_msa_feedback_runtime_scale_ramp_start_step": (
+            training_config.simplex_msa_feedback_runtime_scale_ramp_start_step
+        ),
+        "simplex_msa_feedback_runtime_scale_ramp_steps": (
+            training_config.simplex_msa_feedback_runtime_scale_ramp_steps
+        ),
         "simplex_local_neighbor_k": training_config.simplex_local_neighbor_k,
         "simplex_local_neighbor_k_final": training_config.simplex_local_neighbor_k_final,
         "simplex_local_neighbor_k_ramp_start_step": training_config.simplex_local_neighbor_k_ramp_start_step,
@@ -1678,6 +1696,9 @@ def _train_variant(
         ),
         "simplex_structure_readout_scale": (
             float(getattr(model_config, "simplex_structure_readout_scale", 0.0)) if use_simplicial else 0.0
+        ),
+        "simplex_msa_feedback_scale": (
+            float(getattr(model_config, "simplex_msa_feedback_scale", 0.0)) if use_simplicial else 0.0
         ),
         "simplex_outer_edge_update_scale": (
             float(getattr(model_config, "simplex_outer_edge_update_scale", 0.0)) if use_simplicial else 0.0
@@ -1802,6 +1823,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_segment_cell_runtime_scale_final",
         "simplex_segment_cell_runtime_scale_ramp_start_step",
         "simplex_segment_cell_runtime_scale_ramp_steps",
+        "simplex_msa_feedback_runtime_scale",
+        "simplex_msa_feedback_runtime_scale_final",
+        "simplex_msa_feedback_runtime_scale_ramp_start_step",
+        "simplex_msa_feedback_runtime_scale_ramp_steps",
         "simplex_local_neighbor_k",
         "simplex_local_neighbor_k_final",
         "simplex_local_neighbor_k_ramp_start_step",
@@ -1878,6 +1903,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_pair_update_scale",
         "simplex_single_update_scale",
         "simplex_structure_readout_scale",
+        "simplex_msa_feedback_scale",
         "simplex_outer_edge_update_scale",
         "simplex_outer_edge_context_scale",
         "simplex_hodge_face_update_scale",
@@ -2176,6 +2202,21 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Override the model config scale for simplex readouts into the structure module.",
     )
+    parser.add_argument(
+        "--simplex-msa-feedback-scale",
+        type=float,
+        default=None,
+        help="Override the model config scale for selected simplex cochain feedback into the target MSA row.",
+    )
+    parser.add_argument(
+        "--simplex-msa-feedback-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for selected simplex cochain feedback into the target MSA row.",
+    )
+    parser.add_argument("--simplex-msa-feedback-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-msa-feedback-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-msa-feedback-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
         "--simplex-outer-edge-update-scale",
         type=float,
@@ -2516,6 +2557,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_segment_cell_runtime_scale_final=args.simplex_segment_cell_runtime_scale_final,
         simplex_segment_cell_runtime_scale_ramp_start_step=args.simplex_segment_cell_runtime_scale_ramp_start_step,
         simplex_segment_cell_runtime_scale_ramp_steps=args.simplex_segment_cell_runtime_scale_ramp_steps,
+        simplex_msa_feedback_runtime_scale=args.simplex_msa_feedback_runtime_scale,
+        simplex_msa_feedback_runtime_scale_final=args.simplex_msa_feedback_runtime_scale_final,
+        simplex_msa_feedback_runtime_scale_ramp_start_step=args.simplex_msa_feedback_runtime_scale_ramp_start_step,
+        simplex_msa_feedback_runtime_scale_ramp_steps=args.simplex_msa_feedback_runtime_scale_ramp_steps,
         simplex_local_neighbor_k=args.simplex_local_neighbor_k,
         simplex_local_neighbor_k_final=args.simplex_local_neighbor_k_final,
         simplex_local_neighbor_k_ramp_start_step=args.simplex_local_neighbor_k_ramp_start_step,
@@ -2687,7 +2732,14 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
             args.simplex_segment_cell_runtime_scale_ramp_start_step
         ),
         "simplex_segment_cell_runtime_scale_ramp_steps": args.simplex_segment_cell_runtime_scale_ramp_steps,
+        "simplex_msa_feedback_runtime_scale": args.simplex_msa_feedback_runtime_scale,
+        "simplex_msa_feedback_runtime_scale_final": args.simplex_msa_feedback_runtime_scale_final,
+        "simplex_msa_feedback_runtime_scale_ramp_start_step": (
+            args.simplex_msa_feedback_runtime_scale_ramp_start_step
+        ),
+        "simplex_msa_feedback_runtime_scale_ramp_steps": args.simplex_msa_feedback_runtime_scale_ramp_steps,
         "simplex_structure_readout_scale": args.simplex_structure_readout_scale,
+        "simplex_msa_feedback_scale": args.simplex_msa_feedback_scale,
         "simplex_outer_edge_update_scale": args.simplex_outer_edge_update_scale,
         "simplex_outer_edge_context_scale": args.simplex_outer_edge_context_scale,
         "simplex_hodge_face_update_scale": args.simplex_hodge_face_update_scale,

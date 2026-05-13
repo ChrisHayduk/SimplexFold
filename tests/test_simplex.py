@@ -70,6 +70,7 @@ class SimplexConfig:
     simplex_cell_dropout = 0.0
     simplex_single_transition_n = 2
     simplex_structure_readout_scale = 0.0
+    simplex_msa_feedback_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
     simplex_outer_edge_context_scale = 0.0
     simplex_hodge_face_update_scale = 0.0
@@ -1197,6 +1198,30 @@ def test_simplicial_adapter_can_emit_structure_readout_from_selected_cells():
     assert torch.all(aux["simplex_structure_pair_readout"][1, :, 4:, :] == 0)
 
 
+def test_simplicial_adapter_can_project_selected_cell_readout_to_msa_feedback():
+    class FeedbackConfig(SimplexConfig):
+        simplex_msa_feedback_scale = 0.25
+
+    torch.manual_seed(4)
+    cfg = FeedbackConfig()
+    adapter = SimplicialAdapter(cfg)
+    pair = torch.randn(2, 6, 6, cfg.c_z)
+    single = torch.randn(2, 6, cfg.c_s)
+    seq_mask = torch.tensor(
+        [
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0, 0.0],
+        ]
+    )
+    pair_mask = seq_mask[:, :, None] * seq_mask[:, None, :]
+
+    _, _, aux = adapter(pair, single, seq_mask=seq_mask, pair_mask=pair_mask)
+
+    assert aux["simplex_msa_feedback"].shape == (2, 6, cfg.c_m)
+    assert not torch.allclose(aux["simplex_msa_feedback"][0], torch.zeros_like(aux["simplex_msa_feedback"][0]))
+    assert torch.all(aux["simplex_msa_feedback"][1, 4:] == 0)
+
+
 def test_optional_low_rank_msa_to_face_path_runs():
     torch.manual_seed(2)
     cfg = SimplexConfig()
@@ -1231,6 +1256,46 @@ def test_simplicial_evoformer_returns_auxiliary_simplex_outputs():
     assert aux["simplex_face_distance_logits"].shape[-2:] == (3, cfg.n_dist_bins)
     assert aux["simplex_tetra_geometry_logits"].shape[:2] == (1, 6)
     assert aux["simplex_tetra_distance_logits"].shape[-2:] == (6, cfg.n_dist_bins)
+
+
+def test_simplicial_evoformer_msa_feedback_updates_target_msa_row():
+    class FeedbackConfig(SimplexConfig):
+        simplex_msa_feedback_scale = 0.25
+
+    torch.manual_seed(5)
+    cfg = FeedbackConfig()
+    block = SimplicialEvoformer(cfg)
+    block.eval()
+    msa = torch.randn(1, 3, 6, cfg.c_m)
+    pair = torch.randn(1, 6, 6, cfg.c_z)
+    single = torch.randn(1, 6, cfg.c_s)
+    msa_mask = torch.ones(1, 3, 6)
+    seq_mask = torch.tensor([[1.0, 1.0, 1.0, 1.0, 1.0, 0.0]])
+    pair_mask = seq_mask[:, :, None] * seq_mask[:, None, :]
+
+    off_msa, _, _, _ = block(
+        msa,
+        pair,
+        single,
+        msa_mask=msa_mask,
+        seq_mask=seq_mask,
+        pair_mask=pair_mask,
+        simplex_msa_feedback_scale_override=msa.new_tensor(0.0),
+    )
+    on_msa, _, _, aux = block(
+        msa,
+        pair,
+        single,
+        msa_mask=msa_mask,
+        seq_mask=seq_mask,
+        pair_mask=pair_mask,
+        simplex_msa_feedback_scale_override=msa.new_tensor(0.25),
+    )
+
+    assert "simplex_msa_feedback" in aux
+    assert not torch.allclose(on_msa[:, 0, :5], off_msa[:, 0, :5])
+    assert torch.allclose(on_msa[:, 1:], off_msa[:, 1:])
+    assert torch.allclose(on_msa[:, 0, 5], off_msa[:, 0, 5])
 
 
 def test_simplex_geometry_loss_is_finite_with_and_without_tetrahedra():

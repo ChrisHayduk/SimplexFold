@@ -1242,6 +1242,7 @@ class SimplicialAdapter(torch.nn.Module):
         self.pair_update_scale = float(getattr(config, "simplex_pair_update_scale", 1.0))
         self.single_update_scale = float(getattr(config, "simplex_single_update_scale", 1.0))
         self.structure_readout_scale = float(getattr(config, "simplex_structure_readout_scale", 0.0))
+        self.msa_feedback_scale = float(getattr(config, "simplex_msa_feedback_scale", 0.0))
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
         self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
@@ -1291,6 +1292,8 @@ class SimplicialAdapter(torch.nn.Module):
         self.single_gate = torch.nn.Linear(config.c_s, config.c_s)
         init_gate_linear(self.single_gate)
         self.single_norm = torch.nn.LayerNorm(config.c_s)
+        if self.msa_feedback_scale > 0.0:
+            self.single_to_msa_feedback = SimplexMLP(config.c_s, self.hidden_dim, config.c_m)
         self.auxiliary_heads = SimplexAuxiliaryHeads(config)
         if self.outer_edge_context_scale > 0.0:
             self.face_outer_edge_context = SimplexMLP(
@@ -1395,6 +1398,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
         simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
+        simplex_msa_feedback_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
@@ -1438,6 +1442,12 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_segment_cell_scale_override is not None:
             segment_cell_scale = max(
                 float(simplex_segment_cell_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
+        msa_feedback_scale = self.msa_feedback_scale
+        if simplex_msa_feedback_scale_override is not None:
+            msa_feedback_scale = max(
+                float(simplex_msa_feedback_scale_override.detach().float().cpu().item()),
                 0.0,
             )
         local_neighbor_k = self.local_neighbor_k
@@ -1821,6 +1831,11 @@ class SimplicialAdapter(torch.nn.Module):
         single_readout = single_gate * (single_delta / single_counts.clamp_min(1.0))
         if seq_mask is not None:
             single_readout = single_readout * seq_mask[..., None]
+        msa_feedback: torch.Tensor | None = None
+        if self.msa_feedback_scale > 0.0 and msa_feedback_scale > 0.0:
+            msa_feedback = self.dropout(msa_feedback_scale * self.single_to_msa_feedback(single_readout))
+            if seq_mask is not None:
+                msa_feedback = msa_feedback * seq_mask[..., None]
         single = single + self.dropout(single_update_scale * single_readout)
         if seq_mask is not None:
             single = single * seq_mask[..., None]
@@ -1840,6 +1855,8 @@ class SimplicialAdapter(torch.nn.Module):
         if self.structure_readout_scale > 0.0:
             aux["simplex_structure_pair_readout"] = pair_readout
             aux["simplex_structure_single_readout"] = single_readout
+        if msa_feedback is not None:
+            aux["simplex_msa_feedback"] = msa_feedback
         return pair, single, aux
 
     def _segment_pass(

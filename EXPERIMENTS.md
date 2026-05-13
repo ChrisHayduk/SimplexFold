@@ -70,6 +70,39 @@ stay out of the queue unless they supervise only the selected sparse complex.
 
 ## Paper-Informed Backlog
 
+### E100: Bidirectional Simplex-MSA Feedback
+
+Status: prepared locally for owned-Runpod launch after validation and commit.
+
+Hypothesis: E99 showed the selected face/tetra complex can keep becoming more
+geometrically coherent while final C-alpha lDDT stalls. That suggests a
+communication bottleneck: simplex states influence pair/single and optional
+structure readout, but they do not feed topology-derived residue evidence
+back into the MSA target row that later Evoformer blocks use. Adding this
+reverse route should better realize the README's `M <-> Z <-> F <-> U`
+motivation without adding a generic lDDT hack.
+
+Mechanism: add `simplex_msa_feedback_scale`. When enabled, the selected
+face/tetra-to-residue 0-simplex readout is projected from `c_s` to `c_m` and
+returned as `simplex_msa_feedback`. `SimplicialEvoformer` adds that tensor to
+the target MSA row after the simplex adapter, masked by the target MSA mask.
+Training can ramp the active contribution with
+`--simplex-msa-feedback-runtime-scale*` while allocating the module via the
+static model-config override. This is a cochain communication change, not a
+new output-coordinate loss.
+
+Prepared gate: resume E97 from step 9500 to 10000 with the E97 final topology
+recipe fixed, allocate `--simplex-msa-feedback-scale 0.05`, and ramp
+`--simplex-msa-feedback-runtime-scale 0.0` to `0.05` over steps 9500-10000.
+Use `--max-parameters 3261974`; targeted local tests and an explicit
+parameter audit count the E100 module set at `3,225,090` parameters, leaving
+`36,884` parameters of headroom under the AF2-medium +5% budget.
+
+Decision rule: keep only if step 10000 improves over the E99 step-10000
+control (`val_lddt_ca=0.3972`) and does not degrade selected-boundary
+diagnostics. A result merely matching the E99 continuation is not enough for
+a 30,000-step spend.
+
 ### E83: Fixed Sparse Cell Continuation
 
 Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.

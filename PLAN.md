@@ -1,4 +1,35 @@
-## Current Plan: E98 Continue Annealed Directed Boundary Readout
+## Current Plan: E100 Bidirectional Simplex-MSA Feedback
+
+E99 is the key negative control for the next move. It continued the strongest
+E97 topology-construction branch past 10,000 steps and returned
+`val_lddt_ca=0.4003`, below E96's `0.4043` at step 9000 and E97's `0.4036`
+at step 9500. The selected complex kept improving in isolation, with
+face/tetra boundary lDDT `0.7574` / `0.7386`, but that cleaner complex did
+not translate into better final C-alpha lDDT. This argues against spending on
+a blind 30,000-step continuation of the current lineage.
+
+The next architecture change should therefore alter the cochain communication
+route, not the output-side loss. The README schematic says
+`M <-> Z <-> F <-> U`, but the live model only has a low-rank
+`MSA -> face` path plus selected face/tetra readouts into pair and single
+states. E100 adds the missing reverse direction: selected face/tetra cochain
+messages are reduced to a residue-level 0-simplex readout, projected into
+`c_m`, and added back to the target MSA row. This gives later Evoformer blocks
+a direct way to consume topology-derived residue evidence instead of leaving
+the simplex signal mostly downstream of the MSA trunk.
+
+The first gate should be short and controlled. Resume the E97 checkpoint from
+step 9500, allocate `simplex_msa_feedback_scale=0.05`, and ramp the runtime
+feedback contribution from `0.0` to `0.05` over the next 500 optimizer steps.
+Keep E97's final topology settings fixed: fixed `24/48` sparse cells,
+degree penalty `0.75`, outer-edge-supported cell scoring `0.25`, symmetric
+boundary readout, incidence-normalized transport, selected-boundary
+realization losses, and edge-frame runtime scale `0.0125`. Compare the
+step-10000 result against E99's step-10000 control (`val_lddt_ca=0.3972`) and
+against the E96/E97 local peak. Keep only if the feedback route preserves or
+improves primary C-alpha lDDT while retaining selected-boundary diagnostics.
+
+## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary
 expansion, and selected-cell dropout do not break the C-alpha lDDT plateau.

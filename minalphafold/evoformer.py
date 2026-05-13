@@ -246,6 +246,7 @@ class SimplicialEvoformer(torch.nn.Module):
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
         simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
+        simplex_msa_feedback_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
@@ -309,6 +310,7 @@ class SimplicialEvoformer(torch.nn.Module):
                     simplex_boundary_readout_directionality_override
                 ),
                 simplex_segment_cell_scale_override=simplex_segment_cell_scale_override,
+                simplex_msa_feedback_scale_override=simplex_msa_feedback_scale_override,
                 simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
                 simplex_geometry_distance_weight_override=simplex_geometry_distance_weight_override,
                 simplex_face_top_k_override=simplex_face_top_k_override,
@@ -317,6 +319,12 @@ class SimplicialEvoformer(torch.nn.Module):
                     simplex_cell_score_outer_edge_weight_override
                 ),
             )
+            msa_feedback = simplex_aux.get("simplex_msa_feedback")
+            if msa_feedback is not None:
+                if msa_mask is not None:
+                    msa_feedback = msa_feedback * msa_mask[:, 0, :, None].to(msa_feedback.dtype)
+                msa_representation = msa_representation.clone()
+                msa_representation[:, 0, :, :] = msa_representation[:, 0, :, :] + msa_feedback
 
         pair_representation = pair_representation + self.pair_transition(pair_representation)
         single_update = self.single_transition(single_representation, seq_mask=seq_mask)

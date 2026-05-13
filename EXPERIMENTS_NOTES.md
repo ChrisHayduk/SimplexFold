@@ -3922,3 +3922,31 @@
 - Used `scripts/format_experiment_result_row.py` with `--start-after-step
   9500` to add the E99 row to `EXPERIMENT_RESULTS.md`, so inherited E97
   history does not count as E99's best validation lDDT.
+
+## 2026-05-13 Bidirectional Simplex-MSA Feedback
+
+- E99 makes a blind continuation unattractive: it crossed 10,000 steps but
+  ended below E96/E97 on primary C-alpha lDDT while selected face/tetra
+  boundary lDDT kept improving. The next change should make selected
+  higher-rank cochains affect the trunk more directly instead of adding
+  another output-side loss.
+- Prepared E100 locally: added `simplex_msa_feedback_scale`, a runtime ramp
+  override, and benchmark-runner plumbing. The path projects the selected
+  face/tetra-to-residue 0-simplex readout from `c_s` to `c_m` and adds it to
+  the target MSA row in `SimplicialEvoformer`. This completes the missing
+  reverse direction in the README's `M <-> Z <-> F <-> U` schematic.
+- Local targeted validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_simplicial_adapter_can_project_selected_cell_readout_to_msa_feedback tests/test_simplex.py::test_simplicial_evoformer_msa_feedback_updates_target_msa_row tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_simplicial_msa_feedback_stays_within_medium_budget tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`
+  reported `7 passed`.
+- Broader focused validation passed: `python -m pytest tests/test_simplex.py
+  tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` reported
+  `165 passed`, and `git diff --check` was clean.
+- Explicit parameter audit for the E100-style module set counted
+  `3,225,090` parameters versus AF2-medium `3,106,642`, leaving `36,884`
+  parameters under the +5% ceiling `3,261,974`.
+- Intended E100 gate: resume E97 from step 9500 to 10000, allocate
+  `--simplex-msa-feedback-scale 0.05`, ramp
+  `--simplex-msa-feedback-runtime-scale 0.0 -> 0.05` over steps 9500-10000,
+  keep the E97 final topology recipe fixed, and compare against E99's
+  step-10000 control (`val_lddt_ca=0.3972`) before spending on any longer run.
