@@ -737,7 +737,7 @@ before changing the topology construction again.
 
 ### E98 Candidate: Continue Partial Directed Boundary Readout
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: completed on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E96 improved because directed incidence was relaxed from an
 over-strong `0.5` source/target boundary readout to a partial `0.25` setting.
@@ -773,9 +773,20 @@ tensors, and started a fresh optimizer. The log path is
 and the artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e98_continue_partial_directed_boundary_from_e96_s9500_c256_m64/`.
 
+Result: reject. E98 reached `val_lddt_ca=0.3939`, FoldScore `0.3807`,
+`val_ca_drmsd=10.0459`, and predicted/true C-alpha radius
+`11.5860 / 15.4034`, with `3,154,242` parameters and no early stop. Holding
+partial directed boundary readout at `0.25` did improve dRMSD and radius
+relative to E96, but it lost the primary lDDT gain and softened FoldScore.
+The selected sparse complex remained plausible, with face/tetra boundary lDDT
+`0.7355` / `0.7193` and contraction fractions `0.5656` / `0.5663`, so the
+failure is not a selected-complex collapse. Pivot to the queued E97
+outer-edge-supported cell scorer, which changes complex construction instead
+of continuing boundary-readout pressure.
+
 ### E97 Candidate: Outer-Edge-Supported Cell Scoring After E96
 
-Status: queued only if E98 regresses; do not launch while E98 is running.
+Status: next after E98 regression.
 
 Hypothesis: E96 tests whether directed boundary readout should be relaxed as
 a cochain-routing curriculum. If that still underperforms E87, the next

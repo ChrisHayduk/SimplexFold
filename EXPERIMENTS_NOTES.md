@@ -3779,3 +3779,29 @@
   GPU samples showed memory fixed at about `13,513 MiB` with utilization
   `30%`, `57%`, `42%`, `0%`, and `48%`, so the run still appears active
   rather than failed.
+- E98 returned on owned pod `o1dy17ouv8w5mz`: step 9500
+  `val_lddt_ca=0.3938809931278229`, FoldScore `0.38065901957452297`,
+  `val_ca_drmsd=10.045937269926071`, predicted/true C-alpha radius
+  `11.586045235395432 / 15.403406739234924`, `3,154,242` parameters, and
+  `stopped_early=False`. The fixed runtime boundary-readout directionality
+  was `0.25`.
+- E98 topology diagnostics: selected face/tetra boundary lDDT
+  `0.7355027459561825` / `0.7192892879247665`, boundary length MAE
+  `1.0789909288287163` / `1.1812388822436333`, contraction fractions
+  `0.5656210742890835` / `0.5662743374705315`, boundary-edge mean degree
+  `11.799788415431976` / `33.75571095943451`, and boundary unique-edge
+  fraction `0.08504440410307566` / `0.029881862387672056`.
+- E98 interpretation: reject as a primary-lDDT branch. Holding the partial
+  directed boundary readout at `0.25` improved dRMSD and radius relative to
+  E96, but primary lDDT fell well below E96's `0.4043184444308281` and
+  FoldScore softened. The selected complex did not collapse, so pivot to the
+  queued E97 outer-edge-supported cell scorer that changes face/tetra
+  selection rather than continuing boundary-readout pressure.
+- Copied E98 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e98_continue_partial_directed_boundary_from_e96_s9500_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e98_continue_partial_directed_boundary_from_e96.log`. The local
+  artifact pull excluded the checkpoint directory.
+- Used `scripts/format_experiment_result_row.py` with `--start-after-step
+  9000` to add the E98 row to `EXPERIMENT_RESULTS.md`, so inherited E96
+  history does not count as E98's best validation lDDT.

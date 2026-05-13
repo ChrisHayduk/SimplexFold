@@ -338,17 +338,25 @@ to 9000 and ramping boundary-readout directionality down from `0.5` to
 `11.2733 / 15.4034` with `3,154,242` parameters. This beats E87's
 `0.3992` primary lDDT and avoids E92's held-`0.5` regression.
 
-The active Runpod gate is E98: continue the E96 checkpoint from step 9000 to
-9500 while holding the partial directed-readout setting at `0.25`. This is the
-cleanest slope test for the directed-incidence curriculum before changing the
-selected-complex construction again. The owned H100 pod preflight counted
-`3,154,242` parameters, under the `3,261,974` AF2-medium +5% ceiling, and
-startup resumed E96 at step 9000/examples 72000 with 1244 matching tensors and
-0 new/missing tensors. Keep the fixed `24/48` sparse caps, degree-penalized
-selected cells, selected-boundary realization losses, edge-frame messages, and
-incidence-normalized boundary transport. Reject if E98 falls back below the
-E86/E87/E96 primary-lDDT band; if it regresses, use the already-budgeted E97
-outer-edge-supported scorer fallback.
+E98 rejected the partial directed-readout continuation. It resumed E96 from
+step 9000 to 9500 while holding boundary-readout directionality at `0.25`, but
+returned `val_lddt_ca=0.3939`, below E96's `0.4043`, with FoldScore `0.3807`,
+`val_ca_drmsd=10.0459`, and predicted/true C-alpha radius
+`11.5860 / 15.4034`. The selected complex did not collapse: face/tetra
+boundary lDDT stayed at `0.7355` / `0.7193`, and contraction fractions were
+`0.5656` / `0.5663`. The interpretation is that partial directed readout is
+useful as an annealed curriculum into E96, but holding it for another gate
+overdrives local C-alpha agreement.
+
+The active next gate should be E97: return to topology construction by
+resuming the E96 checkpoint and ramping an outer-edge-supported selected-cell
+score. Keep the fixed `24/48` sparse caps, degree-penalized selected cells,
+selected-boundary realization losses, edge-frame messages, incidence-normalized
+boundary transport, and partial directed boundary readout only as the starting
+checkpoint context. The change under test is which face/tetra cochains exist,
+not a generic coordinate loss. The already-run parameter audit showed this
+outer-edge scorer stays at `3,154,242` parameters, under the `3,261,974`
+AF2-medium +5% ceiling.
 
 The current 2026-05-12 full reread of the saved PDFs reinforces the E79-E81
 direction and the E96 interpretation. The right lesson is not to add another
@@ -357,7 +365,7 @@ cochain-routing curriculum and to measure whether that route helps the selected
 complex write useful edge information back into `Z_ij` without overdriving the
 pair tensor.
 
-If E98 regresses, the next launchable fallback should be outer-edge-supported
+Because E98 regressed, the next launchable fallback is outer-edge-supported
 cell scoring rather than latent segment cells. The remote parameter audit
 shows that an outer-edge scorer on the E87/E96-style sparse/edge-frame setup
 stays at `3,154,242` parameters, while latent segment cells plus edge-frame
