@@ -4872,3 +4872,9 @@
 - Retargeted heartbeat `check-simplexfold-e57-runpod` to E112, preserving the
   owned-pod-only rule for pod `o1dy17ouv8w5mz`, the 30-minute interval, and the
   no-automatic-follow-up-launch rule.
+- E112 mid-run health poll at `2026-05-13T19:54:47Z`: PID `6212` remained
+  active after about 34.4 minutes with process state `Rl`, GPU memory
+  `13511 MiB` allocated, `results.json` and `results.csv` absent, history
+  still at the inherited E106 step-6500 row, and the log still showing clean
+  startup/resume lines only. Continue waiting for the step-7000 write point
+  without changing the remote checkout.
