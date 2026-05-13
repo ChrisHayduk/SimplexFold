@@ -3766,3 +3766,16 @@
   `11,721 MiB`, GPU utilization sampled at `51%`, and the log still showed
   the clean E96 resume with 1244 matching tensors loaded and 0 new/missing
   tensors initialized.
+- E98 live health check at `2026-05-13T00:42:29Z` on owned pod
+  `o1dy17ouv8w5mz`: Python PID `14318` was alive after about 20 minutes,
+  `results.json` was not present yet, GPU memory was allocated at about
+  `13,513 MiB`, and the log still showed only the clean E96 resume. This
+  matches the quiet training-window behavior seen in earlier continuations.
+- E98 deeper health check at `2026-05-13T01:13:10Z` on owned pod
+  `o1dy17ouv8w5mz`: Python PID `14318` was alive after about 51 minutes and
+  still consuming about 10 CPU cores. `run_metadata.json` and
+  `history_full_msa_to_face.json` were present, `results.json` was still
+  absent, and the log/history mtimes remained at the clean resume point. Five
+  GPU samples showed memory fixed at about `13,513 MiB` with utilization
+  `30%`, `57%`, `42%`, `0%`, and `48%`, so the run still appears active
+  rather than failed.
