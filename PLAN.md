@@ -1,4 +1,4 @@
-## Current Plan: E103 Running, E104 Prepared
+## Current Plan: E104 Selected-Boundary Metric-Confidence Gate
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -41,32 +41,32 @@ architecture change, not an output-side lDDT hack: higher-order cells alter
 pair geometry through their boundary edges, while computation stays on the
 sparse selected complex.
 
-E103 is now running on the owned Runpod pod from the E97 checkpoint at step
-9500 to step 10000. It keeps the E97/E101 topology settings fixed, allocates
-the sparse boundary-pair gate module at `0.05`, and ramps the active gate
-from `0.0` to `0.025` over steps 9500-10000. The exact launch module set
-counts `3,193,762` parameters, leaving `68,212` under the AF2-medium +5%
-ceiling. Reject unless it beats E101 and approaches or exceeds the E96/E97
-local peak on primary C-alpha lDDT without damaging selected-boundary
-diagnostics.
+E103 returned at step 10000 with `val_lddt_ca=0.3981`, FoldScore `0.3909`,
+and `val_ca_drmsd=9.8275`. Reject it as a primary-lDDT branch: the sparse
+pair gate improved FoldScore/dRMSD, but it fell below E96, E97, E99 final,
+and E101 on the target C-alpha lDDT. This is useful evidence that direct
+learned pair-conditioned boundary-edge modulation is not the missing 30k
+candidate.
 
-While E103 runs, the next queued branch is E104: a selected-boundary
-metric-confidence gate. The idea is to use the existing face/tetra boundary
-distance heads as reliability estimates for each selected boundary edge. Edges
-whose explicit 2-/3-cell distance distribution is confident get stronger
-cochain transport into the pair trunk; uncertain selected edges are damped.
-This is still a simplicial/topological change because the gate is computed
-only on boundary edges of model-selected faces/tetras and uses the complex's
-own metric cochains. It adds no parameters and should load the E97/E103
-checkpoint lineage without fresh tensors.
+The next branch is E104: a selected-boundary metric-confidence gate. The idea
+is to use the existing face/tetra boundary distance heads as reliability
+estimates for each selected boundary edge. Edges whose explicit 2-/3-cell
+distance distribution is confident get stronger cochain transport into the
+pair trunk; uncertain selected edges are damped. This is still a
+simplicial/topological change because the gate is computed only on boundary
+edges of model-selected faces/tetras and uses the complex's own metric
+cochains. It adds no parameters and should load the E97 lineage without fresh
+tensors.
 
-Do not launch E104 until E103 either returns or is stopped as a confirmed
-performance failure. The first E104 gate should resume the strongest available
-E96/E97/E103-family checkpoint to the next 500-step validation point with the
-E97 sparse-complex recipe fixed, ramping
-`--simplex-boundary-metric-gate-runtime-scale 0.0 -> 0.25`. Reject unless it
-beats the E99/E101 near-10k controls and approaches or exceeds E96/E97 on
-primary C-alpha lDDT while preserving selected-boundary diagnostics.
+E104 is now running on the owned Runpod pod `o1dy17ouv8w5mz`. It resumes E97
+from step 9500 to step 10000 with the E97 sparse-complex recipe fixed,
+E100/E101 MSA feedback disabled, E102 dense pair feedback disabled, and E103
+learned pair gate disabled. It ramps
+`--simplex-boundary-metric-gate-runtime-scale 0.0 -> 0.25` over steps
+9500-10000. Reject unless it beats the E99/E101 near-10k controls and
+approaches or exceeds E96/E97 on primary C-alpha lDDT while preserving
+selected-boundary diagnostics. Do not add E104 to `EXPERIMENT_RESULTS.md`
+until `results.json` has returned and passed remote/local coherence checks.
 
 ## Historical Plan Context
 

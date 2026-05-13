@@ -4222,3 +4222,49 @@
   utilization, but `results.json` was still absent and the history still
   ended at the inherited E97 step-9500 row. This remains an in-flight run,
   not a result.
+- E103 returned on owned pod `o1dy17ouv8w5mz`: remote coherence check found
+  `results.json`, `results.csv`, eval details, and a new history row at step
+  10000. The returned row has effective batch size `8`, `3,193,762`
+  parameters, `stopped_early=False`, `val_lddt_ca=0.3980565518140793`,
+  FoldScore `0.3909183647483587`, `val_ca_drmsd=9.827525943517685`, and
+  predicted/true C-alpha radius `12.048258155584335 / 15.403406739234924`.
+- Copied E103 returned artifacts locally under ignored
+  `artifacts/nanofold_public_benchmarks/e103_sparse_boundary_pair_gate_from_e97_s10000_c256_m64/`
+  and copied the launch log to ignored
+  `logs/e103_sparse_boundary_pair_gate_from_e97.log`. The local artifact pull
+  excluded checkpoint directories and passed a local JSON/history coherence
+  check.
+- Added the E103 row to `EXPERIMENT_RESULTS.md` with
+  `--start-after-step 9500`, so inherited E97 history does not count as
+  E103's best validation lDDT.
+- E103 interpretation: reject as a 30k-spend branch. Sparse pair-gated
+  boundary cochains improved FoldScore and dRMSD, but primary C-alpha lDDT
+  fell below E96, E97, E99 final, and E101. This keeps the plateau diagnosis
+  intact and makes E104's no-new-parameter metric-confidence gate the next
+  cleaner topology-native probe.
+- Remote E104 preparation on owned pod `o1dy17ouv8w5mz`: no active benchmark
+  process was present, the pod checkout fast-forwarded to commit `b9aaf9a`,
+  remote py_compile passed for the runner/model files, CLI help confirmed
+  support for `--simplex-boundary-metric-gate-*`, the E97 checkpoint was
+  present, and the exact E104 module set counted `3,154,242` parameters under
+  the AF2-medium +5% ceiling `3,261,974`.
+- E104 launched on owned pod `o1dy17ouv8w5mz` as
+  `e104_boundary_metric_gate_from_e97_s10000_c256_m64`, log path
+  `/workspace/SimplexFold/logs/e104_boundary_metric_gate_from_e97.log`,
+  artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e104_boundary_metric_gate_from_e97_s10000_c256_m64/`,
+  and Python PID `19749`. The run resumes E97 at step 9500, keeps E97's
+  sparse selected-complex recipe fixed, disables E100/E101 MSA feedback,
+  disables E102 dense pair feedback, disables E103 learned pair gating, and
+  ramps `--simplex-boundary-metric-gate-runtime-scale` from `0.0` to `0.25`
+  across steps 9500-10000.
+- Retargeted the existing heartbeat automation `check-simplexfold-e57-runpod`
+  to E104, keeping the owned-pod-only restriction and the rule that the
+  heartbeat must not launch follow-up experiments automatically.
+- E104 live poll at `2026-05-13T10:19:03Z` on owned pod `o1dy17ouv8w5mz`:
+  Python PID `19749` was active with GPU memory at `12573 MiB`; `results.json`
+  was absent; the artifact directory contained only `run_metadata.json` and
+  the inherited `history_full_msa_to_face.json`; and the history remained at
+  20 rows ending with E97 step 9500 (`val_lddt_ca=0.4035918414592743`). E104
+  is still in flight and must remain out of `EXPERIMENT_RESULTS.md` until it
+  returns and passes remote/local coherence checks.

@@ -217,7 +217,7 @@ checkpoint or result row was written, so it must not be added to
 
 ### E103 Idea: Sparse Boundary-Edge Pair Gate
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E102 tests the right feedback target but applies the boundary
 cochain lift densely over all `L x L` pairs, which may be too expensive for
@@ -250,7 +250,7 @@ Validation so far:
 - Targeted E103/plumbing tests: `7 passed`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `172 passed`
 
-Launch: E103 is running as
+Launch: E103 ran as
 `e103_sparse_boundary_pair_gate_from_e97_s10000_c256_m64`, resuming the E97
 checkpoint from step 9500 to step 10000 with fixed E97 topology settings,
 `--simplex-boundary-pair-gate-scale 0.05`, and a runtime ramp from `0.0` to
@@ -260,16 +260,24 @@ remote artifact path is
 `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e103_sparse_boundary_pair_gate_from_e97_s10000_c256_m64/`,
 and Python PID is `18770`.
 
-Startup poll: `run_metadata.json` records `--max-parameters 3261974`,
+Startup poll: `run_metadata.json` recorded `--max-parameters 3261974`,
 `simplex_boundary_pair_gate_scale=0.05`, the runtime ramp
 `0.0 -> 0.025` from step 9500 over 500 steps, E100/E101 MSA-feedback
-routes disabled, and E102 dense pair feedback disabled. The inherited history
-currently has 20 rows, ending at the E97 step-9500 row
-`val_lddt_ca=0.4035918414592743`; no E103 result has returned yet.
+routes disabled, and E102 dense pair feedback disabled. The inherited startup
+history had 20 rows, ending at the E97 step-9500 row
+`val_lddt_ca=0.4035918414592743`.
+
+Result: reject as a primary-lDDT branch. E103 returned at step 10000 with
+effective batch size `8`, `3,193,762` parameters, `stopped_early=False`,
+`val_lddt_ca=0.3981`, FoldScore `0.3909`, `val_ca_drmsd=9.8275`, and
+predicted/true C-alpha radius `12.0483 / 15.4034`. The sparse pair gate
+improved FoldScore and dRMSD over E96/E97/E101, but it lowered the target
+C-alpha lDDT below E96 (`0.4043`), E97 (`0.4036`), E99 final (`0.4003`), and
+E101 (`0.3998`). Do not spend a 30k run on this exact pair-gate route.
 
 ### E104 Idea: Selected-Boundary Metric-Confidence Gate
 
-Status: implemented locally and queued; do not launch while E103 is running.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E99-E103 suggest the selected face/tetra complex can maintain
 high selected-boundary lDDT while global C-alpha lDDT stalls near `0.40`.
@@ -287,10 +295,9 @@ space. This adds no parameters: it reuses the already-supervised simplex
 distance heads and changes only boundary-edge transport inside the selected
 2-/3-cell complex.
 
-Gate: resume the strongest available E96/E97/E103-family checkpoint to the
-next 500-step validation point with the E97 topology recipe fixed, keep
-E100/E101 MSA feedback, E102 dense pair feedback, and E103 learned pair gate
-disabled unless E103 itself returns as a keep. Ramp
+Gate: resume the E97 checkpoint from step 9500 to 10000 with the E97 topology
+recipe fixed, keep E100/E101 MSA feedback, E102 dense pair feedback, and E103
+learned pair gate disabled. Ramp
 `--simplex-boundary-metric-gate-runtime-scale 0.0` to `0.25` across the
 gate. Reject unless primary `val_lddt_ca` beats the E99/E101 near-10k controls
 and approaches or exceeds the E96/E97 local peak without selected-boundary
@@ -300,6 +307,19 @@ Validation so far:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
 - Targeted E104/plumbing tests: `8 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `175 passed`
+- `git diff --check`
+
+Launch: E104 is running as
+`e104_boundary_metric_gate_from_e97_s10000_c256_m64`, resuming the E97
+checkpoint from step 9500 to step 10000 with fixed E97 topology settings and
+the selected-boundary metric gate ramping from `0.0` to `0.25`. Remote
+prelaunch checks confirmed no active benchmark process, successful
+py_compile, CLI support for `--simplex-boundary-metric-gate-*`, the E97
+checkpoint present, and `3,154,242` parameters under the AF2-medium +5%
+ceiling. Python PID is `19749`. A status poll at `2026-05-13T10:19:03Z`
+showed the process alive, GPU active, `results.json` absent, and the history
+still ending at the inherited E97 step-9500 row.
 
 ### E83: Fixed Sparse Cell Continuation
 
