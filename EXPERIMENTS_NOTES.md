@@ -4778,3 +4778,21 @@
   about 44.4 minutes, process state `Sl` with high CPU activity, GPU
   utilization sampled at `56%` with `13491 MiB` allocated, `results.json` and
   `results.csv` absent, and history still at E106 step 6500.
+- E110 returned on owned pod `o1dy17ouv8w5mz` at the next check. Remote
+  coherence passed across `results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, and `run_metadata.json`: one result row,
+  one CSV row, 15 history rows ending at step 7000, `completed_steps=7000`,
+  `parameters=3154242` under the `3261974` cap, `effective_batch_size=8`, and
+  `stopped_early=False`. Metrics: `val_lddt_ca=0.38161011785268784`,
+  FoldScore `0.37879121489822865`, `val_ca_drmsd=10.373755931854248`, and
+  C-alpha Rg `11.778071075677872 / 15.403406739234924`.
+- Pulled E110 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e110_cochain_recycling_release_from_e106_s7000_c256_m64/`
+  and verified local coherence against the same step, parameter count,
+  effective batch size, stopped-early flag, lDDT, FoldScore, dRMSD, and Rg
+  values.
+- E110 decision: reject. Fully releasing selected-boundary cochain recycling
+  from `0.10` to `0.0` regressed below E106 (`0.3929199054837227`) and below
+  E107/E108/E109 on primary C-alpha lDDT. The cochain-memory schedule family
+  is not the next 30k candidate; launch E111 from the better verified E106
+  checkpoint rather than from E110.

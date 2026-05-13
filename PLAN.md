@@ -1,4 +1,4 @@
-## Current Plan: E110 Cochain-Memory Full Release
+## Current Plan: E111 Pair-Only Boundary-Cochain Structure Bias
 
 E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
 The E97 branch nearly matched it while improving FoldScore and dRMSD, but
@@ -116,26 +116,23 @@ and predicted/true C-alpha radius `11.5503 / 15.4034`. This partially
 recovered the E107/E108 regression and improved FoldScore over E106, but it
 still did not beat E106 on primary C-alpha lDDT.
 
-The active fallback is E110: full cochain-memory release from the verified
-E106 checkpoint. E106 improved while ramping cochain recycling from `0.0` to
-`0.10`, but every continuation with residual cochain memory through step 7000
-has regressed on primary C-alpha lDDT. E110 tests whether the selected-boundary
-cochain should act only as a transient topological scaffold: resume E106 and
-anneal selected-boundary cochain recycling from `0.10` to `0.0` over steps
-6500-7000. This still uses the simplex boundary 1-cochain as inter-cycle
-memory during the transition, adds no parameters, and adds no output loss.
-E110 is now launched on the owned Runpod pod; keep monitoring it as an
-in-flight gate and do not add it to the final results table until returned
-artifacts pass remote and local coherence checks.
+E110 tested full cochain-memory release from the verified E106 checkpoint.
+It resumed E106 and annealed selected-boundary cochain recycling from `0.10`
+to `0.0` over steps 6500-7000. It returned `val_lddt_ca=0.3816`,
+FoldScore `0.3788`, `val_ca_drmsd=10.3738`, and predicted/true C-alpha
+radius `11.7781 / 15.4034`. Reject E110: full release to zero fell below
+E106, E107, E108, and E109 on primary C-alpha lDDT. The failure is therefore
+not just residual cochain memory at validation; the current cochain-recycling
+family is not a 30k candidate.
 
-While E110 runs, prepare but do not launch E111: an RMS-normalized
-pair-only structure-module readout from the selected boundary 1-cochain.
-This is the topology-native alternative if E110 confirms that residual
-inter-cycle cochain memory is harmful. Unlike the broad structure-readout
-runs, E111 should not inject simplex 0-cochain residue updates directly; it
-should let the explicit face/tetra boundary cochain act only as a controlled
-pair bias for IPA. Keep it queued until E110 returns, then choose the best
-verified E106/E110 checkpoint as the handoff.
+The active fallback is E111: an RMS-normalized pair-only structure-module
+readout from the selected boundary 1-cochain. This is the topology-native
+alternative after the E106-E110 cochain-memory family. Unlike the broad
+structure-readout runs, E111 should not inject simplex 0-cochain residue
+updates directly; it should let the explicit face/tetra boundary cochain act
+only as a controlled pair bias for IPA. Launch it from the better verified
+E106 checkpoint, not the weaker E110 checkpoint, and keep it only if primary
+C-alpha lDDT improves over E106 and E110.
 
 ## Historical Plan Context
 

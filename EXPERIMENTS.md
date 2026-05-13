@@ -581,7 +581,7 @@ FoldScore over E106, but primary C-alpha lDDT remains below E106's `0.3929`.
 
 ### E110 Idea: Release Selected-Boundary Cochain Recycling To Zero
 
-Status: launched on owned Runpod pod `o1dy17ouv8w5mz`; in flight.
+Status: returned and rejected; pivot to E111 from the better E106 checkpoint.
 
 Hypothesis: E106's improvement may come from the ramped cochain signal acting
 as a transient scaffold for the pair trunk, while any residual cochain memory
@@ -610,9 +610,20 @@ launch-style parameter audit counted `3,154,242` parameters under the
 `3,261,974` cap. It resumed the E106 checkpoint at step 6500/examples 52000
 with `1244` matching tensors loaded and `0` new/missing tensors initialized.
 
+Result: reject. E110 returned at step 7000 with `val_lddt_ca=0.3816`,
+FoldScore `0.3788`, `val_ca_drmsd=10.3738`, and C-alpha Rg
+`11.7781 / 15.4034`. Remote and local coherence passed across
+`results.json`, `results.csv`, `history_full_msa_to_face.json`, and
+`run_metadata.json`: one result row, one CSV row, 15 history rows ending at
+step 7000, `parameters=3,154,242` under the `3,261,974` cap,
+`effective_batch_size=8`, and `stopped_early=False`. Full release to zero fell
+below E106, E107, E108, and E109 on primary C-alpha lDDT, so leave the
+cochain-memory schedule family and use the better E106 checkpoint for E111.
+
 ### E111 Idea: Pair-Only Boundary-Cochain Structure Bias
 
-Status: implemented locally and queued; do not launch while E110 is in flight.
+Status: implemented locally and queued for launch from the verified E106
+checkpoint.
 
 Hypothesis: E33/E34/E51/E67/E68 showed that broad simplex structure readout
 can perturb the residue and pair streams enough to hurt primary C-alpha lDDT.
@@ -631,10 +642,10 @@ invalid residue pairs, and adds it only to the pair representation consumed by
 the structure module. This adds no parameters and no output loss; it changes
 how explicit higher-order cell cochains bias final backbone assembly.
 
-Gate: after E110 returns, launch a 500-step gate from the best verified E106
-or E110 checkpoint with the E110 selected-complex/release recipe plus
+Gate: launch a 500-step gate from the verified E106 checkpoint with the E106
+selected-complex recipe, cochain recycling released to `0.0`, and
 `--simplex-structure-pair-readout-scale 0.05`. Keep it only if primary
-`val_lddt_ca` improves over the chosen checkpoint and over E110; do not treat
+`val_lddt_ca` improves over E106's `0.3929` and E110's `0.3816`; do not treat
 it as a 30k candidate unless it also recovers toward or above the E96/E97
 leader band.
 
