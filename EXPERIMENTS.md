@@ -377,6 +377,14 @@ feedback/gating routes, and ramp
 5500-6000. Compare this recovery gate against E72, E73, E74, and E76 rather
 than against E96-E104; reject unless it improves primary C-alpha lDDT.
 
+Result: keep as recovery handoff. E105a returned at step 6000 with
+`val_lddt_ca=0.3894`, FoldScore `0.3737`, `val_ca_drmsd=10.7410`, and
+predicted/true C-alpha radius `10.8369 / 15.4034`. It improves the retained
+E72/E73/E74/E76 recovery comparison band and keeps selected face/tetra
+boundary lDDT high (`0.7234` / `0.7077`), but it remains below the E96 primary
+leader. Use the E105a checkpoint for E106 rather than spending 30k on E105a
+directly.
+
 Validation so far:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/model.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
@@ -390,8 +398,8 @@ Validation so far:
 
 ### E106 Idea: Selected-Boundary Cochain Recycling
 
-Status: implemented locally and queued behind the in-flight E105a Runpod gate.
-Do not launch until E105a returns and its artifacts are handled.
+Status: implemented locally and ready to launch from the verified E105a
+checkpoint.
 
 Hypothesis: E104 showed that selected face/tetra boundary lDDT can exceed
 `0.7` locally while full-chain C-alpha lDDT remains near `0.4`. E105a asks
@@ -409,14 +417,12 @@ pass. This is inter-cycle cochain memory: it does not add parameters, does not
 add a new loss, and does not inject simplex readout directly into the current
 structure module.
 
-Gate: after E105a returns, run a 500-step recovery gate from the strongest
-retained compatible checkpoint. If E105a improves over E72/E73/E74/E76, use
-the E105a checkpoint. Otherwise use E72 again only as a diagnostic. Keep the
-E105a selected-complex recipe fixed and add only:
+Gate: run a 500-step recovery gate from the verified E105a checkpoint to step
+6500. Keep the E105a selected-complex recipe fixed and add only:
 `--simplex-boundary-cochain-recycling-scale 0.10`,
 `--simplex-boundary-cochain-recycling-runtime-scale 0.0`,
 `--simplex-boundary-cochain-recycling-runtime-scale-final 0.10`,
-`--simplex-boundary-cochain-recycling-runtime-scale-ramp-start-step <start>`,
+`--simplex-boundary-cochain-recycling-runtime-scale-ramp-start-step 6000`,
 and `--simplex-boundary-cochain-recycling-runtime-scale-ramp-steps 500`.
 Reject unless primary `val_lddt_ca` improves, not just FoldScore or selected
 boundary diagnostics.

@@ -55,7 +55,7 @@ That result sharpens the diagnosis: the explicit simplex complex can learn
 local boundary metrics, but those local metrics are not yet being assembled
 into a better full-chain C-alpha geometry.
 
-The active Runpod branch is E105a: selected-boundary metric recycling. The
+E105a tested selected-boundary metric recycling. The
 plateau evidence suggests that the selected complex learns reasonable local
 boundary geometry, but the main trunk only recycles the final coordinate
 prediction. E105/E105a reuses the existing
@@ -66,20 +66,19 @@ no-new-parameter bias to `z_prev` for the next recycle cycle. This is not a
 new output loss; it changes the inter-cycle cochain memory so explicit
 higher-rank metric states can influence the next pair-trunk pass before the
 structure module. Use the runtime recycling-scale ramp rather than an abrupt
-static turn-on when resuming from E97: start at `0.0` and ramp to `0.05` or
-`0.10` over the 500-step gate.
+static turn-on when resuming from E97/E72.
 
 Checkpoint caveat: E104 artifacts were pulled with checkpoint directories
 excluded, and restarting the zero-volume Runpod pod cleared `/workspace`, so
 the E97/E96-family checkpoint is no longer available locally or remotely.
-The strongest retained compatible checkpoint is E72 at step 5500. E105a is
-currently running from E72 to step 6000 on the owned Runpod pod
-`o1dy17ouv8w5mz` as a recovery gate for the same topology-native mechanism.
-Compare it against E72/E73/E74/E76 rather than the E96-E104 plateau set. If it
-improves primary C-alpha lDDT, rebuild a stronger lineage; if it does not, do
-not spend toward 30k on recycling alone.
+The strongest retained compatible checkpoint was E72 at step 5500. E105a ran
+from E72 to step 6000 on the owned Runpod pod `o1dy17ouv8w5mz` and returned
+`val_lddt_ca=0.3894`, FoldScore `0.3737`, and `val_ca_drmsd=10.7410`.
+It improves the retained E72/E73/E74/E76 recovery band but remains below the
+E96 primary leader, so it is a recovery handoff rather than a 30k candidate by
+itself.
 
-Next prepared branch after E105a returns is E106: selected-boundary cochain
+The next branch is E106: selected-boundary cochain
 recycling. E104 showed that local face/tetra boundary metrics can be strong
 without improving global C-alpha lDDT, and E105/E105a tests recycling only the
 distance-distribution view of that selected 1-skeleton. E106 recycles the
@@ -88,9 +87,8 @@ face/tetra-to-boundary readout is detached, masked to valid residue pairs, and
 added to `z_prev` between AF2 recycle cycles. This keeps the intervention in
 the README's simplex view because persistent rank-2/rank-3 cells influence the
 next pair-trunk pass through their boundary 1-cochain. It adds no parameters
-and no new loss. Queue it only after E105a returns; use a short 500-step gate
-from the best retained compatible checkpoint and ramp the runtime cochain
-recycling scale from `0.0` to a small value such as `0.05` or `0.10`.
+and no new loss. Use the E105a checkpoint for a short 500-step gate and ramp
+the runtime cochain recycling scale from `0.0` to a small value such as `0.10`.
 
 ## Historical Plan Context
 

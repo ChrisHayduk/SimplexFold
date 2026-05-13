@@ -4423,3 +4423,19 @@
   were absent, and `history_full_msa_to_face.json` still had 12 inherited rows
   ending at E72 step 5500. This remains in flight; do not update
   `EXPERIMENT_RESULTS.md` yet.
+- E105a returned on owned pod `o1dy17ouv8w5mz` at `2026-05-13T12:47:49Z`.
+  Remote coherence passed across `results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, and `run_metadata.json`: one result row,
+  one CSV row, 13 history rows ending at step 6000, `parameters=3154242`,
+  `val_lddt_ca=0.3894216101616621`,
+  `val_foldscore=0.37369451113045216`,
+  `val_ca_drmsd=10.740996658802032`, and C-alpha Rg
+  `10.83685490489006 / 15.403406739234924`.
+- Pulled E105a artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e105a_boundary_metric_recycling_from_e72_s6000_c256_m64/`,
+  excluding checkpoints. Local coherence passed across results/history/CSV and
+  confirmed the same step, parameter count, C-alpha lDDT, FoldScore, dRMSD,
+  and C-alpha Rg values. E105a is a recovery-branch keep: it improves the
+  retained E72/E73/E74/E76 comparison band but remains below the E96 primary
+  leader, so use the E105a checkpoint as the handoff for E106 rather than
+  spending 30k on E105a directly.
