@@ -4604,3 +4604,8 @@
   history had 14 rows ending at E106 step 6500
   (`val_lddt_ca=0.3929199054837227`, FoldScore `0.377660034224391`,
   `val_ca_drmsd=10.327910900115967`). Continue to treat E107 as in flight.
+- E107 health poll at `2026-05-13T15:20:48Z`: PID `3424` remained active after
+  about 22.5 minutes, GPU utilization sampled at `74%` with `13493 MiB`
+  allocated, `results.json` and `results.csv` were still absent, and history
+  still had 14 rows ending at E106 step 6500. Continue to treat E107 as an
+  active in-flight gate.
