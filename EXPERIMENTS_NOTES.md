@@ -6098,3 +6098,10 @@
   absent and history remains unchanged at the inherited E120 step-7500 row.
   Continue waiting; do not pull, stop, or launch a follow-up until E126 writes
   coherent step-8000 artifacts or exits with a clear failure.
+- 2026-05-14T20:05Z-20:27Z E126 remained active across a twenty-sample
+  early-break watch. PID `1120` stayed alive, process CPU rose from about
+  `742%` to `800%`, H100 memory stayed allocated at `42899 MiB`, and sampled
+  GPU utilization ranged from `0%` to `81%`. The run is now slower than the
+  E124/E125 short gates but still shows real CPU/GPU activity. No final
+  artifacts exist yet and history still ends at inherited E120 step 7500, so
+  leave the job running and keep `EXPERIMENT_RESULTS.md` unchanged.
