@@ -5134,3 +5134,10 @@
   `eval_details_full_msa_to_face.csv` were not written yet. Continue waiting
   for the step-6000 validation result; do not touch the remote checkout or
   launch a follow-up while this run is active.
+- E116 health poll after about 66 minutes: PID `1566` remained active, with
+  `13589 MiB` GPU memory allocated but no result files yet. A process-state
+  check showed state `Rl`, about `1049%` CPU, 178 threads, and 41 file
+  descriptors, so the run appears compute-active rather than dead. Artifact
+  mtimes still show only startup `run_metadata.json` and inherited
+  `history_full_msa_to_face.json`; continue waiting for the first step-6000
+  write.
