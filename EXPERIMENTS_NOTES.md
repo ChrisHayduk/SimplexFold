@@ -6263,3 +6263,15 @@
   Runpod pod `o1dy17ouv8w5mz` was stopped. The E128 heartbeat automation
   `check-simplexfold-e57-runpod` was paused. No follow-up Runpod experiment is
   active.
+- 2026-05-14T23:37Z prepared E129 as the next topology-native short gate.
+  Rationale: E128 made weak simplex triangle-attention bias useful only after
+  pairing it with E124's oriented face boundary-edge-frame gate. E129 therefore
+  keeps the E128 route fixed and adds a tiny sparse triangle-attention value
+  residual (`0.0125`) so selected face/tetra cochains can provide content, not
+  only logit routing, on represented triples. This changes what AF2 triangle
+  attention propagates through `Z_ij`, rather than adding a generic output
+  loss or increasing the attention-bias scale. Local parameter audit:
+  `3,252,898 <= 3,261,974`. Targeted tests passed:
+  `python -m pytest tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_value tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_value tests/test_trainer.py::test_simplicial_triangle_attention_value_stays_inside_medium_budget tests/test_trainer.py::test_triangle_attention_value_runs_evoformer_block_eagerly tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`.
+  Reject unless it beats E128 primary C-alpha lDDT and moves toward the `0.45`
+  short-gate threshold.

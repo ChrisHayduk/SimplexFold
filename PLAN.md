@@ -1,50 +1,37 @@
-## Current Plan: After E126 Triangle-Attention Bias
+## Current Plan: After E128 Damped Triangle-Attention Bias
 
-Current status after E126: the best returned validation C-alpha lDDT remains
-E124 at `0.4280` at step 8000. E126 returned at step 8000 with
-`val_lddt_ca=0.4254`, FoldScore `0.3992`, and `val_ca_drmsd=11.1227`.
-The sparse simplex triangle-attention logit bias improved FoldScore/dRMSD
-slightly versus the preceding short gates, but it reduced the primary
-C-alpha lDDT below E124/E125 and stayed below the `0.45` short-gate threshold.
+Current status after E128: the best returned validation C-alpha lDDT is E128
+at `0.4311` at step 8500. E128 combined E124's oriented face
+boundary-edge-frame gate with a damped sparse simplex triangle-attention logit
+bias and improved C-alpha lDDT, FoldScore, dRMSD, and expansion versus the
+preceding E124/E126 gates. It is still not a 30,000-step candidate because it
+remains below the `0.45` short-gate threshold and far below the `0.7` target.
 
-Interpretation: the selected-complex-to-triangle-attention route is
-topology-native and well justified, but the logit-bias version is not yet a
-useful primary-lDDT mechanism. It can slightly improve global geometry metrics
-without translating the learned face/tetra cochains into better C-alpha
-assembly. Do not spend 30,000 steps on E126.
+Interpretation: weak selected-complex-to-triangle-attention routing is now
+useful when it is paired with E124's oriented boundary-edge realization path.
+The missing piece remains local-to-global assembly: selected face/tetra
+cochains learn strong local boundary geometry, but the trunk only receives a
+small global improvement. The next short gate should therefore change what
+AF2 triangle attention propagates from represented face/tetra triples, not
+just increase the attention-bias scale or spend more steps.
 
-The E126 mechanism was a default-off architecture hook, not a loss change:
-selected face cochains `F_ijk` and tetra boundary-face cochains derived from
-`U_ijkl` produced sparse per-head biases for AF2 triangle-attention logits on
-the triples they explicitly represent:
+E129 is the next Runpod gate. It resumes the verified E128 checkpoint and adds
+a tiny sparse triangle-attention value residual:
 
 ```text
 selected F_ijk / boundary faces of U_ijkl
-        -> sparse triangle-attention logit bias on ordered triples (i, j, k)
-        -> AF2 triangle attention propagates the cochain signal through Z_ij
+        -> sparse triangle-attention logit bias on ordered triples
+        -> sparse triangle-attention value residual on represented triples
+        -> AF2 triangle attention propagates cochain content through Z_ij
         -> structure module reads globally updated pair geometry
 ```
 
-E127 is prepared locally as the value-side companion rather than a separate
-loss: selected face/tetra cochains can scatter sparse value residuals into AF2
-triangle-attention pair updates on the same represented triples. Keep E127
-parked for now. E126 did not improve primary C-alpha lDDT, so the value-side
-path is not justified as an automatic follow-up spend unless we explicitly
-decide to reopen the triangle-attention route for diagnostic reasons.
-
-The next short gate is E128: resume the E124 checkpoint and add only a damped
-triangle-attention logit bias at `0.0125`. This is not a new loss and not a
-generic lDDT hack. It combines E124's best observed primary-lDDT mechanism,
-where selected face cochains communicate through oriented boundary
-1-simplices, with a much weaker version of E126's topology-native route into
-AF2 triangle attention. The goal is narrow: see whether the triangle-attention
-path can recover E126's small FoldScore/dRMSD benefit without erasing E124's
-primary C-alpha lDDT advantage. The audited profile has `3,240,738`
-parameters, still below the `3,261,974` AF2-medium +5% cap.
-
-Reject E128 unless it beats E124's `0.4280` primary C-alpha lDDT and stays
-coherent on FoldScore/dRMSD. It still needs to clear `0.45` before becoming a
-credible longer-run candidate.
+This remains an architecture change inside the README motivation, not a loss
+hack. Persistent 2- and 3-simplex states write content through the represented
+triangles and their boundary pair orientations. The audited E129 module set
+has `3,252,898` parameters, below the `3,261,974` AF2-medium +5% cap. Reject
+unless E129 beats E128's `0.4311` primary C-alpha lDDT and keeps FoldScore and
+dRMSD coherent. It must still clear `0.45` before any longer-run consideration.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best

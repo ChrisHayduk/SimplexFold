@@ -5532,3 +5532,58 @@ C-alpha lDDT, FoldScore, dRMSD, and expansion versus E124/E126. However, the
 gain is still small and remains below the `0.45` short-gate threshold, so the
 next branch should change the local-to-global realization mechanism rather
 than simply spending 30k steps or increasing triangle-attention bias.
+
+### E129: Sparse Triangle-Attention Value Residual on E128
+
+Status: prepared as the next short Runpod gate.
+
+Hypothesis: E128 finally made the selected-complex-to-triangle-attention route
+positive by combining a weak logit bias with E124's oriented face
+boundary-edge-frame realization. The remaining bottleneck is that the
+triangle-attention path mostly changes where pair information is read from,
+not the cochain content being propagated. E129 tests the value-side companion:
+selected face states and tetra-derived boundary-face states contribute a tiny
+sparse value residual to AF2 triangle attention on the represented triples.
+
+Mechanism: resume from the E128 step-8500 checkpoint, keep the E128 selected
+complex, losses, oriented boundary-edge-frame gate, weak triangle-attention
+logit bias, global context, vertex/edge-star context, and directed boundary
+readout fixed, and add only:
+
+```bash
+--simplex-triangle-attention-value-scale 0.0125
+```
+
+This is topology-native rather than a generic output metric tweak: persistent
+`F_ijk` and `U_ijkl` cochains write sparse value content through their own
+represented triangles and boundary pair orientations, so AF2 triangle
+attention can globalize higher-rank cell evidence inside the pair tensor
+before structure readout.
+
+Candidate launch:
+
+```bash
+--run-name e129_triangle_value_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-triangle-attention-value-scale 0.0125
+```
+
+Keep the E128 shared selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, directed boundary readout `0.25`, edge-frame message
+runtime scale `0.0125`, global context `0.1`, vertex-star context `1.0`, and
+edge-star runtime `0.5`.
+
+Parameter audit: `3,252,898 <= 3,261,974`.
+
+Decision rule: reject unless E129 beats E128's `0.4311` primary C-alpha lDDT
+and keeps FoldScore/dRMSD coherent. It still needs to clear `0.45` before any
+longer-run consideration.
+
+Validation so far:
+
+- `python -m pytest tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_value tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_value tests/test_trainer.py::test_simplicial_triangle_attention_value_stays_inside_medium_budget tests/test_trainer.py::test_triangle_attention_value_runs_evoformer_block_eagerly tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `5 passed`
