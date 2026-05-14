@@ -5267,3 +5267,19 @@
   next 500-step gate at step 7000 with
   `--simplex-vertex-star-context-scale 1.0`; step 6500 is only correct when
   falling back to the E116 step-6000 checkpoint.
+- E119 local implementation prepared while E117 runs. Added default-off
+  `simplex_edge_star_context_scale`, which reuses the E116 global-context
+  MLPs but interpolates their context toward selected boundary-edge star
+  cochains pooled from incident face/tetra states. This is the edge-star
+  analogue of E118's residue vertex-star route and stays inside the
+  topological cochain view: selected cells communicate through their shared
+  1-skeleton before returning to active cells and boundary-edge readout. It
+  adds no parameters and should remain checkpoint-compatible with E116/E117.
+- E119 local validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_edge_star_cell_mean_pools_cells_through_boundary_edges tests/test_simplex.py::test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters tests/test_trainer.py::test_simplicial_edge_star_context_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  reported `4 passed`;
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters tests/test_trainer.py::test_simplicial_edge_star_context_adds_no_parameters`
+  reported `69 passed`; and
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model_config.py minalphafold/simplex.py scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py`
+  passed.

@@ -26,6 +26,16 @@ If E117 is the source checkpoint, E118 should run the next 500-step gate to
 step 7000; only use a step-6500 target if falling back to the E116 step-6000
 checkpoint.
 
+E119 is now prepared locally as the edge-star analogue of E118, but it should
+stay parked until E117 is recorded and E118 is either run or explicitly
+skipped. Where E118 pools selected cell cochains through incident residues,
+E119 pools them through incident boundary edges, then routes each active cell
+the average context of its own boundary-edge star before the same selected
+boundary-edge readout. This is closer to the pair tensor `Z_ij` and should be
+the follow-up only if the global-context family remains stable but still needs
+a sharper local-to-global bridge. It adds no parameters over E116/E118 because
+it reuses the existing global-context adapters.
+
 The next branch should stay topology-native but move the feedback target back
 toward the pair/edge trunk rather than the target MSA row. E100 showed that
 collapsed cell-to-residue MSA feedback is too blunt; E101 showed that

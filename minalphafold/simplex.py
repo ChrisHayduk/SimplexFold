@@ -1256,6 +1256,54 @@ def vertex_star_cell_mean(
     return star_sum / star_counts.clamp_min(1.0)
 
 
+def _cell_boundary_edges(cell_indices: torch.Tensor) -> torch.Tensor:
+    """Return all unordered boundary edges for each selected cell."""
+
+    cell_rank = int(cell_indices.shape[-1])
+    edge_pairs = list(combinations(range(cell_rank), 2))
+    return torch.stack(
+        [
+            torch.stack([cell_indices[..., source], cell_indices[..., target]], dim=-1)
+            for source, target in edge_pairs
+        ],
+        dim=-2,
+    )
+
+
+def edge_star_cell_mean(
+    state: torch.Tensor,
+    cell_indices: torch.Tensor,
+    cell_mask: torch.Tensor,
+    *,
+    num_residues: int,
+    channels: int,
+) -> torch.Tensor:
+    """Pool selected cell cochains into boundary-edge star cochains."""
+
+    if state.numel() == 0 or cell_indices.numel() == 0:
+        return state.new_zeros((state.shape[0], int(num_residues), int(num_residues), int(channels)))
+    batch_size = int(cell_indices.shape[0])
+    edge_indices = _cell_boundary_edges(cell_indices)
+    edge_weights = cell_mask.to(state.dtype)[..., None].expand_as(edge_indices[..., 0])
+    edge_values = state[..., None, :].expand(*edge_indices.shape[:-1], int(channels)) * edge_weights[..., None]
+    lo = torch.minimum(edge_indices[..., 0], edge_indices[..., 1])
+    hi = torch.maximum(edge_indices[..., 0], edge_indices[..., 1])
+    forward_ids = (lo * int(num_residues) + hi).reshape(batch_size, -1)
+    reverse_ids = (hi * int(num_residues) + lo).reshape(batch_size, -1)
+    flat_ids = torch.cat([forward_ids, reverse_ids], dim=1)
+    flat_values_src = edge_values.reshape(batch_size, -1, int(channels))
+    flat_values = torch.cat([flat_values_src, flat_values_src], dim=1)
+    flat_weights_src = edge_weights.reshape(batch_size, -1, 1)
+    flat_weights = torch.cat([flat_weights_src, flat_weights_src], dim=1)
+
+    star_sum = state.new_zeros((batch_size, int(num_residues) * int(num_residues), int(channels)))
+    star_sum.scatter_add_(1, flat_ids[..., None].expand(-1, -1, int(channels)), flat_values)
+    star_counts = state.new_zeros((batch_size, int(num_residues) * int(num_residues), 1))
+    star_counts.scatter_add_(1, flat_ids[..., None], flat_weights)
+    star = star_sum / star_counts.clamp_min(1.0)
+    return star.reshape(batch_size, int(num_residues), int(num_residues), int(channels))
+
+
 FACE_EDGE_FRAME_DIM = 10
 TETRA_EDGE_FRAME_DIM = 18
 SEGMENT_GEOMETRY_DIM = 4
@@ -1599,6 +1647,10 @@ class SimplicialAdapter(torch.nn.Module):
         self.global_context_scale = float(getattr(config, "simplex_global_context_scale", 0.0))
         self.vertex_star_context_scale = min(
             max(float(getattr(config, "simplex_vertex_star_context_scale", 0.0)), 0.0),
+            1.0,
+        )
+        self.edge_star_context_scale = min(
+            max(float(getattr(config, "simplex_edge_star_context_scale", 0.0)), 0.0),
             1.0,
         )
         self.segment_cell_scale = float(getattr(config, "simplex_segment_cell_scale", 0.0))
@@ -2414,6 +2466,30 @@ class SimplicialAdapter(torch.nn.Module):
                 dim=-1,
             )
             face_context = face_context + self.vertex_star_context_scale * (face_vertex_context - face_context)
+        if self.edge_star_context_scale > 0.0:
+            face_edge_star = edge_star_cell_mean(
+                face_state,
+                face_indices,
+                face_mask,
+                num_residues=face_state.shape[1],
+                channels=self.c_face,
+            )
+            tetra_edge_star = edge_star_cell_mean(
+                tetra_state,
+                tetra_indices,
+                tetra_mask,
+                num_residues=face_state.shape[1],
+                channels=self.c_tetra,
+            )
+            face_edges = _cell_boundary_edges(face_indices)
+            face_edge_context = torch.cat(
+                [
+                    gather_pair(face_edge_star, face_edges[..., 0], face_edges[..., 1]).mean(dim=-2),
+                    gather_pair(tetra_edge_star, face_edges[..., 0], face_edges[..., 1]).mean(dim=-2),
+                ],
+                dim=-1,
+            )
+            face_context = face_context + self.edge_star_context_scale * (face_edge_context - face_context)
         face_msg = self.global_to_face(torch.cat([face_state, face_context], dim=-1))
         face_state = face_state + self.dropout(
             self.global_context_scale
@@ -2435,6 +2511,18 @@ class SimplicialAdapter(torch.nn.Module):
                 )
                 tetra_context = tetra_context + self.vertex_star_context_scale * (
                     tetra_vertex_context - tetra_context
+                )
+            if self.edge_star_context_scale > 0.0:
+                tetra_edges = _cell_boundary_edges(tetra_indices)
+                tetra_edge_context = torch.cat(
+                    [
+                        gather_pair(face_edge_star, tetra_edges[..., 0], tetra_edges[..., 1]).mean(dim=-2),
+                        gather_pair(tetra_edge_star, tetra_edges[..., 0], tetra_edges[..., 1]).mean(dim=-2),
+                    ],
+                    dim=-1,
+                )
+                tetra_context = tetra_context + self.edge_star_context_scale * (
+                    tetra_edge_context - tetra_context
                 )
             tetra_msg = self.global_to_tetra(torch.cat([tetra_state, tetra_context], dim=-1))
             tetra_state = tetra_state + self.dropout(

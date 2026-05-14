@@ -983,6 +983,32 @@ def test_simplicial_vertex_star_context_adds_no_parameters():
     assert vertex_star_params == global_context_params
 
 
+def test_simplicial_edge_star_context_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    global_context_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_face_top_k=24,
+        simplex_tetra_top_k=48,
+        simplex_cell_score_degree_penalty=0.75,
+        simplex_cell_score_outer_edge_weight=0.25,
+        simplex_edge_frame_message_scale=0.025,
+        simplex_boundary_readout_directionality=0.25,
+        simplex_boundary_incidence_normalization=1.0,
+        simplex_global_context_scale=0.10,
+    )
+    edge_star_medium = replace(
+        global_context_medium,
+        simplex_edge_star_context_scale=1.0,
+    )
+
+    global_context_params = sum(parameter.numel() for parameter in AlphaFold2(global_context_medium).parameters())
+    edge_star_params = sum(parameter.numel() for parameter in AlphaFold2(edge_star_medium).parameters())
+
+    assert global_context_params == 3_201_970
+    assert edge_star_params == global_context_params
+
+
 def test_simplicial_cell_dropout_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     dropout_medium = replace(

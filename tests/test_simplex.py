@@ -14,6 +14,7 @@ from minalphafold.simplex import (
     build_simplex_topology,
     cell_outer_edge_context,
     coface_degree_attenuate_pair_readout,
+    edge_star_cell_mean,
     face_edge_frame_features,
     face_outer_edge_delta,
     face_tetra_coboundary_delta,
@@ -94,6 +95,7 @@ class SimplexConfig:
     simplex_boundary_readout_directionality = 0.0
     simplex_global_context_scale = 0.0
     simplex_vertex_star_context_scale = 0.0
+    simplex_edge_star_context_scale = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
     simplex_c_segment = 8
@@ -706,6 +708,27 @@ def test_vertex_star_cell_mean_pools_incident_selected_cells():
     assert torch.allclose(star, expected)
 
 
+def test_edge_star_cell_mean_pools_cells_through_boundary_edges():
+    state = torch.tensor([[[[1.0, 10.0], [3.0, 30.0]]]])
+    cell_indices = torch.tensor([[[[0, 1, 2], [1, 2, 3]]]], dtype=torch.long)
+    cell_mask = torch.tensor([[[1.0, 1.0]]])
+
+    star = edge_star_cell_mean(
+        state,
+        cell_indices,
+        cell_mask,
+        num_residues=4,
+        channels=2,
+    )
+
+    assert torch.allclose(star[0, 0, 1], torch.tensor([1.0, 10.0]))
+    assert torch.allclose(star[0, 1, 0], torch.tensor([1.0, 10.0]))
+    assert torch.allclose(star[0, 1, 2], torch.tensor([2.0, 20.0]))
+    assert torch.allclose(star[0, 2, 1], torch.tensor([2.0, 20.0]))
+    assert torch.allclose(star[0, 2, 3], torch.tensor([3.0, 30.0]))
+    assert torch.all(star[0, 0, 3] == 0.0)
+
+
 def test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters():
     class GlobalContextConfig(SimplexConfig):
         simplex_neighbor_k = 3
@@ -725,6 +748,48 @@ def test_vertex_star_context_routes_incident_cell_summary_without_extra_paramete
     star_adapter = SimplicialAdapter(VertexStarContextConfig()).eval()
     with torch.no_grad():
         torch.manual_seed(46)
+        face_weight = torch.randn_like(global_adapter.global_to_face.linear_2.weight) * 0.02
+        face_bias = torch.randn_like(global_adapter.global_to_face.linear_2.bias) * 0.01
+        tetra_weight = torch.randn_like(global_adapter.global_to_tetra.linear_2.weight) * 0.02
+        tetra_bias = torch.randn_like(global_adapter.global_to_tetra.linear_2.bias) * 0.01
+        for adapter in (global_adapter, star_adapter):
+            adapter.global_to_face.linear_2.weight.copy_(face_weight)
+            adapter.global_to_face.linear_2.bias.copy_(face_bias)
+            adapter.global_to_tetra.linear_2.weight.copy_(tetra_weight)
+            adapter.global_to_tetra.linear_2.bias.copy_(tetra_bias)
+    pair = torch.randn(1, 5, 5, GlobalContextConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, GlobalContextConfig.c_s)
+
+    global_params = sum(p.numel() for p in global_adapter.parameters())
+    star_params = sum(p.numel() for p in star_adapter.parameters())
+    global_pair, global_single, _ = global_adapter(pair, single)
+    star_pair, star_single, _ = star_adapter(pair, single)
+
+    assert star_params == global_params
+    assert not torch.allclose(star_pair, global_pair)
+    assert not torch.allclose(star_single, global_single)
+
+
+def test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters():
+    class GlobalContextConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_global_context_scale = 0.25
+
+    class EdgeStarContextConfig(GlobalContextConfig):
+        simplex_edge_star_context_scale = 1.0
+
+    torch.manual_seed(47)
+    global_adapter = SimplicialAdapter(GlobalContextConfig()).eval()
+    torch.manual_seed(47)
+    star_adapter = SimplicialAdapter(EdgeStarContextConfig()).eval()
+    with torch.no_grad():
+        torch.manual_seed(48)
         face_weight = torch.randn_like(global_adapter.global_to_face.linear_2.weight) * 0.02
         face_bias = torch.randn_like(global_adapter.global_to_face.linear_2.bias) * 0.01
         tetra_weight = torch.randn_like(global_adapter.global_to_tetra.linear_2.weight) * 0.02

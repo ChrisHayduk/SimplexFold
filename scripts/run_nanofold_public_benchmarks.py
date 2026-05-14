@@ -988,6 +988,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_boundary_readout_directionality", args.simplex_boundary_readout_directionality),
         ("simplex_global_context_scale", args.simplex_global_context_scale),
         ("simplex_vertex_star_context_scale", args.simplex_vertex_star_context_scale),
+        ("simplex_edge_star_context_scale", args.simplex_edge_star_context_scale),
         ("simplex_geometry_distance_weight", args.simplex_geometry_distance_weight),
         ("simplex_segment_cell_scale", args.simplex_segment_cell_scale),
         ("simplex_segment_radius", args.simplex_segment_radius),
@@ -1818,6 +1819,9 @@ def _train_variant(
         "simplex_vertex_star_context_scale": (
             float(getattr(model_config, "simplex_vertex_star_context_scale", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_edge_star_context_scale": (
+            float(getattr(model_config, "simplex_edge_star_context_scale", 0.0)) if use_simplicial else 0.0
+        ),
         "simplex_boundary_closure_weight": (
             float(getattr(model_config, "simplex_boundary_closure_weight", 0.0)) if use_simplicial else 0.0
         ),
@@ -2021,6 +2025,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_cell_score_segment_weight",
         "simplex_global_context_scale",
         "simplex_vertex_star_context_scale",
+        "simplex_edge_star_context_scale",
         "simplex_cell_score_outer_edge_weight_final",
         "simplex_cell_score_outer_edge_weight_ramp_start_step",
         "simplex_cell_score_outer_edge_weight_ramp_steps",
@@ -2613,6 +2618,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Interpolate selected global-complex context toward residue vertex-star incidence context.",
     )
     parser.add_argument(
+        "--simplex-edge-star-context-scale",
+        type=float,
+        default=None,
+        help="Interpolate selected global-complex context toward boundary-edge star incidence context.",
+    )
+    parser.add_argument(
         "--simplex-geometry-distance-weight",
         type=float,
         default=None,
@@ -3159,6 +3170,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_boundary_readout_directionality": args.simplex_boundary_readout_directionality,
         "simplex_global_context_scale": args.simplex_global_context_scale,
         "simplex_vertex_star_context_scale": args.simplex_vertex_star_context_scale,
+        "simplex_edge_star_context_scale": args.simplex_edge_star_context_scale,
         "simplex_segment_cell_scale": args.simplex_segment_cell_scale,
         "simplex_segment_radius": args.simplex_segment_radius,
         "simplex_c_segment": args.simplex_c_segment,

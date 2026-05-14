@@ -320,6 +320,51 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters`: `66 passed`
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model_config.py minalphafold/simplex.py scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py`: passed
 
+### E119 Idea: Edge-Star Selected-Complex Context
+
+Status: implemented locally; do not launch while E117 is active, and do not
+skip the E117 recording gate.
+
+Hypothesis: E118's residue vertex-star context is a cleaner topological
+local-to-global bridge than E116's single protein-level mean, but the final
+simplex writeback still happens through boundary edges into `Z_ij`. If the
+global-context family remains stable but vertex-star routing is too
+residue-centric, a boundary-edge star should target the actual writeback
+interface more directly: each active face/tetra receives context pooled from
+selected cells that share its own boundary edges.
+
+Mechanism: add default-off `simplex_edge_star_context_scale`. When
+`simplex_global_context_scale` allocates the E116 global-to-face/tetra
+adapters, E119 can interpolate the broadcast selected-complex mean toward an
+edge-star cochain:
+
+```text
+selected F_ijk / U_ijkl -> boundary-edge star cochains
+                         -> active F_ijk / U_ijkl through their boundary edges
+                         -> selected boundary edges Z_ij
+```
+
+This is not a new loss and not a dense all-pairs pair gate. It routes
+persistent higher-rank cochains through the selected 1-skeleton before the
+existing boundary-edge readout. It adds no parameters because it reuses the
+E116 global-context MLPs.
+
+Gate: launch only after E117 is fully recorded and E118 has either run or
+been explicitly skipped. If the source is the E117 step-6500 checkpoint,
+target step 7000; if E118 has already produced a stable step-7000 checkpoint,
+target the next 500-step gate from there. Use the E117/E118 recipe with
+`--simplex-global-context-scale 0.10` and
+`--simplex-edge-star-context-scale 1.0`. Do not combine with
+`--simplex-vertex-star-context-scale` in the first E119 gate; isolate whether
+the boundary-edge star is better than residue-star routing.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_edge_star_cell_mean_pools_cells_through_boundary_edges tests/test_simplex.py::test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters tests/test_trainer.py::test_simplicial_edge_star_context_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `4 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters tests/test_trainer.py::test_simplicial_edge_star_context_adds_no_parameters`: `69 passed`
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model_config.py minalphafold/simplex.py scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py`: passed
+
 ### E100: Bidirectional Simplex-MSA Feedback
 
 Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
