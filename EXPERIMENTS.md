@@ -874,7 +874,7 @@ E101 (`0.3998`). Do not spend a 30k run on this exact pair-gate route.
 
 ### E104 Idea: Selected-Boundary Metric-Confidence Gate
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E99-E103 suggest the selected face/tetra complex can maintain
 high selected-boundary lDDT while global C-alpha lDDT stalls near `0.40`.
@@ -907,16 +907,21 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `175 passed`
 - `git diff --check`
 
-Launch: E104 is running as
+Launch/result: E104 ran as
 `e104_boundary_metric_gate_from_e97_s10000_c256_m64`, resuming the E97
 checkpoint from step 9500 to step 10000 with fixed E97 topology settings and
 the selected-boundary metric gate ramping from `0.0` to `0.25`. Remote
 prelaunch checks confirmed no active benchmark process, successful
 py_compile, CLI support for `--simplex-boundary-metric-gate-*`, the E97
 checkpoint present, and `3,154,242` parameters under the AF2-medium +5%
-ceiling. Python PID is `19749`. A status poll at `2026-05-13T10:19:03Z`
-showed the process alive, GPU active, `results.json` absent, and the history
-still ending at the inherited E97 step-9500 row.
+ceiling.
+
+Result: reject. E104 returned at step 10000 with `val_lddt_ca=0.3956`,
+FoldScore `0.3854`, `val_ca_drmsd=10.1848`, and predicted/true C-alpha
+radius `11.3196 / 15.4034`. Selected face/tetra boundary lDDT stayed high at
+`0.7246` / `0.7072`, but primary C-alpha lDDT fell below E96, E97, E99,
+E101, and E103, so local metric-confidence gating did not solve the
+local-to-global assembly gap.
 
 ### E105 Idea: Selected-Boundary Metric Recycling
 
