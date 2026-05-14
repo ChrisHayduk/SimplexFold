@@ -6105,3 +6105,11 @@
   E124/E125 short gates but still shows real CPU/GPU activity. No final
   artifacts exist yet and history still ends at inherited E120 step 7500, so
   leave the job running and keep `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-14T20:30Z non-disruptive E126 health probe: PID `1120` was still
+  active after about 96 minutes elapsed, with `178` threads, process CPU around
+  `808%`-`809%`, RSS changing from about `2.08 GiB` to `2.23 GiB` over the
+  probe, H100 memory still allocated at `42899 MiB`, and sampled GPU
+  utilization at `55%` then `0%`. `/proc/1120/io` read counters advanced over
+  30 seconds while write counters and the log stayed unchanged. Interpretation:
+  the process is still doing training/evaluation work before the step-8000
+  validation/writeout, not an exited run waiting to be collected.
