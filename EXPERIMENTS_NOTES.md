@@ -6222,3 +6222,12 @@
   `history_full_msa_to_face.json`; history still ended at inherited step 8000,
   and no `results.csv` or checkpoint was present. Continue waiting for the
   coherent step-8500 bundle; do not stop the pod or launch a follow-up.
+- 2026-05-14T22:32Z-22:51Z E128 remained active across a 20-sample watch on
+  the owned pod. PID `1523` stayed alive from about `01:04:28` through
+  `01:23:30` elapsed, process CPU stayed around `746%`-`775%`, RSS stayed
+  about `2.0 GiB`, and the process kept `178` threads. H100 memory stayed
+  allocated at `43353 MiB`, with sampled GPU utilization ranging from `0%` to
+  `100%`. The artifact directory still only had `run_metadata.json` and
+  `history_full_msa_to_face.json`; history still ended at inherited step 8000,
+  with no `results.csv` and no checkpoint. Continue waiting for a coherent
+  step-8500 result; do not stop the pod or launch a follow-up.
