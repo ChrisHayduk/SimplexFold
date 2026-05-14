@@ -5305,8 +5305,7 @@ Validation so far:
 
 ### E125: Ramped Face Boundary-Edge-Frame Gate
 
-Status: queued as the next short Runpod gate after E124 returned below the
-`0.45` short-gate threshold; not launched yet.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: if E124's abrupt face boundary-edge-frame gate is directionally
 helpful but unstable, the same topological route should be tested as a
@@ -5327,8 +5326,7 @@ Candidate launch after E124: E124 improved selected-boundary lDDT and
 contraction but worsened FoldScore/dRMSD and remained globally contracted.
 That is enough evidence to test whether a smoother topology curriculum can
 keep the local face-boundary geometry signal without disrupting global
-assembly as much. Launch E125 as the next short gate only after E124 results
-are committed and the owned pod has no active benchmark process:
+assembly as much. Launch E125 as a short gate with:
 
 ```bash
 --run-name e125_ramped_boundary_edge_frame_gate_from_e120_s8000_c256_m64 \
@@ -5338,6 +5336,18 @@ are committed and the owned pod has no active benchmark process:
 --simplex-boundary-edge-frame-gate-runtime-scale-ramp-start-step 7500 \
 --simplex-boundary-edge-frame-gate-runtime-scale-ramp-steps 500
 ```
+
+Launch: E125 started on `2026-05-14` on owned Runpod pod `o1dy17ouv8w5mz`,
+PID `46151`, as
+`e125_ramped_boundary_edge_frame_gate_from_e120_s8000_c256_m64`. Remote
+checkout fast-forwarded cleanly to `f37fcdd`, no active benchmark process was
+present, the E120 checkpoint was present, and py_compile passed for the
+simplex/evoformer/model/trainer/runner slice. Startup confirmed a clean
+weights-only resume from E120 at step 7500/examples 60000, `1292` matching
+tensors loaded, `24` new gate tensors initialized, and metadata matching the
+intended ramped boundary-edge-frame recipe: `effective_batch_size=8`,
+`max_parameters=3,261,974`, allocation scale `0.05`, runtime scale `0.0`,
+runtime final `0.05`, ramp start step `7500`, and ramp steps `500`.
 
 Validation so far:
 

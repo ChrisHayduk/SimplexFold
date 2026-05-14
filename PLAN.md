@@ -1,4 +1,4 @@
-## Current Plan: Launch E125 Ramped Boundary-Edge-Frame Gate
+## Current Plan: Monitor E125 Ramped Boundary-Edge-Frame Gate
 
 E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
@@ -138,7 +138,7 @@ lDDT (`0.7583` / `0.7406`) plus contraction (`0.5614` / `0.5611`), but it
 remains below the `0.45` short-gate threshold and worsens FoldScore/dRMSD
 versus E123/E120. Do not spend 30,000 steps on E124.
 
-The next short gate is E125:
+The active short gate is E125:
 `simplex_boundary_edge_frame_gate_runtime_scale` lets the same oriented
 face-boundary edge-frame gate ramp from `0.0` to the configured gate scale
 instead of switching on abruptly when resuming from E120. This stays inside the
@@ -147,9 +147,12 @@ through its directed boundary 1-simplices using edge-frame scalarized geometry;
 the only change is treating that inter-rank gate as a topology curriculum.
 Because E124 improved local selected-complex geometry but worsened global
 FoldScore/dRMSD, E125 should test whether a smoother handoff preserves the
-local boundary signal without over-contracting the global C-alpha trace. Launch
-it from the E120 checkpoint to step 8000 with the E124 allocation scale fixed
-at `0.05` and runtime ramp `0.0 -> 0.05` over steps 7500-8000.
+local boundary signal without over-contracting the global C-alpha trace. E125
+is now running on the owned Runpod pod `o1dy17ouv8w5mz` as
+`e125_ramped_boundary_edge_frame_gate_from_e120_s8000_c256_m64`, PID `46151`.
+It resumed the E120 checkpoint at step 7500/examples 60000 with
+`effective_batch_size=8`, `max_parameters=3,261,974`, E124's allocation scale
+fixed at `0.05`, and runtime ramp `0.0 -> 0.05` over steps 7500-8000.
 
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that

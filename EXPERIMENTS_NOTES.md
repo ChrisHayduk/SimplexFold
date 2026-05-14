@@ -5918,3 +5918,19 @@
   the `0.45` short-gate threshold and worsens FoldScore/dRMSD versus E123/E120.
   E124's stronger selected-boundary diagnostics justify E125 only as a short
   smooth-on topology-curriculum probe, not as a long spend.
+- 2026-05-14T16:03Z launched E125 on the owned Runpod pod `o1dy17ouv8w5mz`
+  as `e125_ramped_boundary_edge_frame_gate_from_e120_s8000_c256_m64`, PID
+  `46151`. Remote checkout fast-forwarded to `f37fcdd`, no active benchmark
+  process was present, the E120 checkpoint existed, and py_compile passed for
+  the simplex/evoformer/model/trainer/runner slice. Startup confirmed a clean
+  weights-only resume from E120 at step 7500/examples 60000 with `1292`
+  matching tensors loaded, `24` new gate tensors initialized, and a fresh
+  optimizer. Metadata confirms `steps=8000`, `effective_batch_size=8`,
+  `max_parameters=3261974`, `simplex_boundary_edge_frame_gate_scale=0.05`,
+  `simplex_boundary_edge_frame_gate_runtime_scale=0.0`,
+  `simplex_boundary_edge_frame_gate_runtime_scale_final=0.05`,
+  ramp start step `7500`, ramp steps `500`, global context `0.1`,
+  vertex-star runtime `1.0`, edge-star runtime `0.5`, and sparse caps
+  `24 / 48`. E125 should be treated as a short topology-curriculum probe;
+  do not launch a follow-up or stop the pod until E125 returns coherent
+  artifacts or clearly fails.
