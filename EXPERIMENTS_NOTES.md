@@ -5432,3 +5432,38 @@
   `simplex_global_context_scale=0.1`, `simplex_edge_star_context_scale=1.0`,
   `simplex_vertex_star_context_scale=null`, and the edge-star runtime ramp
   from `0.0` to `1.0` over steps 7000-7500.
+- 2026-05-14T06:43:39Z E119 returned on owned pod `o1dy17ouv8w5mz`.
+  Remote coherence passed before pulling artifacts after interpreting the
+  result row's runtime fields as ramp start `0.0` and final `1.0`:
+  `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, and the checkpoint
+  were present; `completed_steps=7500`, `effective_batch_size=8`,
+  `parameters=3,201,970 <= 3,261,974`,
+  `simplex_global_context_scale=0.1`,
+  `simplex_edge_star_context_scale=1.0`,
+  `simplex_vertex_star_context_scale=0.0`, edge-star runtime ramp `0.0` to
+  `1.0` over steps 7000-7500, `stopped_early=False`, 1000 eval-detail rows,
+  and history ended at step 7500. Final metrics: `val_lddt_ca=0.4181`,
+  FoldScore `0.3957`, `val_ca_drmsd=11.0494`, C-alpha Rg
+  `11.8732 / 16.3091`, selected face/tetra boundary lDDT
+  `0.7428 / 0.7275`, and selected face/tetra contraction
+  `0.6430 / 0.6391`.
+- Pulled E119 non-checkpoint artifacts and log locally. Local coherence passed
+  with the same checks and confirmed no checkpoint directory was pulled. E119
+  improves FoldScore, dRMSD, expansion, and selected-boundary diagnostics
+  versus E118, but primary C-alpha lDDT regressed from E118's `0.4190` to
+  `0.4181`. Reject E119 as a 30k candidate and record the star-context family
+  as still stuck in the low-0.4 lDDT band.
+- Updated `EXPERIMENT_RESULTS.md`, `PLAN.md`, and `EXPERIMENTS.md` to record
+  E119 as final. The next experiment should be a new topology-native
+  local-to-global bridge that changes how selected face/tetra cochains affect
+  pair/edge geometry before structure readout; do not launch a longer E118 or
+  E119 continuation unless a short gate first breaks out of the low-0.4 band.
+- Preserved the E118 and E119 restart checkpoints locally under ignored
+  artifact paths before stopping the owned pod:
+  `artifacts/nanofold_public_benchmarks/e118_vertex_star_context_from_e117_s7000_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+  and
+  `artifacts/nanofold_public_benchmarks/e119_edge_star_context_from_e118_s7500_c256_m64/checkpoints/full_msa_to_face_latest.pt`.
+  Both are about 35 MB and remain outside git. Paused the E119 heartbeat and
+  stopped only the owned Runpod pod `o1dy17ouv8w5mz` after verifying no Python
+  benchmark process was active.

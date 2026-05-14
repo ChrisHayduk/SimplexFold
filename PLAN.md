@@ -1,51 +1,41 @@
-## Current Plan: Monitor E119 Edge-Star Selected-Complex Context
+## Current Plan: Post-E119 Plateau Audit
 
-E118 is now the primary-lDDT leader at `val_lddt_ca=0.4190` at step 7000.
+E118 remains the primary-lDDT leader at `val_lddt_ca=0.4190` at step 7000.
 It continued the selected-complex global-context family and replaced the
 protein-level broadcast with a ramped residue vertex-star cochain: selected
 face and tetra states pool through incident residues, then route back into
-active cells before boundary-edge readout. This branch has now beaten E96's
+active cells before boundary-edge readout. This branch has beaten E96's
 `0.4043` across E116, E117, and E118 without relying on the lost E96/E97
-checkpoint family, so it is the current best topology-native lead.
+checkpoint family, so it remains the current best topology-native lead.
 
-The target remains far away. To reach `0.7` from the current best near
-`0.419`, the model still needs roughly `+0.281` validation C-alpha lDDT. Do
-not spend 30,000 steps yet: E118 confirmed that vertex-star incidence routing
-helps, but the branch is still in the low-0.4 lDDT band. The next gate is E119
-from the E118 step-7000 checkpoint to step 7500 with effective batch 8, the
-same parameter cap, and a runtime ramp from the protein-level selected-complex
-cochain toward boundary-edge-star incidence cochains.
+E119 tested the boundary-edge-star analogue from E118 and returned at step
+7500 with `val_lddt_ca=0.4181`, FoldScore `0.3957`, `val_ca_drmsd=11.0494`,
+and C-alpha Rg `11.8732 / 16.3091`. Remote and local coherence passed:
+`completed_steps=7500`, 1000 eval-detail rows, history ending at step 7500,
+`effective_batch_size=8`, `parameters=3,201,970` under the `3,261,974` cap,
+`simplex_global_context_scale=0.1`, `simplex_edge_star_context_scale=1.0`,
+vertex-star context disabled, and the intended edge-star runtime ramp from
+`0.0` to `1.0` over steps 7000-7500.
 
-E118 returned with remote and local coherence passing: `completed_steps=7000`,
-1000 eval-detail rows, history ending at step 7000, `effective_batch_size=8`,
-`parameters=3,201,970` under the `3,261,974` cap, and the intended
-vertex-star runtime ramp from `0.0` to `1.0` over steps 6500-7000. It improved
-E117's primary C-alpha lDDT from `0.4151` to `0.4190` and FoldScore from
-`0.3927` to `0.3955`, while selected face/tetra boundary lDDT stayed high
-(`0.7404` / `0.7238`). That is enough to test the adjacent edge-star route,
-but not enough to promote the branch to a 30k confirmation run.
+Reject E119 as a 30,000-step candidate. Boundary-edge-star routing improved
+FoldScore, dRMSD, C-alpha expansion, and selected face/tetra boundary lDDT
+(`0.7428` / `0.7275`) versus E118, but the primary C-alpha lDDT slipped below
+E118 and the family remains in the low-0.4 band. To reach `0.7` from the
+current best near `0.419`, the model still needs roughly `+0.281` validation
+C-alpha lDDT, so this is not a "train longer and hope" situation.
 
-E119 is the edge-star analogue of E118. Where E118 pools selected cell
-cochains through incident residues, E119 pools them through incident boundary
-edges, then routes each active cell the average context of its own
-boundary-edge star before the same selected boundary-edge readout. This is
-closer to the pair tensor `Z_ij` and is the right follow-up because the
-global-context family remains stable but still needs a sharper local-to-global
-bridge. It adds no parameters over E116/E118 because it reuses the existing
-global-context adapters. E119 is now running on owned pod `o1dy17ouv8w5mz`
-after the remote checkout fast-forwarded to commit `91ebe38`. It resumed the
-E118 checkpoint at step 7000/examples 56000, targets step 7500, keeps
-`--simplex-global-context-scale 0.10`, uses
-`--simplex-edge-star-context-scale 1.0`, and ramps edge-star runtime scale from
-`0.0` to `1.0` over steps 7000-7500. Do not combine vertex-star and edge-star
-in this first E119 gate. When it returns, record it before deciding whether
-this global/star-context family has earned a longer spend.
+The next branch should stay topology-native and address the same diagnosis
+more directly: explicit higher-rank cells learn good local selected-boundary
+geometry, but the main trunk still fails to assemble a globally accurate
+C-alpha trace. Prefer a mechanism that changes how selected face/tetra
+cochains influence pair/edge geometry before the structure module, with a
+clear short gate before any 30,000-step spend. Do not launch a longer E118 or
+E119 continuation unless a new gate first breaks out of the low-0.4 lDDT band.
 
-The next branch should stay topology-native but move the feedback target back
-toward the pair/edge trunk rather than the target MSA row. E100 showed that
-collapsed cell-to-residue MSA feedback is too blunt; E101 showed that
+The pair/edge-trunk direction remains the most relevant backlog. E100 showed
+that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that
 preserving directed boundary-edge incidence helps relative to E100 but still
-does not beat the E96/E97 leaders. The next candidate should therefore use
+does not beat the E96/E97 leaders. A future candidate should therefore use
 selected boundary-edge cochains as incidence-aware pair/edge bias or gating,
 so the explicit face/tetra complex changes how pair geometry is updated
 before structure readout instead of asking MSA feedback to carry that signal.

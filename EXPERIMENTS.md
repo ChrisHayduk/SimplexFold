@@ -369,7 +369,7 @@ Validation so far:
 
 ### E119 Idea: Edge-Star Selected-Complex Context
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned and recorded.
 
 Hypothesis: E118's residue vertex-star context is a cleaner topological
 local-to-global bridge than E116's single protein-level mean, but the final
@@ -412,7 +412,7 @@ Set `<source_step>=7000`. Do not combine with
 `--simplex-vertex-star-context-scale` in the first E119 gate; isolate whether
 the boundary-edge star is better than residue-star routing.
 
-Launch: E119 is running as
+Launch: E119 ran as
 `e119_edge_star_context_from_e118_s7500_c256_m64` on owned Runpod pod
 `o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `91ebe38`
 before launch. Startup confirmed PID `38461`, resume from the E118 checkpoint
@@ -422,6 +422,21 @@ new/missing tensors initialized. The first health poll confirmed
 `simplex_global_context_scale=0.1`, `simplex_edge_star_context_scale=1.0`,
 `simplex_vertex_star_context_scale=null`, and the edge-star runtime ramp from
 `0.0` to `1.0` over steps 7000-7500.
+
+Result: reject as a 30k candidate. E119 returned at step 7500 with
+`val_lddt_ca=0.4181`, FoldScore `0.3957`, `val_ca_drmsd=11.0494`, and
+C-alpha Rg `11.8732 / 16.3091`. Remote and local coherence passed: one result
+row, 16 history rows ending at step 7500, 1000 final eval-detail rows,
+`parameters=3,201,970` under the `3,261,974` cap, `effective_batch_size=8`,
+`simplex_global_context_scale=0.1`, `simplex_edge_star_context_scale=1.0`,
+vertex-star context disabled, the edge-star runtime ramp from `0.0` to `1.0`
+over steps 7000-7500, and `stopped_early=False`. The selected face/tetra
+boundary lDDT stayed high (`0.7428` / `0.7275`), and E119 improved FoldScore,
+dRMSD, and C-alpha expansion versus E118, but primary C-alpha lDDT slipped
+below E118's `0.4190`. The edge-star route therefore sharpens the diagnosis
+that better local selected-boundary geometry is not yet translating into
+global C-alpha assembly; do not spend 30k on this family without a new gate
+that breaks out of the low-0.4 lDDT band.
 
 Validation so far:
 
