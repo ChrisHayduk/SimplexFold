@@ -6231,3 +6231,13 @@
   `history_full_msa_to_face.json`; history still ended at inherited step 8000,
   with no `results.csv` and no checkpoint. Continue waiting for a coherent
   step-8500 result; do not stop the pod or launch a follow-up.
+- 2026-05-14T22:55Z E128 remained active on the owned pod. PID `1523` had
+  about `01:27:00` elapsed time, process CPU stayed around `782%`-`784%`, RSS
+  was about `2.0 GiB`, and the process kept `178` threads. H100 memory stayed
+  allocated at `43353 MiB`; sampled GPU utilization moved from `44%` to `0%`
+  during the probe. Over 60 seconds, process CPU time advanced from `11:12:44`
+  to `11:22:45`, `/proc/1523/io` read counters advanced, and syscall read
+  counts advanced, while write counters and log size stayed unchanged. The
+  artifact directory still only had the two startup files and history still
+  ended at inherited step 8000. Interpretation: active computation before
+  writeout, not an idle or completed run.
