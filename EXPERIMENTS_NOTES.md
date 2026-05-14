@@ -6070,3 +6070,10 @@
   inherited E120 step-7500 validation row (`val_lddt_ca=0.4248279729783535`).
   Continue monitoring; leave `EXPERIMENT_RESULTS.md` unchanged until E126
   returns a coherent final or early-stop result bundle.
+- 2026-05-14T19:23Z-19:26Z E126 stayed alive through a six-sample monitor
+  window on the owned Runpod pod. PID `1120` remained active, process CPU
+  stayed around `751%`-`755%`, H100 memory stayed allocated at `42899 MiB`,
+  and sampled GPU utilization ranged from `0%` to `60%`. No final result
+  bundle exists yet (`results.json`, `results.csv`, eval details, and
+  checkpoint all absent), and history still ends at inherited E120 step 7500.
+  Treat this as slow active training, not a failed or returned run.
