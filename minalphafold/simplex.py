@@ -1706,6 +1706,9 @@ class SimplicialAdapter(torch.nn.Module):
         self.triangle_attention_bias_scale = float(
             getattr(config, "simplex_triangle_attention_bias_scale", 0.0)
         )
+        self.triangle_attention_value_scale = float(
+            getattr(config, "simplex_triangle_attention_value_scale", 0.0)
+        )
         self.triangle_num_heads = int(getattr(config, "triangle_num_heads", 1))
         self.global_context_scale = float(getattr(config, "simplex_global_context_scale", 0.0))
         self.vertex_star_context_scale = min(
@@ -1771,6 +1774,18 @@ class SimplicialAdapter(torch.nn.Module):
                     2 * self.triangle_num_heads,
                 )
                 init_linear(self.tetra_to_triangle_attention_bias, init="final")
+        if self.triangle_attention_value_scale > 0.0:
+            self.face_to_triangle_attention_value = torch.nn.Linear(
+                self.c_face,
+                2 * config.c_z,
+            )
+            init_linear(self.face_to_triangle_attention_value, init="final")
+            if self.use_tetra:
+                self.tetra_to_triangle_attention_value = torch.nn.Linear(
+                    self.c_tetra,
+                    2 * config.c_z,
+                )
+                init_linear(self.tetra_to_triangle_attention_value, init="final")
         self.auxiliary_heads = SimplexAuxiliaryHeads(config)
         if self.outer_edge_context_scale > 0.0:
             self.face_outer_edge_context = SimplexMLP(
@@ -2247,16 +2262,20 @@ class SimplicialAdapter(torch.nn.Module):
                 edge_star_context_scale=edge_star_context_scale,
             )
 
-        triangle_attention_bias_aux: dict[str, torch.Tensor] | None = None
-        if self.triangle_attention_bias_scale > 0.0 and triangle_attention_bias_scale > 0.0:
-            triangle_attention_bias_aux = self._triangle_attention_bias_aux(
+        triangle_attention_aux: dict[str, torch.Tensor] | None = None
+        if (
+            (self.triangle_attention_bias_scale > 0.0 and triangle_attention_bias_scale > 0.0)
+            or self.triangle_attention_value_scale > 0.0
+        ):
+            triangle_attention_aux = self._triangle_attention_aux(
                 face_state,
                 face_indices,
                 topology.face_mask,
                 tetra_state,
                 topology.tetra_indices,
                 topology.tetra_mask,
-                scale=triangle_attention_bias_scale,
+                bias_scale=triangle_attention_bias_scale,
+                value_scale=self.triangle_attention_value_scale,
             )
 
         face_edge_update = self.face_to_edge(face_state).reshape(*face_state.shape[:-1], 3, self.c_z)
@@ -2573,11 +2592,11 @@ class SimplicialAdapter(torch.nn.Module):
             aux["simplex_msa_feedback"] = msa_feedback
         if boundary_pair_feedback is not None:
             aux["simplex_boundary_pair_feedback"] = boundary_pair_feedback
-        if triangle_attention_bias_aux is not None:
-            aux.update(triangle_attention_bias_aux)
+        if triangle_attention_aux is not None:
+            aux.update(triangle_attention_aux)
         return pair, single, aux
 
-    def _triangle_attention_bias_aux(
+    def _triangle_attention_aux(
         self,
         face_state: torch.Tensor,
         face_indices: torch.Tensor,
@@ -2586,17 +2605,28 @@ class SimplicialAdapter(torch.nn.Module):
         tetra_indices: torch.Tensor,
         tetra_mask: torch.Tensor,
         *,
-        scale: float,
+        bias_scale: float,
+        value_scale: float,
     ) -> dict[str, torch.Tensor]:
-        """Emit sparse triangle-attention biases from selected face/tetra cochains."""
+        """Emit sparse triangle-attention cochains from selected face/tetra states."""
 
         batch_size = face_state.shape[0]
-        face_bias = torch.tanh(self.face_to_triangle_attention_bias(face_state))
-        face_bias = face_bias.reshape(*face_state.shape[:-1], 2, self.triangle_num_heads)
         indices = [face_indices.reshape(batch_size, -1, 3)]
         masks = [face_mask.reshape(batch_size, -1)]
-        start_biases = [face_bias[..., 0, :].reshape(batch_size, -1, self.triangle_num_heads)]
-        end_biases = [face_bias[..., 1, :].reshape(batch_size, -1, self.triangle_num_heads)]
+        start_biases: list[torch.Tensor] = []
+        end_biases: list[torch.Tensor] = []
+        start_values: list[torch.Tensor] = []
+        end_values: list[torch.Tensor] = []
+        if self.triangle_attention_bias_scale > 0.0 and bias_scale > 0.0:
+            face_bias = torch.tanh(self.face_to_triangle_attention_bias(face_state))
+            face_bias = face_bias.reshape(*face_state.shape[:-1], 2, self.triangle_num_heads)
+            start_biases.append(face_bias[..., 0, :].reshape(batch_size, -1, self.triangle_num_heads))
+            end_biases.append(face_bias[..., 1, :].reshape(batch_size, -1, self.triangle_num_heads))
+        if self.triangle_attention_value_scale > 0.0 and value_scale > 0.0:
+            face_value = torch.tanh(self.face_to_triangle_attention_value(face_state))
+            face_value = face_value.reshape(*face_state.shape[:-1], 2, self.c_z)
+            start_values.append(face_value[..., 0, :].reshape(batch_size, -1, self.c_z))
+            end_values.append(face_value[..., 1, :].reshape(batch_size, -1, self.c_z))
 
         if self.use_tetra and tetra_state.numel() > 0 and tetra_indices.shape[2] > 0:
             tet_i, tet_j, tet_k, tet_l = tetra_indices.unbind(dim=-1)
@@ -2609,22 +2639,35 @@ class SimplicialAdapter(torch.nn.Module):
                 ],
                 dim=-2,
             )
-            tetra_bias = torch.tanh(self.tetra_to_triangle_attention_bias(tetra_state))
-            tetra_bias = tetra_bias.reshape(*tetra_state.shape[:-1], 1, 2, self.triangle_num_heads)
-            tetra_bias = tetra_bias.expand(*tetra_face_indices.shape[:-1], 2, self.triangle_num_heads)
             tetra_face_mask = tetra_mask[..., None].expand(*tetra_face_indices.shape[:-1])
             indices.append(tetra_face_indices.reshape(batch_size, -1, 3))
             masks.append(tetra_face_mask.reshape(batch_size, -1))
-            start_biases.append(tetra_bias[..., 0, :].reshape(batch_size, -1, self.triangle_num_heads))
-            end_biases.append(tetra_bias[..., 1, :].reshape(batch_size, -1, self.triangle_num_heads))
+            if self.triangle_attention_bias_scale > 0.0 and bias_scale > 0.0:
+                tetra_bias = torch.tanh(self.tetra_to_triangle_attention_bias(tetra_state))
+                tetra_bias = tetra_bias.reshape(*tetra_state.shape[:-1], 1, 2, self.triangle_num_heads)
+                tetra_bias = tetra_bias.expand(*tetra_face_indices.shape[:-1], 2, self.triangle_num_heads)
+                start_biases.append(tetra_bias[..., 0, :].reshape(batch_size, -1, self.triangle_num_heads))
+                end_biases.append(tetra_bias[..., 1, :].reshape(batch_size, -1, self.triangle_num_heads))
+            if self.triangle_attention_value_scale > 0.0 and value_scale > 0.0:
+                tetra_value = torch.tanh(self.tetra_to_triangle_attention_value(tetra_state))
+                tetra_value = tetra_value.reshape(*tetra_state.shape[:-1], 1, 2, self.c_z)
+                tetra_value = tetra_value.expand(*tetra_face_indices.shape[:-1], 2, self.c_z)
+                start_values.append(tetra_value[..., 0, :].reshape(batch_size, -1, self.c_z))
+                end_values.append(tetra_value[..., 1, :].reshape(batch_size, -1, self.c_z))
 
-        scale_tensor = face_state.new_tensor(float(scale))
-        return {
+        aux = {
             "simplex_triangle_attention_indices": torch.cat(indices, dim=1),
             "simplex_triangle_attention_mask": torch.cat(masks, dim=1),
-            "simplex_triangle_attention_start_bias": scale_tensor * torch.cat(start_biases, dim=1),
-            "simplex_triangle_attention_end_bias": scale_tensor * torch.cat(end_biases, dim=1),
         }
+        if start_biases:
+            bias_scale_tensor = face_state.new_tensor(float(bias_scale))
+            aux["simplex_triangle_attention_start_bias"] = bias_scale_tensor * torch.cat(start_biases, dim=1)
+            aux["simplex_triangle_attention_end_bias"] = bias_scale_tensor * torch.cat(end_biases, dim=1)
+        if start_values:
+            value_scale_tensor = face_state.new_tensor(float(value_scale))
+            aux["simplex_triangle_attention_start_value"] = value_scale_tensor * torch.cat(start_values, dim=1)
+            aux["simplex_triangle_attention_end_value"] = value_scale_tensor * torch.cat(end_values, dim=1)
+        return aux
 
     def _apply_global_context(
         self,

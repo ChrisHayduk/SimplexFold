@@ -513,6 +513,7 @@ def apply_model_config_cli_overrides(model_config: ModelConfig, args: argparse.N
         "simplex_pre_triangle_update_scale",
         "simplex_pre_triangle_single_update_scale",
         "simplex_triangle_attention_bias_scale",
+        "simplex_triangle_attention_value_scale",
         "simplex_boundary_edge_frame_gate_scale",
     ):
         value = getattr(args, field_name, None)
@@ -2504,6 +2505,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Bias AF2 triangle attention logits with sparse selected face/tetra cochains.",
+    )
+    parser.add_argument(
+        "--simplex-triangle-attention-value-scale",
+        type=float,
+        default=None,
+        help="Add sparse selected face/tetra cochain values to AF2 triangle attention pair updates.",
     )
     parser.add_argument(
         "--simplex-boundary-edge-frame-gate-scale",

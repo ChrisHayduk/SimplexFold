@@ -5418,3 +5418,44 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `211 passed`
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/embedders.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - `git diff --check`: passed
+
+### E127: Sparse Simplex Triangle-Attention Value Residual
+
+Status: implemented locally as a parked fallback while E126 is running. Do not
+launch until E126 returns and is pulled/verified.
+
+Hypothesis: E126 gives selected face/tetra cochains control over triangle
+attention weights, but it still relies on existing pair values as the content
+that gets propagated. If E126 moves the curve but stays weak, the bottleneck
+may be value content rather than attention routing. E127 lets persistent
+filled triangle/tetra cochains contribute sparse value residuals to the AF2
+triangle-attention pair update on represented triples.
+
+Mechanism: `simplex_triangle_attention_value_scale` allocates zero-initialized
+face/tetra-to-pair-value projections inside each SimplicialAdapter. During
+the pre-triangle simplex pass, selected face cochains and tetra boundary-face
+cochains emit `simplex_triangle_attention_start_value` and
+`simplex_triangle_attention_end_value`. The starting- and ending-node triangle
+attention modules scatter-add those value residuals to the six ordered
+boundary-pair orientations of each represented triangle after the normal
+attention value aggregation. This remains topology-native: persistent 2- and
+3-simplex states write through their own represented triangle incidences,
+instead of adding a generic coordinate or lDDT objective.
+
+Candidate launch, only if E126 warrants it: use the E126 recipe and add a
+small value residual alongside the logit bias:
+
+```bash
+--simplex-triangle-attention-bias-scale 0.05 \
+--simplex-triangle-attention-value-scale 0.025
+```
+
+The audited E120 selected-complex profile with E126+E127 has
+`3,215,346 <= 3,261,974` parameters. Reject unless it improves the E126/E124
+short-gate result with coherent FoldScore/dRMSD; a pure selected-boundary
+geometry improvement without C-alpha assembly is not enough.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/embedders.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_bias tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_value tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_bias tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_value tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_triangle_attention_bias_stays_inside_medium_budget tests/test_trainer.py::test_simplicial_triangle_attention_value_stays_inside_medium_budget tests/test_trainer.py::test_triangle_attention_bias_runs_evoformer_block_eagerly tests/test_trainer.py::test_triangle_attention_value_runs_evoformer_block_eagerly tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `10 passed`

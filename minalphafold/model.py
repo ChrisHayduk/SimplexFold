@@ -46,7 +46,8 @@ def _uses_pre_triangle_simplex_update(
     if triangle_bias_override is not None:
         triangle_bias_scale = max(triangle_bias_override, 0.0)
 
-    return pair_scale > 0.0 or single_scale > 0.0 or triangle_bias_scale > 0.0
+    triangle_value_scale = max(float(getattr(block, "simplex_triangle_attention_value_scale", 0.0)), 0.0)
+    return pair_scale > 0.0 or single_scale > 0.0 or triangle_bias_scale > 0.0 or triangle_value_scale > 0.0
 
 
 class AlphaFold2(torch.nn.Module):

@@ -232,6 +232,9 @@ class SimplicialEvoformer(torch.nn.Module):
         self.simplex_triangle_attention_bias_scale = float(
             getattr(config, "simplex_triangle_attention_bias_scale", 0.0)
         )
+        self.simplex_triangle_attention_value_scale = float(
+            getattr(config, "simplex_triangle_attention_value_scale", 0.0)
+        )
 
     def forward(
         self,
@@ -309,6 +312,7 @@ class SimplicialEvoformer(torch.nn.Module):
             pre_pair_scale_value > 0.0
             or pre_single_scale_value > 0.0
             or triangle_bias_scale_value > 0.0
+            or self.simplex_triangle_attention_value_scale > 0.0
         ):
             pre_pair_scale = pair_representation.new_tensor(pre_pair_scale_value)
             pre_single_scale = pair_representation.new_tensor(pre_single_scale_value)
@@ -375,6 +379,9 @@ class SimplicialEvoformer(torch.nn.Module):
                 simplex_triangle_attention_bias=pre_simplex_aux.get(
                     "simplex_triangle_attention_start_bias"
                 ),
+                simplex_triangle_attention_value=pre_simplex_aux.get(
+                    "simplex_triangle_attention_start_value"
+                ),
                 simplex_triangle_attention_mask=pre_simplex_aux.get("simplex_triangle_attention_mask"),
             ),
             p=self.pair_dropout,
@@ -387,6 +394,9 @@ class SimplicialEvoformer(torch.nn.Module):
                 simplex_triangle_indices=pre_simplex_aux.get("simplex_triangle_attention_indices"),
                 simplex_triangle_attention_bias=pre_simplex_aux.get(
                     "simplex_triangle_attention_end_bias"
+                ),
+                simplex_triangle_attention_value=pre_simplex_aux.get(
+                    "simplex_triangle_attention_end_value"
                 ),
                 simplex_triangle_attention_mask=pre_simplex_aux.get("simplex_triangle_attention_mask"),
             ),

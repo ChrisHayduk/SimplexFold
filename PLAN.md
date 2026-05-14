@@ -22,10 +22,18 @@ selected F_ijk / boundary faces of U_ijkl
 ```
 
 E126 is now running as a short Runpod gate from the retained E120 checkpoint
-to step 8000 before any 30,000-step decision. The acceptance bar remains high: it
-should break out of the low-0.4 band, ideally clearing `0.45` while improving
-or at least not materially worsening FoldScore/dRMSD. A tiny E124-style
-primary-lDDT gain is not enough.
+to step 8000 before any 30,000-step decision. The acceptance bar remains high:
+it should break out of the low-0.4 band, ideally clearing `0.45` while
+improving or at least not materially worsening FoldScore/dRMSD. A tiny
+E124-style primary-lDDT gain is not enough.
+
+While E126 runs, E127 is prepared locally as the value-side companion rather
+than a separate loss: selected face/tetra cochains can now scatter sparse
+value residuals into AF2 triangle-attention pair updates on the same represented
+triples. If E126 helps but looks too weak, E127 tests whether the issue is that
+filled cells need to contribute content to triangle reasoning, not merely bias
+attention weights. If E126 is flat or regresses, use the E126 result to decide
+whether this value path is still worth a short gate.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best

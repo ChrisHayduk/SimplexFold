@@ -102,6 +102,7 @@ class SimplexConfig:
     simplex_pre_triangle_update_scale = 0.0
     simplex_pre_triangle_single_update_scale = -1.0
     simplex_triangle_attention_bias_scale = 0.0
+    simplex_triangle_attention_value_scale = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
     simplex_c_segment = 8
@@ -1045,6 +1046,30 @@ def test_simplex_adapter_emits_sparse_triangle_attention_bias():
     assert aux["simplex_triangle_attention_end_bias"].shape == aux["simplex_triangle_attention_start_bias"].shape
 
 
+def test_simplex_adapter_emits_sparse_triangle_attention_value():
+    class TriangleValueConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_triangle_attention_value_scale = 0.125
+
+    torch.manual_seed(71)
+    adapter = SimplicialAdapter(TriangleValueConfig()).eval()
+    pair = torch.randn(1, 6, 6, TriangleValueConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 6, TriangleValueConfig.c_s)
+
+    with torch.no_grad():
+        _, _, aux = adapter(pair, single)
+
+    assert aux["simplex_triangle_attention_indices"].shape[-1] == 3
+    assert aux["simplex_triangle_attention_mask"].shape == aux["simplex_triangle_attention_indices"].shape[:-1]
+    assert aux["simplex_triangle_attention_start_value"].shape[-1] == TriangleValueConfig.c_z
+    assert aux["simplex_triangle_attention_end_value"].shape == aux["simplex_triangle_attention_start_value"].shape
+    assert "simplex_triangle_attention_start_bias" not in aux
+
+
 def test_triangle_attention_uses_sparse_simplex_bias():
     torch.manual_seed(67)
     start_attention = TriangleAttentionStartingNode(SimplexConfig()).eval()
@@ -1080,6 +1105,44 @@ def test_triangle_attention_uses_sparse_simplex_bias():
 
     assert not torch.allclose(start_off, start_on)
     assert not torch.allclose(end_off, end_on)
+
+
+def test_triangle_attention_uses_sparse_simplex_value():
+    torch.manual_seed(73)
+    start_attention = TriangleAttentionStartingNode(SimplexConfig()).eval()
+    end_attention = TriangleAttentionEndingNode(SimplexConfig()).eval()
+
+    pair = torch.randn(1, 5, 5, SimplexConfig.c_z)
+    pair_mask = torch.ones(1, 5, 5)
+    triangle_indices = torch.tensor([[[0, 1, 2]]])
+    triangle_mask = torch.ones(1, 1)
+    start_value = torch.zeros(1, 1, SimplexConfig.c_z, dtype=pair.dtype)
+    end_value = torch.zeros_like(start_value)
+    start_value[..., 0] = 0.5
+    end_value[..., 1] = -0.25
+
+    with torch.no_grad():
+        start_off = start_attention(pair, pair_mask=pair_mask)
+        start_on = start_attention(
+            pair,
+            pair_mask=pair_mask,
+            simplex_triangle_indices=triangle_indices,
+            simplex_triangle_attention_value=start_value,
+            simplex_triangle_attention_mask=triangle_mask,
+        )
+        end_off = end_attention(pair, pair_mask=pair_mask)
+        end_on = end_attention(
+            pair,
+            pair_mask=pair_mask,
+            simplex_triangle_indices=triangle_indices,
+            simplex_triangle_attention_value=end_value,
+            simplex_triangle_attention_mask=triangle_mask,
+        )
+
+    assert not torch.allclose(start_off, start_on)
+    assert not torch.allclose(end_off, end_on)
+    assert torch.isclose((start_on - start_off)[0, 0, 1, 0], torch.tensor(0.5))
+    assert torch.isclose((end_on - end_off)[0, 0, 1, 1], torch.tensor(-0.25))
 
 
 def test_face_tetra_coboundary_delta_uses_sibling_faces_in_selected_tetras():

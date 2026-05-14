@@ -900,6 +900,43 @@ def _add_sparse_triangle_attention_bias(
         scores.index_put_((batch_index, a, b, c), values, accumulate=True)
     return scores
 
+
+def _add_sparse_triangle_attention_value(
+    output: torch.Tensor,
+    *,
+    triangle_indices: Optional[torch.Tensor],
+    triangle_value: Optional[torch.Tensor],
+    triangle_mask: Optional[torch.Tensor],
+) -> torch.Tensor:
+    """Accumulate sparse filled-triangle cochain values into pair updates."""
+
+    if triangle_indices is None or triangle_value is None or triangle_mask is None:
+        return output
+    if triangle_indices.numel() == 0 or triangle_value.numel() == 0:
+        return output
+
+    batch_size = output.shape[0]
+    batch_index = torch.arange(batch_size, device=output.device)
+    batch_index = batch_index.reshape(batch_size, *([1] * (triangle_mask.ndim - 1)))
+    batch_index = batch_index.expand_as(triangle_mask).reshape(-1)
+    i, j, k = (part.reshape(-1) for part in triangle_indices.unbind(dim=-1))
+    values = triangle_value.to(dtype=output.dtype) * triangle_mask[..., None].to(dtype=output.dtype)
+    values = values.reshape(-1, values.shape[-1])
+
+    valid = triangle_mask.reshape(-1) > 0
+    if int(valid.sum().item()) == 0:
+        return output
+    batch_index = batch_index[valid]
+    i = i[valid]
+    j = j[valid]
+    k = k[valid]
+    values = values[valid]
+
+    for a, b, _ in ((i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i)):
+        output.index_put_((batch_index, a, b), values, accumulate=True)
+    return output
+
+
 class TriangleAttentionStartingNode(torch.nn.Module):
     """Triangle self-attention around the starting node (Algorithm 13).
 
@@ -942,6 +979,7 @@ class TriangleAttentionStartingNode(torch.nn.Module):
         *,
         simplex_triangle_indices: Optional[torch.Tensor] = None,
         simplex_triangle_attention_bias: Optional[torch.Tensor] = None,
+        simplex_triangle_attention_value: Optional[torch.Tensor] = None,
         simplex_triangle_attention_mask: Optional[torch.Tensor] = None,
     ):
         pair_representation = self.layer_norm(pair_representation)
@@ -994,6 +1032,12 @@ class TriangleAttentionStartingNode(torch.nn.Module):
         values = values.reshape((Q.shape[0], Q.shape[1], Q.shape[2], -1))
 
         output = self.linear_output(values)
+        output = _add_sparse_triangle_attention_value(
+            output,
+            triangle_indices=simplex_triangle_indices,
+            triangle_value=simplex_triangle_attention_value,
+            triangle_mask=simplex_triangle_attention_mask,
+        )
 
         # Zero out padded query positions
         if pair_mask is not None:
@@ -1043,6 +1087,7 @@ class TriangleAttentionEndingNode(torch.nn.Module):
         *,
         simplex_triangle_indices: Optional[torch.Tensor] = None,
         simplex_triangle_attention_bias: Optional[torch.Tensor] = None,
+        simplex_triangle_attention_value: Optional[torch.Tensor] = None,
         simplex_triangle_attention_mask: Optional[torch.Tensor] = None,
     ):
         pair_representation = self.layer_norm(pair_representation)
@@ -1108,6 +1153,12 @@ class TriangleAttentionEndingNode(torch.nn.Module):
         values = values.reshape((Q.shape[0], Q.shape[1], Q.shape[2], -1))
 
         output = self.linear_output(values)
+        output = _add_sparse_triangle_attention_value(
+            output,
+            triangle_indices=simplex_triangle_indices,
+            triangle_value=simplex_triangle_attention_value,
+            triangle_mask=simplex_triangle_attention_mask,
+        )
 
         # Zero out padded query positions
         if pair_mask is not None:

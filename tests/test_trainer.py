@@ -506,6 +506,8 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.0",
             "--simplex-triangle-attention-bias-scale",
             "0.05",
+            "--simplex-triangle-attention-value-scale",
+            "0.025",
             "--simplex-boundary-edge-frame-gate-scale",
             "0.05",
             "--simplex-boundary-edge-frame-gate-runtime-scale",
@@ -559,6 +561,7 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_pre_triangle_update_scale == 0.25
     assert cfg.simplex_pre_triangle_single_update_scale == 0.0
     assert cfg.simplex_triangle_attention_bias_scale == 0.05
+    assert cfg.simplex_triangle_attention_value_scale == 0.025
     assert cfg.simplex_boundary_edge_frame_gate_scale == 0.05
     assert args.simplex_boundary_edge_frame_gate_runtime_scale == 0.0
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_final == 0.05
@@ -1236,6 +1239,35 @@ def test_simplicial_triangle_attention_bias_stays_inside_medium_budget():
     assert triangle_bias_params <= int(af2_params * 1.05)
 
 
+def test_simplicial_triangle_attention_value_stays_inside_medium_budget():
+    af2_medium = replace(load_model_config("medium"), use_simplicial_evoformer=False)
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    triangle_value_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_face_top_k=24,
+        simplex_tetra_top_k=48,
+        simplex_cell_score_degree_penalty=0.75,
+        simplex_cell_score_outer_edge_weight=0.25,
+        simplex_edge_frame_message_scale=0.025,
+        simplex_boundary_readout_directionality=0.25,
+        simplex_boundary_incidence_normalization=1.0,
+        simplex_global_context_scale=0.10,
+        simplex_vertex_star_context_scale=1.0,
+        simplex_edge_star_context_scale=1.0,
+        simplex_triangle_attention_bias_scale=0.05,
+        simplex_triangle_attention_value_scale=0.025,
+    )
+
+    af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())
+    triangle_value_params = sum(parameter.numel() for parameter in AlphaFold2(triangle_value_medium).parameters())
+
+    assert af2_params == 3_106_642
+    assert triangle_value_params == 3_215_346
+    assert triangle_value_params > 3_203_186
+    assert triangle_value_params <= int(af2_params * 1.05)
+
+
 def test_pre_triangle_simplex_update_runs_evoformer_block_eagerly(monkeypatch):
     import minalphafold.model as model_module
     from minalphafold.evoformer import SimplicialEvoformer
@@ -1286,6 +1318,36 @@ def test_triangle_attention_bias_runs_evoformer_block_eagerly(monkeypatch):
     def checkpoint_spy(function, *args, **kwargs):
         if isinstance(function, SimplicialEvoformer):
             raise AssertionError("triangle-attention simplex bias blocks must bypass activation checkpointing")
+        return original_checkpoint(function, *args, **kwargs)
+
+    monkeypatch.setattr(model_module.torch_checkpoint, "checkpoint", checkpoint_spy)
+
+    outputs = model(
+        torch.zeros(1, 4, 22),
+        torch.arange(4).reshape(1, 4),
+        torch.zeros(1, 2, 4, 49),
+        torch.zeros(1, 0, 4, 25),
+        torch.zeros(1, 0, 4, 4, 88),
+        torch.zeros(1, 4, dtype=torch.long),
+        n_cycles=1,
+    )
+
+    assert outputs["atom14_coords"].shape == (1, 4, 14, 3)
+
+
+def test_triangle_attention_value_runs_evoformer_block_eagerly(monkeypatch):
+    import minalphafold.model as model_module
+    from minalphafold.evoformer import SimplicialEvoformer
+
+    model_config = replace(load_model_config("tiny"), simplex_triangle_attention_value_scale=0.025)
+    model = AlphaFold2(model_config)
+    model.train()
+
+    original_checkpoint = model_module.torch_checkpoint.checkpoint
+
+    def checkpoint_spy(function, *args, **kwargs):
+        if isinstance(function, SimplicialEvoformer):
+            raise AssertionError("triangle-attention simplex value blocks must bypass activation checkpointing")
         return original_checkpoint(function, *args, **kwargs)
 
     monkeypatch.setattr(model_module.torch_checkpoint, "checkpoint", checkpoint_spy)

@@ -6034,3 +6034,22 @@
   `o1dy17ouv8w5mz` only, must not inspect or manage any other Runpod pod, must
   pull and verify artifacts locally before stopping the owned pod, and must not
   launch a follow-up automatically.
+- 2026-05-14T19:08Z prepared E127 locally while E126 is still active and
+  resultless. The owned pod still shows PID `1120` running for E126, the log
+  remains at the clean startup/resume messages, and the only E126 artifacts are
+  `history_full_msa_to_face.json` plus `run_metadata.json`; no final result
+  files exist, so `EXPERIMENT_RESULTS.md` remains unchanged. E127 adds
+  `simplex_triangle_attention_value_scale`, a default-off architecture hook
+  that lets selected face cochains and tetra boundary-face cochains scatter
+  sparse value residuals into the starting-/ending-node AF2 triangle-attention
+  pair updates for represented triples. This is the value-side companion to
+  E126's logit-bias path, not a new lDDT or coordinate loss. The E120
+  selected-complex profile with both `simplex_triangle_attention_bias_scale=0.05`
+  and `simplex_triangle_attention_value_scale=0.025` audits at
+  `3,215,346 <= 3,261,974` parameters. Local validation passed:
+  `python -m py_compile minalphafold/embedders.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+  and
+  `python -m pytest tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_bias tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_value tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_bias tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_value tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_triangle_attention_bias_stays_inside_medium_budget tests/test_trainer.py::test_simplicial_triangle_attention_value_stays_inside_medium_budget tests/test_trainer.py::test_triangle_attention_bias_runs_evoformer_block_eagerly tests/test_trainer.py::test_triangle_attention_value_runs_evoformer_block_eagerly tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  with `10 passed`. Keep E127 parked until E126 returns and is
+  pulled/verified; launch only if the E126 result suggests triangle-attention
+  cochain routing is directionally useful but too weak.
