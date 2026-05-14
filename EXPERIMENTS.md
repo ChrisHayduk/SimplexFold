@@ -5148,7 +5148,7 @@ Validation:
 
 ### E123: Ramped Pair-Only Pre-Triangle Simplex Injection
 
-Status: next queued short gate after E121b returned below the spend threshold.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E120 shows that explicit face/tetra states have learned coherent
 selected-boundary geometry, but global C-alpha lDDT remains in the low-0.4
@@ -5194,6 +5194,17 @@ The key deltas relative to E121b are:
 --simplex-pre-triangle-single-update-runtime-scale-ramp-start-step 7500 \
 --simplex-pre-triangle-single-update-runtime-scale-ramp-steps 500
 ```
+
+Launch: E123 started on `2026-05-14` on owned Runpod pod `o1dy17ouv8w5mz`,
+PID `21142`, as
+`e123_ramped_pair_pre_triangle_from_e120_s8000_c256_m64`. Remote checkout
+fast-forwarded cleanly to `5fce7f1`, no active benchmark process was present,
+the E120 checkpoint was present, py_compile passed for the model/trainer/
+runner slice, and the launch-style parameter audit counted `3,201,970`
+parameters under the `3,261,974` cap. Startup confirmed a clean weights-only
+resume from E120 at step 7500/examples 60000, `1292` matching tensors loaded,
+`0` new/missing tensors initialized, and metadata matching the intended
+pair-only runtime ramp.
 
 Validation:
 

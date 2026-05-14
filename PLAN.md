@@ -1,4 +1,4 @@
-## Current Plan: Launch E123 Pair-Only Pre-Triangle Ramp
+## Current Plan: Monitor E123 Pair-Only Pre-Triangle Ramp
 
 E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
@@ -120,6 +120,16 @@ pre-triangle runtime scale from `0.0` to `0.25` over steps 7500-8000. This
 adds no parameters and keeps the experiment in the README's cochain
 communication view. Reject E123 unless it clears E120 by more than noise and
 shows a real move toward the `0.45`/`0.50` candidate gates.
+
+E123 is active on the owned Runpod pod `o1dy17ouv8w5mz` as
+`e123_ramped_pair_pre_triangle_from_e120_s8000_c256_m64`, PID `21142`, with
+remote HEAD `5fce7f1`. Startup confirmed a clean resume from the E120
+checkpoint at step 7500/examples 60000, `1292` matching tensors loaded, `0`
+new/missing tensors initialized, `effective_batch_size=8`, and the intended
+runtime ramp: pair pre-triangle update `0.0 -> 0.25` over steps 7500-8000,
+pre-triangle single update held at `0.0`, vertex-star context `1.0`,
+edge-star context `0.5`, and sparse caps `24 / 48`. Do not launch E124 while
+E123 is active.
 
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that

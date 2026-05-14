@@ -5797,3 +5797,14 @@
   expected step, batch size, parameter cap, result/eval/history counts,
   checkpoint, metadata, and finite metrics. Record E121b as rejected and make
   E123 the next queued Runpod gate.
+- 2026-05-14T12:25Z launched E123 on the owned Runpod pod `o1dy17ouv8w5mz`
+  as `e123_ramped_pair_pre_triangle_from_e120_s8000_c256_m64`, PID `21142`.
+  Remote checkout fast-forwarded cleanly to `5fce7f1`, no active benchmark
+  process was present, the E120 checkpoint existed, py_compile passed for the
+  relevant model/trainer/runner files, and the launch-style parameter audit
+  counted `3,201,970 <= 3,261,974`. Startup health confirmed a clean
+  weights-only resume at step 7500/examples 60000 with `1292` matching tensors
+  loaded and `0` new/missing tensors. Metadata confirms the intended
+  pair-only pre-triangle ramp: static pair scale `0.25`, static single scale
+  `0.0`, pair runtime `0.0 -> 0.25` over steps 7500-8000, and single runtime
+  held at `0.0`.
