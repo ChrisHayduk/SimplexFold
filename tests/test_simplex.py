@@ -1,5 +1,6 @@
 import torch
 
+from minalphafold.embedders import TriangleAttentionEndingNode, TriangleAttentionStartingNode
 from minalphafold.evoformer import SimplicialEvoformer
 from minalphafold.simplex import (
     SimplexGeometryLoss,
@@ -100,6 +101,7 @@ class SimplexConfig:
     simplex_edge_star_context_scale = 0.0
     simplex_pre_triangle_update_scale = 0.0
     simplex_pre_triangle_single_update_scale = -1.0
+    simplex_triangle_attention_bias_scale = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
     simplex_c_segment = 8
@@ -1018,6 +1020,66 @@ def test_pre_triangle_simplex_update_can_run_pair_only():
 
     assert not torch.allclose(pair_full, pair_pair_only)
     assert not torch.allclose(single_full, single_pair_only)
+
+
+def test_simplex_adapter_emits_sparse_triangle_attention_bias():
+    class TriangleBiasConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_triangle_attention_bias_scale = 0.25
+
+    torch.manual_seed(61)
+    adapter = SimplicialAdapter(TriangleBiasConfig()).eval()
+    pair = torch.randn(1, 6, 6, TriangleBiasConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 6, TriangleBiasConfig.c_s)
+
+    with torch.no_grad():
+        _, _, aux = adapter(pair, single)
+
+    assert aux["simplex_triangle_attention_indices"].shape[-1] == 3
+    assert aux["simplex_triangle_attention_mask"].shape == aux["simplex_triangle_attention_indices"].shape[:-1]
+    assert aux["simplex_triangle_attention_start_bias"].shape[-1] == TriangleBiasConfig.triangle_num_heads
+    assert aux["simplex_triangle_attention_end_bias"].shape == aux["simplex_triangle_attention_start_bias"].shape
+
+
+def test_triangle_attention_uses_sparse_simplex_bias():
+    torch.manual_seed(67)
+    start_attention = TriangleAttentionStartingNode(SimplexConfig()).eval()
+    end_attention = TriangleAttentionEndingNode(SimplexConfig()).eval()
+    with torch.no_grad():
+        start_attention.linear_output.weight.normal_(mean=0.0, std=0.1)
+        end_attention.linear_output.weight.normal_(mean=0.0, std=0.1)
+
+    pair = torch.randn(1, 5, 5, SimplexConfig.c_z)
+    pair_mask = torch.ones(1, 5, 5)
+    triangle_indices = torch.tensor([[[0, 1, 2]]])
+    triangle_mask = torch.ones(1, 1)
+    start_bias = torch.tensor([[[0.75, -0.25]]], dtype=pair.dtype)
+    end_bias = torch.tensor([[[-0.5, 0.5]]], dtype=pair.dtype)
+
+    with torch.no_grad():
+        start_off = start_attention(pair, pair_mask=pair_mask)
+        start_on = start_attention(
+            pair,
+            pair_mask=pair_mask,
+            simplex_triangle_indices=triangle_indices,
+            simplex_triangle_attention_bias=start_bias,
+            simplex_triangle_attention_mask=triangle_mask,
+        )
+        end_off = end_attention(pair, pair_mask=pair_mask)
+        end_on = end_attention(
+            pair,
+            pair_mask=pair_mask,
+            simplex_triangle_indices=triangle_indices,
+            simplex_triangle_attention_bias=end_bias,
+            simplex_triangle_attention_mask=triangle_mask,
+        )
+
+    assert not torch.allclose(start_off, start_on)
+    assert not torch.allclose(end_off, end_on)
 
 
 def test_face_tetra_coboundary_delta_uses_sibling_faces_in_selected_tetras():

@@ -28,6 +28,7 @@ def _uses_pre_triangle_simplex_update(
     *,
     simplex_pre_triangle_update_scale_override: torch.Tensor | None,
     simplex_pre_triangle_single_update_scale_override: torch.Tensor | None,
+    simplex_triangle_attention_bias_scale_override: torch.Tensor | None,
 ) -> bool:
     pair_scale = max(float(getattr(block, "simplex_pre_triangle_update_scale", 0.0)), 0.0)
     pair_override = _scalar_override_to_float(simplex_pre_triangle_update_scale_override)
@@ -40,7 +41,12 @@ def _uses_pre_triangle_simplex_update(
     if single_override is not None:
         single_scale = max(single_override, 0.0)
 
-    return pair_scale > 0.0 or single_scale > 0.0
+    triangle_bias_scale = max(float(getattr(block, "simplex_triangle_attention_bias_scale", 0.0)), 0.0)
+    triangle_bias_override = _scalar_override_to_float(simplex_triangle_attention_bias_scale_override)
+    if triangle_bias_override is not None:
+        triangle_bias_scale = max(triangle_bias_override, 0.0)
+
+    return pair_scale > 0.0 or single_scale > 0.0 or triangle_bias_scale > 0.0
 
 
 class AlphaFold2(torch.nn.Module):
@@ -265,6 +271,7 @@ class AlphaFold2(torch.nn.Module):
             simplex_boundary_pair_feedback_scale_override: torch.Tensor | None = None,
             simplex_boundary_pair_gate_scale_override: torch.Tensor | None = None,
             simplex_boundary_metric_gate_scale_override: torch.Tensor | None = None,
+            simplex_triangle_attention_bias_scale_override: torch.Tensor | None = None,
             simplex_boundary_metric_recycling_scale_override: torch.Tensor | None = None,
             simplex_boundary_cochain_recycling_scale_override: torch.Tensor | None = None,
             simplex_local_neighbor_k_override: torch.Tensor | None = None,
@@ -454,6 +461,9 @@ class AlphaFold2(torch.nn.Module):
                                 simplex_pre_triangle_single_update_scale_override=(
                                     simplex_pre_triangle_single_update_scale_override
                                 ),
+                                simplex_triangle_attention_bias_scale_override=(
+                                    simplex_triangle_attention_bias_scale_override
+                                ),
                             )
                             if use_checkpoint:
                                 # Non-reentrant checkpointing supports kwargs
@@ -519,6 +529,9 @@ class AlphaFold2(torch.nn.Module):
                                         simplex_boundary_metric_gate_scale_override=(
                                             simplex_boundary_metric_gate_scale_override
                                         ),
+                                        simplex_triangle_attention_bias_scale_override=(
+                                            simplex_triangle_attention_bias_scale_override
+                                        ),
                                         simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
                                         simplex_geometry_distance_weight_override=(
                                             simplex_geometry_distance_weight_override
@@ -583,6 +596,9 @@ class AlphaFold2(torch.nn.Module):
                                     ),
                                     simplex_boundary_metric_gate_scale_override=(
                                         simplex_boundary_metric_gate_scale_override
+                                    ),
+                                    simplex_triangle_attention_bias_scale_override=(
+                                        simplex_triangle_attention_bias_scale_override
                                     ),
                                     simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
                                     simplex_geometry_distance_weight_override=(

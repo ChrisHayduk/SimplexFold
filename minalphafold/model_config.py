@@ -161,6 +161,7 @@ class ModelConfig:
     simplex_edge_star_context_scale: float = 0.0
     simplex_pre_triangle_update_scale: float = 0.0
     simplex_pre_triangle_single_update_scale: float = -1.0
+    simplex_triangle_attention_bias_scale: float = 0.0
     simplex_segment_cell_scale: float = 0.0
     simplex_segment_radius: int = 4
     simplex_c_segment: int = 12

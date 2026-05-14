@@ -1,6 +1,33 @@
 ## Current Plan: Pivot Beyond Boundary-Edge-Frame Gate
 
-E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
+Current status after E125: the best returned validation C-alpha lDDT remains
+E124 at `0.4280` at step 8000, with E125 slightly lower at `0.4275`. The
+boundary-edge-frame schedule family improved local selected-complex geometry
+but did not translate into better global C-alpha assembly, so it should not
+receive a 30,000-step spend.
+
+The next concrete mechanism is E126 sparse simplex triangle-attention bias.
+It is a default-off architecture hook, not a loss change: selected face
+cochains `F_ijk` and tetra boundary-face cochains derived from `U_ijkl`
+produce sparse per-head biases for AF2 triangle-attention logits on the
+triples they explicitly represent. This tests the README thesis more directly
+than another pair readout, because persistent filled triangle/tetra states
+now steer the trunk's triangle consistency operation itself:
+
+```text
+selected F_ijk / boundary faces of U_ijkl
+        -> sparse triangle-attention logit bias on ordered triples (i, j, k)
+        -> AF2 triangle attention propagates the cochain signal through Z_ij
+        -> structure module reads globally updated pair geometry
+```
+
+Use E126 as a short Runpod gate from the retained E120 checkpoint to step
+8000 before any 30,000-step decision. The acceptance bar remains high: it
+should break out of the low-0.4 band, ideally clearing `0.45` while improving
+or at least not materially worsening FoldScore/dRMSD. A tiny E124-style
+primary-lDDT gain is not enough.
+
+Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
 E118 residue vertex-star route with a half-strength boundary-edge-star
 correction. Remote and local coherence passed: `completed_steps=7500`, 1000

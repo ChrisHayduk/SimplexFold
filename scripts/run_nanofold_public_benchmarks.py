@@ -1001,6 +1001,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_edge_star_context_scale", args.simplex_edge_star_context_scale),
         ("simplex_pre_triangle_update_scale", args.simplex_pre_triangle_update_scale),
         ("simplex_pre_triangle_single_update_scale", args.simplex_pre_triangle_single_update_scale),
+        ("simplex_triangle_attention_bias_scale", args.simplex_triangle_attention_bias_scale),
         ("simplex_geometry_distance_weight", args.simplex_geometry_distance_weight),
         ("simplex_segment_cell_scale", args.simplex_segment_cell_scale),
         ("simplex_segment_radius", args.simplex_segment_radius),
@@ -2023,6 +2024,11 @@ def _train_variant(
             if use_simplicial
             else 0.0
         ),
+        "simplex_triangle_attention_bias_scale": (
+            float(getattr(model_config, "simplex_triangle_attention_bias_scale", 0.0))
+            if use_simplicial
+            else 0.0
+        ),
         "simplex_segment_cell_scale": (
             float(getattr(model_config, "simplex_segment_cell_scale", 0.0)) if use_simplicial else 0.0
         ),
@@ -2242,6 +2248,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_outer_edge_context_scale",
         "simplex_hodge_face_update_scale",
         "simplex_edge_frame_message_scale",
+        "simplex_triangle_attention_bias_scale",
         "simplex_boundary_message_degree_attenuation",
         "simplex_boundary_incidence_normalization",
         "simplex_boundary_readout_directionality",
@@ -2801,6 +2808,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "Override the pre-triangle simplex single-update scale; negative "
             "inherits --simplex-pre-triangle-update-scale."
         ),
+    )
+    parser.add_argument(
+        "--simplex-triangle-attention-bias-scale",
+        type=float,
+        default=None,
+        help="Bias AF2 triangle attention logits with sparse selected face/tetra cochains.",
     )
     parser.add_argument("--simplex-vertex-star-context-runtime-scale", type=float, default=None)
     parser.add_argument("--simplex-vertex-star-context-runtime-scale-final", type=float, default=None)
@@ -3465,6 +3478,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_edge_star_context_scale": args.simplex_edge_star_context_scale,
         "simplex_pre_triangle_update_scale": args.simplex_pre_triangle_update_scale,
         "simplex_pre_triangle_single_update_scale": args.simplex_pre_triangle_single_update_scale,
+        "simplex_triangle_attention_bias_scale": args.simplex_triangle_attention_bias_scale,
         "simplex_segment_cell_scale": args.simplex_segment_cell_scale,
         "simplex_segment_radius": args.simplex_segment_radius,
         "simplex_c_segment": args.simplex_c_segment,

@@ -5980,3 +5980,21 @@
   pod `o1dy17ouv8w5mz` was stopped. A final idle check found no active
   benchmark process and confirmed the required E125 artifact files were still
   present on the pod before stopping. No follow-up run is active.
+- 2026-05-14T18:01Z implemented E126 as a default-off sparse simplex
+  triangle-attention bias. This is an architecture change, not a new output
+  loss: selected face cochains and tetra boundary-face cochains now emit
+  sparse per-head logits for AF2 triangle attention on represented triples,
+  so persistent higher-order cells can steer triangle consistency directly.
+  The projections are zero-initialized for checkpoint compatibility and add
+  only `1,216` parameters to the E120 selected-complex profile
+  (`3,203,186 <= 3,261,974`). Local validation passed:
+  `python -m py_compile minalphafold/embedders.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+  and
+  `python -m pytest tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_bias tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_bias tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_triangle_attention_bias_stays_inside_medium_budget tests/test_trainer.py::test_triangle_attention_bias_runs_evoformer_block_eagerly tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  with `6 passed`; the broader
+  `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  slice passed with `211 passed`; Ruff undefined-name checks passed; and
+  `git diff --check` passed. Queue E126 as
+  `e126_triangle_attention_bias_from_e120_s8000_c256_m64` from the E120
+  checkpoint, not as a blind continuation; reject it unless it clears the
+  low-0.4 band and preferably the `0.45` short-gate threshold.

@@ -865,6 +865,41 @@ class TriangleMultiplicationIncoming(torch.nn.Module):
 
         return out
 
+def _add_sparse_triangle_attention_bias(
+    scores: torch.Tensor,
+    *,
+    triangle_indices: Optional[torch.Tensor],
+    triangle_bias: Optional[torch.Tensor],
+    triangle_mask: Optional[torch.Tensor],
+) -> torch.Tensor:
+    """Accumulate sparse filled-triangle cochain logits into triangle attention."""
+
+    if triangle_indices is None or triangle_bias is None or triangle_mask is None:
+        return scores
+    if triangle_indices.numel() == 0 or triangle_bias.numel() == 0:
+        return scores
+
+    batch_size = scores.shape[0]
+    batch_index = torch.arange(batch_size, device=scores.device)
+    batch_index = batch_index.reshape(batch_size, *([1] * (triangle_mask.ndim - 1)))
+    batch_index = batch_index.expand_as(triangle_mask).reshape(-1)
+    i, j, k = (part.reshape(-1) for part in triangle_indices.unbind(dim=-1))
+    values = triangle_bias.to(dtype=scores.dtype) * triangle_mask[..., None].to(dtype=scores.dtype)
+    values = values.reshape(-1, values.shape[-1])
+
+    valid = triangle_mask.reshape(-1) > 0
+    if int(valid.sum().item()) == 0:
+        return scores
+    batch_index = batch_index[valid]
+    i = i[valid]
+    j = j[valid]
+    k = k[valid]
+    values = values[valid]
+
+    for a, b, c in ((i, j, k), (i, k, j), (j, i, k), (j, k, i), (k, i, j), (k, j, i)):
+        scores.index_put_((batch_index, a, b, c), values, accumulate=True)
+    return scores
+
 class TriangleAttentionStartingNode(torch.nn.Module):
     """Triangle self-attention around the starting node (Algorithm 13).
 
@@ -900,7 +935,15 @@ class TriangleAttentionStartingNode(torch.nn.Module):
         init_gate_linear(self.linear_gate)
         init_linear(self.linear_output, init="final")
 
-    def forward(self, pair_representation: torch.Tensor, pair_mask: Optional[torch.Tensor] = None):
+    def forward(
+        self,
+        pair_representation: torch.Tensor,
+        pair_mask: Optional[torch.Tensor] = None,
+        *,
+        simplex_triangle_indices: Optional[torch.Tensor] = None,
+        simplex_triangle_attention_bias: Optional[torch.Tensor] = None,
+        simplex_triangle_attention_mask: Optional[torch.Tensor] = None,
+    ):
         pair_representation = self.layer_norm(pair_representation)
 
         # Shape (batch, N_res, N_res, self.total_dim)
@@ -928,6 +971,12 @@ class TriangleAttentionStartingNode(torch.nn.Module):
         # Output shape (batch, N_res_i, N_res_j, N_res_k, self.num_heads)
         scores = torch.einsum('bijhd, bikhd -> bijkh', Q, K)
         scores = scores / math.sqrt(self.head_dim) + B.unsqueeze(1)
+        scores = _add_sparse_triangle_attention_bias(
+            scores,
+            triangle_indices=simplex_triangle_indices,
+            triangle_bias=simplex_triangle_attention_bias,
+            triangle_mask=simplex_triangle_attention_mask,
+        )
 
         # Apply pair mask to key positions (k dimension, for a given i)
         if pair_mask is not None:
@@ -987,7 +1036,15 @@ class TriangleAttentionEndingNode(torch.nn.Module):
         init_gate_linear(self.linear_gate)
         init_linear(self.linear_output, init="final")
 
-    def forward(self, pair_representation: torch.Tensor, pair_mask: Optional[torch.Tensor] = None):
+    def forward(
+        self,
+        pair_representation: torch.Tensor,
+        pair_mask: Optional[torch.Tensor] = None,
+        *,
+        simplex_triangle_indices: Optional[torch.Tensor] = None,
+        simplex_triangle_attention_bias: Optional[torch.Tensor] = None,
+        simplex_triangle_attention_mask: Optional[torch.Tensor] = None,
+    ):
         pair_representation = self.layer_norm(pair_representation)
 
         # Shape (batch, N_res, N_res, self.total_dim)
@@ -1026,6 +1083,12 @@ class TriangleAttentionEndingNode(torch.nn.Module):
         # Inserting a new j-axis with unsqueeze(2) broadcasts that bias to every
         # (i, j, k, h) score.
         scores = scores / math.sqrt(self.head_dim) + B.transpose(1, 2).unsqueeze(2)
+        scores = _add_sparse_triangle_attention_bias(
+            scores,
+            triangle_indices=simplex_triangle_indices,
+            triangle_bias=simplex_triangle_attention_bias,
+            triangle_mask=simplex_triangle_attention_mask,
+        )
 
         # Apply pair mask to key positions: an attention score at (b, i, j, k, h)
         # should be masked when the *key* pair z_{k,j} is padding, i.e. when

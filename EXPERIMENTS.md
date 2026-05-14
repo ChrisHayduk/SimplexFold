@@ -5367,3 +5367,53 @@ Validation so far:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py::test_boundary_edge_frame_gate_runtime_scale_gates_pair_readout tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_edge_frame_gate_stays_inside_medium_budget tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `6 passed`
+
+### E126: Sparse Simplex Triangle-Attention Bias
+
+Status: implemented locally and queued for a short Runpod gate.
+
+Hypothesis: the selected face/tetra complex is learning useful local boundary
+geometry, but pair readouts and MSA feedback have not forced that signal into
+global pair-trunk assembly. E126 lets persistent learned face states and
+tetra-derived boundary-face states bias AF2 triangle-attention logits on the
+ordered triples they explicitly represent. This keeps the change inside the
+simplicial/topological view: a filled 2-simplex or the boundary face of a
+3-simplex now influences the trunk operation that reasons over residue
+triangles, rather than adding an output-side lDDT objective.
+
+Mechanism: `simplex_triangle_attention_bias_scale` allocates zero-initialized
+face/tetra-to-head projections inside each SimplicialAdapter. During the
+pre-triangle simplex pass, the adapter emits sparse
+`simplex_triangle_attention_*` cochains for selected faces and tetra boundary
+faces. `TriangleAttentionStartingNode` and `TriangleAttentionEndingNode`
+scatter-add those sparse biases into their attention logits for all ordered
+orientations of the represented triangle. The hook is default-off, keeps old
+configs/checkpoints unchanged, and adds only `1,216` parameters to the E120
+selected-complex profile (`3,203,186 <= 3,261,974`).
+
+Candidate launch: run as
+`e126_triangle_attention_bias_from_e120_s8000_c256_m64`, resuming the E120
+step-7500 checkpoint with fresh optimizer and matching tensors loaded
+weights-only. Keep the E120 selected-complex recipe fixed:
+`simplex_global_context_scale=0.10`, vertex-star context `1.0`, edge-star
+context `1.0` with runtime scale `0.5`, sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported selection, incidence normalization
+`1.0`, directed boundary readout `0.25`, and edge-frame message scale
+`0.0125`. Add only:
+
+```bash
+--simplex-triangle-attention-bias-scale 0.05
+```
+
+Decision rule: reject as a 30k candidate if it remains below the `0.45` short
+gate or worsens FoldScore/dRMSD in the same pattern as E124/E125. Consider a
+longer confirmation only if it shows a qualitative local-to-global assembly
+gain.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/embedders.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_bias tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_bias tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_triangle_attention_bias_stays_inside_medium_budget tests/test_trainer.py::test_triangle_attention_bias_runs_evoformer_block_eagerly tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `6 passed`
+- `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `211 passed`
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/embedders.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `git diff --check`: passed
