@@ -6275,3 +6275,21 @@
   `python -m pytest tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_value tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_value tests/test_trainer.py::test_simplicial_triangle_attention_value_stays_inside_medium_budget tests/test_trainer.py::test_triangle_attention_value_runs_evoformer_block_eagerly tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`.
   Reject unless it beats E128 primary C-alpha lDDT and moves toward the `0.45`
   short-gate threshold.
+- 2026-05-14T23:55Z launched E129 on the owned Runpod pod
+  `o1dy17ouv8w5mz` only, after restart on SSH `root@103.207.149.82:16326`.
+  The remote SimplexFold checkout is commit `c825faf`, and the remote
+  nanoFold checkout is commit `96afc84`. Public data staging audit passed
+  after removing macOS AppleDouble sidecars from the transfer archive:
+  `processed_features=11000`, `processed_labels=11000`, train/val/all rows
+  `10000/1000/11000`, data/artifact hidden/private/salt path count `0`,
+  FoldScore import ok, H100 `NVIDIA H100 80GB HBM3`, and launch-style E129
+  parameter count `3,252,898 <= 3,261,974`. Run
+  `e129_triangle_value_from_e128_s9000_c256_m64` started with PID `1033`, log
+  `logs/e129_triangle_value_from_e128.log`, and artifact directory
+  `artifacts/nanofold_public_benchmarks/e129_triangle_value_from_e128_s9000_c256_m64`.
+  Startup confirmed resume from the E128 checkpoint at step 8500/examples
+  68000, `1332` matching tensors loaded, `16` new/missing value-residual
+  tensors initialized, and a fresh optimizer. Initial health at 23:55Z: PID
+  `1033`, elapsed `00:19`, process CPU `774%`, RSS about `2.0 GiB`, H100
+  memory `18665 MiB`, two startup files, and history ending at inherited step
+  8500.
