@@ -5852,3 +5852,9 @@
   boundary readout directionality/runtime `0.25`, edge-frame message runtime
   `0.0125`, global context `0.1`, vertex-star context `1.0`, edge-star
   context `0.5`, and sparse caps `24 / 48`.
+- 2026-05-14T14:27Z E124 health check: PID `33724` is still active on the
+  owned pod with the intended command. The artifact directory exists and
+  contains `run_metadata.json` plus `history_full_msa_to_face.json`, but
+  `results.json` has not been written yet. The history is still at inherited
+  pre-step-8000 validation rows, so there is no returned E124 metric to record
+  in `EXPERIMENT_RESULTS.md`.
