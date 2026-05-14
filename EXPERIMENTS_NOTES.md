@@ -6178,3 +6178,11 @@
   `history_full_msa_to_face.json`; history still ended at inherited step 8000,
   and the log remained at startup. Interpretation: active short-gate training
   before the step-8500 validation/writeout, not a completed result.
+- 2026-05-14T21:35Z E128 remained active on the owned pod. PID `1523` had
+  about `06:47` elapsed time, process CPU stayed around `770%`-`774%`, RSS was
+  about `2.0 GiB`, and the process still had `178` threads. H100 memory was
+  still allocated at `38489 MiB`, with sampled GPU utilization ranging from
+  `48%` to `100%`. The artifact directory still had only the two startup files,
+  the log was unchanged after startup, and history still ended at inherited
+  step 8000. Leave the job running; do not pull, stop, or launch another run
+  until E128 writes a coherent step-8500 bundle or exits.
