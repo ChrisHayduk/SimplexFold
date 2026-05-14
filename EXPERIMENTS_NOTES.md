@@ -5942,3 +5942,11 @@
   remains at the inherited E120 step-7500 state. Continue monitoring under
   the E125 heartbeat; do not update `EXPERIMENT_RESULTS.md`, stop the pod, or
   launch another follow-up while E125 is still alive.
+- 2026-05-14T17:02Z E125 remains active after another 25-minute monitor
+  window. PID `46151` stayed alive across six checks, H100 memory remained
+  allocated at `13673 MiB`, and sampled GPU utilization ranged from `0%` to
+  `46%`. The final result bundle remains absent (`results.json`,
+  `results.csv`, eval details, and checkpoint all missing), while history is
+  still the inherited E120 step-7500 row. Treat this as a slow active run;
+  continue monitoring and do not stop the pod or launch any follow-up while
+  E125 is still alive.
