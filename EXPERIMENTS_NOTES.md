@@ -5231,3 +5231,8 @@
   returns. The heartbeat should launch E118 only if E117 remains stable near
   or above the E96/E116 lDDT band; if E117 collapses, it should not launch a
   follow-up.
+- E117 health poll after about 19 minutes: PID `13554` remained active on the
+  owned pod with state `Rl`, about `1014%` CPU, 178 threads, and sampled GPU
+  utilization `53%` with `13593 MiB` allocated. No `results.json`,
+  `results.csv`, eval-detail file, or new checkpoint yet; this matches the
+  long compute-only phase seen in E116. Keep waiting and do not launch E118.
