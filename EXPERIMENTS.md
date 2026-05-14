@@ -5471,3 +5471,50 @@ Validation so far:
 
 - `python -m py_compile minalphafold/embedders.py minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_bias tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_value tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_bias tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_value tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_triangle_attention_bias_stays_inside_medium_budget tests/test_trainer.py::test_simplicial_triangle_attention_value_stays_inside_medium_budget tests/test_trainer.py::test_triangle_attention_bias_runs_evoformer_block_eagerly tests/test_trainer.py::test_triangle_attention_value_runs_evoformer_block_eagerly tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `10 passed`
+
+### E128: Damped Triangle-Attention Bias on E124 Boundary Geometry
+
+Status: prepared as the next short Runpod gate.
+
+Hypothesis: E124 is the current primary-lDDT leader because oriented
+face-boundary-edge-frame communication improves selected boundary geometry,
+but it worsens FoldScore/dRMSD. E126 improves FoldScore/dRMSD slightly but
+lowers primary lDDT, likely because triangle-attention logit bias at `0.05`
+is too strong when used without E124's stronger oriented boundary realization
+route. E128 tests the combined simplicial route rather than a new loss:
+
+```text
+selected F_ijk -> oriented boundary 1-simplex gate -> Z_ij
+selected F_ijk / boundary faces of U_ijkl -> weak triangle-attention bias
+AF2 triangle reasoning -> structure module
+```
+
+Mechanism: resume from the E124 step-8000 checkpoint, keep the E124 selected
+face boundary-edge-frame gate at `0.05`, and add only a damped
+`simplex_triangle_attention_bias_scale=0.0125`. This keeps the change inside
+the topological view: selected face/tetra cochains influence the pair
+1-skeleton both through their oriented boundaries and through the represented
+triangles used by AF2's triangle attention.
+
+Candidate launch:
+
+```bash
+--run-name e128_damped_triangle_bias_from_e124_s8500_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e124_face_edge_frame_gate_from_e120_s8000_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 8500 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125
+```
+
+Keep the E124/E126 shared selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, directed boundary readout `0.25`, edge-frame message
+runtime scale `0.0125`, global context `0.1`, vertex-star context `1.0`, and
+edge-star runtime `0.5`.
+
+Parameter audit: `3,240,738 <= 3,261,974`.
+
+Decision rule: reject unless E128 beats E124's `0.4280` primary C-alpha lDDT
+and keeps FoldScore/dRMSD coherent. It still needs to clear `0.45` before any
+longer-run consideration.

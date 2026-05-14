@@ -6139,3 +6139,13 @@
   Runpod pod `o1dy17ouv8w5mz` was stopped. The E126 heartbeat automation
   `check-simplexfold-e57-runpod` was paused. No follow-up Runpod experiment is
   active.
+- 2026-05-14T21:00Z prepared E128 as the next topology-native short gate.
+  Rationale: E124 is still the primary-lDDT leader via oriented selected face
+  boundary-edge-frame transport, while E126 improved FoldScore/dRMSD but
+  reduced primary lDDT. E128 resumes the E124 checkpoint and adds a much
+  weaker sparse simplex triangle-attention bias (`0.0125`) so selected
+  face/tetra cochains can weakly influence represented residue triples without
+  overwhelming E124's boundary-realization signal. Local checkpoint
+  availability for E124 was confirmed, and the combined profile audits at
+  `3,240,738 <= 3,261,974` parameters. Reject unless it beats E124 primary
+  C-alpha lDDT and moves toward the `0.45` short-gate threshold.

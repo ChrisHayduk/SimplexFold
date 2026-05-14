@@ -32,6 +32,20 @@ parked for now. E126 did not improve primary C-alpha lDDT, so the value-side
 path is not justified as an automatic follow-up spend unless we explicitly
 decide to reopen the triangle-attention route for diagnostic reasons.
 
+The next short gate is E128: resume the E124 checkpoint and add only a damped
+triangle-attention logit bias at `0.0125`. This is not a new loss and not a
+generic lDDT hack. It combines E124's best observed primary-lDDT mechanism,
+where selected face cochains communicate through oriented boundary
+1-simplices, with a much weaker version of E126's topology-native route into
+AF2 triangle attention. The goal is narrow: see whether the triangle-attention
+path can recover E126's small FoldScore/dRMSD benefit without erasing E124's
+primary C-alpha lDDT advantage. The audited profile has `3,240,738`
+parameters, still below the `3,261,974` AF2-medium +5% cap.
+
+Reject E128 unless it beats E124's `0.4280` primary C-alpha lDDT and stays
+coherent on FoldScore/dRMSD. It still needs to clear `0.45` before becoming a
+credible longer-run candidate.
+
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
 E118 residue vertex-star route with a half-strength boundary-edge-star
