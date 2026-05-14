@@ -5975,3 +5975,8 @@
   but reduced primary C-alpha lDDT, dRMSD, selected-boundary lDDT, and
   contraction. Do not continue the plain boundary-edge-frame schedule family
   without a new topology mechanism.
+- 2026-05-14T17:47Z after E125 remote coherence, local artifact pull, and
+  local verifier passed, the E125 heartbeat was paused and the owned Runpod
+  pod `o1dy17ouv8w5mz` was stopped. A final idle check found no active
+  benchmark process and confirmed the required E125 artifact files were still
+  present on the pod before stopping. No follow-up run is active.
