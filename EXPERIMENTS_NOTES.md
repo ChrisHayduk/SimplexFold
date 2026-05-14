@@ -5752,3 +5752,11 @@
   passed; and the verifier accepted the known-good E120 artifact directory
   with `completed_steps=7500`, effective batch size `8`, `1000` eval-detail
   rows, `3,201,970` parameters under cap, and history ending at step `7500`.
+- 2026-05-14T10:54Z E121b health poll: PID `1845` is still alive on the owned
+  Runpod pod after about `54:37` elapsed. `results.json` is absent, artifacts
+  remain limited to `run_metadata.json` and `history_full_msa_to_face.json`,
+  and history still ends at the inherited E120 step-7500 row
+  (`val_lddt_ca=0.4248279729783535`, FoldScore `0.3983173668086529`,
+  `val_ca_drmsd=11.145049806624652`). GPU utilization was active at `35%`
+  with `42,875 / 81,559` MiB allocated. Leave E121b running; do not launch
+  E123/E124 until the step-8000 result is coherently returned.
