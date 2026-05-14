@@ -6259,3 +6259,7 @@
   the new primary-lDDT and FoldScore leader, but reject as a 30k candidate
   because it remains below the `0.45` short-gate threshold and far below the
   `0.7` target.
+- After local verification and documentation were committed/pushed, the owned
+  Runpod pod `o1dy17ouv8w5mz` was stopped. The E128 heartbeat automation
+  `check-simplexfold-e57-runpod` was paused. No follow-up Runpod experiment is
+  active.
