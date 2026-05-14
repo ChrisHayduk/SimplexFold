@@ -6135,3 +6135,7 @@
   geometry versus E124, and stayed below the `0.45` short-gate threshold.
   Keep E127 parked; do not launch it automatically from this weak
   primary-lDDT signal.
+- After local verification and documentation were committed/pushed, the owned
+  Runpod pod `o1dy17ouv8w5mz` was stopped. The E126 heartbeat automation
+  `check-simplexfold-e57-runpod` was paused. No follow-up Runpod experiment is
+  active.
