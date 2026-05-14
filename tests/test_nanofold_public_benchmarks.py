@@ -20,6 +20,8 @@ from minalphafold.trainer import (
     simplex_msa_feedback_runtime_scale_at_step,
     simplex_outer_edge_context_runtime_scale_at_step,
     simplex_pair_update_runtime_scale_at_step,
+    simplex_pre_triangle_single_update_runtime_scale_at_step,
+    simplex_pre_triangle_update_runtime_scale_at_step,
     simplex_segment_cell_runtime_scale_at_step,
     simplex_single_update_runtime_scale_at_step,
     simplex_tetra_top_k_at_step,
@@ -475,6 +477,22 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.25",
             "--simplex-pre-triangle-single-update-scale",
             "0.0",
+            "--simplex-pre-triangle-update-runtime-scale",
+            "0.0",
+            "--simplex-pre-triangle-update-runtime-scale-final",
+            "0.25",
+            "--simplex-pre-triangle-update-runtime-scale-ramp-start-step",
+            "3000",
+            "--simplex-pre-triangle-update-runtime-scale-ramp-steps",
+            "500",
+            "--simplex-pre-triangle-single-update-runtime-scale",
+            "0.0",
+            "--simplex-pre-triangle-single-update-runtime-scale-final",
+            "0.0",
+            "--simplex-pre-triangle-single-update-runtime-scale-ramp-start-step",
+            "3000",
+            "--simplex-pre-triangle-single-update-runtime-scale-ramp-steps",
+            "500",
             "--simplex-vertex-star-context-runtime-scale",
             "0.0",
             "--simplex-vertex-star-context-runtime-scale-final",
@@ -608,6 +626,14 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_edge_star_context_scale == 0.5
     assert args.simplex_pre_triangle_update_scale == 0.25
     assert args.simplex_pre_triangle_single_update_scale == 0.0
+    assert args.simplex_pre_triangle_update_runtime_scale == 0.0
+    assert args.simplex_pre_triangle_update_runtime_scale_final == 0.25
+    assert args.simplex_pre_triangle_update_runtime_scale_ramp_start_step == 3000
+    assert args.simplex_pre_triangle_update_runtime_scale_ramp_steps == 500
+    assert args.simplex_pre_triangle_single_update_runtime_scale == 0.0
+    assert args.simplex_pre_triangle_single_update_runtime_scale_final == 0.0
+    assert args.simplex_pre_triangle_single_update_runtime_scale_ramp_start_step == 3000
+    assert args.simplex_pre_triangle_single_update_runtime_scale_ramp_steps == 500
     assert args.simplex_vertex_star_context_runtime_scale == 0.0
     assert args.simplex_vertex_star_context_runtime_scale_final == 1.0
     assert args.simplex_vertex_star_context_runtime_scale_ramp_start_step == 3000
@@ -693,6 +719,14 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         simplex_edge_star_context_runtime_scale_final=0.0,
         simplex_edge_star_context_runtime_scale_ramp_start_step=3000,
         simplex_edge_star_context_runtime_scale_ramp_steps=500,
+        simplex_pre_triangle_update_runtime_scale=0.0,
+        simplex_pre_triangle_update_runtime_scale_final=0.25,
+        simplex_pre_triangle_update_runtime_scale_ramp_start_step=3000,
+        simplex_pre_triangle_update_runtime_scale_ramp_steps=500,
+        simplex_pre_triangle_single_update_runtime_scale=0.0,
+        simplex_pre_triangle_single_update_runtime_scale_final=0.0,
+        simplex_pre_triangle_single_update_runtime_scale_ramp_start_step=3000,
+        simplex_pre_triangle_single_update_runtime_scale_ramp_steps=500,
         simplex_hodge_face_runtime_scale=0.0,
         simplex_hodge_face_runtime_scale_final=0.05,
         simplex_hodge_face_runtime_scale_ramp_start_step=3000,
@@ -778,6 +812,12 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert simplex_edge_star_context_runtime_scale_at_step(cfg, 3000) == 1.0
     assert simplex_edge_star_context_runtime_scale_at_step(cfg, 3250) == 0.5
     assert simplex_edge_star_context_runtime_scale_at_step(cfg, 3500) == 0.0
+    assert simplex_pre_triangle_update_runtime_scale_at_step(cfg, 3000) == 0.0
+    assert simplex_pre_triangle_update_runtime_scale_at_step(cfg, 3250) == 0.125
+    assert simplex_pre_triangle_update_runtime_scale_at_step(cfg, 3500) == 0.25
+    assert simplex_pre_triangle_single_update_runtime_scale_at_step(cfg, 3000) == 0.0
+    assert simplex_pre_triangle_single_update_runtime_scale_at_step(cfg, 3250) == 0.0
+    assert simplex_pre_triangle_single_update_runtime_scale_at_step(cfg, 3500) == 0.0
     assert simplex_hodge_face_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_hodge_face_runtime_scale_at_step(cfg, 3250) == 0.025
     assert simplex_hodge_face_runtime_scale_at_step(cfg, 3500) == 0.05
@@ -823,6 +863,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         use_simplex_boundary_readout_directionality_runtime_scale=True,
         use_simplex_vertex_star_context_runtime_scale=True,
         use_simplex_edge_star_context_runtime_scale=True,
+        use_simplex_pre_triangle_runtime_scale=True,
         use_simplex_hodge_face_runtime_scale=True,
         use_simplex_segment_cell_runtime_scale=True,
         use_simplex_msa_feedback_runtime_scale=True,
@@ -843,6 +884,8 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert torch.isclose(inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
     assert torch.isclose(inputs["simplex_vertex_star_context_scale_override"], torch.tensor(0.5))
     assert torch.isclose(inputs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
+    assert torch.isclose(inputs["simplex_pre_triangle_update_scale_override"], torch.tensor(0.125))
+    assert torch.isclose(inputs["simplex_pre_triangle_single_update_scale_override"], torch.tensor(0.0))
     assert torch.isclose(inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_segment_cell_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_msa_feedback_scale_override"], torch.tensor(0.025))
@@ -894,6 +937,14 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
         simplex_edge_star_context_runtime_scale_final=0.0,
         simplex_edge_star_context_runtime_scale_ramp_start_step=3000,
         simplex_edge_star_context_runtime_scale_ramp_steps=500,
+        simplex_pre_triangle_update_runtime_scale=0.0,
+        simplex_pre_triangle_update_runtime_scale_final=0.25,
+        simplex_pre_triangle_update_runtime_scale_ramp_start_step=3000,
+        simplex_pre_triangle_update_runtime_scale_ramp_steps=500,
+        simplex_pre_triangle_single_update_runtime_scale=0.0,
+        simplex_pre_triangle_single_update_runtime_scale_final=0.0,
+        simplex_pre_triangle_single_update_runtime_scale_ramp_start_step=3000,
+        simplex_pre_triangle_single_update_runtime_scale_ramp_steps=500,
         simplex_segment_cell_runtime_scale=0.0,
         simplex_segment_cell_runtime_scale_final=0.05,
         simplex_segment_cell_runtime_scale_ramp_start_step=3000,
@@ -988,6 +1039,8 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
     assert torch.isclose(model.kwargs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
     assert torch.isclose(model.kwargs["simplex_vertex_star_context_scale_override"], torch.tensor(0.5))
     assert torch.isclose(model.kwargs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
+    assert torch.isclose(model.kwargs["simplex_pre_triangle_update_scale_override"], torch.tensor(0.125))
+    assert torch.isclose(model.kwargs["simplex_pre_triangle_single_update_scale_override"], torch.tensor(0.0))
     assert torch.isclose(model.kwargs["simplex_segment_cell_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_msa_feedback_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_boundary_pair_feedback_scale_override"], torch.tensor(0.0125))

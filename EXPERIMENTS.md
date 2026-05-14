@@ -5109,3 +5109,40 @@ Mechanism: resume E81's checkpoint from step 8000 to step 8500 with fixed
 Launch: E84 is running as `e84_degree_penalty_from_e81_s8500_c256_m64`. Main
 Python PID is `4828`; a status poll at `2026-05-12T10:43:02Z` showed the
 process alive, GPU active, and no returned `results.json` yet.
+
+### E123: Ramped Pair-Only Pre-Triangle Simplex Injection
+
+Status: implemented locally as a parked fallback while E121 runs.
+
+Hypothesis: E120 shows that explicit face/tetra states have learned coherent
+selected-boundary geometry, but global C-alpha lDDT remains in the low-0.4
+band. E121 tests sending those cochains into the pair tensor before AF2's
+triangle stack with a fixed scale. A ramped pair-only version may be safer for
+a resumed E120 checkpoint: the selected higher-rank boundary signal can enter
+`Z_ij` gradually while leaving the single/residue stream untouched during the
+pre-triangle pass.
+
+Mechanism: add default-off runtime schedules for
+`simplex_pre_triangle_update_scale` and
+`simplex_pre_triangle_single_update_scale`. The model-level static scale still
+defines the default behavior, but the trainer and NanoFold runner can pass
+per-step overrides into each `SimplicialEvoformer` block. A candidate launch
+would resume E120/E121-compatible weights and use, for example,
+`--simplex-pre-triangle-update-runtime-scale 0.0`,
+`--simplex-pre-triangle-update-runtime-scale-final 0.25`, and
+`--simplex-pre-triangle-single-update-runtime-scale 0.0` over a short ramp.
+This adds no parameters and no new loss; it only changes when selected
+face/tetra boundary cochains are allowed to update the pair 1-skeleton before
+triangle reasoning.
+
+Decision rule: launch only after E121 returns. Prefer E123 if E121 underperforms
+E120 or improves selected-boundary diagnostics without a clear primary-lDDT
+gain. Do not spend 30,000 steps unless a short gate leaves the low-0.4 band and
+shows a plausible path toward `0.7` validation C-alpha lDDT.
+
+Validation:
+
+- `python -m py_compile minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_simplex.py::test_pre_triangle_simplex_update_can_run_pair_only tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`

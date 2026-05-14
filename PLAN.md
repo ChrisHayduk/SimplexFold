@@ -2068,3 +2068,20 @@ the selected-boundary lDDT objective from the E63 checkpoint to step 4000
 (`32,000` effective examples at batch 8). This is a necessary stability check
 because E56 showed that continuing E55 without this topology-mediated loss
 regressed C-alpha lDDT despite improving some global geometry metrics.
+
+## 2026-05-14 E123 Ramp Prepared
+
+Current leader E120 improves the selected-complex branch to `val_lddt_ca=0.4248`
+with strong selected face/tetra boundary lDDT, but it is still not a 30k-step
+candidate. E121 is testing an abrupt pre-triangle simplex cochain update from
+the E120 checkpoint on the owned Runpod pod. If that abrupt gate is unstable
+or too strong, the next topology-native fallback is a ramped pair-only
+pre-triangle route.
+
+The E123 plan keeps parameters unchanged and keeps the change inside the
+README motivation: selected face/tetra cochains write back into the pair
+1-skeleton before AlphaFold2 triangle multiplication and attention globalize
+the pair tensor. The runtime ramp lets a resumed checkpoint receive this
+message gradually, so the experiment tests whether explicit higher-rank
+boundary cochains can become useful inputs to triangle reasoning rather than
+acting as an unrelated output loss.

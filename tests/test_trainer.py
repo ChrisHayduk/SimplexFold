@@ -62,6 +62,8 @@ from minalphafold.trainer import (
     simplex_local_neighbor_k_at_step,
     simplex_msa_feedback_runtime_scale_at_step,
     simplex_pair_update_runtime_scale_at_step,
+    simplex_pre_triangle_single_update_runtime_scale_at_step,
+    simplex_pre_triangle_update_runtime_scale_at_step,
     simplex_segment_cell_runtime_scale_at_step,
     simplex_single_update_runtime_scale_at_step,
     simplex_update_scale_at_step,
@@ -101,6 +103,12 @@ def test_simplicial_runtime_overrides_reach_model_path():
         assert parameter in inspect.signature(SimplicialAdapter.forward).parameters
     assert "simplex_boundary_metric_recycling_scale_override" in inspect.signature(AlphaFold2.forward).parameters
     assert "simplex_boundary_cochain_recycling_scale_override" in inspect.signature(AlphaFold2.forward).parameters
+    for parameter in (
+        "simplex_pre_triangle_update_scale_override",
+        "simplex_pre_triangle_single_update_scale_override",
+    ):
+        assert parameter in inspect.signature(AlphaFold2.forward).parameters
+        assert parameter in inspect.signature(SimplicialEvoformer.forward).parameters
 
 
 def test_train_step_updates_model_parameters(tmp_path):
@@ -199,6 +207,14 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_edge_star_context_runtime_scale_final=0.0,
         simplex_edge_star_context_runtime_scale_ramp_start_step=10,
         simplex_edge_star_context_runtime_scale_ramp_steps=10,
+        simplex_pre_triangle_update_runtime_scale=0.0,
+        simplex_pre_triangle_update_runtime_scale_final=0.25,
+        simplex_pre_triangle_update_runtime_scale_ramp_start_step=10,
+        simplex_pre_triangle_update_runtime_scale_ramp_steps=10,
+        simplex_pre_triangle_single_update_runtime_scale=0.0,
+        simplex_pre_triangle_single_update_runtime_scale_final=0.0,
+        simplex_pre_triangle_single_update_runtime_scale_ramp_start_step=10,
+        simplex_pre_triangle_single_update_runtime_scale_ramp_steps=10,
         simplex_segment_cell_runtime_scale=0.0,
         simplex_segment_cell_runtime_scale_final=0.1,
         simplex_segment_cell_runtime_scale_ramp_start_step=10,
@@ -245,6 +261,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, 15) == 0.25
     assert simplex_vertex_star_context_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_edge_star_context_runtime_scale_at_step(training_config, 15) == 0.5
+    assert simplex_pre_triangle_update_runtime_scale_at_step(training_config, 15) == 0.125
+    assert simplex_pre_triangle_single_update_runtime_scale_at_step(training_config, 15) == 0.0
     assert simplex_segment_cell_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_msa_feedback_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_boundary_pair_feedback_runtime_scale_at_step(training_config, 15) == 0.05
@@ -262,6 +280,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert "simplex_boundary_readout_directionality_override" not in eval_inputs
     assert "simplex_vertex_star_context_scale_override" not in eval_inputs
     assert "simplex_edge_star_context_scale_override" not in eval_inputs
+    assert "simplex_pre_triangle_update_scale_override" not in eval_inputs
+    assert "simplex_pre_triangle_single_update_scale_override" not in eval_inputs
     assert "simplex_segment_cell_scale_override" not in eval_inputs
     assert "simplex_msa_feedback_scale_override" not in eval_inputs
     assert "simplex_boundary_pair_feedback_scale_override" not in eval_inputs
@@ -281,6 +301,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
         use_simplex_boundary_readout_directionality_runtime_scale=True,
         use_simplex_vertex_star_context_runtime_scale=True,
         use_simplex_edge_star_context_runtime_scale=True,
+        use_simplex_pre_triangle_runtime_scale=True,
         use_simplex_segment_cell_runtime_scale=True,
         use_simplex_msa_feedback_runtime_scale=True,
         use_simplex_boundary_pair_feedback_runtime_scale=True,
@@ -301,6 +322,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
     assert torch.allclose(train_inputs["simplex_vertex_star_context_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
+    assert torch.allclose(train_inputs["simplex_pre_triangle_update_scale_override"], torch.tensor(0.125))
+    assert torch.allclose(train_inputs["simplex_pre_triangle_single_update_scale_override"], torch.tensor(0.0))
     assert torch.allclose(train_inputs["simplex_segment_cell_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_msa_feedback_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_boundary_pair_feedback_scale_override"], torch.tensor(0.05))
@@ -497,6 +520,22 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "6000",
             "--simplex-edge-star-context-runtime-scale-ramp-steps",
             "500",
+            "--simplex-pre-triangle-update-runtime-scale",
+            "0.0",
+            "--simplex-pre-triangle-update-runtime-scale-final",
+            "0.25",
+            "--simplex-pre-triangle-update-runtime-scale-ramp-start-step",
+            "6000",
+            "--simplex-pre-triangle-update-runtime-scale-ramp-steps",
+            "500",
+            "--simplex-pre-triangle-single-update-runtime-scale",
+            "0.0",
+            "--simplex-pre-triangle-single-update-runtime-scale-final",
+            "0.0",
+            "--simplex-pre-triangle-single-update-runtime-scale-ramp-start-step",
+            "6000",
+            "--simplex-pre-triangle-single-update-runtime-scale-ramp-steps",
+            "500",
         ]
     )
 
@@ -515,6 +554,14 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert args.simplex_edge_star_context_runtime_scale_final == 0.0
     assert args.simplex_edge_star_context_runtime_scale_ramp_start_step == 6000
     assert args.simplex_edge_star_context_runtime_scale_ramp_steps == 500
+    assert args.simplex_pre_triangle_update_runtime_scale == 0.0
+    assert args.simplex_pre_triangle_update_runtime_scale_final == 0.25
+    assert args.simplex_pre_triangle_update_runtime_scale_ramp_start_step == 6000
+    assert args.simplex_pre_triangle_update_runtime_scale_ramp_steps == 500
+    assert args.simplex_pre_triangle_single_update_runtime_scale == 0.0
+    assert args.simplex_pre_triangle_single_update_runtime_scale_final == 0.0
+    assert args.simplex_pre_triangle_single_update_runtime_scale_ramp_start_step == 6000
+    assert args.simplex_pre_triangle_single_update_runtime_scale_ramp_steps == 500
 
 
 def test_load_model_config_raises_for_missing_profile():

@@ -251,6 +251,8 @@ class SimplicialEvoformer(torch.nn.Module):
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
         simplex_vertex_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_star_context_scale_override: Optional[torch.Tensor] = None,
+        simplex_pre_triangle_update_scale_override: Optional[torch.Tensor] = None,
+        simplex_pre_triangle_single_update_scale_override: Optional[torch.Tensor] = None,
         simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
         simplex_msa_feedback_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_pair_feedback_scale_override: Optional[torch.Tensor] = None,
@@ -276,11 +278,21 @@ class SimplicialEvoformer(torch.nn.Module):
 
         pair_representation = pair_representation + self.outer_mean(msa_representation, msa_mask=msa_mask)
         pre_pair_scale_value = max(self.simplex_pre_triangle_update_scale, 0.0)
+        if simplex_pre_triangle_update_scale_override is not None:
+            pre_pair_scale_value = max(
+                float(simplex_pre_triangle_update_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
         pre_single_scale_value = (
             pre_pair_scale_value
             if self.simplex_pre_triangle_single_update_scale < 0.0
             else max(self.simplex_pre_triangle_single_update_scale, 0.0)
         )
+        if simplex_pre_triangle_single_update_scale_override is not None:
+            pre_single_scale_value = max(
+                float(simplex_pre_triangle_single_update_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
         if self.enable_simplex and (pre_pair_scale_value > 0.0 or pre_single_scale_value > 0.0):
             pre_pair_scale = pair_representation.new_tensor(pre_pair_scale_value)
             pre_single_scale = pair_representation.new_tensor(pre_single_scale_value)

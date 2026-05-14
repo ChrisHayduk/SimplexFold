@@ -5633,3 +5633,23 @@
   `python -m py_compile minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
   `python -m pytest tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_simplex.py::test_pre_triangle_simplex_update_can_run_pair_only tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
   reported `5 passed`.
+- 2026-05-14T09:18Z E121 health poll: PID `1051` is still active on owned
+  Runpod pod `o1dy17ouv8w5mz`, no `results.json` yet, and the log still shows
+  the expected post-resume quiet training phase from step 7500. Do not sync
+  new local code into the remote checkout while E121 is running.
+- Prepared E123 locally as a ramped pair-only pre-triangle fallback. The new
+  runtime override fields schedule `simplex_pre_triangle_update_scale` and
+  `simplex_pre_triangle_single_update_scale` through the trainer and NanoFold
+  public benchmark runner, then route those per-step values into
+  `AlphaFold2.forward` and `SimplicialEvoformer.forward`. The intended follow-up
+  is topology-native and zero-parameter: gradually let selected face/tetra
+  boundary cochains update pair `Z_ij` before AF2 triangle operations, while
+  optionally holding the pre-triangle single update at zero. Awaiting tests
+  before commit.
+- E123 local validation passed:
+  `python -m py_compile minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  focused runtime/pre-triangle tests reported `9 passed`;
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `202 passed`;
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  passed. E123 is ready to launch only after E121 returns.
