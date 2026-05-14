@@ -314,3 +314,38 @@ Experiment implications for the active SimplexFold queue:
 - Do not add dense C-alpha lDDT, radius-of-gyration, or all-pairs distance
   losses as independent score hacks. A loss is justified only when it
   supervises realization of the model-selected sparse complex.
+
+## 2026-05-14 Full Reread for E121/E123
+
+I re-extracted and reread both saved repo copies end to end while E121 was
+running:
+
+- `hands_on_geometric_deep_learning_nodes_to_complexes.pdf`: 28 pages,
+  836 extracted lines.
+- `2509.03885v1.pdf`: 22 pages, 1217 extracted lines.
+
+The saved PDFs still hash-match the user-provided files in Downloads:
+`11a87bfc6867cec432a2f9b8068212997e14acd5a2f0653944ed3ca17e3e3c60`
+for the TDL guide and
+`676fd6764bb8a1788a6fbcf7a59edf831c23dd7f5661672a8b265ff397f9e4a7`
+for Topotein. The PDFs remain physically saved under `references/papers/`
+but ignored by git pending redistribution-rights confirmation.
+
+Current implications:
+
+- E121/E123 are well aligned with the TDL guide's two-tier aggregation view:
+  the intervention changes inter-rank cochain communication from selected
+  faces/tetras back into the edge/pair 1-skeleton before pair-triangle
+  operations, rather than adding an output-side metric loss.
+- Topotein strengthens the case for keeping directed boundary-edge semantics
+  and outer-edge/edge-frame information visible to higher-rank cells. The
+  most portable protein-specific ideas are still directed edges, outer-edge
+  neighborhoods, edge-centric scalarization, and hierarchical message passing.
+- The next idea after the pre-triangle family should be edge-centric and
+  selected-complex restricted: project selected face/tetra geometric messages
+  onto boundary or outer-edge frames before scalar pair injection. This would
+  follow Topotein's edge-frame scalarization idea without importing DSSP/SSE
+  labels or external structure annotations.
+- A 30k spend is still not justified by the papers alone. The model must first
+  show that these topology-native routes move global C-alpha lDDT out of the
+  low-0.4 band while preserving the selected-boundary diagnostics.

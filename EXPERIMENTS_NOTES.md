@@ -5653,3 +5653,12 @@
   reported `202 passed`;
   `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
   passed. E123 is ready to launch only after E121 returns.
+- 2026-05-14 full PDF reread completed while E121 was active. The saved
+  PDFs in `references/papers/` still hash-match the Downloads originals and
+  remain intentionally git-ignored. The current takeaways for the E121/E123
+  family are: pre-triangle simplex injection is justified as inter-rank
+  cochain communication into the pair 1-skeleton before triangle reasoning;
+  the next paper-derived architecture idea should be selected-complex
+  edge-centric scalarization onto boundary/outer-edge frames; and dense
+  C-alpha/radius/all-pairs losses remain out of scope unless restricted to
+  realization of the model-selected sparse complex.

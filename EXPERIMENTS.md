@@ -5146,3 +5146,29 @@ Validation:
 - `python -m pytest tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_simplex.py::test_pre_triangle_simplex_update_can_run_pair_only tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+
+### E124: Edge-Centric Pre-Triangle Boundary Scalarization
+
+Status: idea only; do not implement or launch until E121/E123 results say the
+pre-triangle route is worth another branch.
+
+Hypothesis: Topotein's strongest portable protein-specific idea is not just
+that higher-rank cells exist, but that their geometric content should be
+scalarized through associated directed edges or outer-edge frames. If E121 or
+E123 shows that selected face/tetra cochains can help when injected before
+AF2 triangle operations, an edge-centric variant may make that injection more
+geometrically meaningful by aligning selected-cell messages to the boundary
+edge frames that define the pair 1-skeleton.
+
+Mechanism sketch: keep the same selected face/tetra complex and sparse caps,
+but before the pre-triangle pair update, project selected face/tetra geometric
+summaries onto their boundary-edge or outer-edge frames and use those scalar
+features to gate the pair update into `Z_ij`. The update must stay restricted
+to selected boundary/outer edges and must not require DSSP/SSE labels,
+external annotations, pretrained features, or a dense output-side coordinate
+objective.
+
+Decision rule: consider this only if the pre-triangle family improves
+selected-boundary diagnostics but does not translate enough of that signal
+into global C-alpha lDDT. Keep it as an architecture/cochain-communication
+experiment, not a standalone lDDT loss.
