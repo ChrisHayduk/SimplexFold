@@ -1,4 +1,4 @@
-## Current Plan: Continue E116 Global Selected-Complex Context
+## Current Plan: Monitor E117 Global Selected-Complex Context
 
 E116 is now the primary-lDDT leader at `val_lddt_ca=0.4095` at step 6000.
 It resumed the weaker retained E72 checkpoint and added selected-complex
@@ -10,10 +10,11 @@ best topology-native lead.
 
 The target remains far away. To reach `0.7` from the current best near
 `0.410`, the model still needs roughly `+0.290` validation C-alpha lDDT. Do
-not spend 30,000 steps yet: E116 needs at least one short continuation gate to
-show that the gain is stable rather than a one-gate jump from E72. Launch E117
-from the E116 step-6000 checkpoint to step 6500 with the same global-context
-recipe, effective batch 8, and the same parameter cap.
+not spend 30,000 steps yet: E117 is now running from the E116 step-6000
+checkpoint to step 6500 with the same global-context recipe, effective batch
+8, and the same parameter cap. Use its result as the next gate: continue only
+if the E116 gain persists or improves the local-to-global translation
+diagnostics without a primary-lDDT collapse.
 
 The next branch should stay topology-native but move the feedback target back
 toward the pair/edge trunk rather than the target MSA row. E100 showed that

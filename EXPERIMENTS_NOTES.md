@@ -5163,3 +5163,21 @@
   main metric beyond the previous plateau. It is still far below `0.7`; launch
   E117 as a matched 500-step continuation from the E116 checkpoint before any
   longer 30k spend.
+- Committed and pushed the E116 result tracker update as `9548d5f`
+  (`Record E116 global context result`). The owned pod was still running, with
+  no active SimplexFold benchmark process and the E116 checkpoint present.
+- E117 launched on owned pod `o1dy17ouv8w5mz` as
+  `e117_global_context_continue_from_e116_s6500_c256_m64`, PID `13554`, log
+  `/workspace/SimplexFold/logs/e117_global_context_continue_from_e116.log`,
+  and artifact path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e117_global_context_continue_from_e116_s6500_c256_m64/`.
+  The remote checkout fast-forwarded to commit `9548d5f` before launch. E117
+  resumes the E116 checkpoint at step 6000/examples 48000 with
+  `--resume-model-weights-only`, keeps the same selected sparse-complex/global
+  context recipe, and targets step 6500 at effective batch 8.
+- E117 startup health poll: PID `13554` was compute-active after about
+  31 seconds, metadata recorded `steps=6500`, `effective_batch_size=8`,
+  `max_parameters=3261974`, `simplex_global_context_scale=0.1`,
+  `simplex_face_top_k=24`, `simplex_tetra_top_k=48`, and
+  `simplex_boundary_incidence_normalization=1.0`. The inherited history had
+  13 rows ending at step 6000 and no `results.json` yet.

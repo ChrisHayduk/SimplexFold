@@ -244,7 +244,7 @@ from E116 to test stability before considering a longer spend.
 
 ### E117 Idea: Continue Global Selected-Complex Context
 
-Status: queued on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E116 is the first topology-native branch to break the previous
 E96 primary-lDDT leader, but it did so over a single 500-step gate from E72.
@@ -269,6 +269,16 @@ boundary readout 0.25, boundary incidence normalization 1.0, and global
 context 0.10. Continue only if E117 stays above E96/E116's local band or
 improves the local-to-global translation diagnostics without a primary-lDDT
 collapse.
+
+Launch: E117 is running as
+`e117_global_context_continue_from_e116_s6500_c256_m64` on owned Runpod pod
+`o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `9548d5f`
+before launch. Startup confirmed PID `13554`, resume from the E116 checkpoint
+at step 6000/examples 48000, `1292` matching tensors loaded, and `0`
+new/missing tensors initialized. The first health poll confirmed
+`steps=6500`, `effective_batch_size=8`, `max_parameters=3261974`,
+`simplex_global_context_scale=0.1`, face/tetra top-k `24 / 48`, and inherited
+history ending at step 6000 with no result file yet.
 
 Validation so far:
 
