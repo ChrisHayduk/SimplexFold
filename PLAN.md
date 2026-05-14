@@ -1,38 +1,34 @@
-## Current Plan: Monitor E117 Global Selected-Complex Context
+## Current Plan: Launch E118 Vertex-Star Selected-Complex Context
 
-E116 is now the primary-lDDT leader at `val_lddt_ca=0.4095` at step 6000.
-It resumed the weaker retained E72 checkpoint and added selected-complex
-global context: active face and tetra cochains are pooled into one
-protein-level cochain, then routed back into active cells before their
-boundary-edge readout. This is the first branch to beat E96's `0.4043`
-without relying on the lost E96/E97 checkpoint family, so it is the current
-best topology-native lead.
+E117 is now the primary-lDDT leader at `val_lddt_ca=0.4151` at step 6500.
+It continued E116's selected-complex global context: active face and tetra
+cochains are pooled into one protein-level cochain, then routed back into
+active cells before their boundary-edge readout. This branch has now beaten
+E96's `0.4043` twice without relying on the lost E96/E97 checkpoint family,
+so it is the current best topology-native lead.
 
 The target remains far away. To reach `0.7` from the current best near
-`0.410`, the model still needs roughly `+0.290` validation C-alpha lDDT. Do
-not spend 30,000 steps yet: E117 is now running from the E116 step-6000
-checkpoint to step 6500 with the same global-context recipe, effective batch
-8, and the same parameter cap. Use its result as the next gate: continue only
-if the E116 gain persists or improves the local-to-global translation
-diagnostics without a primary-lDDT collapse.
+`0.415`, the model still needs roughly `+0.285` validation C-alpha lDDT. Do
+not spend 30,000 steps yet: E117 confirmed that the global-context gain is not
+a one-gate spike, but it is still in the low-0.4 lDDT band. The next gate is
+E118 from the E117 step-6500 checkpoint to step 7000 with effective batch 8,
+the same parameter cap, and a runtime ramp from the protein-level selected
+complex cochain toward residue vertex-star incidence cochains.
 
-While E117 runs, E118 is prepared locally as a zero-parameter refinement of
-the same idea: interpolate the selected global-complex cochain toward
-residue vertex-star cochains pooled by incidence from selected face/tetra
-cells. This keeps the intervention inside the topological cochain view and
-reuses the E116 global-context modules, so it should remain checkpoint- and
-budget-compatible. The launch path now supports a runtime star-context ramp,
-so a resumed E118 gate can anneal from the proven E116 protein-level
-selected-complex cochain toward the vertex-star incidence cochain instead of
-switching the cochain routing abruptly. Do not launch E118 until E117 returns
-and is recorded. If E117 is the source checkpoint, E118 should run the next
-500-step gate to step 7000 with the vertex-star runtime scale ramped from
-`0.0` to `1.0` over steps 6500-7000; only use a step-6500 target and
-6000-6500 ramp if falling back to the E116 step-6000 checkpoint.
+E118 is a zero-parameter refinement of the same idea: interpolate the selected
+global-complex cochain toward residue vertex-star cochains pooled by incidence
+from selected face/tetra cells. This keeps the intervention inside the
+topological cochain view and reuses the E116/E117 global-context modules, so
+it remains checkpoint- and budget-compatible. Launch E118 only after the
+remote checkout is fast-forwarded to the current branch tip. Use the E117
+checkpoint as source, target step 7000, and ramp
+`--simplex-vertex-star-context-runtime-scale` from `0.0` to `1.0` over steps
+6500-7000 while keeping `--simplex-global-context-scale 0.10` and
+`--simplex-vertex-star-context-scale 1.0`.
 
 E119 is now prepared locally as the edge-star analogue of E118, but it should
-stay parked until E117 is recorded and E118 is either run or explicitly
-skipped. Where E118 pools selected cell cochains through incident residues,
+stay parked until E118 is either run or explicitly skipped. Where E118 pools
+selected cell cochains through incident residues,
 E119 pools them through incident boundary edges, then routes each active cell
 the average context of its own boundary-edge star before the same selected
 boundary-edge readout. This is closer to the pair tensor `Z_ij` and should be

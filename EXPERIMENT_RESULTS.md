@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-14.
 
-Best validation C-alpha lDDT so far: **E116**, `val_lddt_ca=0.4095` at step
-6000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E117**, `val_lddt_ca=0.4151` at step
+6500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -132,3 +132,4 @@ recorded in the running notes for that run.
 | E114 segment-supported filtration | returned | 7500 | 0.3814 | 0.3814 | 0.3793 | 10.6123 | 11.8583 / 15.4034 | Rejected: segment-supported cell scoring improved FoldScore/dRMSD, expansion, and contraction, but primary C-alpha lDDT fell sharply below E113 and E106; launch an E115 no-segment continuation control from E113 before trying a weaker segment-support scale. |
 | E115 no-segment E113 continuation control | returned | 7500 | 0.3820 | 0.3820 | 0.3771 | 10.3770 | 11.5707 / 15.4034 | Rejected: matched no-segment continuation fell below E113 and E106 and nearly matched E114's primary-lDDT drop, so the E113 recovery lineage is unstable; do not launch E116 from E113/E115 without a stronger checkpoint audit. |
 | E116 global selected-complex context from E72 | returned | 6000 | 0.4095 | 0.4095 | 0.3881 | 11.2964 | 11.5918 / 16.3091 | New primary-lDDT leader: selected face/tetra global-context routing from explicit higher-rank cells back through active cells beats E96 despite starting from the weaker E72 checkpoint; continue one short E117 gate to test stability before considering any 30k spend. |
+| E117 continue global selected-complex context | returned | 6500 | 0.4151 | 0.4151 | 0.3927 | 11.2046 | 11.5744 / 16.3091 | New primary-lDDT leader and stable continuation: global selected-complex cochain routing improves E116 while keeping parameters under cap; launch the zero-parameter E118 vertex-star runtime-ramp gate, but do not treat the branch as a 30k candidate until it leaves the low-0.4 lDDT band. |

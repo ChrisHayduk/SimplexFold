@@ -244,7 +244,7 @@ from E116 to test stability before considering a longer spend.
 
 ### E117 Idea: Continue Global Selected-Complex Context
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned and recorded.
 
 Hypothesis: E116 is the first topology-native branch to break the previous
 E96 primary-lDDT leader, but it did so over a single 500-step gate from E72.
@@ -270,7 +270,7 @@ context 0.10. Continue only if E117 stays above E96/E116's local band or
 improves the local-to-global translation diagnostics without a primary-lDDT
 collapse.
 
-Launch: E117 is running as
+Launch: E117 ran as
 `e117_global_context_continue_from_e116_s6500_c256_m64` on owned Runpod pod
 `o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `9548d5f`
 before launch. Startup confirmed PID `13554`, resume from the E116 checkpoint
@@ -280,9 +280,19 @@ new/missing tensors initialized. The first health poll confirmed
 `simplex_global_context_scale=0.1`, face/tetra top-k `24 / 48`, and inherited
 history ending at step 6000 with no result file yet.
 
+Result: keep as the new primary-lDDT leader. E117 returned at step 6500 with
+`val_lddt_ca=0.4151`, FoldScore `0.3927`, `val_ca_drmsd=11.2046`, and
+C-alpha Rg `11.5744 / 16.3091`. Remote and local coherence passed: one result
+row, 14 history rows ending at step 6500, 1000 final eval-detail rows,
+`parameters=3,201,970` under the `3,261,974` cap, `effective_batch_size=8`,
+`simplex_global_context_scale=0.1`, and `stopped_early=False`. The selected
+face/tetra boundary lDDT stayed high (`0.7342` / `0.7174`), but primary lDDT
+remains in the low-0.4 band. Launch E118 as a topology-native local-to-global
+bridge, not as a 30k confirmation run yet.
+
 ### E118 Idea: Vertex-Star Selected-Complex Context
 
-Status: implemented locally; do not launch while E117 is active.
+Status: ready to launch from the returned E117 checkpoint.
 
 Hypothesis: E116's protein-level selected-complex cochain finally improved
 primary lDDT, but a single mean context may be too coarse to help each
@@ -305,11 +315,11 @@ This is an incidence/cochain-routing change, not a generic output loss. It
 adds no parameters because it reuses the existing global-to-face and
 global-to-tetra adapters introduced for E116.
 
-Gate: launch only after E117 returns. If E117 is stable but still stuck near
-the `0.40` band, run a short E118 gate from the best E116/E117 checkpoint with
-the E117 recipe plus `--simplex-vertex-star-context-scale 1.0`. Use the
-runtime star-context ramp to avoid an abrupt route change when resuming from
-the E116/E117 global-context checkpoint:
+Gate: E117 returned stable but still stuck in the low-0.4 band, so run a short
+E118 gate from the E117 step-6500 checkpoint with the E117 recipe plus
+`--simplex-vertex-star-context-scale 1.0`. Use the runtime star-context ramp
+to avoid an abrupt route change when resuming from the E117 global-context
+checkpoint:
 
 ```text
 --simplex-vertex-star-context-runtime-scale 0.0
@@ -318,9 +328,9 @@ the E116/E117 global-context checkpoint:
 --simplex-vertex-star-context-runtime-scale-ramp-steps 500
 ```
 
-If the source is the E117 step-6500 checkpoint, target step 7000 with
-`<source_step>=6500`; only target step 6500 and use `<source_step>=6000` when
-falling back to the E116 step-6000 checkpoint. Keep
+Use the E117 step-6500 checkpoint, target step 7000, and set
+`<source_step>=6500`; only target step 6500 and use `<source_step>=6000` if
+the E117 checkpoint becomes unavailable and the run must fall back to E116. Keep
 `--simplex-global-context-scale 0.10` so the new flag changes only which
 selected-complex context is routed through the existing modules.
 
@@ -338,8 +348,8 @@ Validation so far:
 
 ### E119 Idea: Edge-Star Selected-Complex Context
 
-Status: implemented locally; do not launch while E117 is active, and do not
-skip the E117 recording gate.
+Status: implemented locally; keep parked until E118 has either returned or
+been explicitly skipped.
 
 Hypothesis: E118's residue vertex-star context is a cleaner topological
 local-to-global bridge than E116's single protein-level mean, but the final
