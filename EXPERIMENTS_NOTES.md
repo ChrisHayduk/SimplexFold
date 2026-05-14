@@ -5141,3 +5141,25 @@
   mtimes still show only startup `run_metadata.json` and inherited
   `history_full_msa_to_face.json`; continue waiting for the first step-6000
   write.
+- E116 returned on owned pod `o1dy17ouv8w5mz`. Remote coherence passed after
+  correcting the eval-detail expectation: one result row, 13 history rows
+  ending at step 6000, 1000 final eval-detail rows, `completed_steps=6000`,
+  `parameters=3201970` under the `3261974` cap, `effective_batch_size=8`,
+  `simplex_global_context_scale=0.1`, and `stopped_early=False`. Metrics:
+  `val_lddt_ca=0.4095440942049027`, FoldScore `0.3880571389496326`,
+  `val_ca_drmsd=11.29642592227459`, C-alpha Rg
+  `11.591795643806458 / 16.30911695623398`, selected face/tetra boundary
+  lDDT `0.7231793713569641 / 0.7094700435996055`, and selected face/tetra
+  contraction `0.601930175870657 / 0.5994533261656761`.
+- Pulled E116 non-checkpoint artifacts locally into
+  `artifacts/nanofold_public_benchmarks/e116_global_context_from_e72_s6000_c256_m64/`
+  and the log into `logs/e116_global_context_from_e72.log`. Local coherence
+  passed against the same step, result row, history row, eval-detail row,
+  parameter count, effective batch, stopped-early flag, global-context scale,
+  and primary metrics.
+- E116 decision: keep as the new primary-lDDT leader. It beats E96's
+  `0.4043` despite starting from the weaker E72 checkpoint, so the selected
+  global-complex cochain is the first topology-native change to improve the
+  main metric beyond the previous plateau. It is still far below `0.7`; launch
+  E117 as a matched 500-step continuation from the E116 checkpoint before any
+  longer 30k spend.

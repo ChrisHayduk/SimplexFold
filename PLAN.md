@@ -1,19 +1,19 @@
-## Current Plan: Record E115, Audit Checkpoints, Then Decide E116 Source
+## Current Plan: Continue E116 Global Selected-Complex Context
 
-E96 remains the primary-lDDT leader at `val_lddt_ca=0.4043` at step 9000.
-The E97 branch nearly matched it while improving FoldScore and dRMSD, but
-the first evidence across the 10,000-step boundary is not encouraging: E99
-continued E97 to step 10500 and returned `0.4003`, E100 returned `0.3936`,
-and E101 returned `0.3998` at step 10000. These runs show that the current
-E96/E97 lineage is not obviously undertrained; it is locally plateaued in
-the `0.40` lDDT band.
+E116 is now the primary-lDDT leader at `val_lddt_ca=0.4095` at step 6000.
+It resumed the weaker retained E72 checkpoint and added selected-complex
+global context: active face and tetra cochains are pooled into one
+protein-level cochain, then routed back into active cells before their
+boundary-edge readout. This is the first branch to beat E96's `0.4043`
+without relying on the lost E96/E97 checkpoint family, so it is the current
+best topology-native lead.
 
-Do not spend a full 30,000-step confirmation on E96, E97, E99, E100, or E101
-as-is. To reach `0.7` from the current best near `0.404`, the model would
-need roughly `+0.296` validation C-alpha lDDT over the remaining 21,000
-steps after E96. That requires a much stronger late-training slope than the
-recent topology branches have shown, and E99/E101 already provide negative
-controls just beyond 10,000 steps.
+The target remains far away. To reach `0.7` from the current best near
+`0.410`, the model still needs roughly `+0.290` validation C-alpha lDDT. Do
+not spend 30,000 steps yet: E116 needs at least one short continuation gate to
+show that the gain is stable rather than a one-gate jump from E72. Launch E117
+from the E116 step-6000 checkpoint to step 6500 with the same global-context
+recipe, effective batch 8, and the same parameter cap.
 
 The next branch should stay topology-native but move the feedback target back
 toward the pair/edge trunk rather than the target MSA row. E100 showed that
@@ -178,17 +178,15 @@ their boundary-edge readout. This keeps the intervention inside the README's
 `Z_ij <-> F_ijk <-> U_ijkl` view; it is not an output-side lDDT, radius, or
 all-pairs distance loss.
 
-The E116 launch-style parameter audit for the E113/E115 sparse recipe plus
-global context is `3,201,970`, still under the AF2-medium +5% cap of
-`3,261,974`. Do not launch it from E113/E115 blindly now that E115 returned
-low. The first owned-pod checkpoint audit found retained checkpoints for E72
-and E105a-E115, but no E96/E97-family checkpoint. Restarting the zero-volume
-pod then wiped `/workspace` again, leaving only local retained checkpoints up
-through E72. Therefore E116 is launched as a clean E72-sourced short gate to
-step 6000, using the E105a sparse-complex recipe with metric recycling removed
-and global selected-complex context enabled. Treat it as a recovery probe
-against E72/E105a, not as a 30,000-step candidate unless it breaks out of the
-`0.40` band quickly.
+The E116 launch-style parameter audit for the E72 sparse recipe plus global
+context is `3,201,970`, still under the AF2-medium +5% cap of `3,261,974`.
+E116 returned `val_lddt_ca=0.4095`, FoldScore `0.3881`,
+`val_ca_drmsd=11.2964`, and predicted/true C-alpha radius
+`11.5918 / 16.3091`. The selected face/tetra boundary lDDT stayed strong at
+`0.7232 / 0.7095`, while contraction fractions improved to roughly
+`0.602 / 0.599`. Continue this route with E117 rather than pivoting: the
+mechanism directly addresses the local-to-global gap and finally moved the
+primary metric.
 
 ## Historical Plan Context
 

@@ -175,7 +175,7 @@ filtration tweak or a blind E116 launch from E113/E115.
 
 ### E116 Idea: Global Selected-Complex Context
 
-Status: implemented locally; queued pending retained-checkpoint audit.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E96-E115 repeatedly show good local selected-complex geometry but
 weak global C-alpha assembly. Selected face/tetra boundary lDDT can exceed
@@ -218,7 +218,7 @@ Compare primarily against E72 and E105a, with E96 still the global leader.
 Treat it as a real 30k candidate only if it leaves the `0.40` lDDT band and
 improves the local-to-global translation diagnostics.
 
-Launch: E116 is running as
+Launch: E116 ran as
 `e116_global_context_from_e72_s6000_c256_m64` on owned Runpod pod
 `o1dy17ouv8w5mz`. The pod had to be restaged after zero-volume restart wiped
 `/workspace`: SimplexFold was recloned at commit `7ba7bc9`, nanoFold was
@@ -230,6 +230,45 @@ py_compile passed, and the launch-style parameter count was `3,201,970`
 under the `3,261,974` cap. Startup confirmed PID `1566`, resume from E72 at
 step 5500/examples 44000, `1244` matching tensors loaded, and `48`
 new/missing tensors initialized for the global-context modules.
+
+Result: keep as the new primary-lDDT leader. E116 returned at step 6000 with
+`val_lddt_ca=0.4095`, FoldScore `0.3881`, `val_ca_drmsd=11.2964`, and
+C-alpha Rg `11.5918 / 16.3091`. Remote and local coherence passed: one result
+row, 13 history rows ending at step 6000, 1000 final eval-detail rows,
+`parameters=3,201,970` under the `3,261,974` cap, `effective_batch_size=8`,
+`simplex_global_context_scale=0.1`, and `stopped_early=False`. The selected
+face/tetra boundary lDDT stayed high (`0.7232` / `0.7095`), and selected
+contraction fractions improved to `0.6019` / `0.5995`. Because E116 beats E96
+despite starting from the weaker E72 checkpoint, continue one short E117 gate
+from E116 to test stability before considering a longer spend.
+
+### E117 Idea: Continue Global Selected-Complex Context
+
+Status: queued on owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E116 is the first topology-native branch to break the previous
+E96 primary-lDDT leader, but it did so over a single 500-step gate from E72.
+A matched continuation to step 6500 tests whether global selected-complex
+context is a stable local-to-global assembly route or only a one-gate recovery
+spike.
+
+Mechanism: resume the E116 checkpoint with the same selected sparse complex
+and `simplex_global_context_scale=0.10`. Keep metric and cochain recycling
+disabled so the comparison isolates persistence of the global context path:
+
+```text
+selected F_ijk / U_ijkl -> global selected-complex cochain
+                         -> active F_ijk / U_ijkl
+                         -> selected boundary edges Z_ij
+```
+
+Gate: run from step 6000 to 6500 with crop 256, MSA 64, effective batch 8,
+`parameters <= 3,261,974`, face top-k 24, tetra top-k 48, degree penalty
+0.75, outer-edge support 0.25, edge-frame runtime scale 0.0125, directed
+boundary readout 0.25, boundary incidence normalization 1.0, and global
+context 0.10. Continue only if E117 stays above E96/E116's local band or
+improves the local-to-global translation diagnostics without a primary-lDDT
+collapse.
 
 Validation so far:
 
