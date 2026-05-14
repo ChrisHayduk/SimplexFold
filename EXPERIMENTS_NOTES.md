@@ -6062,3 +6062,11 @@
   files exist yet. Treat this as slow active training; do not pull, update
   `EXPERIMENT_RESULTS.md`, stop the pod, or launch E127 while E126 is still
   alive.
+- 2026-05-14T19:19Z E126 is still active on the same owned Runpod pod. PID
+  `1120` has been running for about 24 minutes with process CPU around `754%`;
+  the H100 sample reported `42899 MiB` allocated and `43%` GPU utilization.
+  Required final artifacts remain absent (`results.json`, `results.csv`,
+  eval details, and checkpoint), while the history file still ends at the
+  inherited E120 step-7500 validation row (`val_lddt_ca=0.4248279729783535`).
+  Continue monitoring; leave `EXPERIMENT_RESULTS.md` unchanged until E126
+  returns a coherent final or early-stop result bundle.
