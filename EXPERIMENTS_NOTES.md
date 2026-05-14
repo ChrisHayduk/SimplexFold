@@ -5808,3 +5808,13 @@
   pair-only pre-triangle ramp: static pair scale `0.25`, static single scale
   `0.0`, pair runtime `0.0 -> 0.25` over steps 7500-8000, and single runtime
   held at `0.0`.
+- 2026-05-14T13:20Z E123 remains active on owned Runpod pod
+  `o1dy17ouv8w5mz` after about `54:57` elapsed. `results.json` and
+  `results.csv` are still absent, artifacts remain limited to
+  `run_metadata.json` and `history_full_msa_to_face.json`, and the history
+  endpoint is still the inherited E120 step-7500 row
+  (`val_lddt_ca=0.4248279729783535`, FoldScore `0.3983173668086529`,
+  `val_ca_drmsd=11.145049806624652`). The process is CPU-active, so treat
+  this as an in-flight ramped pair-only pre-triangle gate rather than a
+  returned or failed experiment. Do not launch E124 while this PID remains
+  active.
