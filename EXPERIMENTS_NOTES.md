@@ -5181,3 +5181,9 @@
   `simplex_face_top_k=24`, `simplex_tetra_top_k=48`, and
   `simplex_boundary_incidence_normalization=1.0`. The inherited history had
   13 rows ending at step 6000 and no `results.json` yet.
+- E117 health poll after about 3 minutes: PID `13554` remained active on the
+  owned pod, still running from the E116 checkpoint with no `results.json`,
+  `results.csv`, eval-detail file, or checkpoint written yet. Artifact files
+  are still limited to `run_metadata.json` and inherited
+  `history_full_msa_to_face.json`; continue waiting for the step-6500
+  validation write and do not launch a follow-up while this process is active.
