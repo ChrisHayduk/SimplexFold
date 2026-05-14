@@ -5246,3 +5246,8 @@
   utilization `28%`, and `13593 MiB` GPU memory allocated. No result files,
   eval-detail file, or `full_msa_to_face_latest.pt` checkpoint yet. Leave the
   process alone and keep E118 parked until E117 returns and is recorded.
+- E117 health poll after about 24 minutes: PID `13554` remained active on the
+  owned pod with state `Rl`, about `1015%` CPU, 178 threads, sampled GPU
+  utilization `31%`, and `13593 MiB` GPU memory allocated. Still no result
+  files, eval-detail file, or checkpoint. Continue waiting for the first
+  step-6500 validation write.
