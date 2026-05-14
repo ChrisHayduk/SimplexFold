@@ -5872,3 +5872,10 @@
   slice, and focused tests passed (`6 passed`) for adapter runtime gating,
   trainer CLI parsing, AF2-medium budget preservation, benchmark CLI parsing,
   model-input plumbing, and validation-time runtime overrides.
+- 2026-05-14T14:42Z E124 slow in-flight check: PID `33724` remains active on
+  the owned pod after about 21 minutes elapsed. H100 memory remains allocated
+  (`13673 MiB`), but instantaneous GPU utilization sampled at `0%`; the
+  process is still CPU-active. No final artifacts exist yet (`results.json`,
+  `results.csv`, eval details, and checkpoint all absent), and history still
+  ends at inherited step 7500. Keep monitoring; do not pull, stop, or launch a
+  follow-up until E124 either returns coherent artifacts or clearly fails.
