@@ -1,4 +1,4 @@
-## Current Plan: Launch E124 Face Boundary-Edge-Frame Gate
+## Current Plan: Monitor E124 Face Boundary-Edge-Frame Gate
 
 E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
@@ -130,6 +130,16 @@ face-to-edge messages with edge-frame scalarized face geometry. Keep it as a
 500-step topology-communication probe from the E120 checkpoint at small scale
 (`simplex_boundary_edge_frame_gate_scale=0.05`) and do not add the tetra gate
 without a fresh parameter audit.
+
+E124 is active on the owned Runpod pod `o1dy17ouv8w5mz` as
+`e124_face_edge_frame_gate_from_e120_s8000_c256_m64`, PID `33724`, with
+remote HEAD `7cefa48`. Startup confirmed a clean weights-only resume from the
+E120 checkpoint at step 7500/examples 60000, `1292` matching tensors loaded,
+`24` new gate tensors initialized, `effective_batch_size=8`, and the intended
+metadata: boundary edge-frame gate scale `0.05`, directed boundary readout
+`0.25`, edge-frame message runtime `0.0125`, global context `0.1`,
+vertex-star context `1.0`, edge-star context `0.5`, and sparse caps
+`24 / 48`.
 
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that

@@ -5229,7 +5229,7 @@ Validation:
 
 ### E124: Face Boundary-Edge-Frame Gate
 
-Status: next queued short gate after E123 returned below the spend threshold.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: the strongest portable topological idea from the paper reread is
 not just that higher-rank cells exist, but that their geometric content should
@@ -5269,6 +5269,16 @@ small scale. From the current E120 checkpoint this would be:
 
 Do not combine E124 with a fresh tetra gate unless the parameter budget is
 re-audited first; the first face+tetra draft exceeded the AF2-medium +5% cap.
+
+Launch: E124 started on `2026-05-14` on owned Runpod pod `o1dy17ouv8w5mz`,
+PID `33724`, as `e124_face_edge_frame_gate_from_e120_s8000_c256_m64`.
+Remote checkout fast-forwarded cleanly to `7cefa48`, no active benchmark
+process was present, the E120 checkpoint was present, py_compile passed for
+the simplex/config/trainer/runner slice, and the launch-style parameter audit
+counted `3,239,522` parameters under the `3,261,974` cap. Startup confirmed a
+clean weights-only resume from E120 at step 7500/examples 60000, `1292`
+matching tensors loaded, `24` new gate tensors initialized, and metadata
+matching the intended face boundary-edge-frame gate recipe.
 
 Validation so far:
 

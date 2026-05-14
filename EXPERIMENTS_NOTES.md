@@ -5840,3 +5840,15 @@
   primary-lDDT leader but reject it as a 30k candidate because it remains
   below the `0.45` short gate and softens selected-boundary diagnostics versus
   E120. E124 is now the next short topology-communication probe to consider.
+- 2026-05-14T14:21Z launched E124 on the owned Runpod pod `o1dy17ouv8w5mz`
+  as `e124_face_edge_frame_gate_from_e120_s8000_c256_m64`, PID `33724`.
+  Remote checkout fast-forwarded cleanly to `7cefa48`, no active benchmark
+  process was present, the E120 checkpoint existed, py_compile passed for the
+  relevant simplex/config/trainer/runner files, and the launch-style
+  parameter audit counted `3,239,522 <= 3,261,974`. Startup health confirmed
+  a clean weights-only resume at step 7500/examples 60000 with `1292`
+  matching tensors loaded and `24` new gate tensors initialized. Metadata
+  confirms the intended face boundary-edge-frame gate: scale `0.05`,
+  boundary readout directionality/runtime `0.25`, edge-frame message runtime
+  `0.0125`, global context `0.1`, vertex-star context `1.0`, edge-star
+  context `0.5`, and sparse caps `24 / 48`.
