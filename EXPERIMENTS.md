@@ -541,7 +541,8 @@ follow-up gate shows a much larger breakout.
 
 ### E121 Idea: Pre-Triangle Simplex Injection
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: failed before producing a new validation point; corrective E121b
+rerun is required.
 
 Hypothesis: E116-E120 all point at the same local-to-global bottleneck:
 selected face/tetra cochains learn useful local boundary geometry, but the
@@ -589,12 +590,36 @@ new/missing tensors, and a fresh optimizer. Launch metadata confirmed
 runtime scale `1.0`, edge-star runtime scale `0.5`, fixed sparse caps
 `24 / 48`, and `parameters=3,201,970` under cap.
 
+Outcome: E121 failed before reaching the step-8000 eval/checkpoint boundary.
+The log ended with a `torch.utils.checkpoint.CheckpointError`: activation
+checkpoint recomputation saw variable-size selected-complex tensors with
+different packed lengths (`4399` vs `4403`). This is an implementation
+interaction between checkpoint recomputation and the dynamic pre-triangle
+selected complex, not a validation result. Do not score E121 or continue from
+it.
+
+Corrective E121b: rerun the same gate from the E120 checkpoint after the
+local fix that executes active pre-triangle simplex blocks eagerly during
+training. The rerun keeps the E121 hypothesis, selected-complex recipe,
+losses, parameter count, step target, and effective batch size unchanged.
+
 Validation so far:
 
 - `python -m py_compile minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `4 passed`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `200 passed`
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- E121b checkpoint fix validation:
+  `python -m py_compile minalphafold/model.py`;
+  `python -m pytest tests/test_trainer.py::test_pre_triangle_simplex_update_runs_evoformer_block_eagerly tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_simplex.py::test_pre_triangle_simplex_update_can_run_pair_only tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs`
+  reported `5 passed`;
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `203 passed`;
+  `python -m py_compile minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+  passed;
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model.py tests/test_trainer.py`
+  passed; and the same ruff undefined-name check over the full touched
+  SimplexFold/model/trainer/runner/test slice passed.
 - Post-E120-launch sparse edge-star context validation:
   `python -m py_compile minalphafold/simplex.py`;
   `python -m pytest tests/test_simplex.py::test_edge_star_cell_mean_pools_cells_through_boundary_edges tests/test_simplex.py::test_boundary_edge_star_context_matches_dense_edge_star_gather tests/test_simplex.py::test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters tests/test_simplex.py::test_star_context_runtime_overrides_gate_context_route`

@@ -5667,3 +5667,23 @@
   `history_full_msa_to_face.json` still ends at the inherited E120 step-7500
   row (`val_lddt_ca=0.4248279729783535`). This is expected until E121 reaches
   its step-8000 eval/checkpoint boundary. Leave the run alone.
+- E121 failed before a new validation point. Remote PID `1051` exited with no
+  `results.json`, no step-8000 history row, and no new checkpoint. The log
+  traceback ended in `torch.utils.checkpoint.CheckpointError`: checkpoint
+  recomputation saw selected-complex packed tensors with different metadata,
+  including shapes `[4399, 1]` in the original forward and `[4403, 1]` during
+  recomputation. Pulled the failed log plus `history_full_msa_to_face.json`
+  and `run_metadata.json` locally for audit. This is an implementation failure
+  of the activation-checkpointed dynamic pre-triangle path, not an experiment
+  result; do not update the leader.
+- Implemented the E121b corrective fix locally: active pre-triangle simplex
+  blocks run eagerly during training instead of through activation
+  checkpointing. This keeps the scientific intervention unchanged while
+  avoiding recomputation over variable-size selected-cell tensors. Validation
+  passed: `python -m py_compile minalphafold/model.py`; focused
+  pre-triangle/checkpoint tests reported `5 passed`; ruff undefined-name check
+  over `minalphafold/model.py tests/test_trainer.py` passed.
+- Broader E121b validation passed: `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `203 passed`; `python -m py_compile minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+  passed; the full touched-file ruff undefined-name check passed; and
+  `git diff --check` passed.

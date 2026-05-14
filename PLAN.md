@@ -1,4 +1,4 @@
-## Current Plan: Monitor E121 Pre-Triangle Gate
+## Current Plan: Correct E121 Pre-Triangle Gate
 
 E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
@@ -78,7 +78,7 @@ module to assemble it. The hook is default-off and parameter-neutral. Because
 E120 returned as a better but still low-0.4 leader, E121 is the next
 topology-native short gate candidate, not an automatic 30k run.
 
-E121 is now running on owned Runpod pod `o1dy17ouv8w5mz`. It resumes E120's
+E121 ran on owned Runpod pod `o1dy17ouv8w5mz`. It resumed E120's
 step-7500 checkpoint and keeps the mixed selected-complex recipe fixed:
 `simplex_global_context_scale=0.1`, vertex-star context `1.0`, edge-star
 context `1.0` with runtime scale `0.5`, fixed sparse caps `24 / 48`,
@@ -88,7 +88,16 @@ change is `--simplex-pre-triangle-update-scale 0.25`, which reuses the
 existing simplex adapter before AF2 triangle updates. Launch metadata confirms
 `steps=8000`, `effective_batch_size=8`, `parameters=3,201,970 <= 3,261,974`,
 and a clean weights-only resume from the E120 checkpoint with all `1292`
-model tensors loaded.
+model tensors loaded. The run failed before producing a new validation point:
+PyTorch activation checkpointing recomputed the dynamic pre-triangle selected
+complex with different packed tensor lengths, so no E121 metric should be
+treated as returned.
+
+Corrective plan: rerun the same scientific gate as E121b after the local fix
+that executes active pre-triangle simplex blocks eagerly during training. This
+does not change the experimental hypothesis, parameters, loss, selected
+complex, or launch recipe; it only avoids activation-checkpoint recomputation
+over variable-size selected-cell tensors.
 
 Evaluation rule: treat E121 as a 500-step gate. If it returns in the low-0.4
 band, record and reject it as another local-to-global miss. Only consider a

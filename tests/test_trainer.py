@@ -1161,6 +1161,43 @@ def test_simplicial_pre_triangle_update_adds_no_parameters():
     assert pair_only_pre_triangle_params == global_context_params
 
 
+def test_pre_triangle_simplex_update_runs_evoformer_block_eagerly(monkeypatch):
+    import minalphafold.model as model_module
+    from minalphafold.evoformer import SimplicialEvoformer
+
+    model_config = replace(load_model_config("tiny"), simplex_pre_triangle_update_scale=0.25)
+    model = AlphaFold2(model_config)
+    model.train()
+
+    original_checkpoint = model_module.torch_checkpoint.checkpoint
+
+    def checkpoint_spy(function, *args, **kwargs):
+        if isinstance(function, SimplicialEvoformer):
+            raise AssertionError("pre-triangle simplex blocks must bypass activation checkpointing")
+        return original_checkpoint(function, *args, **kwargs)
+
+    monkeypatch.setattr(model_module.torch_checkpoint, "checkpoint", checkpoint_spy)
+
+    target_feat = torch.zeros(1, 4, 22)
+    residue_index = torch.arange(4).reshape(1, 4)
+    msa_feat = torch.zeros(1, 2, 4, 49)
+    extra_msa_feat = torch.zeros(1, 0, 4, 25)
+    template_pair_feat = torch.zeros(1, 0, 4, 4, 88)
+    aatype = torch.zeros(1, 4, dtype=torch.long)
+
+    outputs = model(
+        target_feat,
+        residue_index,
+        msa_feat,
+        extra_msa_feat,
+        template_pair_feat,
+        aatype,
+        n_cycles=1,
+    )
+
+    assert outputs["atom14_coords"].shape == (1, 4, 14, 3)
+
+
 def test_simplicial_cell_dropout_adds_no_parameters():
     simplex_medium = load_model_config("simplexfold_medium_param_matched")
     dropout_medium = replace(

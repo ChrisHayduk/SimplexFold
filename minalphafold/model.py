@@ -17,6 +17,32 @@ def _rms_normalize_last_dim(x: torch.Tensor) -> torch.Tensor:
     return x / denom.to(dtype=x.dtype)
 
 
+def _scalar_override_to_float(value: torch.Tensor | None) -> float | None:
+    if value is None:
+        return None
+    return float(value.detach().float().cpu().item())
+
+
+def _uses_pre_triangle_simplex_update(
+    block: SimplicialEvoformer,
+    *,
+    simplex_pre_triangle_update_scale_override: torch.Tensor | None,
+    simplex_pre_triangle_single_update_scale_override: torch.Tensor | None,
+) -> bool:
+    pair_scale = max(float(getattr(block, "simplex_pre_triangle_update_scale", 0.0)), 0.0)
+    pair_override = _scalar_override_to_float(simplex_pre_triangle_update_scale_override)
+    if pair_override is not None:
+        pair_scale = max(pair_override, 0.0)
+
+    configured_single_scale = float(getattr(block, "simplex_pre_triangle_single_update_scale", -1.0))
+    single_scale = pair_scale if configured_single_scale < 0.0 else max(configured_single_scale, 0.0)
+    single_override = _scalar_override_to_float(simplex_pre_triangle_single_update_scale_override)
+    if single_override is not None:
+        single_scale = max(single_override, 0.0)
+
+    return pair_scale > 0.0 or single_scale > 0.0
+
+
 class AlphaFold2(torch.nn.Module):
     """Top-level AlphaFold2 model (Algorithm 2).
 
@@ -419,11 +445,24 @@ class AlphaFold2(torch.nn.Module):
                     single_repr = self.single_rep_proj(msa_repr[:, 0, :, :])
                     for block in self.evoformer_blocks:
                         if isinstance(block, SimplicialEvoformer):
-                            if self.training:
+                            use_checkpoint = self.training and not _uses_pre_triangle_simplex_update(
+                                block,
+                                simplex_pre_triangle_update_scale_override=(
+                                    simplex_pre_triangle_update_scale_override
+                                ),
+                                simplex_pre_triangle_single_update_scale_override=(
+                                    simplex_pre_triangle_single_update_scale_override
+                                ),
+                            )
+                            if use_checkpoint:
                                 # Non-reentrant checkpointing supports kwargs
                                 # and nested outputs, so the simplex auxiliary
                                 # dictionary can be recomputed just like the
-                                # tensor activations inside the block.
+                                # tensor activations inside the block. The
+                                # pre-triangle simplex pass is excluded because
+                                # its selected complex can contain variable-size
+                                # packed tensors; eager execution avoids
+                                # checkpoint recomputation metadata mismatches.
                                 msa_repr, pair_repr, single_repr, simplex_aux = cast(
                                     tuple[torch.Tensor, torch.Tensor, torch.Tensor, dict[str, torch.Tensor]],
                                     torch_checkpoint.checkpoint(
