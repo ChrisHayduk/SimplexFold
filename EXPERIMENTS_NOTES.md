@@ -6170,3 +6170,11 @@
   and a fresh optimizer. Initial history currently ends at inherited E124 step
   8000 with `val_lddt_ca=0.42803398206830023`; wait for the coherent step-8500
   bundle before pulling or updating `EXPERIMENT_RESULTS.md`.
+- 2026-05-14T21:33Z E128 was still active on the owned pod. PID `1523`
+  had about `04:51` elapsed time, process CPU stayed around `755%`-`768%`,
+  RSS was about `2.0 GiB`, and the process had `178` threads. H100 memory was
+  allocated at `38489 MiB`, with sampled GPU utilization ranging from `42%` to
+  `95%`. The artifact directory still contained only `run_metadata.json` and
+  `history_full_msa_to_face.json`; history still ended at inherited step 8000,
+  and the log remained at startup. Interpretation: active short-gate training
+  before the step-8500 validation/writeout, not a completed result.
