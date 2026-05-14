@@ -5221,3 +5221,13 @@
   the process was still running with high CPU and `13593 MiB` GPU memory
   allocated. No result artifacts yet; continue waiting for the step-6500
   validation write.
+- E117 health poll after about 17 minutes: PID `13554` remained active on the
+  owned pod with state `Rl`, about `1014%` CPU, 178 threads, and `13593 MiB`
+  GPU memory allocated. No result artifacts yet; artifact mtimes still show
+  only the inherited history and run metadata from launch.
+- Updated heartbeat `check-simplexfold-e57-runpod` to keep monitoring only
+  owned pod `o1dy17ouv8w5mz`, record E117 before any follow-up, and consider
+  the prepared E118 vertex-star selected-complex context only after E117
+  returns. The heartbeat should launch E118 only if E117 remains stable near
+  or above the E96/E116 lDDT band; if E117 collapses, it should not launch a
+  follow-up.
