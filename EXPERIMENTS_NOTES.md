@@ -5568,3 +5568,28 @@
   `python -m pytest tests/test_simplex.py` reported `68 passed`;
   `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py tests/test_simplex.py`
   passed.
+- 2026-05-14T08:43Z E120 returned on owned pod `o1dy17ouv8w5mz`. Remote
+  coherence passed before pulling artifacts: `results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, `eval_details_full_msa_to_face.csv`,
+  `run_metadata.json`, and
+  `checkpoints/full_msa_to_face_latest.pt` were present;
+  `completed_steps=7500`, `effective_batch_size=8`,
+  `parameters=3,201,970 <= 3,261,974`, `stopped_early=False`, 1000
+  eval-detail rows, history ended at step 7500,
+  `simplex_global_context_scale=0.1`,
+  `simplex_vertex_star_context_scale=1.0`, vertex-star runtime scale `1.0`,
+  `simplex_edge_star_context_scale=1.0`, and the edge-star runtime ramp was
+  `0.0` to `0.5` over steps 7000-7500. Final metrics:
+  `val_lddt_ca=0.4248`, FoldScore `0.3983`, `val_ca_drmsd=11.1450`,
+  C-alpha Rg `11.4973 / 16.3091`, selected face/tetra boundary lDDT
+  `0.7548 / 0.7383`, and selected face/tetra boundary contraction
+  `0.5845 / 0.5826`.
+- Pulled E120 artifacts, log, and the step-7500 checkpoint locally. Local
+  coherence passed with the same checks. E120 is the new primary-lDDT and
+  FoldScore leader, and it shows that mixed vertex/edge-star cochain routing
+  can improve the topology-native branch. It is still not a 30,000-step
+  candidate: the model remains in the low-0.4 C-alpha lDDT band, C-alpha Rg
+  is still under-expanded, and reaching `0.7` would require roughly `+0.275`
+  absolute lDDT. Keep the E120 checkpoint as the strongest restart point, but
+  use E121 pre-triangle simplex injection as the next short-gate idea rather
+  than extending E120 blindly.

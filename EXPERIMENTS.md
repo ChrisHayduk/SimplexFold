@@ -456,7 +456,7 @@ Validation so far:
 
 ### E120 Idea: Mixed Vertex-Star and Edge-Star Context
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E118's residue vertex-star context is still the best primary-lDDT
 route, while E119's boundary-edge-star route improved FoldScore, dRMSD,
@@ -529,9 +529,20 @@ inside the same simplicial/topological mechanism, adds no parameters and no
 losses, and should reduce overhead for E121 or any future mixed star-context
 retry.
 
+Result: keep as the new primary-lDDT leader, but not as a 30k candidate. E120
+returned at step 7500 with `val_lddt_ca=0.4248`, FoldScore `0.3983`,
+`val_ca_drmsd=11.1450`, and predicted/true C-alpha radius
+`11.4973 / 16.3091`. It improves E118's primary lDDT and FoldScore while
+recovering from E119's primary-lDDT regression. Selected face/tetra boundary
+lDDT rose to `0.7548` / `0.7383`, and selected face/tetra boundary contraction
+fractions were `0.5845` / `0.5826`. This is the best topology-native lead so
+far, but it remains in the low-0.4 band; do not spend 30,000 steps unless a
+follow-up gate shows a much larger breakout.
+
 ### E121 Idea: Pre-Triangle Simplex Injection
 
-Status: implemented locally and parked until E120 returns.
+Status: implemented locally and queued as the next short-gate candidate after
+E120 is fully recorded.
 
 Hypothesis: E116-E120 all point at the same local-to-global bottleneck:
 selected face/tetra cochains learn useful local boundary geometry, but the

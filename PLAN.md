@@ -1,12 +1,15 @@
-## Current Plan: Launch E120 Mixed Star Context Gate
+## Current Plan: Record E120 And Prepare E121
 
-E118 remains the primary-lDDT leader at `val_lddt_ca=0.4190` at step 7000.
-It continued the selected-complex global-context family and replaced the
-protein-level broadcast with a ramped residue vertex-star cochain: selected
-face and tetra states pool through incident residues, then route back into
-active cells before boundary-edge readout. This branch has beaten E96's
-`0.4043` across E116, E117, and E118 without relying on the lost E96/E97
-checkpoint family, so it remains the current best topology-native lead.
+E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
+It continued the selected-complex global-context family by combining the best
+E118 residue vertex-star route with a half-strength boundary-edge-star
+correction. Remote and local coherence passed: `completed_steps=7500`, 1000
+eval-detail rows, history ending at step 7500, `effective_batch_size=8`,
+`parameters=3,201,970` under the `3,261,974` cap,
+`simplex_global_context_scale=0.1`,
+`simplex_vertex_star_context_scale=1.0`, vertex-star runtime scale `1.0`,
+`simplex_edge_star_context_scale=1.0`, and the intended edge-star runtime ramp
+from `0.0` to `0.5` over steps 7000-7500.
 
 E119 tested the boundary-edge-star analogue from E118 and returned at step
 7500 with `val_lddt_ca=0.4181`, FoldScore `0.3957`, `val_ca_drmsd=11.0494`,
@@ -20,9 +23,10 @@ vertex-star context disabled, and the intended edge-star runtime ramp from
 Reject E119 as a 30,000-step candidate. Boundary-edge-star routing improved
 FoldScore, dRMSD, C-alpha expansion, and selected face/tetra boundary lDDT
 (`0.7428` / `0.7275`) versus E118, but the primary C-alpha lDDT slipped below
-E118 and the family remains in the low-0.4 band. To reach `0.7` from the
-current best near `0.419`, the model still needs roughly `+0.281` validation
-C-alpha lDDT, so this is not a "train longer and hope" situation.
+E118. E120 fixed that specific regression and improved the leader to `0.4248`,
+but the family remains in the low-0.4 band. To reach `0.7` from the current
+best near `0.425`, the model still needs roughly `+0.275` validation C-alpha
+lDDT, so this is not a "train longer and hope" situation.
 
 The next branch should stay topology-native and address the same diagnosis
 more directly: explicit higher-rank cells learn good local selected-boundary
@@ -32,12 +36,12 @@ cochains influence pair/edge geometry before the structure module, with a
 clear short gate before any 30,000-step spend. Do not launch a longer E118 or
 E119 continuation unless a new gate first breaks out of the low-0.4 lDDT band.
 
-E120 is now running as the next short gate on owned Runpod pod
-`o1dy17ouv8w5mz`. It is not a blind continuation and not a new loss: it resumes
-the E118 checkpoint at step 7000, keeps the winning vertex-star route at `1.0`,
-and ramps a partial edge-star context from `0.0` to `0.5` over steps
-7000-7500. Because the adapter composes star contexts by interpolation, this
-tests a mixed selected-complex context:
+E120 returned as a short gate on owned Runpod pod `o1dy17ouv8w5mz`. It was not
+a blind continuation and not a new loss: it resumed the E118 checkpoint at
+step 7000, kept the winning vertex-star route at `1.0`, and ramped a partial
+edge-star context from `0.0` to `0.5` over steps 7000-7500. Because the
+adapter composes star contexts by interpolation, this tested a mixed
+selected-complex context:
 
 ```text
 selected F_ijk / U_ijkl -> residue vertex-star cochains
@@ -49,9 +53,10 @@ selected F_ijk / U_ijkl -> residue vertex-star cochains
 The hypothesis is narrow: E119 improved FoldScore, dRMSD, expansion, and
 selected-boundary diagnostics but lost primary lDDT, while E118 had the best
 primary lDDT. A half-strength edge-star pull might add E119's pair-interface
-packing signal without overwriting the vertex-star assembly route. Reject it
-unless it beats E118 on primary `val_lddt_ca`; only consider a longer spend if
-it also breaks out of the low-0.4 band.
+packing signal without overwriting the vertex-star assembly route. E120 did
+beat E118 on primary `val_lddt_ca` and improved FoldScore, but it did not
+break out of the low-0.4 band, so do not spend 30,000 steps on this branch as
+is.
 
 The active E120 run was launched before the local sparse edge-star performance
 refactor. Future star-context gates should use the local branch's
@@ -62,16 +67,16 @@ keeps the selected boundary 1-skeleton communication pattern, adds no
 parameters or losses, and is meant to make E121 or any E120 retry less
 expensive.
 
-If E120 returns without a primary-lDDT breakout, the next prepared fallback is
-E121 pre-triangle simplex injection. The repeated failure mode is that local
-selected-boundary geometry improves while global C-alpha assembly stays weak.
-E121 keeps the same selected complex but lets a scaled face/tetra boundary
-cochain update `Z_ij` before the pair triangle multiplication/attention stack
-inside each enabled Evoformer block. That gives AF2's own triangle machinery a
-chance to propagate simplex evidence globally within the same block, rather
-than waiting for later blocks or the structure module to assemble it. The hook
-is default-off, parameter-neutral, and should only be launched after E120
-returns and is recorded.
+The next prepared fallback is E121 pre-triangle simplex injection. The repeated
+failure mode is that local selected-boundary geometry improves while global
+C-alpha assembly stays weak. E121 keeps the same selected complex but lets a
+scaled face/tetra boundary cochain update `Z_ij` before the pair triangle
+multiplication/attention stack inside each enabled Evoformer block. That gives
+AF2's own triangle machinery a chance to propagate simplex evidence globally
+within the same block, rather than waiting for later blocks or the structure
+module to assemble it. The hook is default-off and parameter-neutral. Because
+E120 returned as a better but still low-0.4 leader, E121 is the next
+topology-native short gate candidate, not an automatic 30k run.
 
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that

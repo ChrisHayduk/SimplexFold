@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-14.
 
-Best validation C-alpha lDDT so far: **E118**, `val_lddt_ca=0.4190` at step
-7000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E120**, `val_lddt_ca=0.4248` at step
+7500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -135,3 +135,4 @@ recorded in the running notes for that run.
 | E117 continue global selected-complex context | returned | 6500 | 0.4151 | 0.4151 | 0.3927 | 11.2046 | 11.5744 / 16.3091 | New primary-lDDT leader and stable continuation: global selected-complex cochain routing improves E116 while keeping parameters under cap; launch the zero-parameter E118 vertex-star runtime-ramp gate, but do not treat the branch as a 30k candidate until it leaves the low-0.4 lDDT band. |
 | E118 vertex-star selected-complex context | returned | 7000 | 0.4190 | 0.4190 | 0.3955 | 11.2342 | 11.3877 / 16.3091 | New primary-lDDT leader: incidence-ramped residue vertex-star cochain routing improves E117 and keeps parameters under cap, but remains in the low-0.4 band; launch the zero-parameter E119 edge-star gate before considering any 30k spend. |
 | E119 edge-star selected-complex context | returned | 7500 | 0.4181 | 0.4181 | 0.3957 | 11.0494 | 11.8732 / 16.3091 | Rejected as a 30k candidate: boundary-edge-star incidence routing improves FoldScore, dRMSD, C-alpha expansion, and selected-boundary diagnostics versus E118, but primary C-alpha lDDT slips below E118 and remains in the low-0.4 band. |
+| E120 mixed vertex/edge-star selected-complex context | returned | 7500 | 0.4248 | 0.4248 | 0.3983 | 11.1450 | 11.4973 / 16.3091 | New primary-lDDT and FoldScore leader: mixed residue vertex-star plus partial boundary-edge-star context beats E118/E119, with selected face/tetra boundary lDDT `0.7548` / `0.7383`, but remains in the low-0.4 band and is not a 30k candidate yet. |
