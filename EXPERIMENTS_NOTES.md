@@ -5934,3 +5934,11 @@
   `24 / 48`. E125 should be treated as a short topology-curriculum probe;
   do not launch a follow-up or stop the pod until E125 returns coherent
   artifacts or clearly fails.
+- 2026-05-14T16:34Z E125 remains active after a 25-minute monitor window.
+  PID `46151` stayed alive across six checks, H100 memory remained allocated
+  at `13673 MiB` after startup, and sampled GPU utilization ranged from `0%`
+  to `59%`. The final result bundle is still absent (`results.json`,
+  `results.csv`, eval details, and checkpoint all missing), while history
+  remains at the inherited E120 step-7500 state. Continue monitoring under
+  the E125 heartbeat; do not update `EXPERIMENT_RESULTS.md`, stop the pod, or
+  launch another follow-up while E125 is still alive.
