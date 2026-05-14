@@ -479,6 +479,8 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.5",
             "--simplex-pre-triangle-update-scale",
             "0.25",
+            "--simplex-pre-triangle-single-update-scale",
+            "0.0",
             "--simplex-vertex-star-context-runtime-scale",
             "0.0",
             "--simplex-vertex-star-context-runtime-scale-final",
@@ -504,6 +506,7 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_vertex_star_context_scale == 0.75
     assert cfg.simplex_edge_star_context_scale == 0.5
     assert cfg.simplex_pre_triangle_update_scale == 0.25
+    assert cfg.simplex_pre_triangle_single_update_scale == 0.0
     assert args.simplex_vertex_star_context_runtime_scale == 0.0
     assert args.simplex_vertex_star_context_runtime_scale_final == 1.0
     assert args.simplex_vertex_star_context_runtime_scale_ramp_start_step == 6000
@@ -1095,12 +1098,20 @@ def test_simplicial_pre_triangle_update_adds_no_parameters():
         global_context_medium,
         simplex_pre_triangle_update_scale=0.25,
     )
+    pair_only_pre_triangle_medium = replace(
+        pre_triangle_medium,
+        simplex_pre_triangle_single_update_scale=0.0,
+    )
 
     global_context_params = sum(parameter.numel() for parameter in AlphaFold2(global_context_medium).parameters())
     pre_triangle_params = sum(parameter.numel() for parameter in AlphaFold2(pre_triangle_medium).parameters())
+    pair_only_pre_triangle_params = sum(
+        parameter.numel() for parameter in AlphaFold2(pair_only_pre_triangle_medium).parameters()
+    )
 
     assert global_context_params == 3_201_970
     assert pre_triangle_params == global_context_params
+    assert pair_only_pre_triangle_params == global_context_params
 
 
 def test_simplicial_cell_dropout_adds_no_parameters():

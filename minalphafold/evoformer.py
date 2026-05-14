@@ -226,6 +226,9 @@ class SimplicialEvoformer(torch.nn.Module):
         self.single_dropout = float(getattr(config, "simplex_dropout", 0.0))
         self.enable_simplex = enable_simplex
         self.simplex_pre_triangle_update_scale = float(getattr(config, "simplex_pre_triangle_update_scale", 0.0))
+        self.simplex_pre_triangle_single_update_scale = float(
+            getattr(config, "simplex_pre_triangle_single_update_scale", -1.0)
+        )
 
     def forward(
         self,
@@ -272,8 +275,15 @@ class SimplicialEvoformer(torch.nn.Module):
         msa_representation = msa_representation + self.msa_transition(msa_representation)
 
         pair_representation = pair_representation + self.outer_mean(msa_representation, msa_mask=msa_mask)
-        if self.enable_simplex and self.simplex_pre_triangle_update_scale > 0.0:
-            pre_scale = pair_representation.new_tensor(self.simplex_pre_triangle_update_scale)
+        pre_pair_scale_value = max(self.simplex_pre_triangle_update_scale, 0.0)
+        pre_single_scale_value = (
+            pre_pair_scale_value
+            if self.simplex_pre_triangle_single_update_scale < 0.0
+            else max(self.simplex_pre_triangle_single_update_scale, 0.0)
+        )
+        if self.enable_simplex and (pre_pair_scale_value > 0.0 or pre_single_scale_value > 0.0):
+            pre_pair_scale = pair_representation.new_tensor(pre_pair_scale_value)
+            pre_single_scale = pair_representation.new_tensor(pre_single_scale_value)
             pair_representation, single_representation, pre_simplex_aux = self.simplex_adapter(
                 pair_representation,
                 single_representation,
@@ -286,8 +296,8 @@ class SimplicialEvoformer(torch.nn.Module):
                 simplex_teacher_ca_coords=simplex_teacher_ca_coords,
                 simplex_teacher_ca_mask=simplex_teacher_ca_mask,
                 simplex_teacher_forcing_weight=simplex_teacher_forcing_weight,
-                simplex_pair_update_scale_override=pre_scale,
-                simplex_single_update_scale_override=pre_scale,
+                simplex_pair_update_scale_override=pre_pair_scale,
+                simplex_single_update_scale_override=pre_single_scale,
                 simplex_outer_edge_context_scale_override=simplex_outer_edge_context_scale_override,
                 simplex_hodge_face_update_scale_override=simplex_hodge_face_update_scale_override,
                 simplex_edge_frame_message_scale_override=simplex_edge_frame_message_scale_override,

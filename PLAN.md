@@ -95,6 +95,16 @@ band, record and reject it as another local-to-global miss. Only consider a
 longer run if it beats E120's `0.4248` and shows a real breakout rather than
 another small `0.005`-style increment.
 
+A pair-only pre-triangle fallback is now implemented locally and parked. E121
+uses the pre-triangle adapter with equal pair and single update scales, but
+the strongest topological claim is narrower: selected face/tetra boundary
+cochains should enter the pair edge tensor `Z_ij` before AF2 triangle updates.
+The new `simplex_pre_triangle_single_update_scale` override keeps existing
+behavior by default, and lets a follow-up set the single pre-triangle scale to
+`0.0` while leaving pair injection at `0.25`. This adds no parameters and is
+the natural E122 control if E121 improves local diagnostics but fails to move
+global C-alpha lDDT.
+
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that
 preserving directed boundary-edge incidence helps relative to E100 but still

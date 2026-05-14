@@ -5617,3 +5617,19 @@
   `simplex_vertex_star_context_scale=1.0`, vertex-star runtime scale `1.0`,
   `simplex_edge_star_context_scale=1.0`, edge-star runtime scale `0.5`, and
   the intended pre-triangle scale `0.25`.
+- E121 health poll after about 3 minutes: PID `1051` remained active on the
+  owned pod and `results.json` was still absent. The remote checkout is at
+  commit `34ef7d7`, which is fine for the active run because the later
+  `a6b5b86` commit only recorded launch docs. Continue waiting and do not
+  launch follow-up while E121 is active.
+- Prepared a default-off E122 pair-only pre-triangle fallback locally while
+  E121 runs. The new `simplex_pre_triangle_single_update_scale` keeps E121's
+  behavior by default with `-1.0`, but allows a follow-up gate to set the
+  pre-triangle single scale to `0.0` while keeping
+  `simplex_pre_triangle_update_scale=0.25` for pair/edge `Z_ij` injection.
+  This keeps the topology-native claim focused on selected face/tetra
+  boundary cochains entering the AF2 triangle stack, adds no parameters, and
+  avoids adding any new loss. Validation passed:
+  `python -m py_compile minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_simplex.py::test_pre_triangle_simplex_update_can_run_pair_only tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  reported `5 passed`.

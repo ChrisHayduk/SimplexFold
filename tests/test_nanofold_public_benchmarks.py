@@ -473,6 +473,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.5",
             "--simplex-pre-triangle-update-scale",
             "0.25",
+            "--simplex-pre-triangle-single-update-scale",
+            "0.0",
             "--simplex-vertex-star-context-runtime-scale",
             "0.0",
             "--simplex-vertex-star-context-runtime-scale-final",
@@ -605,6 +607,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_vertex_star_context_scale == 0.75
     assert args.simplex_edge_star_context_scale == 0.5
     assert args.simplex_pre_triangle_update_scale == 0.25
+    assert args.simplex_pre_triangle_single_update_scale == 0.0
     assert args.simplex_vertex_star_context_runtime_scale == 0.0
     assert args.simplex_vertex_star_context_runtime_scale_final == 1.0
     assert args.simplex_vertex_star_context_runtime_scale_ramp_start_step == 3000
@@ -643,6 +646,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_vertex_star_context_scale == 0.75
     assert cfg.simplex_edge_star_context_scale == 0.5
     assert cfg.simplex_pre_triangle_update_scale == 0.25
+    assert cfg.simplex_pre_triangle_single_update_scale == 0.0
     assert cfg.simplex_structure_pair_readout_scale == 0.125
     assert cfg.simplex_msa_feedback_scale == 0.25
     assert cfg.simplex_boundary_msa_feedback_scale == 0.125

@@ -603,6 +603,39 @@ Validation so far:
   `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py tests/test_simplex.py`
   passed.
 
+### E122 Idea: Pair-Only Pre-Triangle Simplex Injection
+
+Status: implemented locally and parked until E121 returns.
+
+Hypothesis: E121 tests whether selected face/tetra cochains need to enter the
+pair trunk before AF2's triangle updates, but its pre-triangle adapter also
+updates the residue/single stream. If E121 fails or only produces another
+small low-0.4 improvement, that may mean the topological signal should be
+restricted to the edge tensor `Z_ij` before triangle propagation instead of
+also perturbing residue states before the block's normal post-triangle simplex
+readout.
+
+Mechanism: add default-preserving
+`simplex_pre_triangle_single_update_scale`. A negative value keeps the
+current E121 behavior by inheriting `simplex_pre_triangle_update_scale`; a
+value of `0.0` makes the pre-triangle pass pair-only while leaving the normal
+post-triangle simplex adapter unchanged. This is not a new loss and adds no
+parameters. It simply separates the rank-1 edge cochain route into `Z_ij`
+from the rank-0 residue update when the simplex adapter is invoked before
+triangle multiplication/attention.
+
+Gate: if E121 does not break out, resume the strongest compatible E120/E121
+checkpoint for a 500-step gate with the same selected-complex recipe,
+`--simplex-pre-triangle-update-scale 0.25`, and
+`--simplex-pre-triangle-single-update-scale 0.0`. Reject unless primary
+`val_lddt_ca` beats the E120/E121 leader and selected-boundary diagnostics
+remain coherent.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_simplex.py::test_pre_triangle_simplex_update_can_run_pair_only tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `5 passed`
+
 ### E100: Bidirectional Simplex-MSA Feedback
 
 Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
