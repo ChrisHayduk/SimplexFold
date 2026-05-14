@@ -1,4 +1,4 @@
-## Current Plan: Correct E121 Pre-Triangle Gate
+## Current Plan: Launch E123 Pair-Only Pre-Triangle Ramp
 
 E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
@@ -99,24 +99,27 @@ does not change the experimental hypothesis, parameters, loss, selected
 complex, or launch recipe; it only avoids activation-checkpoint recomputation
 over variable-size selected-cell tensors.
 
-E121b is active on the owned Runpod pod `o1dy17ouv8w5mz` as
+E121b returned on the owned Runpod pod `o1dy17ouv8w5mz` as
 `e121b_pre_triangle_eager_from_e120_s8000_c256_m64`, with the same E120
 checkpoint, step-8000 target, effective batch size 8, and parameter count
-`3,201,970 <= 3,261,974`. Evaluation rule: treat E121b as the corrected
-500-step gate. If it returns in the low-0.4 band, record and reject it as
-another local-to-global miss. Only consider a longer run if it beats E120's
-`0.4248` and shows a real breakout rather than another small `0.005`-style
-increment.
+`3,201,970 <= 3,261,974`. Remote and local coherence passed after a post-hoc
+FoldScore repair from the saved checkpoint: `completed_steps=8000`, one
+result row, 1000 eval-detail rows, history ending at step 8000,
+`stopped_early=False`, and the expected E120/E121b metadata. The result is a
+reject: `val_lddt_ca=0.4223`, FoldScore `0.4007`,
+`val_ca_drmsd=11.1491`, and C-alpha Rg `11.8330 / 16.3091`. It is below
+E120's `0.4248` primary lDDT and below the `0.45` short-gate threshold, so do
+not spend 30,000 steps on abrupt eager pre-triangle injection.
 
-A pair-only pre-triangle fallback is now implemented locally and parked. E121
-uses the pre-triangle adapter with equal pair and single update scales, but
-the strongest topological claim is narrower: selected face/tetra boundary
+A ramped pair-only pre-triangle fallback is now the next queued short gate.
+E121b used the pre-triangle adapter with equal pair and single update scales,
+but the strongest topological claim is narrower: selected face/tetra boundary
 cochains should enter the pair edge tensor `Z_ij` before AF2 triangle updates.
-The new `simplex_pre_triangle_single_update_scale` override keeps existing
-behavior by default, and lets a follow-up set the single pre-triangle scale to
-`0.0` while leaving pair injection at `0.25`. This adds no parameters and is
-the natural E122 control if E121 improves local diagnostics but fails to move
-global C-alpha lDDT.
+E123 holds the pre-triangle single update at `0.0` and ramps only the pair
+pre-triangle runtime scale from `0.0` to `0.25` over steps 7500-8000. This
+adds no parameters and keeps the experiment in the README's cochain
+communication view. Reject E123 unless it clears E120 by more than noise and
+shows a real move toward the `0.45`/`0.50` candidate gates.
 
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that

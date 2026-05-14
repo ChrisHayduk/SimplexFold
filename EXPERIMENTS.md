@@ -602,16 +602,29 @@ interaction between checkpoint recomputation and the dynamic pre-triangle
 selected complex, not a validation result. Do not score E121 or continue from
 it.
 
-Corrective E121b: rerun the same gate from the E120 checkpoint after the
+Corrective E121b: reran the same gate from the E120 checkpoint after the
 local fix that executes active pre-triangle simplex blocks eagerly during
-training. The rerun keeps the E121 hypothesis, selected-complex recipe,
+training. The rerun kept the E121 hypothesis, selected-complex recipe,
 losses, parameter count, step target, and effective batch size unchanged.
-It is active on owned Runpod pod `o1dy17ouv8w5mz` as
-`e121b_pre_triangle_eager_from_e120_s8000_c256_m64`, PID `1845`, with remote
-HEAD `a598e32` and a clean remote worktree. Current health poll:
-`results.json` is absent, the history still ends at the inherited E120
-step-7500 row, and the process remains active. Do not launch E122/E123 while
-E121b is running.
+It returned on owned Runpod pod `o1dy17ouv8w5mz` as
+`e121b_pre_triangle_eager_from_e120_s8000_c256_m64`, with remote HEAD
+`a598e32` and a clean remote worktree.
+
+Result: reject. E121b returned at step 8000 with
+`val_lddt_ca=0.4223`, FoldScore `0.4007`, `val_ca_drmsd=11.1491`, and
+C-alpha Rg `11.8330 / 16.3091`. Remote coherence passed, artifacts were
+pulled locally, and the local verifier passed with `completed_steps=8000`,
+1000 eval-detail rows, one result row, history ending at step 8000,
+`effective_batch_size=8`, `parameters=3,201,970 <= 3,261,974`, and
+`stopped_early=False`. The pod initially lacked the public NanoFold
+`nanofold` Python package, so the returned run had no FoldScore field; after
+syncing that public package to the owned pod, a post-hoc evaluation from the
+saved E121b checkpoint reproduced C-alpha lDDT within `4.2e-6` and supplied
+`val_foldscore=0.4007264578`. E121b remains below E120's primary
+`val_lddt_ca=0.4248` and below the `0.45` short-gate threshold despite high
+selected face/tetra boundary lDDT (`0.7505` / `0.7344`). Do not spend 30,000
+steps on this abrupt eager pre-triangle route; launch E123 as the safer
+ramped pair-only pre-triangle fallback.
 
 Validation so far:
 
@@ -5135,7 +5148,7 @@ Validation:
 
 ### E123: Ramped Pair-Only Pre-Triangle Simplex Injection
 
-Status: implemented locally as a parked fallback while E121b runs.
+Status: next queued short gate after E121b returned below the spend threshold.
 
 Hypothesis: E120 shows that explicit face/tetra states have learned coherent
 selected-boundary geometry, but global C-alpha lDDT remains in the low-0.4
@@ -5158,10 +5171,9 @@ This adds no parameters and no new loss; it only changes when selected
 face/tetra boundary cochains are allowed to update the pair 1-skeleton before
 triangle reasoning.
 
-Decision rule: launch only after E121b returns. Prefer E123 if E121b underperforms
-E120 or improves selected-boundary diagnostics without a clear primary-lDDT
-gain. Do not spend 30,000 steps unless a short gate leaves the low-0.4 band and
-shows a plausible path toward `0.7` validation C-alpha lDDT.
+Decision rule: E121b underperformed E120, so E123 is now the preferred next
+short gate. Do not spend 30,000 steps unless a short gate leaves the low-0.4
+band and shows a plausible path toward `0.7` validation C-alpha lDDT.
 
 Candidate launch recipe if E121b returns weakly: resume the E120 step-7500
 checkpoint to step 8000 with the E120 selected-complex recipe fixed, but set
@@ -5192,8 +5204,8 @@ Validation:
 
 ### E124: Face Boundary-Edge-Frame Gate
 
-Status: implemented locally as a parked fallback; do not launch while E121b is
-running.
+Status: implemented locally as a parked fallback; consider only after the
+E123 ramped pair-only pre-triangle gate returns.
 
 Hypothesis: the strongest portable topological idea from the paper reread is
 not just that higher-rank cells exist, but that their geometric content should

@@ -5778,3 +5778,22 @@
   only startup/resume lines, so treat this as a slow in-flight eager
   pre-triangle gate rather than a returned or failed experiment. Do not launch
   E123/E124 while this PID remains alive.
+- 2026-05-14T11:33Z E121b returned coherently on the owned Runpod pod at step
+  8000. Remote coherence passed: no active benchmark process, required result,
+  metadata, history, eval-detail, and checkpoint files present, one
+  `results.csv` row, 1000 eval-detail rows, history ending at step 8000,
+  `effective_batch_size=8`, `parameters=3,201,970 <= 3,261,974`, and
+  `stopped_early=False`. The raw returned score was
+  `val_lddt_ca=0.4222809443175793`, below E120's `0.4248279729783535` and
+  below the `0.45` short-gate threshold.
+- 2026-05-14T12:20Z repaired the missing FoldScore field for E121b without
+  changing the scientific result. The run log showed `FoldScore components
+  unavailable: No module named 'nanofold'`, so the owned pod's public
+  NanoFold package was synced and a post-hoc full validation evaluation was
+  run from the saved E121b checkpoint. Recomputed C-alpha lDDT was
+  `0.42227677324414253`, within `4.2e-6` of the returned value, and supplied
+  `val_foldscore=0.4007264577746391`. Pulled the amended artifacts locally;
+  `scripts/verify_nanofold_benchmark_artifacts.py` passed for E121b with the
+  expected step, batch size, parameter cap, result/eval/history counts,
+  checkpoint, metadata, and finite metrics. Record E121b as rejected and make
+  E123 the next queued Runpod gate.
