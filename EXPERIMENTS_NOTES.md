@@ -6213,3 +6213,12 @@
   directory still had only the two startup files, history still ended at
   inherited step 8000, and the log remained at startup. Treat as active work
   before writeout, not a completed or failed run.
+- 2026-05-14T22:15Z-22:29Z E128 remained active across a 15-sample watch on
+  the owned pod. PID `1523` stayed alive from about `47:39` through `01:01:40`
+  elapsed, process CPU stayed around `750%`-`754%`, RSS stayed about `2.0 GiB`,
+  and the process kept `178` threads. H100 memory stayed allocated at
+  `43353 MiB`, with sampled GPU utilization ranging from `17%` to `63%`.
+  Artifacts were still limited to `run_metadata.json` and
+  `history_full_msa_to_face.json`; history still ended at inherited step 8000,
+  and no `results.csv` or checkpoint was present. Continue waiting for the
+  coherent step-8500 bundle; do not stop the pod or launch a follow-up.
