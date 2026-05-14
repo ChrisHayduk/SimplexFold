@@ -5818,3 +5818,10 @@
   this as an in-flight ramped pair-only pre-triangle gate rather than a
   returned or failed experiment. Do not launch E124 while this PID remains
   active.
+- 2026-05-14T14:04Z E123 is still in flight on the owned pod after about
+  `01:39:24` elapsed. PID `21142` remains active, no `results.json`,
+  `results.csv`, eval-detail file, or run checkpoint exists yet, and history
+  still ends at the inherited E120 step-7500 row. The process remains
+  CPU-active, so continue treating this as a slow active run. Do not pull,
+  score, stop the pod, or launch E124 until E123 either returns coherent
+  artifacts or fails with an exited PID/log traceback.
