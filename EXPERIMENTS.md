@@ -636,7 +636,7 @@ Validation so far:
 
 ### E122 Idea: Pair-Only Pre-Triangle Simplex Injection
 
-Status: implemented locally and parked until E121 returns.
+Status: implemented locally and parked until E121b returns.
 
 Hypothesis: E121 tests whether selected face/tetra cochains need to enter the
 pair trunk before AF2's triangle updates, but its pre-triangle adapter also
@@ -5143,7 +5143,7 @@ process alive, GPU active, and no returned `results.json` yet.
 
 ### E123: Ramped Pair-Only Pre-Triangle Simplex Injection
 
-Status: implemented locally as a parked fallback while E121 runs.
+Status: implemented locally as a parked fallback while E121b runs.
 
 Hypothesis: E120 shows that explicit face/tetra states have learned coherent
 selected-boundary geometry, but global C-alpha lDDT remains in the low-0.4
@@ -5166,10 +5166,30 @@ This adds no parameters and no new loss; it only changes when selected
 face/tetra boundary cochains are allowed to update the pair 1-skeleton before
 triangle reasoning.
 
-Decision rule: launch only after E121 returns. Prefer E123 if E121 underperforms
+Decision rule: launch only after E121b returns. Prefer E123 if E121b underperforms
 E120 or improves selected-boundary diagnostics without a clear primary-lDDT
 gain. Do not spend 30,000 steps unless a short gate leaves the low-0.4 band and
 shows a plausible path toward `0.7` validation C-alpha lDDT.
+
+Candidate launch recipe if E121b returns weakly: resume the E120 step-7500
+checkpoint to step 8000 with the E120 selected-complex recipe fixed, but set
+the static pre-triangle scale to `0.25`, ramp the pair pre-triangle runtime
+scale from `0.0` to `0.25`, and hold the pre-triangle single update at `0.0`.
+The key deltas relative to E121b are:
+
+```bash
+--run-name e123_ramped_pair_pre_triangle_from_e120_s8000_c256_m64 \
+--simplex-pre-triangle-update-scale 0.25 \
+--simplex-pre-triangle-single-update-scale 0.0 \
+--simplex-pre-triangle-update-runtime-scale 0.0 \
+--simplex-pre-triangle-update-runtime-scale-final 0.25 \
+--simplex-pre-triangle-update-runtime-scale-ramp-start-step 7500 \
+--simplex-pre-triangle-update-runtime-scale-ramp-steps 500 \
+--simplex-pre-triangle-single-update-runtime-scale 0.0 \
+--simplex-pre-triangle-single-update-runtime-scale-final 0.0 \
+--simplex-pre-triangle-single-update-runtime-scale-ramp-start-step 7500 \
+--simplex-pre-triangle-single-update-runtime-scale-ramp-steps 500
+```
 
 Validation:
 
@@ -5208,6 +5228,19 @@ Decision rule: consider this after E121b/E123 only if the pre-triangle family
 improves selected-boundary diagnostics but still does not translate enough of
 that signal into global C-alpha lDDT. Keep it as an architecture/cochain
 communication experiment, not a standalone lDDT loss.
+
+Candidate launch recipe if the pre-triangle family is still low-0.4 but not
+catastrophic: resume the strongest compatible checkpoint to a short
+500-step gate with the E120 selected-complex recipe fixed and add the gate at
+small scale. From the current E120 checkpoint this would be:
+
+```bash
+--run-name e124_face_edge_frame_gate_from_e120_s8000_c256_m64 \
+--simplex-boundary-edge-frame-gate-scale 0.05
+```
+
+Do not combine E124 with a fresh tetra gate unless the parameter budget is
+re-audited first; the first face+tetra draft exceeded the AF2-medium +5% cap.
 
 Validation so far:
 

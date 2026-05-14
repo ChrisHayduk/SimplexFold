@@ -2099,6 +2099,15 @@ message gradually, so the experiment tests whether explicit higher-rank
 boundary cochains can become useful inputs to triangle reasoning rather than
 acting as an unrelated output loss.
 
+When E121b returns, the next launch decision should be mechanical rather than
+improvised. If E121b underperforms E120 or only shows a tiny low-0.4 gain,
+prefer E123: same checkpoint and recipe, but pair-only pre-triangle injection
+ramped from `0.0` to `0.25` over steps 7500-8000 with single pre-triangle
+updates held at `0.0`. If E121b/E123 suggest the pre-triangle route is useful
+but still fails to translate selected-boundary geometry into global C-alpha
+assembly, use E124 as the next short gate: add the face boundary-edge-frame
+gate at `0.05`, with no tetra gate unless the parameter budget is re-audited.
+
 ## 2026-05-14 E124 Edge-Frame Gate Prepared
 
 E121b remains the active run, and E123 remains the no-new-parameter fallback.

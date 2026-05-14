@@ -5652,7 +5652,7 @@
   `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
   reported `202 passed`;
   `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
-  passed. E123 is ready to launch only after E121 returns.
+  passed. E123 is ready to launch only after E121b returns.
 - 2026-05-14 full PDF reread completed while E121 was active. The saved
   PDFs in `references/papers/` still hash-match the Downloads originals and
   remain intentionally git-ignored. The current takeaways for the E121/E123
@@ -5721,3 +5721,10 @@
   `38%`, memory `42,875 / 81,559` MiB, and power draw `179.76 W`; the Python
   process showed high CPU while the log/history mtimes remained at launch
   time. Keep waiting for the step-8000 eval/checkpoint boundary.
+- 2026-05-14T10:25Z E121b still has no `results.json`; PID `1845` remains
+  active on the owned H100 and history still ends at E120 step 7500. While
+  leaving the remote undisturbed, tightened the local launch decision notes:
+  E123 should be the first fallback if E121b is weak, using pair-only
+  pre-triangle injection ramped from `0.0` to `0.25` over steps 7500-8000;
+  E124 should remain a later face boundary-edge-frame gate at scale `0.05`
+  unless the pre-triangle family gives a reason to spend that extra budget.
