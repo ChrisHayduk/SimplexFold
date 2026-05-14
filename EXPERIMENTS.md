@@ -5474,7 +5474,7 @@ Validation so far:
 
 ### E128: Damped Triangle-Attention Bias on E124 Boundary Geometry
 
-Status: prepared as the next short Runpod gate.
+Status: returned and locally verified.
 
 Hypothesis: E124 is the current primary-lDDT leader because oriented
 face-boundary-edge-frame communication improves selected boundary geometry,
@@ -5518,3 +5518,17 @@ Parameter audit: `3,240,738 <= 3,261,974`.
 Decision rule: reject unless E128 beats E124's `0.4280` primary C-alpha lDDT
 and keeps FoldScore/dRMSD coherent. It still needs to clear `0.45` before any
 longer-run consideration.
+
+Result: keep as a new short-gate leader, but reject as a 30k candidate. E128
+returned at step 8500 with `val_lddt_ca=0.4311`, FoldScore `0.4025`,
+`val_ca_drmsd=11.0046`, and predicted/true C-alpha radius
+`11.7198 / 16.3091`. Remote and local coherence passed with
+`completed_steps=8500`, `effective_batch_size=8`, one result row, 1000
+eval-detail rows, history ending at step 8500, checkpoint present,
+`stopped_early=False`, and `parameters=3,240,738 <= 3,261,974`. The result
+supports the combined simplicial route: the oriented face boundary-edge-frame
+gate plus damped selected simplex triangle-attention bias improved primary
+C-alpha lDDT, FoldScore, dRMSD, and expansion versus E124/E126. However, the
+gain is still small and remains below the `0.45` short-gate threshold, so the
+next branch should change the local-to-global realization mechanism rather
+than simply spending 30k steps or increasing triangle-attention bias.

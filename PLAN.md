@@ -375,6 +375,19 @@ E116 returned `val_lddt_ca=0.4095`, FoldScore `0.3881`,
 mechanism directly addresses the local-to-global gap and finally moved the
 primary metric.
 
+E128 is the current short-gate leader after combining E124's oriented
+face-boundary-edge-frame gate with a damped sparse simplex triangle-attention
+bias. It returned at step 8500 with `val_lddt_ca=0.4311`, FoldScore `0.4025`,
+`val_ca_drmsd=11.0046`, and predicted/true C-alpha radius
+`11.7198 / 16.3091`, with local verification passing at
+`3,240,738 <= 3,261,974` parameters. This keeps supporting the central
+topological hypothesis that explicit selected face/tetra cochains help when
+they communicate through boundary 1-simplices and represented triangles. It is
+still not a 30,000-step candidate: the gain over E124 is small, the run has not
+cleared the `0.45` short-gate threshold, and the target remains `>0.7`. The
+next plan should focus on translating strong selected-complex geometry into
+global C-alpha assembly, not just making triangle-attention bias stronger.
+
 ## Historical Plan Context
 
 E44-E52 show that closure masks, broad structure readouts, stronger auxiliary

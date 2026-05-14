@@ -6241,3 +6241,21 @@
   artifact directory still only had the two startup files and history still
   ended at inherited step 8000. Interpretation: active computation before
   writeout, not an idle or completed run.
+- 2026-05-14T23:26Z E128 returned coherently on the owned pod
+  `o1dy17ouv8w5mz`. Remote verification found all required files
+  (`results.json`, `results.csv`, history, eval details, run metadata, and
+  checkpoint), one result row, 1000 eval-detail rows, history ending at step
+  8500, `completed_steps=8500`, `effective_batch_size=8`,
+  `stopped_early=False`, and `parameters=3,240,738 <= 3,261,974`. Local
+  artifacts were pulled into
+  `artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/`,
+  and `scripts/verify_nanofold_benchmark_artifacts.py` passed with the same
+  step, batch, row-count, parameter-cap, stopped-early, checkpoint, and
+  metadata checks. Result: `val_lddt_ca=0.4311057258844376`, FoldScore
+  `0.4025340421795845`, `val_ca_drmsd=11.004606088757514`, C-alpha Rg
+  `11.719762571811676 / 16.30911695623398`, selected face/tetra boundary
+  lDDT `0.7559379814267159` / `0.7384514356851578`, and selected face/tetra
+  contraction `0.5746216677725315` / `0.5738915434479713`. Decision: keep as
+  the new primary-lDDT and FoldScore leader, but reject as a 30k candidate
+  because it remains below the `0.45` short-gate threshold and far below the
+  `0.7` target.

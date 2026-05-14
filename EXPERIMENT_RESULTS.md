@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-14.
 
-Best validation C-alpha lDDT so far: **E124**, `val_lddt_ca=0.4280` at step
-8000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E128**, `val_lddt_ca=0.4311` at step
+8500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -142,3 +142,4 @@ recorded in the running notes for that run.
 | E124 face boundary-edge-frame gate | returned | 8000 | 0.4280 | 0.4280 | 0.3979 | 11.2529 | 11.3075 / 16.3091 | Tiny new primary-lDDT leader but rejected as a 30k candidate: oriented face boundary-edge-frame gating improves selected face/tetra boundary lDDT (`0.7583` / `0.7406`) and contraction (`0.5614` / `0.5611`) but remains below the 0.45 short-gate threshold and worsens FoldScore/dRMSD versus E123/E120; use only as evidence for a smoother topology-curriculum probe. |
 | E125 ramped boundary-edge-frame gate | returned | 8000 | 0.4275 | 0.4275 | 0.3986 | 11.3161 | 11.2998 / 16.3091 | Rejected: ramping the E124 face boundary-edge-frame gate improved FoldScore slightly versus E124 but reduced primary C-alpha lDDT, selected-boundary lDDT, and dRMSD; the boundary-edge-frame family remains below the 0.45 short-gate threshold and should not receive a 30k spend. |
 | E126 sparse simplex triangle-attention bias | returned | 8000 | 0.4254 | 0.4254 | 0.3992 | 11.1227 | 11.6615 / 16.3091 | Rejected: sparse simplex triangle-attention logit bias slightly improved FoldScore/dRMSD versus E120/E124/E125 but reduced primary C-alpha lDDT below E124/E125 and stayed below the 0.45 short-gate threshold; do not launch E127 automatically from this weak primary-lDDT signal. |
+| E128 damped triangle-attention bias from E124 | returned | 8500 | 0.4311 | 0.4311 | 0.4025 | 11.0046 | 11.7198 / 16.3091 | New primary-lDDT/FoldScore leader but not a 30k candidate: combining E124's oriented face boundary-edge-frame gate with a damped simplex triangle-attention bias improves C-alpha lDDT, FoldScore, dRMSD, and C-alpha expansion, with selected face/tetra boundary lDDT `0.7559` / `0.7385`, but it remains far below 0.7 and still below the 0.45 short-gate threshold. |
