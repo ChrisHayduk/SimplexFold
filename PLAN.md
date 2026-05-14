@@ -1,4 +1,4 @@
-## Current Plan: Launch E118 Vertex-Star Selected-Complex Context
+## Current Plan: Monitor E118 Vertex-Star Selected-Complex Context
 
 E117 is now the primary-lDDT leader at `val_lddt_ca=0.4151` at step 6500.
 It continued E116's selected-complex global context: active face and tetra
@@ -10,21 +10,21 @@ so it is the current best topology-native lead.
 The target remains far away. To reach `0.7` from the current best near
 `0.415`, the model still needs roughly `+0.285` validation C-alpha lDDT. Do
 not spend 30,000 steps yet: E117 confirmed that the global-context gain is not
-a one-gate spike, but it is still in the low-0.4 lDDT band. The next gate is
-E118 from the E117 step-6500 checkpoint to step 7000 with effective batch 8,
-the same parameter cap, and a runtime ramp from the protein-level selected
-complex cochain toward residue vertex-star incidence cochains.
+a one-gate spike, but it is still in the low-0.4 lDDT band. E118 is now running
+from the E117 step-6500 checkpoint to step 7000 with effective batch 8, the
+same parameter cap, and a runtime ramp from the protein-level selected complex
+cochain toward residue vertex-star incidence cochains.
 
 E118 is a zero-parameter refinement of the same idea: interpolate the selected
 global-complex cochain toward residue vertex-star cochains pooled by incidence
 from selected face/tetra cells. This keeps the intervention inside the
 topological cochain view and reuses the E116/E117 global-context modules, so
-it remains checkpoint- and budget-compatible. Launch E118 only after the
-remote checkout is fast-forwarded to the current branch tip. Use the E117
-checkpoint as source, target step 7000, and ramp
-`--simplex-vertex-star-context-runtime-scale` from `0.0` to `1.0` over steps
-6500-7000 while keeping `--simplex-global-context-scale 0.10` and
-`--simplex-vertex-star-context-scale 1.0`.
+it remains checkpoint- and budget-compatible. It launched after the remote
+checkout fast-forwarded to commit `3013d4f`. Monitor only owned pod
+`o1dy17ouv8w5mz`; when E118 returns, run remote coherence, pull
+non-checkpoint artifacts and the log, run local coherence, then update
+`EXPERIMENT_RESULTS.md`, `PLAN.md`, `EXPERIMENTS.md`, and
+`EXPERIMENTS_NOTES.md` before deciding whether E119 is warranted.
 
 E119 is now prepared locally as the edge-star analogue of E118, but it should
 stay parked until E118 is either run or explicitly skipped. Where E118 pools

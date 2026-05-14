@@ -5377,3 +5377,17 @@
   `--simplex-vertex-star-context-scale 1.0`, and ramp
   `--simplex-vertex-star-context-runtime-scale` from `0.0` to `1.0` over
   steps 6500-7000.
+- 2026-05-14T03:22:55Z launched E118 on owned pod `o1dy17ouv8w5mz` after
+  fast-forwarding the remote checkout to commit `3013d4f`. Run name:
+  `e118_vertex_star_context_from_e117_s7000_c256_m64`; PID `26269`; log
+  `/workspace/SimplexFold/logs/e118_vertex_star_context_from_e117.log`;
+  artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e118_vertex_star_context_from_e117_s7000_c256_m64/`.
+  The source checkpoint is the returned E117 step-6500 checkpoint. Startup
+  confirmed resume at step 6500/examples 52000, `1292` matching tensors loaded,
+  and `0` new/missing tensors. Metadata confirmed `steps=7000`,
+  `effective_batch_size=8`, `max_parameters=3261974`,
+  `simplex_global_context_scale=0.1`,
+  `simplex_vertex_star_context_scale=1.0`, and the vertex-star runtime ramp
+  from `0.0` to `1.0` over steps 6500-7000. E119 remains parked until E118
+  returns or is explicitly skipped.
