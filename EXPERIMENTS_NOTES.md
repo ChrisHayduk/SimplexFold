@@ -5879,3 +5879,8 @@
   `results.csv`, eval details, and checkpoint all absent), and history still
   ends at inherited step 7500. Keep monitoring; do not pull, stop, or launch a
   follow-up until E124 either returns coherent artifacts or clearly fails.
+- 2026-05-14T14:54Z E124 remains in flight on the owned pod after about
+  33 minutes elapsed. GPU utilization sampled at `21%` with `13673 MiB`
+  allocated, so the run still appears alive rather than frozen. No final
+  artifacts exist yet and history still ends at step 7500; continue monitoring
+  without pulling, stopping, or launching a follow-up.
