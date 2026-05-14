@@ -5187,3 +5187,27 @@
   are still limited to `run_metadata.json` and inherited
   `history_full_msa_to_face.json`; continue waiting for the step-6500
   validation write and do not launch a follow-up while this process is active.
+- E117 health poll after about 4.5 minutes: PID `13554` remained active with
+  no final result artifacts yet. The remote checkout is still at the E116
+  result commit `9548d5f` plus the editable-install `minalphafold.egg-info/`
+  dirt only; this is acceptable for the already-launched E117 run.
+- E118 local implementation prepared while E117 runs. Added default-off
+  `simplex_vertex_star_context_scale`, which reuses the existing selected
+  global-complex MLPs but interpolates their context toward residue
+  vertex-star cochains pooled by incidence from selected face/tetra states.
+  This is topology-native: selected cells communicate through their incident
+  residues before returning to active cells and boundary edges. It adds no
+  parameters and should be checkpoint-compatible with E116/E117 when enabled.
+- E118 local validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  reported `3 passed`; and
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters`
+  reported `65 passed`.
+- E118 lint note: full
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check ...`
+  over the touched files is blocked by pre-existing style/import findings in
+  `simplex.py`, `run_nanofold_public_benchmarks.py`, and tests. The narrower
+  undefined-name gate
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model_config.py minalphafold/simplex.py scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py`
+  passed.

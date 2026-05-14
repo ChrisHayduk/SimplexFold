@@ -16,6 +16,13 @@ checkpoint to step 6500 with the same global-context recipe, effective batch
 if the E116 gain persists or improves the local-to-global translation
 diagnostics without a primary-lDDT collapse.
 
+While E117 runs, E118 is prepared locally as a zero-parameter refinement of
+the same idea: interpolate the selected global-complex cochain toward
+residue vertex-star cochains pooled by incidence from selected face/tetra
+cells. This keeps the intervention inside the topological cochain view and
+reuses the E116 global-context modules, so it should remain checkpoint- and
+budget-compatible. Do not launch E118 until E117 returns and is recorded.
+
 The next branch should stay topology-native but move the feedback target back
 toward the pair/edge trunk rather than the target MSA row. E100 showed that
 collapsed cell-to-residue MSA feedback is too blunt; E101 showed that

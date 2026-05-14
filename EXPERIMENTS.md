@@ -280,6 +280,44 @@ new/missing tensors initialized. The first health poll confirmed
 `simplex_global_context_scale=0.1`, face/tetra top-k `24 / 48`, and inherited
 history ending at step 6000 with no result file yet.
 
+### E118 Idea: Vertex-Star Selected-Complex Context
+
+Status: implemented locally; do not launch while E117 is active.
+
+Hypothesis: E116's protein-level selected-complex cochain finally improved
+primary lDDT, but a single mean context may be too coarse to help each
+residue neighborhood assemble globally. A vertex-star cochain should be a more
+topological local-to-global bridge: each residue pools the selected face/tetra
+states incident on it, and each active cell receives the average star context
+of its own vertices before boundary-edge readout.
+
+Mechanism: add default-off `simplex_vertex_star_context_scale`. When the
+existing `simplex_global_context_scale` modules are enabled, this interpolates
+their broadcast protein-level context toward a selected vertex-star context:
+
+```text
+selected F_ijk / U_ijkl -> residue vertex-star cochains
+                         -> active F_ijk / U_ijkl through their vertices
+                         -> selected boundary edges Z_ij
+```
+
+This is an incidence/cochain-routing change, not a generic output loss. It
+adds no parameters because it reuses the existing global-to-face and
+global-to-tetra adapters introduced for E116.
+
+Gate: launch only after E117 returns. If E117 is stable but still stuck near
+the `0.40` band, run a short E118 gate from the best E116/E117 checkpoint with
+the E117 recipe plus `--simplex-vertex-star-context-scale 1.0`. Keep
+`--simplex-global-context-scale 0.10` so the new flag changes only which
+selected-complex context is routed through the existing modules.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `3 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters`: `65 passed`
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model_config.py minalphafold/simplex.py scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py`: passed
+
 Validation so far:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`

@@ -92,6 +92,7 @@ class SimplexConfig:
     simplex_boundary_incidence_normalization = 0.0
     simplex_boundary_readout_directionality = 0.0
     simplex_global_context_scale = 0.0
+    simplex_vertex_star_context_scale = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
     simplex_c_segment = 8
@@ -671,6 +672,48 @@ def test_global_context_adapter_routes_selected_complex_summary_back_to_cells():
     assert on_params - off_params < 5_000
     assert not torch.allclose(on_pair, off_pair)
     assert not torch.allclose(on_single, off_single)
+
+
+def test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters():
+    class GlobalContextConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_global_context_scale = 0.25
+
+    class VertexStarContextConfig(GlobalContextConfig):
+        simplex_vertex_star_context_scale = 1.0
+
+    torch.manual_seed(45)
+    global_adapter = SimplicialAdapter(GlobalContextConfig()).eval()
+    torch.manual_seed(45)
+    star_adapter = SimplicialAdapter(VertexStarContextConfig()).eval()
+    with torch.no_grad():
+        torch.manual_seed(46)
+        face_weight = torch.randn_like(global_adapter.global_to_face.linear_2.weight) * 0.02
+        face_bias = torch.randn_like(global_adapter.global_to_face.linear_2.bias) * 0.01
+        tetra_weight = torch.randn_like(global_adapter.global_to_tetra.linear_2.weight) * 0.02
+        tetra_bias = torch.randn_like(global_adapter.global_to_tetra.linear_2.bias) * 0.01
+        for adapter in (global_adapter, star_adapter):
+            adapter.global_to_face.linear_2.weight.copy_(face_weight)
+            adapter.global_to_face.linear_2.bias.copy_(face_bias)
+            adapter.global_to_tetra.linear_2.weight.copy_(tetra_weight)
+            adapter.global_to_tetra.linear_2.bias.copy_(tetra_bias)
+    pair = torch.randn(1, 5, 5, GlobalContextConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, GlobalContextConfig.c_s)
+
+    global_params = sum(p.numel() for p in global_adapter.parameters())
+    star_params = sum(p.numel() for p in star_adapter.parameters())
+    global_pair, global_single, _ = global_adapter(pair, single)
+    star_pair, star_single, _ = star_adapter(pair, single)
+
+    assert star_params == global_params
+    assert not torch.allclose(star_pair, global_pair)
+    assert not torch.allclose(star_single, global_single)
 
 
 def test_face_tetra_coboundary_delta_uses_sibling_faces_in_selected_tetras():

@@ -1228,6 +1228,34 @@ def masked_cell_mean(state: torch.Tensor, mask: torch.Tensor, channels: int) -> 
     return total / count
 
 
+def vertex_star_cell_mean(
+    state: torch.Tensor,
+    cell_indices: torch.Tensor,
+    cell_mask: torch.Tensor,
+    *,
+    num_residues: int,
+    channels: int,
+) -> torch.Tensor:
+    """Pool selected cell cochains into residue vertex-star cochains."""
+
+    if state.numel() == 0 or cell_indices.numel() == 0:
+        return state.new_zeros((state.shape[0], int(num_residues), int(channels)))
+    batch_size = int(cell_indices.shape[0])
+    cell_rank = int(cell_indices.shape[-1])
+    cell_weights = cell_mask.to(state.dtype)
+    vertex_values = state[..., None, :].expand(*state.shape[:-1], cell_rank, int(channels))
+    vertex_values = vertex_values * cell_weights[..., None, None]
+    flat_ids = cell_indices.reshape(batch_size, -1)
+    flat_values = vertex_values.reshape(batch_size, -1, int(channels))
+    flat_weights = cell_weights[..., None].expand_as(cell_indices).reshape(batch_size, -1, 1)
+
+    star_sum = state.new_zeros((batch_size, int(num_residues), int(channels)))
+    star_sum.scatter_add_(1, flat_ids[..., None].expand(-1, -1, int(channels)), flat_values)
+    star_counts = state.new_zeros((batch_size, int(num_residues), 1))
+    star_counts.scatter_add_(1, flat_ids[..., None], flat_weights)
+    return star_sum / star_counts.clamp_min(1.0)
+
+
 FACE_EDGE_FRAME_DIM = 10
 TETRA_EDGE_FRAME_DIM = 18
 SEGMENT_GEOMETRY_DIM = 4
@@ -1569,6 +1597,10 @@ class SimplicialAdapter(torch.nn.Module):
             1.0,
         )
         self.global_context_scale = float(getattr(config, "simplex_global_context_scale", 0.0))
+        self.vertex_star_context_scale = min(
+            max(float(getattr(config, "simplex_vertex_star_context_scale", 0.0)), 0.0),
+            1.0,
+        )
         self.segment_cell_scale = float(getattr(config, "simplex_segment_cell_scale", 0.0))
         self.segment_radius = int(getattr(config, "simplex_segment_radius", 4))
 
@@ -2045,8 +2077,10 @@ class SimplicialAdapter(torch.nn.Module):
         if self.global_context_scale > 0.0:
             face_state, tetra_state = self._apply_global_context(
                 face_state,
+                face_indices,
                 topology.face_mask,
                 tetra_state,
+                topology.tetra_indices,
                 topology.tetra_mask,
             )
 
@@ -2345,8 +2379,10 @@ class SimplicialAdapter(torch.nn.Module):
     def _apply_global_context(
         self,
         face_state: torch.Tensor,
+        face_indices: torch.Tensor,
         face_mask: torch.Tensor,
         tetra_state: torch.Tensor,
+        tetra_indices: torch.Tensor,
         tetra_mask: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Route a protein-level selected-complex summary back into active cells."""
@@ -2355,6 +2391,29 @@ class SimplicialAdapter(torch.nn.Module):
         tetra_mean = masked_cell_mean(tetra_state, tetra_mask, self.c_tetra)
         global_context = torch.cat([face_mean, tetra_mean], dim=-1)
         face_context = global_context[:, None, None, :].expand(*face_state.shape[:-1], -1)
+        if self.vertex_star_context_scale > 0.0:
+            face_star = vertex_star_cell_mean(
+                face_state,
+                face_indices,
+                face_mask,
+                num_residues=face_state.shape[1],
+                channels=self.c_face,
+            )
+            tetra_star = vertex_star_cell_mean(
+                tetra_state,
+                tetra_indices,
+                tetra_mask,
+                num_residues=face_state.shape[1],
+                channels=self.c_tetra,
+            )
+            face_vertex_context = torch.cat(
+                [
+                    gather_single(face_star, face_indices).mean(dim=-2),
+                    gather_single(tetra_star, face_indices).mean(dim=-2),
+                ],
+                dim=-1,
+            )
+            face_context = face_context + self.vertex_star_context_scale * (face_vertex_context - face_context)
         face_msg = self.global_to_face(torch.cat([face_state, face_context], dim=-1))
         face_state = face_state + self.dropout(
             self.global_context_scale
@@ -2366,6 +2425,17 @@ class SimplicialAdapter(torch.nn.Module):
 
         if tetra_state.numel() > 0 and self.use_tetra:
             tetra_context = global_context[:, None, None, :].expand(*tetra_state.shape[:-1], -1)
+            if self.vertex_star_context_scale > 0.0:
+                tetra_vertex_context = torch.cat(
+                    [
+                        gather_single(face_star, tetra_indices).mean(dim=-2),
+                        gather_single(tetra_star, tetra_indices).mean(dim=-2),
+                    ],
+                    dim=-1,
+                )
+                tetra_context = tetra_context + self.vertex_star_context_scale * (
+                    tetra_vertex_context - tetra_context
+                )
             tetra_msg = self.global_to_tetra(torch.cat([tetra_state, tetra_context], dim=-1))
             tetra_state = tetra_state + self.dropout(
                 self.global_context_scale
