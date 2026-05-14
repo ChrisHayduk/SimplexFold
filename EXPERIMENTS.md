@@ -5370,7 +5370,8 @@ Validation so far:
 
 ### E126: Sparse Simplex Triangle-Attention Bias
 
-Status: implemented locally and queued for a short Runpod gate.
+Status: launched on the owned Runpod pod for a short gate; no returned result
+yet.
 
 Hypothesis: the selected face/tetra complex is learning useful local boundary
 geometry, but pair readouts and MSA feedback have not forced that signal into
@@ -5391,7 +5392,7 @@ orientations of the represented triangle. The hook is default-off, keeps old
 configs/checkpoints unchanged, and adds only `1,216` parameters to the E120
 selected-complex profile (`3,203,186 <= 3,261,974`).
 
-Candidate launch: run as
+Candidate launch: running as
 `e126_triangle_attention_bias_from_e120_s8000_c256_m64`, resuming the E120
 step-7500 checkpoint with fresh optimizer and matching tensors loaded
 weights-only. Keep the E120 selected-complex recipe fixed:

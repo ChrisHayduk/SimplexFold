@@ -21,8 +21,8 @@ selected F_ijk / boundary faces of U_ijkl
         -> structure module reads globally updated pair geometry
 ```
 
-Use E126 as a short Runpod gate from the retained E120 checkpoint to step
-8000 before any 30,000-step decision. The acceptance bar remains high: it
+E126 is now running as a short Runpod gate from the retained E120 checkpoint
+to step 8000 before any 30,000-step decision. The acceptance bar remains high: it
 should break out of the low-0.4 band, ideally clearing `0.45` while improving
 or at least not materially worsening FoldScore/dRMSD. A tiny E124-style
 primary-lDDT gain is not enough.

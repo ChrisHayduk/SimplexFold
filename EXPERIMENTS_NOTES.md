@@ -5998,3 +5998,39 @@
   `e126_triangle_attention_bias_from_e120_s8000_c256_m64` from the E120
   checkpoint, not as a blind continuation; reject it unless it clears the
   low-0.4 band and preferably the `0.45` short-gate threshold.
+- 2026-05-14T18:57Z launched E126 on the owned Runpod pod only:
+  `o1dy17ouv8w5mz` (`codex-simplexfold-e74-runpod-20260512`), SSH
+  `root@103.207.149.82:10677` with
+  `/Users/christopherhayduk/.runpod/ssh/RunPod-Key-Go`. After the pod restart,
+  `/workspace` was empty, so the remote workspace was restaged from scratch:
+  SimplexFold was cloned at commit `206fdc5` on
+  `codex/simplexfold-topology-e07-boundary-coordinate`; only public NanoFold
+  assets were copied (`11000` processed features, `11000` processed labels,
+  manifests with `10000 / 1000 / 11000` train/val/all chains, and
+  `nanofold/`); the E120 checkpoint was restored at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e120_mixed_star_context_from_e118_s7500_c256_m64/checkpoints/full_msa_to_face_latest.pt`.
+  Prelaunch audit passed: modified Python files compiled remotely,
+  `nanofold.metrics.foldscore_components` imported, the model parameter audit
+  returned `3,203,186 <= 3,261,974`, hidden/sidecar scan was empty, GPU was
+  `NVIDIA H100 80GB HBM3`, and no benchmark process was already active.
+- E126 command:
+  `python scripts/run_nanofold_public_benchmarks.py --nanofold-root /workspace/nanoFold-Competition --model-config simplexfold_medium_param_matched --variants full_msa_to_face --run-name e126_triangle_attention_bias_from_e120_s8000_c256_m64 --steps 8000 --crop-size 256 --msa-depth 64 --extra-msa-depth 0 --batch-size 1 --grad-accum-steps 8 --learning-rate 0.001 --n-cycles 4 --eval-every 500 --checkpoint-every 500 --max-parameters 3261974 --resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e120_mixed_star_context_from_e118_s7500_c256_m64/checkpoints/full_msa_to_face_latest.pt --resume-model-weights-only --simplex-face-coordinate-weight 1.0 --simplex-face-coordinate-distance-weight 0.5 --simplex-face-boundary-lddt-weight 0.05 --simplex-tetra-coordinate-weight 1.0 --simplex-tetra-coordinate-distance-weight 0.5 --simplex-tetra-boundary-lddt-weight 0.05 --simplex-geometry-distance-weight 0.025 --simplex-face-top-k 24 --simplex-tetra-top-k 48 --simplex-cell-score-degree-penalty 0.75 --simplex-cell-score-outer-edge-weight 0.25 --simplex-edge-frame-message-scale 0.025 --simplex-edge-frame-message-runtime-scale 0.0125 --simplex-boundary-readout-directionality 0.25 --simplex-boundary-readout-directionality-runtime-scale 0.25 --simplex-boundary-incidence-normalization 1.0 --simplex-global-context-scale 0.1 --simplex-vertex-star-context-scale 1.0 --simplex-edge-star-context-scale 1.0 --simplex-vertex-star-context-runtime-scale 1.0 --simplex-edge-star-context-runtime-scale 0.5 --simplex-triangle-attention-bias-scale 0.05`.
+  It started as PID `1120`, writing
+  `/workspace/SimplexFold/logs/e126_triangle_attention_bias_from_e120.log`
+  and artifacts under
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e126_triangle_attention_bias_from_e120_s8000_c256_m64/`.
+  Initial log health is clean: `train=10000 val=1000 crop=256 msa=64`,
+  resumed E120 at `step=7500 examples=60000`, loaded `1292` matching tensors,
+  initialized `16` new/missing tensors, and started a fresh optimizer. Current
+  `run_metadata.json` confirms `effective_batch_size=8`,
+  `max_parameters=3261974`, `simplex_triangle_attention_bias_scale=0.05`,
+  the intended star-context/readout/runtime scales, and
+  `resume_model_weights_only=True`; the top-level `parameters` field is not
+  written until result materialization, so final verification should use the
+  returned result row plus the explicit parameter audit. No final result files
+  exist yet, so `EXPERIMENT_RESULTS.md` intentionally remains unchanged.
+- Retargeted heartbeat `check-simplexfold-e57-runpod` to E126 and reactivated
+  it on a 30-minute interval. The heartbeat is scoped to pod
+  `o1dy17ouv8w5mz` only, must not inspect or manage any other Runpod pod, must
+  pull and verify artifacts locally before stopping the owned pod, and must not
+  launch a follow-up automatically.
