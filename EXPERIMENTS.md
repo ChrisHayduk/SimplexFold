@@ -5178,28 +5178,41 @@ Validation:
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
 
-### E124: Edge-Centric Pre-Triangle Boundary Scalarization
+### E124: Face Boundary-Edge-Frame Gate
 
-Status: idea only; do not implement or launch until E121/E123 results say the
-pre-triangle route is worth another branch.
+Status: implemented locally as a parked fallback; do not launch while E121b is
+running.
 
-Hypothesis: Topotein's strongest portable protein-specific idea is not just
-that higher-rank cells exist, but that their geometric content should be
-scalarized through associated directed edges or outer-edge frames. If E121 or
-E123 shows that selected face/tetra cochains can help when injected before
-AF2 triangle operations, an edge-centric variant may make that injection more
-geometrically meaningful by aligning selected-cell messages to the boundary
-edge frames that define the pair 1-skeleton.
+Hypothesis: the strongest portable topological idea from the paper reread is
+not just that higher-rank cells exist, but that their geometric content should
+be scalarized through associated directed edges or outer-edge frames. E120
+shows coherent selected simplex boundary geometry, but global C-alpha assembly
+is still weak. A face-boundary gate may make the face-to-edge cochain scatter
+more useful by aligning it to the oriented boundary 1-simplices that define
+the pair 1-skeleton.
 
-Mechanism sketch: keep the same selected face/tetra complex and sparse caps,
-but before the pre-triangle pair update, project selected face/tetra geometric
-summaries onto their boundary-edge or outer-edge frames and use those scalar
-features to gate the pair update into `Z_ij`. The update must stay restricted
-to selected boundary/outer edges and must not require DSSP/SSE labels,
-external annotations, pretrained features, or a dense output-side coordinate
-objective.
+Mechanism: add default-off `simplex_boundary_edge_frame_gate_scale`. For each
+selected face boundary edge, `face_edge_frame_features` scalarizes the opposite
+vertex and oriented normal in the directed edge frame. The adapter concatenates
+that geometry with the face cochain and the current boundary-edge `Z_ij`, then
+uses a small MLP gate to modulate only the selected face-to-edge message before
+scatter. The tetra path is deliberately not gated yet so the E120-style medium
+configuration remains within the parameter cap. No loss terms, external
+annotations, pretrained features, or dense output coordinate targets are added.
 
-Decision rule: consider this only if the pre-triangle family improves
-selected-boundary diagnostics but does not translate enough of that signal
-into global C-alpha lDDT. Keep it as an architecture/cochain-communication
-experiment, not a standalone lDDT loss.
+Parameter audit: the E120-style medium config with
+`simplex_boundary_edge_frame_gate_scale=0.05` has `3,239,522` parameters,
+below the AF2-medium +5% cap `3,261,974`.
+
+Decision rule: consider this after E121b/E123 only if the pre-triangle family
+improves selected-boundary diagnostics but still does not translate enough of
+that signal into global C-alpha lDDT. Keep it as an architecture/cochain
+communication experiment, not a standalone lDDT loss.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_boundary_edge_frame_gate_modulates_boundary_readout tests/test_simplex.py::test_edge_frame_message_scale_changes_pair_readout_within_adapter tests/test_simplex.py::test_simplicial_adapter_can_pair_gate_sparse_boundary_edges tests/test_trainer.py::test_simplicial_boundary_edge_frame_gate_stays_inside_medium_budget tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `6 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `205 passed`
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `git diff --check`: passed

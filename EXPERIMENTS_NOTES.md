@@ -5697,3 +5697,19 @@
   `check-simplexfold-e57-runpod` is active and already points to E121b with
   the owned-pod-only scope and remote/local coherence gates. Leave E121b
   running and do not launch E122/E123 until it returns.
+- 2026-05-14T10:11Z prepared E124 locally while E121b runs. New default-off
+  knob: `simplex_boundary_edge_frame_gate_scale`. The adapter scalarizes each
+  selected face boundary edge in its directed edge frame, concatenates that
+  oriented geometry with the face cochain and current boundary `Z_ij`, and
+  gates only the selected face-to-edge message before scatter. This is a
+  topology-native cochain communication change, not a new lDDT loss. A first
+  face+tetra version exceeded the AF2-medium +5% cap (`3,275,762 > 3,261,974`),
+  so the parked version is face-boundary-only and audits at `3,239,522`
+  parameters under the cap. Validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  focused E124/parser/budget tests reported `6 passed`;
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `205 passed`; the touched-file ruff undefined-name check passed;
+  and `git diff --check` passed. Do not launch E124 while E121b is active;
+  consider it only after E121b/E123 clarify whether pre-triangle/cochain
+  communication is worth another branch.

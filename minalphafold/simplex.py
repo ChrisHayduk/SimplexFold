@@ -1690,6 +1690,9 @@ class SimplicialAdapter(torch.nn.Module):
         self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
         self.edge_frame_message_scale = float(getattr(config, "simplex_edge_frame_message_scale", 0.0))
+        self.boundary_edge_frame_gate_scale = float(
+            getattr(config, "simplex_boundary_edge_frame_gate_scale", 0.0)
+        )
         self.boundary_message_degree_attenuation = float(
             getattr(config, "simplex_boundary_message_degree_attenuation", 0.0)
         )
@@ -1777,6 +1780,12 @@ class SimplicialAdapter(torch.nn.Module):
                     self.hidden_dim,
                     self.c_z,
                 )
+        if self.boundary_edge_frame_gate_scale > 0.0:
+            self.face_boundary_edge_frame_gate = SimplexMLP(
+                self.c_face + config.c_z + FACE_EDGE_FRAME_DIM,
+                self.hidden_dim,
+                self.c_z,
+            )
         if self.global_context_scale > 0.0:
             global_dim = self.c_face + self.c_tetra
             self.global_to_face = SimplexMLP(
@@ -2209,7 +2218,10 @@ class SimplicialAdapter(torch.nn.Module):
             )
 
         face_edge_update = self.face_to_edge(face_state).reshape(*face_state.shape[:-1], 3, self.c_z)
-        if edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0:
+        needs_face_edge_frame = (
+            edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0
+        ) or self.boundary_edge_frame_gate_scale > 0.0
+        if needs_face_edge_frame:
             face_opposite_indices = torch.stack([k, j, i], dim=-1)
             face_frame_features = face_edge_frame_features(
                 face_edge_indices,
@@ -2219,11 +2231,27 @@ class SimplicialAdapter(torch.nn.Module):
                 distance_max=self.distance_max,
             ).to(pair.dtype)
             face_edge_state = face_state[..., None, :].expand(*face_edge_indices.shape[:-1], self.c_face)
+        if (
+            self.boundary_edge_frame_gate_scale > 0.0
+            or (self.boundary_pair_gate_scale > 0.0 and boundary_pair_gate_scale > 0.0)
+        ):
+            face_edge_pair_state = torch.stack([z_ij, z_ik, z_jk], dim=-2)
+        if edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0:
             face_edge_update = face_edge_update + edge_frame_message_scale * self.face_edge_frame_to_edge(
                 torch.cat([face_edge_state, face_frame_features], dim=-1)
             )
+        if self.boundary_edge_frame_gate_scale > 0.0:
+            face_edge_update = face_edge_update + self.dropout(
+                self.boundary_edge_frame_gate_scale
+                * torch.tanh(
+                    self.face_boundary_edge_frame_gate(
+                        torch.cat([face_edge_state, face_edge_pair_state, face_frame_features], dim=-1)
+                    )
+                )
+                * face_edge_update
+                * face_edge_mask[..., None]
+            )
         if self.boundary_pair_gate_scale > 0.0 and boundary_pair_gate_scale > 0.0:
-            face_edge_pair_state = torch.stack([z_ij, z_ik, z_jk], dim=-2)
             face_edge_update = face_edge_update + self.dropout(
                 boundary_pair_gate_scale
                 * torch.tanh(self.boundary_pair_gate(torch.cat([face_edge_update, face_edge_pair_state], dim=-1)))
@@ -2298,7 +2326,8 @@ class SimplicialAdapter(torch.nn.Module):
             )
             tet_edge_update = self.tetra_to_edge(tetra_state).reshape(*tetra_state.shape[:-1], 6, self.c_z)
             tet_edge_mask = topology.tetra_mask[..., None].expand(-1, -1, -1, 6)
-            if edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0:
+            needs_tet_edge_frame = edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0
+            if needs_tet_edge_frame:
                 tet_opposite_indices = torch.stack(
                     [
                         torch.stack([tet_k, tet_l], dim=-1),
@@ -2319,10 +2348,9 @@ class SimplicialAdapter(torch.nn.Module):
                     volume_scale=self.volume_scale,
                 ).to(pair.dtype)
                 tetra_edge_state = tetra_state[..., None, :].expand(*tet_edge_indices.shape[:-1], self.c_tetra)
-                tet_edge_update = tet_edge_update + edge_frame_message_scale * self.tetra_edge_frame_to_edge(
-                    torch.cat([tetra_edge_state, tet_frame_features], dim=-1)
-                )
-            if self.boundary_pair_gate_scale > 0.0 and boundary_pair_gate_scale > 0.0:
+            if (
+                self.boundary_pair_gate_scale > 0.0 and boundary_pair_gate_scale > 0.0
+            ):
                 tet_edge_pair_state = torch.stack(
                     [
                         gather_pair(pair, tet_i, tet_j),
@@ -2334,6 +2362,11 @@ class SimplicialAdapter(torch.nn.Module):
                     ],
                     dim=-2,
                 )
+            if edge_frame_message_scale > 0.0 and self.edge_frame_message_scale > 0.0:
+                tet_edge_update = tet_edge_update + edge_frame_message_scale * self.tetra_edge_frame_to_edge(
+                    torch.cat([tetra_edge_state, tet_frame_features], dim=-1)
+                )
+            if self.boundary_pair_gate_scale > 0.0 and boundary_pair_gate_scale > 0.0:
                 tet_edge_update = tet_edge_update + self.dropout(
                     boundary_pair_gate_scale
                     * torch.tanh(self.boundary_pair_gate(torch.cat([tet_edge_update, tet_edge_pair_state], dim=-1)))

@@ -504,6 +504,8 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.25",
             "--simplex-pre-triangle-single-update-scale",
             "0.0",
+            "--simplex-boundary-edge-frame-gate-scale",
+            "0.05",
             "--simplex-vertex-star-context-runtime-scale",
             "0.0",
             "--simplex-vertex-star-context-runtime-scale-final",
@@ -546,6 +548,7 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_edge_star_context_scale == 0.5
     assert cfg.simplex_pre_triangle_update_scale == 0.25
     assert cfg.simplex_pre_triangle_single_update_scale == 0.0
+    assert cfg.simplex_boundary_edge_frame_gate_scale == 0.05
     assert args.simplex_vertex_star_context_runtime_scale == 0.0
     assert args.simplex_vertex_star_context_runtime_scale_final == 1.0
     assert args.simplex_vertex_star_context_runtime_scale_ramp_start_step == 6000
@@ -1159,6 +1162,36 @@ def test_simplicial_pre_triangle_update_adds_no_parameters():
     assert global_context_params == 3_201_970
     assert pre_triangle_params == global_context_params
     assert pair_only_pre_triangle_params == global_context_params
+
+
+def test_simplicial_boundary_edge_frame_gate_stays_inside_medium_budget():
+    af2_medium = replace(load_model_config("medium"), use_simplicial_evoformer=False)
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    edge_frame_gate_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_face_top_k=24,
+        simplex_tetra_top_k=48,
+        simplex_cell_score_degree_penalty=0.75,
+        simplex_cell_score_outer_edge_weight=0.25,
+        simplex_edge_frame_message_scale=0.025,
+        simplex_boundary_edge_frame_gate_scale=0.05,
+        simplex_boundary_readout_directionality=0.25,
+        simplex_boundary_incidence_normalization=1.0,
+        simplex_global_context_scale=0.10,
+        simplex_vertex_star_context_scale=1.0,
+        simplex_edge_star_context_scale=1.0,
+    )
+
+    af2_params = sum(parameter.numel() for parameter in AlphaFold2(af2_medium).parameters())
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    edge_frame_gate_params = sum(parameter.numel() for parameter in AlphaFold2(edge_frame_gate_medium).parameters())
+
+    assert af2_params == 3_106_642
+    assert simplex_params == 3_106_690
+    assert edge_frame_gate_params == 3_239_522
+    assert edge_frame_gate_params > 3_201_970
+    assert edge_frame_gate_params <= int(af2_params * 1.05)
 
 
 def test_pre_triangle_simplex_update_runs_evoformer_block_eagerly(monkeypatch):

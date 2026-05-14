@@ -467,6 +467,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "1.0",
             "--simplex-boundary-readout-directionality",
             "0.5",
+            "--simplex-boundary-edge-frame-gate-scale",
+            "0.05",
             "--simplex-global-context-scale",
             "0.125",
             "--simplex-vertex-star-context-scale",
@@ -621,6 +623,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_boundary_message_degree_attenuation == 0.5
     assert args.simplex_boundary_incidence_normalization == 1.0
     assert args.simplex_boundary_readout_directionality == 0.5
+    assert args.simplex_boundary_edge_frame_gate_scale == 0.05
     assert args.simplex_global_context_scale == 0.125
     assert args.simplex_vertex_star_context_scale == 0.75
     assert args.simplex_edge_star_context_scale == 0.5

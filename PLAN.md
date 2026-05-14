@@ -2098,3 +2098,21 @@ the pair tensor. The runtime ramp lets a resumed checkpoint receive this
 message gradually, so the experiment tests whether explicit higher-rank
 boundary cochains can become useful inputs to triangle reasoning rather than
 acting as an unrelated output loss.
+
+## 2026-05-14 E124 Edge-Frame Gate Prepared
+
+E121b remains the active run, and E123 remains the no-new-parameter fallback.
+The next heavier fallback is now implemented locally but should stay parked
+until E121b returns: a face-boundary-edge-frame gate. It scalarizes selected
+face geometry in each directed boundary edge frame, concatenates that oriented
+geometry with the face cochain and current boundary `Z_ij`, and uses the
+result to gate only the selected face-to-edge message before scatter back into
+the pair tensor.
+
+This is topology-native rather than an lDDT hack: the change asks whether a
+learned 2-simplex state can communicate through its own oriented boundary
+1-simplices more cleanly than an ungated cochain scatter. It adds no new loss
+and no dense coordinate objective. To stay within the AF2-medium +5% cap, the
+gate is intentionally face-boundary-only for now; the audited E120-style
+medium config with the new gate has `3,239,522` parameters, below the
+`3,261,974` cap.

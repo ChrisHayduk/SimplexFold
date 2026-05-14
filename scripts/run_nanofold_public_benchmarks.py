@@ -990,6 +990,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_outer_edge_context_scale", args.simplex_outer_edge_context_scale),
         ("simplex_hodge_face_update_scale", args.simplex_hodge_face_update_scale),
         ("simplex_edge_frame_message_scale", args.simplex_edge_frame_message_scale),
+        ("simplex_boundary_edge_frame_gate_scale", args.simplex_boundary_edge_frame_gate_scale),
         ("simplex_boundary_message_degree_attenuation", args.simplex_boundary_message_degree_attenuation),
         ("simplex_boundary_incidence_normalization", args.simplex_boundary_incidence_normalization),
         ("simplex_boundary_readout_directionality", args.simplex_boundary_readout_directionality),
@@ -2704,6 +2705,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the model config scale for edge-frame scalarized simplex messages.",
     )
     parser.add_argument(
+        "--simplex-boundary-edge-frame-gate-scale",
+        type=float,
+        default=None,
+        help="Gate selected simplex boundary-edge messages with oriented edge-frame scalar features.",
+    )
+    parser.add_argument(
         "--simplex-boundary-message-degree-attenuation",
         type=float,
         default=None,
@@ -3388,6 +3395,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_outer_edge_context_scale": args.simplex_outer_edge_context_scale,
         "simplex_hodge_face_update_scale": args.simplex_hodge_face_update_scale,
         "simplex_edge_frame_message_scale": args.simplex_edge_frame_message_scale,
+        "simplex_boundary_edge_frame_gate_scale": args.simplex_boundary_edge_frame_gate_scale,
         "simplex_boundary_message_degree_attenuation": args.simplex_boundary_message_degree_attenuation,
         "simplex_boundary_incidence_normalization": args.simplex_boundary_incidence_normalization,
         "simplex_boundary_readout_directionality": args.simplex_boundary_readout_directionality,

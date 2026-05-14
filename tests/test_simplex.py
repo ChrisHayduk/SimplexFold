@@ -91,6 +91,7 @@ class SimplexConfig:
     simplex_outer_edge_context_scale = 0.0
     simplex_hodge_face_update_scale = 0.0
     simplex_edge_frame_message_scale = 0.0
+    simplex_boundary_edge_frame_gate_scale = 0.0
     simplex_boundary_message_degree_attenuation = 0.0
     simplex_boundary_incidence_normalization = 0.0
     simplex_boundary_readout_directionality = 0.0
@@ -1160,6 +1161,36 @@ def test_edge_frame_message_scale_changes_pair_readout_within_adapter():
 
     off_pair, off_single, _ = off_adapter(pair, single, recycled_ca_coords=coords, recycled_frames=frames)
     on_pair, on_single, _ = on_adapter(pair, single, recycled_ca_coords=coords, recycled_frames=frames)
+
+    assert sum(p.numel() for p in on_adapter.parameters()) > sum(p.numel() for p in off_adapter.parameters())
+    assert not torch.allclose(on_pair, off_pair)
+    assert torch.allclose(on_single, off_single)
+
+
+def test_boundary_edge_frame_gate_modulates_boundary_readout():
+    class BoundaryEdgeFrameConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class BoundaryEdgeFrameGateConfig(BoundaryEdgeFrameConfig):
+        simplex_boundary_edge_frame_gate_scale = 0.25
+
+    torch.manual_seed(17)
+    off_adapter = SimplicialAdapter(BoundaryEdgeFrameConfig()).eval()
+    torch.manual_seed(17)
+    on_adapter = SimplicialAdapter(BoundaryEdgeFrameGateConfig()).eval()
+    pair = torch.randn(1, 5, 5, BoundaryEdgeFrameConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, BoundaryEdgeFrameConfig.c_s)
+    coords = torch.randn(1, 5, 3)
+    frames = torch.eye(3).reshape(1, 1, 3, 3).expand(1, 5, 3, 3).clone()
+
+    with torch.no_grad():
+        off_pair, off_single, _ = off_adapter(pair, single, recycled_ca_coords=coords, recycled_frames=frames)
+        on_pair, on_single, _ = on_adapter(pair, single, recycled_ca_coords=coords, recycled_frames=frames)
 
     assert sum(p.numel() for p in on_adapter.parameters()) > sum(p.numel() for p in off_adapter.parameters())
     assert not torch.allclose(on_pair, off_pair)
