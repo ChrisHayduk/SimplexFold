@@ -5957,3 +5957,21 @@
   checkpoint all missing), and history still ends at the inherited E120
   step-7500 row. Continue treating E125 as slow active training; leave the pod
   running and do not update final results until coherent artifacts return.
+- 2026-05-14T17:42Z E125 returned coherently on the owned Runpod pod at step
+  8000. The process exited, all required result/metadata/history/eval-detail/
+  checkpoint files were present, `results.csv` had one row, eval details had
+  1000 rows, history ended at step 8000, `effective_batch_size=8`,
+  `parameters=3,239,522 <= 3,261,974`, `stopped_early=False`, and the
+  intended ramped E125 metadata was present. Artifacts, checkpoint, and log
+  were pulled locally; `scripts/verify_nanofold_benchmark_artifacts.py` passed
+  with the expected step, batch, result rows, eval rows, history endpoint,
+  parameter cap, stopped-early state, and metadata. Result:
+  `val_lddt_ca=0.42745678713917734`, FoldScore `0.39857429602742195`,
+  `val_ca_drmsd=11.316084318935872`, C-alpha Rg
+  `11.29976204776764 / 16.30911695623398`, selected face/tetra boundary lDDT
+  `0.7486708375811577` / `0.7314348567426204`, and selected face/tetra
+  contraction `0.5641601893305779` / `0.565635446369648`. Decision: reject as
+  a 30k candidate. The smoother ramp improved FoldScore slightly versus E124
+  but reduced primary C-alpha lDDT, dRMSD, selected-boundary lDDT, and
+  contraction. Do not continue the plain boundary-edge-frame schedule family
+  without a new topology mechanism.

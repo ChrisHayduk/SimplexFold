@@ -5305,7 +5305,7 @@ Validation so far:
 
 ### E125: Ramped Face Boundary-Edge-Frame Gate
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: if E124's abrupt face boundary-edge-frame gate is directionally
 helpful but unstable, the same topological route should be tested as a
@@ -5348,6 +5348,20 @@ tensors loaded, `24` new gate tensors initialized, and metadata matching the
 intended ramped boundary-edge-frame recipe: `effective_batch_size=8`,
 `max_parameters=3,261,974`, allocation scale `0.05`, runtime scale `0.0`,
 runtime final `0.05`, ramp start step `7500`, and ramp steps `500`.
+
+Result: reject as a 30k candidate. E125 returned at step 8000 with
+`val_lddt_ca=0.4275`, FoldScore `0.3986`, `val_ca_drmsd=11.3161`, and
+C-alpha Rg `11.2998 / 16.3091`. Remote and local coherence passed:
+`completed_steps=8000`, one result row, 1000 eval-detail rows, history ending
+at step 8000, `effective_batch_size=8`, `parameters=3,239,522 <= 3,261,974`,
+`stopped_early=False`, checkpoint present, and the intended ramped
+boundary-edge-frame metadata. The smoother curriculum recovered a small amount
+of FoldScore versus abrupt E124, but it reduced primary C-alpha lDDT
+(`0.4275` versus E124's `0.4280`), worsened dRMSD, and softened selected
+face/tetra boundary lDDT (`0.7487` / `0.7314`) and contraction
+(`0.5642` / `0.5656`) relative to E124. Do not spend 30,000 steps on E125 or
+another plain boundary-edge-frame schedule; the family remains in the low-0.4
+band.
 
 Validation so far:
 

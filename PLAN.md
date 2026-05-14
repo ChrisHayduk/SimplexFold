@@ -1,4 +1,4 @@
-## Current Plan: Monitor E125 Ramped Boundary-Edge-Frame Gate
+## Current Plan: Pivot Beyond Boundary-Edge-Frame Gate
 
 E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
@@ -138,7 +138,7 @@ lDDT (`0.7583` / `0.7406`) plus contraction (`0.5614` / `0.5611`), but it
 remains below the `0.45` short-gate threshold and worsens FoldScore/dRMSD
 versus E123/E120. Do not spend 30,000 steps on E124.
 
-The active short gate is E125:
+E125 has now returned:
 `simplex_boundary_edge_frame_gate_runtime_scale` lets the same oriented
 face-boundary edge-frame gate ramp from `0.0` to the configured gate scale
 instead of switching on abruptly when resuming from E120. This stays inside the
@@ -147,12 +147,15 @@ through its directed boundary 1-simplices using edge-frame scalarized geometry;
 the only change is treating that inter-rank gate as a topology curriculum.
 Because E124 improved local selected-complex geometry but worsened global
 FoldScore/dRMSD, E125 should test whether a smoother handoff preserves the
-local boundary signal without over-contracting the global C-alpha trace. E125
-is now running on the owned Runpod pod `o1dy17ouv8w5mz` as
-`e125_ramped_boundary_edge_frame_gate_from_e120_s8000_c256_m64`, PID `46151`.
-It resumed the E120 checkpoint at step 7500/examples 60000 with
-`effective_batch_size=8`, `max_parameters=3,261,974`, E124's allocation scale
-fixed at `0.05`, and runtime ramp `0.0 -> 0.05` over steps 7500-8000.
+local boundary signal without over-contracting the global C-alpha trace. It
+returned at step 8000 with `val_lddt_ca=0.4275`, FoldScore `0.3986`,
+`val_ca_drmsd=11.3161`, and C-alpha Rg `11.2998 / 16.3091`. Remote and local
+coherence passed with `parameters=3,239,522 <= 3,261,974`,
+`effective_batch_size=8`, one result row, 1000 eval-detail rows, and history
+ending at step 8000. The ramp slightly improves FoldScore versus E124 but
+reduces primary C-alpha lDDT, dRMSD, selected-boundary lDDT, and contraction.
+Do not spend 30,000 steps on E125 or another plain boundary-edge-frame
+schedule.
 
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that
