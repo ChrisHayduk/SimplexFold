@@ -5713,3 +5713,10 @@
   and `git diff --check` passed. Do not launch E124 while E121b is active;
   consider it only after E121b/E123 clarify whether pre-triangle/cochain
   communication is worth another branch.
+- 2026-05-14T10:14Z E121b health poll: PID `1845` is still active on owned
+  pod `o1dy17ouv8w5mz`; `results.json` is absent and history still ends at
+  the inherited E120 step-7500 row. The process appears to be actively
+  training rather than wedged: `nvidia-smi` reported H100 GPU utilization
+  `38%`, memory `42,875 / 81,559` MiB, and power draw `179.76 W`; the Python
+  process showed high CPU while the log/history mtimes remained at launch
+  time. Keep waiting for the step-8000 eval/checkpoint boundary.
