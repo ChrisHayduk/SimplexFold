@@ -5728,3 +5728,14 @@
   pre-triangle injection ramped from `0.0` to `0.25` over steps 7500-8000;
   E124 should remain a later face boundary-edge-frame gate at scale `0.05`
   unless the pre-triangle family gives a reason to spend that extra budget.
+- 2026-05-14T10:30Z 30k-candidate assessment while E121b is active: there is
+  still no returned branch that deserves a 30,000-step confirmation. E120 is
+  the best returned score at `val_lddt_ca=0.4248`, so reaching `0.7` by step
+  30000 would require a qualitative local-to-global assembly improvement, not
+  just a smoother continuation. Treat E121b/E123 as plausible short gates
+  because pre-triangle simplex cochain injection is topology-native and gives
+  AF2 triangle reasoning earlier access to selected face/tetra evidence. Use
+  a stricter spend gate: below `0.45` at step 8000 means reject as another
+  low-0.4 branch; `0.45`-`0.50` needs another short confirmation; above
+  `0.50` with coherent FoldScore/dRMSD improvement is the first credible
+  30k-candidate signal. A tiny `0.005`-style gain over E120 is not enough.
