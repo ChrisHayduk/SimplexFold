@@ -5707,9 +5707,10 @@
   so the parked version is face-boundary-only and audits at `3,239,522`
   parameters under the cap. Validation passed:
   `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
-  focused E124/parser/budget tests reported `6 passed`;
+  focused E124/parser/budget tests reported `7 passed`, including a
+  tetra-enabled regression case for the parked face-boundary gate;
   `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
-  reported `205 passed`; the touched-file ruff undefined-name check passed;
+  reported `206 passed`; the touched-file ruff undefined-name check passed;
   and `git diff --check` passed. Do not launch E124 while E121b is active;
   consider it only after E121b/E123 clarify whether pre-triangle/cochain
   communication is worth another branch.

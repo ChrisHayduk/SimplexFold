@@ -1197,6 +1197,46 @@ def test_boundary_edge_frame_gate_modulates_boundary_readout():
     assert torch.allclose(on_single, off_single)
 
 
+def test_boundary_edge_frame_gate_runs_with_tetra_enabled():
+    class BoundaryEdgeFrameTetraConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class BoundaryEdgeFrameTetraGateConfig(BoundaryEdgeFrameTetraConfig):
+        simplex_boundary_edge_frame_gate_scale = 0.25
+
+    torch.manual_seed(23)
+    off_adapter = SimplicialAdapter(BoundaryEdgeFrameTetraConfig()).eval()
+    torch.manual_seed(23)
+    on_adapter = SimplicialAdapter(BoundaryEdgeFrameTetraGateConfig()).eval()
+    pair = torch.randn(1, 6, 6, BoundaryEdgeFrameTetraConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 6, BoundaryEdgeFrameTetraConfig.c_s)
+    coords = torch.randn(1, 6, 3)
+    frames = torch.eye(3).reshape(1, 1, 3, 3).expand(1, 6, 3, 3).clone()
+
+    with torch.no_grad():
+        off_pair, off_single, off_aux = off_adapter(
+            pair,
+            single,
+            recycled_ca_coords=coords,
+            recycled_frames=frames,
+        )
+        on_pair, on_single, on_aux = on_adapter(
+            pair,
+            single,
+            recycled_ca_coords=coords,
+            recycled_frames=frames,
+        )
+
+    assert off_aux["simplex_tetra_distance_logits"].shape[-3] > 0
+    assert on_aux["simplex_tetra_distance_logits"].shape == off_aux["simplex_tetra_distance_logits"].shape
+    assert not torch.allclose(on_pair, off_pair)
+    assert torch.allclose(on_single, off_single)
+
+
 def test_edge_frame_message_runtime_scale_gates_pair_readout():
     class EdgeFrameConfig(SimplexConfig):
         simplex_neighbor_k = 3
