@@ -6053,3 +6053,12 @@
   with `10 passed`. Keep E127 parked until E126 returns and is
   pulled/verified; launch only if the E126 result suggests triangle-attention
   cochain routing is directionally useful but too weak.
+- 2026-05-14T19:12Z E126 remains active on the owned Runpod pod. PID `1120`
+  stayed alive through a four-sample monitor window from `19:11:41Z` to
+  `19:12:11Z`; process CPU stayed around `755%`, H100 memory stayed at
+  `42899 MiB`, and sampled GPU utilization ranged from `35%` to `57%`.
+  The log still only contains clean startup/resume lines, `history_full_msa_to_face.json`
+  has not advanced past its inherited startup timestamp, and no final result
+  files exist yet. Treat this as slow active training; do not pull, update
+  `EXPERIMENT_RESULTS.md`, stop the pod, or launch E127 while E126 is still
+  alive.
