@@ -506,6 +506,14 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.0",
             "--simplex-boundary-edge-frame-gate-scale",
             "0.05",
+            "--simplex-boundary-edge-frame-gate-runtime-scale",
+            "0.0",
+            "--simplex-boundary-edge-frame-gate-runtime-scale-final",
+            "0.05",
+            "--simplex-boundary-edge-frame-gate-runtime-scale-ramp-start-step",
+            "6000",
+            "--simplex-boundary-edge-frame-gate-runtime-scale-ramp-steps",
+            "500",
             "--simplex-vertex-star-context-runtime-scale",
             "0.0",
             "--simplex-vertex-star-context-runtime-scale-final",
@@ -549,6 +557,10 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_pre_triangle_update_scale == 0.25
     assert cfg.simplex_pre_triangle_single_update_scale == 0.0
     assert cfg.simplex_boundary_edge_frame_gate_scale == 0.05
+    assert args.simplex_boundary_edge_frame_gate_runtime_scale == 0.0
+    assert args.simplex_boundary_edge_frame_gate_runtime_scale_final == 0.05
+    assert args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step == 6000
+    assert args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps == 500
     assert args.simplex_vertex_star_context_runtime_scale == 0.0
     assert args.simplex_vertex_star_context_runtime_scale_final == 1.0
     assert args.simplex_vertex_star_context_runtime_scale_ramp_start_step == 6000

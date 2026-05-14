@@ -248,6 +248,7 @@ class SimplicialEvoformer(torch.nn.Module):
         simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
         simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_edge_frame_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
         simplex_vertex_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_star_context_scale_override: Optional[torch.Tensor] = None,
@@ -313,6 +314,7 @@ class SimplicialEvoformer(torch.nn.Module):
                 simplex_outer_edge_context_scale_override=simplex_outer_edge_context_scale_override,
                 simplex_hodge_face_update_scale_override=simplex_hodge_face_update_scale_override,
                 simplex_edge_frame_message_scale_override=simplex_edge_frame_message_scale_override,
+                simplex_boundary_edge_frame_gate_scale_override=simplex_boundary_edge_frame_gate_scale_override,
                 simplex_boundary_readout_directionality_override=(
                     simplex_boundary_readout_directionality_override
                 ),
@@ -377,6 +379,7 @@ class SimplicialEvoformer(torch.nn.Module):
                 simplex_outer_edge_context_scale_override=simplex_outer_edge_context_scale_override,
                 simplex_hodge_face_update_scale_override=simplex_hodge_face_update_scale_override,
                 simplex_edge_frame_message_scale_override=simplex_edge_frame_message_scale_override,
+                simplex_boundary_edge_frame_gate_scale_override=simplex_boundary_edge_frame_gate_scale_override,
                 simplex_boundary_readout_directionality_override=(
                     simplex_boundary_readout_directionality_override
                 ),

@@ -6,6 +6,7 @@ from minalphafold.trainer import (
     load_model_config,
     model_inputs_from_batch,
     simplex_boundary_cochain_recycling_runtime_scale_at_step,
+    simplex_boundary_edge_frame_gate_runtime_scale_at_step,
     simplex_boundary_metric_gate_runtime_scale_at_step,
     simplex_boundary_metric_recycling_runtime_scale_at_step,
     simplex_boundary_pair_feedback_runtime_scale_at_step,
@@ -469,6 +470,14 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.5",
             "--simplex-boundary-edge-frame-gate-scale",
             "0.05",
+            "--simplex-boundary-edge-frame-gate-runtime-scale",
+            "0.0",
+            "--simplex-boundary-edge-frame-gate-runtime-scale-final",
+            "0.05",
+            "--simplex-boundary-edge-frame-gate-runtime-scale-ramp-start-step",
+            "3000",
+            "--simplex-boundary-edge-frame-gate-runtime-scale-ramp-steps",
+            "500",
             "--simplex-global-context-scale",
             "0.125",
             "--simplex-vertex-star-context-scale",
@@ -624,6 +633,10 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_boundary_incidence_normalization == 1.0
     assert args.simplex_boundary_readout_directionality == 0.5
     assert args.simplex_boundary_edge_frame_gate_scale == 0.05
+    assert args.simplex_boundary_edge_frame_gate_runtime_scale == 0.0
+    assert args.simplex_boundary_edge_frame_gate_runtime_scale_final == 0.05
+    assert args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step == 3000
+    assert args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps == 500
     assert args.simplex_global_context_scale == 0.125
     assert args.simplex_vertex_star_context_scale == 0.75
     assert args.simplex_edge_star_context_scale == 0.5
@@ -710,6 +723,10 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         simplex_edge_frame_message_runtime_scale_final=0.05,
         simplex_edge_frame_message_runtime_scale_ramp_start_step=3000,
         simplex_edge_frame_message_runtime_scale_ramp_steps=500,
+        simplex_boundary_edge_frame_gate_runtime_scale=0.0,
+        simplex_boundary_edge_frame_gate_runtime_scale_final=0.05,
+        simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step=3000,
+        simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps=500,
         simplex_boundary_readout_directionality_runtime_scale=0.0,
         simplex_boundary_readout_directionality_runtime_scale_final=0.5,
         simplex_boundary_readout_directionality_runtime_scale_ramp_start_step=3000,
@@ -806,6 +823,9 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert simplex_edge_frame_message_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_edge_frame_message_runtime_scale_at_step(cfg, 3250) == 0.025
     assert simplex_edge_frame_message_runtime_scale_at_step(cfg, 3500) == 0.05
+    assert simplex_boundary_edge_frame_gate_runtime_scale_at_step(cfg, 3000) == 0.0
+    assert simplex_boundary_edge_frame_gate_runtime_scale_at_step(cfg, 3250) == 0.025
+    assert simplex_boundary_edge_frame_gate_runtime_scale_at_step(cfg, 3500) == 0.05
     assert simplex_boundary_readout_directionality_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_boundary_readout_directionality_runtime_scale_at_step(cfg, 3250) == 0.25
     assert simplex_boundary_readout_directionality_runtime_scale_at_step(cfg, 3500) == 0.5
@@ -863,6 +883,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         use_simplex_update_scale=True,
         use_simplex_outer_edge_context_runtime_scale=True,
         use_simplex_edge_frame_message_runtime_scale=True,
+        use_simplex_boundary_edge_frame_gate_runtime_scale=True,
         use_simplex_boundary_readout_directionality_runtime_scale=True,
         use_simplex_vertex_star_context_runtime_scale=True,
         use_simplex_edge_star_context_runtime_scale=True,
@@ -884,6 +905,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert torch.isclose(inputs["simplex_single_update_scale_override"], torch.tensor(0.625))
     assert torch.isclose(inputs["simplex_outer_edge_context_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_edge_frame_message_scale_override"], torch.tensor(0.025))
+    assert torch.isclose(inputs["simplex_boundary_edge_frame_gate_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
     assert torch.isclose(inputs["simplex_vertex_star_context_scale_override"], torch.tensor(0.5))
     assert torch.isclose(inputs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
@@ -928,6 +950,10 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
         simplex_edge_frame_message_runtime_scale_final=0.05,
         simplex_edge_frame_message_runtime_scale_ramp_start_step=3000,
         simplex_edge_frame_message_runtime_scale_ramp_steps=500,
+        simplex_boundary_edge_frame_gate_runtime_scale=0.0,
+        simplex_boundary_edge_frame_gate_runtime_scale_final=0.05,
+        simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step=3000,
+        simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps=500,
         simplex_boundary_readout_directionality_runtime_scale=0.0,
         simplex_boundary_readout_directionality_runtime_scale_final=0.5,
         simplex_boundary_readout_directionality_runtime_scale_ramp_start_step=3000,
@@ -1039,6 +1065,7 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
     assert torch.isclose(model.kwargs["simplex_pair_update_scale_override"], torch.tensor(0.75))
     assert torch.isclose(model.kwargs["simplex_single_update_scale_override"], torch.tensor(0.625))
     assert torch.isclose(model.kwargs["simplex_edge_frame_message_scale_override"], torch.tensor(0.025))
+    assert torch.isclose(model.kwargs["simplex_boundary_edge_frame_gate_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
     assert torch.isclose(model.kwargs["simplex_vertex_star_context_scale_override"], torch.tensor(0.5))
     assert torch.isclose(model.kwargs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))

@@ -1878,6 +1878,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
         simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_edge_frame_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
         simplex_vertex_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_star_context_scale_override: Optional[torch.Tensor] = None,
@@ -1917,6 +1918,12 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_edge_frame_message_scale_override is not None:
             edge_frame_message_scale = max(
                 float(simplex_edge_frame_message_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
+        boundary_edge_frame_gate_scale = self.boundary_edge_frame_gate_scale
+        if simplex_boundary_edge_frame_gate_scale_override is not None:
+            boundary_edge_frame_gate_scale = max(
+                float(simplex_boundary_edge_frame_gate_scale_override.detach().float().cpu().item()),
                 0.0,
             )
         boundary_readout_directionality = self.boundary_readout_directionality
@@ -2240,9 +2247,9 @@ class SimplicialAdapter(torch.nn.Module):
             face_edge_update = face_edge_update + edge_frame_message_scale * self.face_edge_frame_to_edge(
                 torch.cat([face_edge_state, face_frame_features], dim=-1)
             )
-        if self.boundary_edge_frame_gate_scale > 0.0:
+        if self.boundary_edge_frame_gate_scale > 0.0 and boundary_edge_frame_gate_scale > 0.0:
             face_edge_update = face_edge_update + self.dropout(
-                self.boundary_edge_frame_gate_scale
+                boundary_edge_frame_gate_scale
                 * torch.tanh(
                     self.face_boundary_edge_frame_gate(
                         torch.cat([face_edge_state, face_edge_pair_state, face_frame_features], dim=-1)

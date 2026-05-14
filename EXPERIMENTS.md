@@ -5287,3 +5287,39 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `206 passed`
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - `git diff --check`: passed
+
+### E125: Ramped Face Boundary-Edge-Frame Gate
+
+Status: implemented locally as a queued fallback while E124 is still running;
+not launched.
+
+Hypothesis: if E124's abrupt face boundary-edge-frame gate is directionally
+helpful but unstable, the same topological route should be tested as a
+curriculum. This is not a new loss and not a different geometric target. It
+keeps E124's selected face cochain communication through directed boundary
+1-simplices, but exposes `simplex_boundary_edge_frame_gate_runtime_scale` so
+the oriented edge-frame gate can ramp in after a resumed checkpoint.
+
+Mechanism: the model still allocates the gate with
+`simplex_boundary_edge_frame_gate_scale=0.05`, preserving the E124 parameter
+count and boundary-edge-frame MLP. The new training/runtime override can pass
+`simplex_boundary_edge_frame_gate_scale_override` through the trainer,
+benchmark runner, AlphaFold2 forward path, SimplicialEvoformer blocks, and the
+SimplicialAdapter. At runtime, the gate contribution can be `0.0` at resume
+and ramp to `0.05` by the step-8000 validation point.
+
+Candidate launch if E124 rejects but suggests abrupt-gate instability:
+
+```bash
+--run-name e125_ramped_boundary_edge_frame_gate_from_e120_s8000_c256_m64 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-boundary-edge-frame-gate-runtime-scale 0.0 \
+--simplex-boundary-edge-frame-gate-runtime-scale-final 0.05 \
+--simplex-boundary-edge-frame-gate-runtime-scale-ramp-start-step 7500 \
+--simplex-boundary-edge-frame-gate-runtime-scale-ramp-steps 500
+```
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_boundary_edge_frame_gate_runtime_scale_gates_pair_readout tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_edge_frame_gate_stays_inside_medium_budget tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `6 passed`

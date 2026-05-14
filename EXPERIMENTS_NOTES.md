@@ -5858,3 +5858,17 @@
   `results.json` has not been written yet. The history is still at inherited
   pre-step-8000 validation rows, so there is no returned E124 metric to record
   in `EXPERIMENT_RESULTS.md`.
+- 2026-05-14T14:30Z E124 health check: PID `33724` remains active on the
+  owned pod. The final artifacts are still absent: no `results.json`, no
+  `results.csv`, no eval details, and no checkpoint. The history still ends at
+  step 7500 with inherited `val_lddt_ca=0.4248279729783535`.
+- 2026-05-14T14:31Z prepared E125 locally while E124 runs:
+  `simplex_boundary_edge_frame_gate_runtime_scale` adds a runtime ramp for the
+  same oriented face boundary-edge-frame gate used by E124. This keeps the
+  change inside the selected-complex/topological view: selected face cochains
+  still communicate through directed boundary 1-simplices with edge-frame
+  scalarized geometry; the new knob only lets that gate turn on as a
+  curriculum. Py_compile passed for the simplex/evoformer/model/trainer/runner
+  slice, and focused tests passed (`6 passed`) for adapter runtime gating,
+  trainer CLI parsing, AF2-medium budget preservation, benchmark CLI parsing,
+  model-input plumbing, and validation-time runtime overrides.

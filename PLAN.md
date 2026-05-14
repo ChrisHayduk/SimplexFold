@@ -141,6 +141,19 @@ metadata: boundary edge-frame gate scale `0.05`, directed boundary readout
 vertex-star context `1.0`, edge-star context `0.5`, and sparse caps
 `24 / 48`.
 
+While E124 runs, a no-science-change E125 fallback is now prepared locally:
+`simplex_boundary_edge_frame_gate_runtime_scale` lets the same oriented
+face-boundary edge-frame gate ramp from `0.0` to the configured gate scale
+instead of switching on abruptly when resuming from E120. This stays inside the
+same selected-complex view as E124. The selected face cochain still writes
+through its directed boundary 1-simplices using edge-frame scalarized geometry;
+the only change is treating that inter-rank gate as a topology curriculum. If
+E124 returns below the short gate, E125 should be the first follow-up only if a
+smooth-on variant is scientifically useful after inspecting the E124 boundary
+diagnostics. A candidate launch would keep `simplex_boundary_edge_frame_gate_scale=0.05`
+for parameter allocation but add a runtime ramp from `0.0` to `0.05` over
+steps 7500-8000.
+
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that
 preserving directed boundary-edge incidence helps relative to E100 but still

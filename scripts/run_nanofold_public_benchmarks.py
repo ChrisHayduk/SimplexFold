@@ -64,6 +64,7 @@ from minalphafold.trainer import (  # noqa: E402
     resolve_device,
     set_optimizer_learning_rate,
     set_seed,
+    simplex_boundary_edge_frame_gate_runtime_scale_at_step,
     simplex_boundary_cochain_recycling_runtime_scale_at_step,
     simplex_boundary_metric_gate_runtime_scale_at_step,
     simplex_boundary_metric_recycling_runtime_scale_at_step,
@@ -646,6 +647,7 @@ def _evaluate(
                         use_simplex_outer_edge_context_runtime_scale=True,
                         use_simplex_hodge_face_runtime_scale=True,
                         use_simplex_edge_frame_message_runtime_scale=True,
+                        use_simplex_boundary_edge_frame_gate_runtime_scale=True,
                         use_simplex_boundary_readout_directionality_runtime_scale=True,
                         use_simplex_vertex_star_context_runtime_scale=True,
                         use_simplex_edge_star_context_runtime_scale=True,
@@ -1213,6 +1215,10 @@ def _train_variant(
             training_config,
             step,
         )
+        simplex_boundary_edge_frame_gate_runtime_scale = simplex_boundary_edge_frame_gate_runtime_scale_at_step(
+            training_config,
+            step,
+        )
         simplex_boundary_readout_directionality_runtime_scale = (
             simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, step)
         )
@@ -1283,6 +1289,7 @@ def _train_variant(
                         use_simplex_outer_edge_context_runtime_scale=True,
                         use_simplex_hodge_face_runtime_scale=True,
                         use_simplex_edge_frame_message_runtime_scale=True,
+                        use_simplex_boundary_edge_frame_gate_runtime_scale=True,
                         use_simplex_boundary_readout_directionality_runtime_scale=True,
                         use_simplex_vertex_star_context_runtime_scale=True,
                         use_simplex_edge_star_context_runtime_scale=True,
@@ -1415,6 +1422,11 @@ def _train_variant(
                     float("nan")
                     if simplex_edge_frame_message_runtime_scale is None
                     else simplex_edge_frame_message_runtime_scale
+                ),
+                "simplex_boundary_edge_frame_gate_runtime_scale": (
+                    float("nan")
+                    if simplex_boundary_edge_frame_gate_runtime_scale is None
+                    else simplex_boundary_edge_frame_gate_runtime_scale
                 ),
                 "simplex_boundary_readout_directionality_runtime_scale": (
                     float("nan")
@@ -1701,6 +1713,18 @@ def _train_variant(
         ),
         "simplex_edge_frame_message_runtime_scale_ramp_steps": (
             training_config.simplex_edge_frame_message_runtime_scale_ramp_steps
+        ),
+        "simplex_boundary_edge_frame_gate_runtime_scale": (
+            training_config.simplex_boundary_edge_frame_gate_runtime_scale
+        ),
+        "simplex_boundary_edge_frame_gate_runtime_scale_final": (
+            training_config.simplex_boundary_edge_frame_gate_runtime_scale_final
+        ),
+        "simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step": (
+            training_config.simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step
+        ),
+        "simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps": (
+            training_config.simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps
         ),
         "simplex_boundary_readout_directionality_runtime_scale": (
             training_config.simplex_boundary_readout_directionality_runtime_scale
@@ -2083,6 +2107,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_edge_frame_message_runtime_scale_final",
         "simplex_edge_frame_message_runtime_scale_ramp_start_step",
         "simplex_edge_frame_message_runtime_scale_ramp_steps",
+        "simplex_boundary_edge_frame_gate_runtime_scale",
+        "simplex_boundary_edge_frame_gate_runtime_scale_final",
+        "simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step",
+        "simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps",
         "simplex_boundary_readout_directionality_runtime_scale",
         "simplex_boundary_readout_directionality_runtime_scale_final",
         "simplex_boundary_readout_directionality_runtime_scale_ramp_start_step",
@@ -2711,6 +2739,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Gate selected simplex boundary-edge messages with oriented edge-frame scalar features.",
     )
     parser.add_argument(
+        "--simplex-boundary-edge-frame-gate-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for oriented edge-frame gates on selected face boundary messages.",
+    )
+    parser.add_argument("--simplex-boundary-edge-frame-gate-runtime-scale-final", type=float, default=None)
+    parser.add_argument(
+        "--simplex-boundary-edge-frame-gate-runtime-scale-ramp-start-step",
+        type=int,
+        default=None,
+    )
+    parser.add_argument("--simplex-boundary-edge-frame-gate-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-boundary-message-degree-attenuation",
         type=float,
         default=None,
@@ -3012,6 +3053,16 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
             args.simplex_edge_frame_message_runtime_scale_ramp_start_step
         ),
         simplex_edge_frame_message_runtime_scale_ramp_steps=args.simplex_edge_frame_message_runtime_scale_ramp_steps,
+        simplex_boundary_edge_frame_gate_runtime_scale=args.simplex_boundary_edge_frame_gate_runtime_scale,
+        simplex_boundary_edge_frame_gate_runtime_scale_final=(
+            args.simplex_boundary_edge_frame_gate_runtime_scale_final
+        ),
+        simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step=(
+            args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step
+        ),
+        simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps=(
+            args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps
+        ),
         simplex_boundary_readout_directionality_runtime_scale=(
             args.simplex_boundary_readout_directionality_runtime_scale
         ),
@@ -3262,6 +3313,16 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         ),
         "simplex_edge_frame_message_runtime_scale_ramp_steps": (
             args.simplex_edge_frame_message_runtime_scale_ramp_steps
+        ),
+        "simplex_boundary_edge_frame_gate_runtime_scale": args.simplex_boundary_edge_frame_gate_runtime_scale,
+        "simplex_boundary_edge_frame_gate_runtime_scale_final": (
+            args.simplex_boundary_edge_frame_gate_runtime_scale_final
+        ),
+        "simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step": (
+            args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step
+        ),
+        "simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps": (
+            args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_steps
         ),
         "simplex_boundary_readout_directionality_runtime_scale": (
             args.simplex_boundary_readout_directionality_runtime_scale
