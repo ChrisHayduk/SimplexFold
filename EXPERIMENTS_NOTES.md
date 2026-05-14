@@ -6186,3 +6186,12 @@
   the log was unchanged after startup, and history still ended at inherited
   step 8000. Leave the job running; do not pull, stop, or launch another run
   until E128 writes a coherent step-8500 bundle or exits.
+- 2026-05-14T21:36Z-21:45Z bounded E128 watch on the owned pod: PID `1523`
+  stayed alive from about `08:17` through `17:18` elapsed, process CPU stayed
+  around `758%`-`773%`, RSS stayed about `2.0 GiB`, and the process kept `178`
+  threads. H100 memory stayed allocated at `43353 MiB`, with sampled GPU
+  utilization ranging from `19%` to `95%`. The artifact directory still had
+  only `run_metadata.json` and `history_full_msa_to_face.json`, history still
+  ended at inherited step 8000, and no `results.csv` or checkpoint was present.
+  Interpretation: active training/evaluation before the step-8500 writeout;
+  leave the run alone and let the heartbeat catch the coherent result bundle.
