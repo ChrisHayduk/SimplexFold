@@ -5251,3 +5251,7 @@
   utilization `31%`, and `13593 MiB` GPU memory allocated. Still no result
   files, eval-detail file, or checkpoint. Continue waiting for the first
   step-6500 validation write.
+- E117 health poll after about 25.5 minutes: PID `13554` remained active on
+  the owned pod with state `Sl`, about `1015%` CPU, 178 threads, sampled GPU
+  utilization `31%`, and `13593 MiB` GPU memory allocated. Still no result
+  files, eval-detail file, or checkpoint; keep waiting and do not launch E118.
