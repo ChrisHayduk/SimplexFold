@@ -5543,3 +5543,15 @@
   utilization samples between `29%` and `52%` around 13.6 GiB allocated. Treat
   the run as long-running rather than stalled; leave it alive and let the
   heartbeat or next manual poll catch the 7500-step return.
+- E120 health at `2026-05-14T08:34:17Z`: still active on owned pod
+  `o1dy17ouv8w5mz` with PID `1274`, elapsed `01:25:36`, accumulated process
+  CPU time `14:59:05`, and no `results.json`. Code inspection explains why the
+  artifact directory can remain quiet until the end: after resuming from step
+  7000, this benchmark loop only logs/evaluates/checkpoints on `step % 500 == 0`
+  or final step, so the next expected history row is step 7500. The mixed
+  vertex/edge-star route is also computationally heavier than the isolated
+  vertex-star route because `edge_star_cell_mean` materializes dense `L x L`
+  boundary-edge star cochains for both face and tetra states before gathering
+  selected boundary edges back into cells. Treat E120 as a slow active gate,
+  not a failed launch; do not stop or replace it unless the process exits
+  without coherent step-7500 artifacts.
