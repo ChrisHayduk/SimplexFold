@@ -202,18 +202,34 @@ constructed from explicit selected higher-rank cells and can influence the
 main trunk only by returning through those cells. It is not a generic C-alpha
 lDDT, radius, or all-pairs distance loss.
 
-Gate: after E115 returned low, do not resume blindly from E113/E115. The owned
-Runpod pod retains checkpoints for E72 and E105a-E115, but no E96/E97-family
-checkpoint. Use the retained E106 checkpoint only as a short recovery-branch
-test. Keep the E113/E115 selected sparse complex fixed where compatible:
+Gate: after E115 returned low, do not resume blindly from E113/E115. The first
+owned Runpod checkpoint audit retained E72 and E105a-E115 but no E96/E97-family
+checkpoint; restarting the zero-volume pod then wiped `/workspace` again, so
+only local retained checkpoints up through E72 are available. Launch E116 from
+E72 to step 6000 as a short recovery-branch probe, not a 30k candidate. Keep
+the E105a sparse-complex settings fixed where compatible:
 `--simplex-face-top-k 24`, `--simplex-tetra-top-k 48`,
 `--simplex-cell-score-degree-penalty 0.75`,
 `--simplex-cell-score-outer-edge-weight 0.25`, edge-frame message allocation,
 directed boundary readout at `0.25`, boundary incidence normalization `1.0`,
-and `--simplex-global-context-scale 0.10`. Compare primarily against the source
-checkpoint, E106/E113/E115, and the global E96 leader. Treat it as a real 30k
-candidate only if it leaves the `0.40` lDDT band and improves the
-local-to-global translation diagnostics.
+and `--simplex-global-context-scale 0.10`, while leaving metric/cochain
+recycling disabled so the new effect is the global selected-complex context.
+Compare primarily against E72 and E105a, with E96 still the global leader.
+Treat it as a real 30k candidate only if it leaves the `0.40` lDDT band and
+improves the local-to-global translation diagnostics.
+
+Launch: E116 is running as
+`e116_global_context_from_e72_s6000_c256_m64` on owned Runpod pod
+`o1dy17ouv8w5mz`. The pod had to be restaged after zero-volume restart wiped
+`/workspace`: SimplexFold was recloned at commit `7ba7bc9`, nanoFold was
+recloned at commit `96afc846`, public processed features/labels/manifests and
+the E72 checkpoint were transferred as a single Runpod archive, and remote
+audit confirmed `11000/11000` feature/label NPZs, `10000/1000/11000`
+train/val/all manifest rows, zero `._*` sidecars, E72 checkpoint present,
+py_compile passed, and the launch-style parameter count was `3,201,970`
+under the `3,261,974` cap. Startup confirmed PID `1566`, resume from E72 at
+step 5500/examples 44000, `1244` matching tensors loaded, and `48`
+new/missing tensors initialized for the global-context modules.
 
 Validation so far:
 

@@ -181,11 +181,14 @@ all-pairs distance loss.
 The E116 launch-style parameter audit for the E113/E115 sparse recipe plus
 global context is `3,201,970`, still under the AF2-medium +5% cap of
 `3,261,974`. Do not launch it from E113/E115 blindly now that E115 returned
-low. The owned-pod checkpoint audit found retained checkpoints for E72 and
-E105a-E115, but no E96/E97-family checkpoint. E116 from E106 may still be a
-fair short recovery test because E106 is the strongest stable retained source;
-E116 from E113/E115 should not be treated as a candidate for 30,000 steps
-unless it breaks out of the `0.40` band quickly.
+low. The first owned-pod checkpoint audit found retained checkpoints for E72
+and E105a-E115, but no E96/E97-family checkpoint. Restarting the zero-volume
+pod then wiped `/workspace` again, leaving only local retained checkpoints up
+through E72. Therefore E116 is launched as a clean E72-sourced short gate to
+step 6000, using the E105a sparse-complex recipe with metric recycling removed
+and global selected-complex context enabled. Treat it as a recovery probe
+against E72/E105a, not as a 30,000-step candidate unless it breaks out of the
+`0.40` band quickly.
 
 ## Historical Plan Context
 

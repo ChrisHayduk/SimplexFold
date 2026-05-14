@@ -5093,3 +5093,37 @@
 - Paused heartbeat `check-simplexfold-e57-runpod` because no SimplexFold
   benchmark is active. Stopped owned pod `o1dy17ouv8w5mz` after local
   verification and checkpoint audit; Runpod reported desired status `EXITED`.
+- Restarted owned pod `o1dy17ouv8w5mz` to continue the E116 probe. As after
+  E104, the zero-volume restart returned with an empty `/workspace`; the
+  remote SimplexFold checkout, NanoFold checkout, and E105a-E115 checkpoints
+  were gone. Local retained checkpoints only go up through E72, so the
+  immediate E116 launch source changed from E106 to E72.
+- Restaged the owned pod from scratch for E116. Cloned SimplexFold branch
+  `codex/simplexfold-topology-e07-boundary-coordinate` at commit `7ba7bc9`,
+  cloned nanoFold-Competition at commit `96afc846`, recreated
+  `/workspace/venv` with system site packages, and installed SimplexFold
+  editable. Rsync was too slow on the many-file public data tree, so the final
+  transfer used a single Runpod croc archive
+  `/tmp/simplexfold_e116_stage.tgz` containing public `processed_features`,
+  `processed_labels`, `manifests`, and the local E72 checkpoint. Remote audit
+  confirmed feature/label NPZ counts `11000/11000`, manifest rows
+  `10000/1000/11000`, zero `._*` sidecars, E72 checkpoint present, py_compile
+  passed for model/runner files, CLI support for `--simplex-global-context-scale`,
+  and launch-style parameter count `3,201,970 <= 3,261,974`.
+- E116 launched on owned pod `o1dy17ouv8w5mz` as
+  `e116_global_context_from_e72_s6000_c256_m64`, PID `1566`, log
+  `/workspace/SimplexFold/logs/e116_global_context_from_e72.log`, and artifact
+  path
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e116_global_context_from_e72_s6000_c256_m64/`.
+  It resumes the local E72 checkpoint at step 5500/examples 44000 with
+  `--resume-model-weights-only`, keeps the E105a sparse-complex recipe fixed,
+  disables metric/cochain recycling, and enables
+  `--simplex-global-context-scale 0.10`. Startup showed `1244` matching
+  tensors loaded and `48` new/missing tensors initialized for the
+  global-context modules with a fresh optimizer.
+- E116 startup health poll: PID `1566` remained active after about 42 seconds,
+  GPU memory was allocated, metadata recorded `steps=6000`,
+  `effective_batch_size=8`, `max_parameters=3261974`,
+  `simplex_global_context_scale=0.1`, `simplex_face_top_k=24`, and
+  `simplex_tetra_top_k=48`. The inherited history had 12 rows ending at E72
+  step 5500 and no `results.json` yet.
