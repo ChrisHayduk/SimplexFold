@@ -498,6 +498,7 @@ def apply_model_config_cli_overrides(model_config: ModelConfig, args: argparse.N
         "simplex_global_context_scale",
         "simplex_vertex_star_context_scale",
         "simplex_edge_star_context_scale",
+        "simplex_pre_triangle_update_scale",
     ):
         value = getattr(args, field_name, None)
         if value is not None:
@@ -2381,6 +2382,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Interpolate selected global-complex context toward boundary-edge star incidence context.",
+    )
+    parser.add_argument(
+        "--simplex-pre-triangle-update-scale",
+        type=float,
+        default=None,
+        help="Run a scaled simplex cochain update before pair triangle operations in each enabled block.",
     )
     parser.add_argument("--simplex-vertex-star-context-runtime-scale", type=float, default=None)
     parser.add_argument("--simplex-vertex-star-context-runtime-scale-final", type=float, default=None)

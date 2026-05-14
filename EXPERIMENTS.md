@@ -520,6 +520,52 @@ new/missing tensors initialized, `effective_batch_size=8`,
 `simplex_edge_star_context_scale=1.0`, and edge-star runtime ramp `0.0` to
 `0.5` over steps 7000-7500.
 
+### E121 Idea: Pre-Triangle Simplex Injection
+
+Status: implemented locally and parked until E120 returns.
+
+Hypothesis: E116-E120 all point at the same local-to-global bottleneck:
+selected face/tetra cochains learn useful local boundary geometry, but the
+main trunk does not assemble that signal into a substantially better C-alpha
+trace. In the current block order, the simplex adapter writes back to pair
+state after the AF2-style triangle multiplication/attention stack. E121 tests
+whether the simplex signal needs to enter `Z_ij` before those triangle updates
+so the trunk can propagate higher-rank evidence through its strongest global
+pair-geometry machinery inside the same block.
+
+Mechanism: add default-off `simplex_pre_triangle_update_scale`. Each enabled
+SimplicialEvoformer block may run the existing SimplicialAdapter once after
+MSA/outer-product updates and before triangle multiplication/attention, using
+the configured scale as a temporary pair/single update scale. The normal
+post-triangle simplex adapter still runs afterward. This reuses the existing
+face/tetra adapter parameters and selected-complex construction:
+
+```text
+M -> Z_ij
+     -> selected F_ijk / U_ijkl
+     -> scaled boundary cochain back into Z_ij
+     -> AF2 triangle updates over Z_ij
+     -> normal selected-complex update/readout
+```
+
+This is a topology-native architecture change, not a loss hack. It changes
+where explicit higher-rank cochains enter the pair trunk so triangle updates
+can globalize them before structure readout. It adds no parameters.
+
+Gate: do not launch while E120 is active. If E120 does not beat E118, resume
+the strongest compatible checkpoint for a 500-step gate with the E120 selected
+complex recipe and a cautious `--simplex-pre-triangle-update-scale 0.25`.
+Reject unless primary `val_lddt_ca` beats E118 and selected-boundary
+diagnostics stay coherent; only consider 30k if it breaks out of the low-0.4
+band.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `4 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `200 passed`
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+
 ### E100: Bidirectional Simplex-MSA Feedback
 
 Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.

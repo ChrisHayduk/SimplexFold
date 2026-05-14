@@ -477,6 +477,8 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.75",
             "--simplex-edge-star-context-scale",
             "0.5",
+            "--simplex-pre-triangle-update-scale",
+            "0.25",
             "--simplex-vertex-star-context-runtime-scale",
             "0.0",
             "--simplex-vertex-star-context-runtime-scale-final",
@@ -501,6 +503,7 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_global_context_scale == 0.125
     assert cfg.simplex_vertex_star_context_scale == 0.75
     assert cfg.simplex_edge_star_context_scale == 0.5
+    assert cfg.simplex_pre_triangle_update_scale == 0.25
     assert args.simplex_vertex_star_context_runtime_scale == 0.0
     assert args.simplex_vertex_star_context_runtime_scale_final == 1.0
     assert args.simplex_vertex_star_context_runtime_scale_ramp_start_step == 6000
@@ -1070,6 +1073,34 @@ def test_simplicial_edge_star_context_adds_no_parameters():
 
     assert global_context_params == 3_201_970
     assert edge_star_params == global_context_params
+
+
+def test_simplicial_pre_triangle_update_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    global_context_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_face_top_k=24,
+        simplex_tetra_top_k=48,
+        simplex_cell_score_degree_penalty=0.75,
+        simplex_cell_score_outer_edge_weight=0.25,
+        simplex_edge_frame_message_scale=0.025,
+        simplex_boundary_readout_directionality=0.25,
+        simplex_boundary_incidence_normalization=1.0,
+        simplex_global_context_scale=0.10,
+        simplex_vertex_star_context_scale=1.0,
+        simplex_edge_star_context_scale=1.0,
+    )
+    pre_triangle_medium = replace(
+        global_context_medium,
+        simplex_pre_triangle_update_scale=0.25,
+    )
+
+    global_context_params = sum(parameter.numel() for parameter in AlphaFold2(global_context_medium).parameters())
+    pre_triangle_params = sum(parameter.numel() for parameter in AlphaFold2(pre_triangle_medium).parameters())
+
+    assert global_context_params == 3_201_970
+    assert pre_triangle_params == global_context_params
 
 
 def test_simplicial_cell_dropout_adds_no_parameters():

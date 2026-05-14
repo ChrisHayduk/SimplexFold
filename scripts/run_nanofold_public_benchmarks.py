@@ -993,6 +993,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_global_context_scale", args.simplex_global_context_scale),
         ("simplex_vertex_star_context_scale", args.simplex_vertex_star_context_scale),
         ("simplex_edge_star_context_scale", args.simplex_edge_star_context_scale),
+        ("simplex_pre_triangle_update_scale", args.simplex_pre_triangle_update_scale),
         ("simplex_geometry_distance_weight", args.simplex_geometry_distance_weight),
         ("simplex_segment_cell_scale", args.simplex_segment_cell_scale),
         ("simplex_segment_radius", args.simplex_segment_radius),
@@ -1866,6 +1867,9 @@ def _train_variant(
         "simplex_edge_star_context_scale": (
             float(getattr(model_config, "simplex_edge_star_context_scale", 0.0)) if use_simplicial else 0.0
         ),
+        "simplex_pre_triangle_update_scale": (
+            float(getattr(model_config, "simplex_pre_triangle_update_scale", 0.0)) if use_simplicial else 0.0
+        ),
         "simplex_boundary_closure_weight": (
             float(getattr(model_config, "simplex_boundary_closure_weight", 0.0)) if use_simplicial else 0.0
         ),
@@ -2040,6 +2044,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_edge_star_context_runtime_scale_final",
         "simplex_edge_star_context_runtime_scale_ramp_start_step",
         "simplex_edge_star_context_runtime_scale_ramp_steps",
+        "simplex_pre_triangle_update_scale",
         "simplex_hodge_face_runtime_scale",
         "simplex_hodge_face_runtime_scale_final",
         "simplex_hodge_face_runtime_scale_ramp_start_step",
@@ -2675,6 +2680,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Interpolate selected global-complex context toward boundary-edge star incidence context.",
     )
+    parser.add_argument(
+        "--simplex-pre-triangle-update-scale",
+        type=float,
+        default=None,
+        help="Run a scaled simplex cochain update before pair triangle operations in each enabled block.",
+    )
     parser.add_argument("--simplex-vertex-star-context-runtime-scale", type=float, default=None)
     parser.add_argument("--simplex-vertex-star-context-runtime-scale-final", type=float, default=None)
     parser.add_argument("--simplex-vertex-star-context-runtime-scale-ramp-start-step", type=int, default=None)
@@ -3261,6 +3272,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_global_context_scale": args.simplex_global_context_scale,
         "simplex_vertex_star_context_scale": args.simplex_vertex_star_context_scale,
         "simplex_edge_star_context_scale": args.simplex_edge_star_context_scale,
+        "simplex_pre_triangle_update_scale": args.simplex_pre_triangle_update_scale,
         "simplex_segment_cell_scale": args.simplex_segment_cell_scale,
         "simplex_segment_radius": args.simplex_segment_radius,
         "simplex_c_segment": args.simplex_c_segment,

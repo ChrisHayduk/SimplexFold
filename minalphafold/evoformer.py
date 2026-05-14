@@ -225,6 +225,7 @@ class SimplicialEvoformer(torch.nn.Module):
         self.pair_dropout = config.evoformer_pair_dropout
         self.single_dropout = float(getattr(config, "simplex_dropout", 0.0))
         self.enable_simplex = enable_simplex
+        self.simplex_pre_triangle_update_scale = float(getattr(config, "simplex_pre_triangle_update_scale", 0.0))
 
     def forward(
         self,
@@ -271,6 +272,49 @@ class SimplicialEvoformer(torch.nn.Module):
         msa_representation = msa_representation + self.msa_transition(msa_representation)
 
         pair_representation = pair_representation + self.outer_mean(msa_representation, msa_mask=msa_mask)
+        if self.enable_simplex and self.simplex_pre_triangle_update_scale > 0.0:
+            pre_scale = pair_representation.new_tensor(self.simplex_pre_triangle_update_scale)
+            pair_representation, single_representation, pre_simplex_aux = self.simplex_adapter(
+                pair_representation,
+                single_representation,
+                msa_representation=msa_representation,
+                msa_mask=msa_mask,
+                seq_mask=seq_mask,
+                pair_mask=pair_mask,
+                recycled_ca_coords=recycled_ca_coords,
+                recycled_frames=recycled_frames,
+                simplex_teacher_ca_coords=simplex_teacher_ca_coords,
+                simplex_teacher_ca_mask=simplex_teacher_ca_mask,
+                simplex_teacher_forcing_weight=simplex_teacher_forcing_weight,
+                simplex_pair_update_scale_override=pre_scale,
+                simplex_single_update_scale_override=pre_scale,
+                simplex_outer_edge_context_scale_override=simplex_outer_edge_context_scale_override,
+                simplex_hodge_face_update_scale_override=simplex_hodge_face_update_scale_override,
+                simplex_edge_frame_message_scale_override=simplex_edge_frame_message_scale_override,
+                simplex_boundary_readout_directionality_override=(
+                    simplex_boundary_readout_directionality_override
+                ),
+                simplex_vertex_star_context_scale_override=simplex_vertex_star_context_scale_override,
+                simplex_edge_star_context_scale_override=simplex_edge_star_context_scale_override,
+                simplex_segment_cell_scale_override=simplex_segment_cell_scale_override,
+                simplex_msa_feedback_scale_override=simplex_msa_feedback_scale_override,
+                simplex_boundary_pair_feedback_scale_override=simplex_boundary_pair_feedback_scale_override,
+                simplex_boundary_pair_gate_scale_override=simplex_boundary_pair_gate_scale_override,
+                simplex_boundary_metric_gate_scale_override=simplex_boundary_metric_gate_scale_override,
+                simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
+                simplex_geometry_distance_weight_override=simplex_geometry_distance_weight_override,
+                simplex_face_top_k_override=simplex_face_top_k_override,
+                simplex_tetra_top_k_override=simplex_tetra_top_k_override,
+                simplex_cell_score_outer_edge_weight_override=(
+                    simplex_cell_score_outer_edge_weight_override
+                ),
+            )
+            pre_msa_feedback = pre_simplex_aux.get("simplex_msa_feedback")
+            if pre_msa_feedback is not None:
+                if msa_mask is not None:
+                    pre_msa_feedback = pre_msa_feedback * msa_mask[:, 0, :, None].to(pre_msa_feedback.dtype)
+                msa_representation = msa_representation.clone()
+                msa_representation[:, 0, :, :] = msa_representation[:, 0, :, :] + pre_msa_feedback
         pair_representation = pair_representation + dropout_rowwise(
             self.triangle_mult_out(pair_representation, pair_mask=pair_mask),
             p=self.pair_dropout,

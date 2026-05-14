@@ -5498,3 +5498,22 @@
   `simplex_vertex_star_context_scale=1.0`, vertex-star runtime scale `1.0`,
   `simplex_edge_star_context_scale=1.0`, and edge-star runtime ramp `0.0` to
   `0.5` over steps 7000-7500.
+- E120 health at `2026-05-14T07:17:28Z`: PID `1274` still active, no
+  `results.json`, and log remains in the expected quiet compute phase after
+  clean E118 resume. Do not touch the run or launch follow-up while E120 is
+  active.
+- Implemented E121 locally as default-off
+  `simplex_pre_triangle_update_scale`. The change reuses the existing
+  SimplicialAdapter before the AF2 pair triangle stack inside each enabled
+  SimplicialEvoformer block, so selected face/tetra cochains can write to
+  `Z_ij` before triangle multiplication/attention globalizes pair evidence.
+  This adds no loss and no parameters; it is meant to address the recurring
+  gap between high selected-boundary diagnostics and low global C-alpha lDDT.
+- E121 validation passed:
+  `python -m py_compile minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  reported `4 passed`;
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `200 passed`;
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  passed. Park E121 until E120 returns and is recorded.

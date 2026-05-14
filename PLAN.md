@@ -53,6 +53,17 @@ packing signal without overwriting the vertex-star assembly route. Reject it
 unless it beats E118 on primary `val_lddt_ca`; only consider a longer spend if
 it also breaks out of the low-0.4 band.
 
+If E120 returns without a primary-lDDT breakout, the next prepared fallback is
+E121 pre-triangle simplex injection. The repeated failure mode is that local
+selected-boundary geometry improves while global C-alpha assembly stays weak.
+E121 keeps the same selected complex but lets a scaled face/tetra boundary
+cochain update `Z_ij` before the pair triangle multiplication/attention stack
+inside each enabled Evoformer block. That gives AF2's own triangle machinery a
+chance to propagate simplex evidence globally within the same block, rather
+than waiting for later blocks or the structure module to assemble it. The hook
+is default-off, parameter-neutral, and should only be launched after E120
+returns and is recorded.
+
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that
 preserving directed boundary-edge incidence helps relative to E100 but still

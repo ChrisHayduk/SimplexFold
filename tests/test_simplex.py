@@ -96,6 +96,7 @@ class SimplexConfig:
     simplex_global_context_scale = 0.0
     simplex_vertex_star_context_scale = 0.0
     simplex_edge_star_context_scale = 0.0
+    simplex_pre_triangle_update_scale = 0.0
     simplex_segment_cell_scale = 0.0
     simplex_segment_radius = 2
     simplex_c_segment = 8
@@ -864,6 +865,46 @@ def test_star_context_runtime_overrides_gate_context_route():
     assert torch.allclose(zero_single, global_single)
     assert not torch.allclose(active_pair, global_pair)
     assert not torch.allclose(active_single, global_single)
+
+
+def test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state():
+    class PreTriangleConfig(SimplexConfig):
+        simplex_pre_triangle_update_scale = 0.5
+
+    torch.manual_seed(51)
+    base = SimplicialEvoformer(SimplexConfig()).eval()
+    torch.manual_seed(51)
+    pre_triangle = SimplicialEvoformer(PreTriangleConfig()).eval()
+    pre_triangle.load_state_dict(base.state_dict())
+
+    msa = torch.randn(1, 3, 5, SimplexConfig.c_m)
+    pair = torch.randn(1, 5, 5, SimplexConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, SimplexConfig.c_s)
+    msa_mask = torch.ones(1, 3, 5)
+    pair_mask = torch.ones(1, 5, 5)
+    seq_mask = torch.ones(1, 5)
+
+    with torch.no_grad():
+        _, pair_base, single_base, _ = base(
+            msa,
+            pair,
+            single,
+            msa_mask=msa_mask,
+            pair_mask=pair_mask,
+            seq_mask=seq_mask,
+        )
+        _, pair_pre, single_pre, _ = pre_triangle(
+            msa,
+            pair,
+            single,
+            msa_mask=msa_mask,
+            pair_mask=pair_mask,
+            seq_mask=seq_mask,
+        )
+
+    assert not torch.allclose(pair_base, pair_pre)
+    assert not torch.allclose(single_base, single_pre)
 
 
 def test_face_tetra_coboundary_delta_uses_sibling_faces_in_selected_tetras():
