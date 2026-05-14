@@ -6077,3 +6077,11 @@
   bundle exists yet (`results.json`, `results.csv`, eval details, and
   checkpoint all absent), and history still ends at inherited E120 step 7500.
   Treat this as slow active training, not a failed or returned run.
+- 2026-05-14T19:28Z-19:38Z E126 remained active through a longer ten-sample
+  monitor window. PID `1120` stayed alive with process CPU around
+  `758%`-`763%`, H100 memory stayed allocated at `42899 MiB`, and sampled GPU
+  utilization ranged from `0%` to `65%`. The required final artifacts are
+  still absent and `history_full_msa_to_face.json` still ends at the inherited
+  E120 step-7500 row. Keep waiting for the coherent step-8000 bundle before
+  pulling, updating `EXPERIMENT_RESULTS.md`, stopping the pod, or launching
+  E127.
