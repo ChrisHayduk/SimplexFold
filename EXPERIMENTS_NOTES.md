@@ -6205,3 +6205,11 @@
   `checkpoints/full_msa_to_face_latest.pt` was present. Continue to wait; do
   not pull, stop, or launch a follow-up until the coherent step-8500 bundle
   appears or the process exits with a clear failure.
+- 2026-05-14T22:14Z E128 was still active on the owned pod. PID `1523` had
+  about `46:03` elapsed time, process CPU stayed around `754%`-`755%`, RSS was
+  about `2.0 GiB`, and the process kept `178` threads. H100 memory remained at
+  `43353 MiB`, sampled GPU utilization moved from `51%` to `64%`, and
+  `/proc/1523/io` read counters advanced over a 30-second probe. The artifact
+  directory still had only the two startup files, history still ended at
+  inherited step 8000, and the log remained at startup. Treat as active work
+  before writeout, not a completed or failed run.
