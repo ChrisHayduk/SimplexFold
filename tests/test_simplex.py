@@ -25,6 +25,7 @@ from minalphafold.simplex import (
     simplex_boundary_metric_recycling_bins,
     tetra_edge_frame_features,
     tetra_geometry_features,
+    vertex_star_cell_mean,
 )
 
 
@@ -672,6 +673,37 @@ def test_global_context_adapter_routes_selected_complex_summary_back_to_cells():
     assert on_params - off_params < 5_000
     assert not torch.allclose(on_pair, off_pair)
     assert not torch.allclose(on_single, off_single)
+
+
+def test_vertex_star_cell_mean_pools_incident_selected_cells():
+    state = torch.tensor(
+        [[[[1.0, 10.0], [2.0, 20.0]], [[3.0, 30.0], [4.0, 40.0]]]],
+    )
+    cell_indices = torch.tensor(
+        [[[[0, 1, 2], [1, 2, 3]], [[0, 2, 3], [0, 1, 3]]]],
+        dtype=torch.long,
+    )
+    cell_mask = torch.tensor([[[1.0, 1.0], [0.0, 1.0]]])
+
+    star = vertex_star_cell_mean(
+        state,
+        cell_indices,
+        cell_mask,
+        num_residues=4,
+        channels=2,
+    )
+
+    expected = torch.tensor(
+        [
+            [
+                [2.5, 25.0],
+                [7.0 / 3.0, 70.0 / 3.0],
+                [1.5, 15.0],
+                [3.0, 30.0],
+            ]
+        ]
+    )
+    assert torch.allclose(star, expected)
 
 
 def test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters():
