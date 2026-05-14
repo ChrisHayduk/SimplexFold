@@ -5884,3 +5884,12 @@
   allocated, so the run still appears alive rather than frozen. No final
   artifacts exist yet and history still ends at step 7500; continue monitoring
   without pulling, stopping, or launching a follow-up.
+- 2026-05-14T15:11Z E124 is still in flight on the owned pod. PID `33724`
+  remains alive, H100 memory is still allocated (`13673 MiB`), and the
+  latest instantaneous GPU utilization sample was `0%`. Required final
+  artifacts remain absent (`results.json`, `results.csv`, eval details, and
+  checkpoint), and history still ends at inherited E120 step 7500 with
+  `val_lddt_ca=0.4248279729783535`. Treat this as a slow active run, not a
+  returned result; do not update `EXPERIMENT_RESULTS.md`, stop the pod, or
+  launch E125 until E124 returns coherent artifacts or exits with a clear
+  failure.
