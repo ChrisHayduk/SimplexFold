@@ -99,10 +99,14 @@ does not change the experimental hypothesis, parameters, loss, selected
 complex, or launch recipe; it only avoids activation-checkpoint recomputation
 over variable-size selected-cell tensors.
 
-Evaluation rule: treat E121 as a 500-step gate. If it returns in the low-0.4
-band, record and reject it as another local-to-global miss. Only consider a
-longer run if it beats E120's `0.4248` and shows a real breakout rather than
-another small `0.005`-style increment.
+E121b is active on the owned Runpod pod `o1dy17ouv8w5mz` as
+`e121b_pre_triangle_eager_from_e120_s8000_c256_m64`, with the same E120
+checkpoint, step-8000 target, effective batch size 8, and parameter count
+`3,201,970 <= 3,261,974`. Evaluation rule: treat E121b as the corrected
+500-step gate. If it returns in the low-0.4 band, record and reject it as
+another local-to-global miss. Only consider a longer run if it beats E120's
+`0.4248` and shows a real breakout rather than another small `0.005`-style
+increment.
 
 A pair-only pre-triangle fallback is now implemented locally and parked. E121
 uses the pre-triangle adapter with equal pair and single update scales, but

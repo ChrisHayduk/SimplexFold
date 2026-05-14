@@ -5687,3 +5687,13 @@
   reported `203 passed`; `python -m py_compile minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
   passed; the full touched-file ruff undefined-name check passed; and
   `git diff --check` passed.
+- 2026-05-14T10:03Z E121b health poll: owned Runpod pod `o1dy17ouv8w5mz`
+  is running remote commit `a598e32` with a clean worktree. Active run
+  `e121b_pre_triangle_eager_from_e120_s8000_c256_m64` has PID `1845`; no
+  `results.json` exists yet; `history_full_msa_to_face.json` still has 16
+  rows and ends at the inherited E120 step-7500 row
+  (`val_lddt_ca=0.4248279729783535`, FoldScore `0.3983173668086529`,
+  `val_ca_drmsd=11.145049806624652`). The heartbeat
+  `check-simplexfold-e57-runpod` is active and already points to E121b with
+  the owned-pod-only scope and remote/local coherence gates. Leave E121b
+  running and do not launch E122/E123 until it returns.

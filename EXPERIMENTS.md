@@ -602,6 +602,12 @@ Corrective E121b: rerun the same gate from the E120 checkpoint after the
 local fix that executes active pre-triangle simplex blocks eagerly during
 training. The rerun keeps the E121 hypothesis, selected-complex recipe,
 losses, parameter count, step target, and effective batch size unchanged.
+It is active on owned Runpod pod `o1dy17ouv8w5mz` as
+`e121b_pre_triangle_eager_from_e120_s8000_c256_m64`, PID `1845`, with remote
+HEAD `a598e32` and a clean remote worktree. Current health poll:
+`results.json` is absent, the history still ends at the inherited E120
+step-7500 row, and the process remains active. Do not launch E122/E123 while
+E121b is running.
 
 Validation so far:
 
