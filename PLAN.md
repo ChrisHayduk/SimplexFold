@@ -22,6 +22,9 @@ residue vertex-star cochains pooled by incidence from selected face/tetra
 cells. This keeps the intervention inside the topological cochain view and
 reuses the E116 global-context modules, so it should remain checkpoint- and
 budget-compatible. Do not launch E118 until E117 returns and is recorded.
+If E117 is the source checkpoint, E118 should run the next 500-step gate to
+step 7000; only use a step-6500 target if falling back to the E116 step-6000
+checkpoint.
 
 The next branch should stay topology-native but move the feedback target back
 toward the pair/edge trunk rather than the target MSA row. E100 showed that

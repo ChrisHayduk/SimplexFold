@@ -5262,3 +5262,8 @@
   `minalphafold.egg-info/` dirt. The artifact directory still contains only
   `run_metadata.json` and inherited `history_full_msa_to_face.json`; no
   `results.json`, `results.csv`, eval-detail file, or checkpoint has returned.
+- Clarified the E118 follow-up gate in `PLAN.md`, `EXPERIMENTS.md`, and the
+  active heartbeat. If E117 is the source checkpoint, E118 should target the
+  next 500-step gate at step 7000 with
+  `--simplex-vertex-star-context-scale 1.0`; step 6500 is only correct when
+  falling back to the E116 step-6000 checkpoint.
