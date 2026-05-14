@@ -5893,3 +5893,10 @@
   returned result; do not update `EXPERIMENT_RESULTS.md`, stop the pod, or
   launch E125 until E124 returns coherent artifacts or exits with a clear
   failure.
+- 2026-05-14T15:46Z E124 remains an active slow run after a 25-minute
+  monitor window. PID `33724` stayed alive across six checks, H100 memory
+  remained allocated at `13673 MiB`, and sampled GPU utilization ranged from
+  `0%` to `68%`. The final result bundle is still absent (`results.json`,
+  `results.csv`, eval details, and checkpoint all missing), so there is no
+  returned metric to record. Continue waiting under the owned-pod-only
+  heartbeat; do not stop the pod or launch E125 while E124 is still alive.
