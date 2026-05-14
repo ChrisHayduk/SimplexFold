@@ -5593,3 +5593,27 @@
   absolute lDDT. Keep the E120 checkpoint as the strongest restart point, but
   use E121 pre-triangle simplex injection as the next short-gate idea rather
   than extending E120 blindly.
+- Stopped only the owned Runpod pod `o1dy17ouv8w5mz` after verifying no
+  benchmark Python process was active and preserving the E120 checkpoint
+  locally. Paused the E120 heartbeat, then restarted the same owned pod for
+  the next gate; the zero-volume workspace came back empty, so the remote was
+  restaged from local source with public train/val feature and label caches
+  only. Remote prelaunch audit for E121 passed: SimplexFold commit `34ef7d7`,
+  clean status, `11000/11000` feature/label NPZs, manifest rows
+  `10000/1000/11000`, zero `._*` sidecars, the E120 checkpoint present, and
+  launch-style parameters `3,201,970 <= 3,261,974`.
+- 2026-05-14T08:54Z launched E121 on owned Runpod pod `o1dy17ouv8w5mz` using
+  SSH endpoint `103.207.149.82:19763` and key
+  `/Users/christopherhayduk/.runpod/ssh/RunPod-Key-Go`. Run name:
+  `e121_pre_triangle_from_e120_s8000_c256_m64`; PID `1051`; log
+  `/workspace/SimplexFold/logs/e121_pre_triangle_from_e120.log`; artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e121_pre_triangle_from_e120_s8000_c256_m64/`.
+  The run resumes the E120 step-7500 checkpoint to step 8000 with the E120
+  mixed selected-complex recipe fixed and adds
+  `--simplex-pre-triangle-update-scale 0.25`. Startup verification confirmed
+  resume at step 7500/examples 60000, `1292` matching tensors loaded, `0`
+  new/missing tensors, `effective_batch_size=8`,
+  `simplex_global_context_scale=0.1`,
+  `simplex_vertex_star_context_scale=1.0`, vertex-star runtime scale `1.0`,
+  `simplex_edge_star_context_scale=1.0`, edge-star runtime scale `0.5`, and
+  the intended pre-triangle scale `0.25`.

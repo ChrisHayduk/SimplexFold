@@ -541,8 +541,7 @@ follow-up gate shows a much larger breakout.
 
 ### E121 Idea: Pre-Triangle Simplex Injection
 
-Status: implemented locally and queued as the next short-gate candidate after
-E120 is fully recorded.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E116-E120 all point at the same local-to-global bottleneck:
 selected face/tetra cochains learn useful local boundary geometry, but the
@@ -572,12 +571,23 @@ This is a topology-native architecture change, not a loss hack. It changes
 where explicit higher-rank cochains enter the pair trunk so triangle updates
 can globalize them before structure readout. It adds no parameters.
 
-Gate: do not launch while E120 is active. If E120 does not beat E118, resume
-the strongest compatible checkpoint for a 500-step gate with the E120 selected
-complex recipe and a cautious `--simplex-pre-triangle-update-scale 0.25`.
-Reject unless primary `val_lddt_ca` beats E118 and selected-boundary
-diagnostics stay coherent; only consider 30k if it breaks out of the low-0.4
-band.
+Gate: resume the E120 step-7500 checkpoint for a 500-step gate to step 8000,
+keep the E120 selected-complex recipe fixed, and add cautious
+`--simplex-pre-triangle-update-scale 0.25`. Reject unless primary
+`val_lddt_ca` beats E120's `0.4248` and selected-boundary diagnostics stay
+coherent; only consider 30k if it breaks out of the low-0.4 band.
+
+Launch: started `e121_pre_triangle_from_e120_s8000_c256_m64` on
+`2026-05-14` on owned Runpod pod `o1dy17ouv8w5mz`, PID `1051`, log
+`/workspace/SimplexFold/logs/e121_pre_triangle_from_e120.log`. The run
+resumed
+`/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e120_mixed_star_context_from_e118_s7500_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+at step 7500/examples 60000 with `1292` matching tensors loaded, `0`
+new/missing tensors, and a fresh optimizer. Launch metadata confirmed
+`steps=8000`, `effective_batch_size=8`, `max_parameters=3,261,974`,
+`simplex_pre_triangle_update_scale=0.25`, global context `0.1`, vertex-star
+runtime scale `1.0`, edge-star runtime scale `0.5`, fixed sparse caps
+`24 / 48`, and `parameters=3,201,970` under cap.
 
 Validation so far:
 
