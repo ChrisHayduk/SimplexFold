@@ -5555,3 +5555,16 @@
   selected boundary edges back into cells. Treat E120 as a slow active gate,
   not a failed launch; do not stop or replace it unless the process exits
   without coherent step-7500 artifacts.
+- Implemented a local sparse edge-star context path for future gates. The new
+  `boundary_edge_star_context` computes the same selected boundary-edge star
+  means that the dense `edge_star_cell_mean` path would gather, but it only
+  gathers requested target cell boundary edges instead of materializing a full
+  `L x L` cochain tensor. This is topology-equivalent to the E119/E120
+  boundary-edge-star route, adds no parameters and no losses, and does not
+  affect the already-running E120 remote checkout. Validation passed:
+  `python -m py_compile minalphafold/simplex.py`;
+  `python -m pytest tests/test_simplex.py::test_edge_star_cell_mean_pools_cells_through_boundary_edges tests/test_simplex.py::test_boundary_edge_star_context_matches_dense_edge_star_gather tests/test_simplex.py::test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters tests/test_simplex.py::test_star_context_runtime_overrides_gate_context_route`
+  reported `4 passed`;
+  `python -m pytest tests/test_simplex.py` reported `68 passed`;
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py tests/test_simplex.py`
+  passed.

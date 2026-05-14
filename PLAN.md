@@ -53,6 +53,15 @@ packing signal without overwriting the vertex-star assembly route. Reject it
 unless it beats E118 on primary `val_lddt_ca`; only consider a longer spend if
 it also breaks out of the low-0.4 band.
 
+The active E120 run was launched before the local sparse edge-star performance
+refactor. Future star-context gates should use the local branch's
+`boundary_edge_star_context` path, which gathers the same boundary-edge star
+cochains for selected target edges without materializing the dense `L x L`
+star tensor. This is a topology-equivalent implementation improvement: it
+keeps the selected boundary 1-skeleton communication pattern, adds no
+parameters or losses, and is meant to make E121 or any E120 retry less
+expensive.
+
 If E120 returns without a primary-lDDT breakout, the next prepared fallback is
 E121 pre-triangle simplex injection. The repeated failure mode is that local
 selected-boundary geometry improves while global C-alpha assembly stays weak.

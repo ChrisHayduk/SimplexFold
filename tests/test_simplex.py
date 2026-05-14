@@ -9,6 +9,7 @@ from minalphafold.simplex import (
     _boundary_degree_weights,
     _cell_outer_edge_support,
     _cell_segment_support,
+    boundary_edge_star_context,
     boundary_incidence_weights,
     boundary_metric_confidence,
     build_simplex_topology,
@@ -728,6 +729,73 @@ def test_edge_star_cell_mean_pools_cells_through_boundary_edges():
     assert torch.allclose(star[0, 2, 1], torch.tensor([2.0, 20.0]))
     assert torch.allclose(star[0, 2, 3], torch.tensor([3.0, 30.0]))
     assert torch.all(star[0, 0, 3] == 0.0)
+
+
+def test_boundary_edge_star_context_matches_dense_edge_star_gather():
+    state = torch.tensor(
+        [
+            [
+                [[1.0, 10.0], [3.0, 30.0]],
+                [[5.0, 50.0], [7.0, 70.0]],
+            ]
+        ]
+    )
+    cell_indices = torch.tensor(
+        [
+            [
+                [[0, 1, 2], [1, 2, 3]],
+                [[0, 2, 4], [2, 3, 4]],
+            ]
+        ],
+        dtype=torch.long,
+    )
+    cell_mask = torch.tensor([[[1.0, 1.0], [0.0, 1.0]]])
+    target_edges = torch.tensor(
+        [
+            [
+                [
+                    [[1, 2], [2, 3], [0, 4]],
+                    [[0, 2], [2, 4], [3, 4]],
+                ]
+            ]
+        ],
+        dtype=torch.long,
+    )
+
+    dense_star = edge_star_cell_mean(
+        state,
+        cell_indices,
+        cell_mask,
+        num_residues=5,
+        channels=2,
+    )
+    batch = torch.zeros_like(target_edges[..., 0])
+    expected = dense_star[batch, target_edges[..., 0], target_edges[..., 1]].mean(dim=-2)
+
+    sparse = boundary_edge_star_context(
+        state,
+        cell_indices,
+        cell_mask,
+        target_edges,
+        num_residues=5,
+        channels=2,
+    )
+
+    assert torch.allclose(sparse, expected)
+
+    differentiable_state = state.clone().requires_grad_(True)
+    differentiable_sparse = boundary_edge_star_context(
+        differentiable_state,
+        cell_indices,
+        cell_mask,
+        target_edges,
+        num_residues=5,
+        channels=2,
+    )
+    differentiable_sparse.sum().backward()
+    assert differentiable_state.grad is not None
+    assert torch.isfinite(differentiable_state.grad).all()
+    assert differentiable_state.grad.abs().sum() > 0.0
 
 
 def test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters():

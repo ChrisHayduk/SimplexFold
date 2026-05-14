@@ -520,6 +520,15 @@ new/missing tensors initialized, `effective_batch_size=8`,
 `simplex_edge_star_context_scale=1.0`, and edge-star runtime ramp `0.0` to
 `0.5` over steps 7000-7500.
 
+Post-launch implementation note: E120's remote checkout predates the local
+sparse edge-star optimization. The local branch now routes edge-star context
+with `boundary_edge_star_context`, which computes the same selected
+boundary-edge star means that the dense `edge_star_cell_mean` path would
+gather, but only for the target cell boundary edges. This keeps the experiment
+inside the same simplicial/topological mechanism, adds no parameters and no
+losses, and should reduce overhead for E121 or any future mixed star-context
+retry.
+
 ### E121 Idea: Pre-Triangle Simplex Injection
 
 Status: implemented locally and parked until E120 returns.
@@ -565,6 +574,13 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py::test_pre_triangle_simplex_update_changes_evoformer_block_outputs_without_new_state tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_pre_triangle_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `4 passed`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `200 passed`
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- Post-E120-launch sparse edge-star context validation:
+  `python -m py_compile minalphafold/simplex.py`;
+  `python -m pytest tests/test_simplex.py::test_edge_star_cell_mean_pools_cells_through_boundary_edges tests/test_simplex.py::test_boundary_edge_star_context_matches_dense_edge_star_gather tests/test_simplex.py::test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters tests/test_simplex.py::test_star_context_runtime_overrides_gate_context_route`
+  reported `4 passed`;
+  `python -m pytest tests/test_simplex.py` reported `68 passed`;
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py tests/test_simplex.py`
+  passed.
 
 ### E100: Bidirectional Simplex-MSA Feedback
 
