@@ -5825,3 +5825,18 @@
   CPU-active, so continue treating this as a slow active run. Do not pull,
   score, stop the pod, or launch E124 until E123 either returns coherent
   artifacts or fails with an exited PID/log traceback.
+- 2026-05-14T14:16Z E123 returned coherently on the owned Runpod pod at step
+  8000. Remote coherence passed with no active benchmark process, all required
+  result/metadata/history/eval-detail/checkpoint files present, one
+  `results.csv` row, 1000 eval-detail rows, history ending at step 8000,
+  `effective_batch_size=8`, `parameters=3,201,970 <= 3,261,974`,
+  `stopped_early=False`, finite `val_lddt_ca`, `val_foldscore`, and
+  `val_ca_drmsd`, plus the intended pair-only pre-triangle runtime metadata.
+  Pulled artifacts and the checkpoint locally, and the local verifier passed.
+  Result: `val_lddt_ca=0.42700926753878593`, FoldScore
+  `0.3992369193732738`, `val_ca_drmsd=11.192668638288975`, C-alpha Rg
+  `11.470016014099121 / 16.30911695623398`, selected face/tetra boundary
+  lDDT `0.7446703624725342` / `0.7280488775372506`. Treat this as a tiny new
+  primary-lDDT leader but reject it as a 30k candidate because it remains
+  below the `0.45` short gate and softens selected-boundary diagnostics versus
+  E120. E124 is now the next short topology-communication probe to consider.

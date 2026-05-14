@@ -5148,7 +5148,7 @@ Validation:
 
 ### E123: Ramped Pair-Only Pre-Triangle Simplex Injection
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E120 shows that explicit face/tetra states have learned coherent
 selected-boundary geometry, but global C-alpha lDDT remains in the low-0.4
@@ -5171,9 +5171,9 @@ This adds no parameters and no new loss; it only changes when selected
 face/tetra boundary cochains are allowed to update the pair 1-skeleton before
 triangle reasoning.
 
-Decision rule: E121b underperformed E120, so E123 is now the preferred next
-short gate. Do not spend 30,000 steps unless a short gate leaves the low-0.4
-band and shows a plausible path toward `0.7` validation C-alpha lDDT.
+Decision rule: E121b underperformed E120, so E123 tested the safer pair-only
+ramp. Do not spend 30,000 steps unless a short gate leaves the low-0.4 band
+and shows a plausible path toward `0.7` validation C-alpha lDDT.
 
 Candidate launch recipe if E121b returns weakly: resume the E120 step-7500
 checkpoint to step 8000 with the E120 selected-complex recipe fixed, but set
@@ -5206,6 +5206,20 @@ resume from E120 at step 7500/examples 60000, `1292` matching tensors loaded,
 `0` new/missing tensors initialized, and metadata matching the intended
 pair-only runtime ramp.
 
+Result: tiny new primary-lDDT leader but reject as a 30k candidate. E123
+returned at step 8000 with `val_lddt_ca=0.4270`, FoldScore `0.3992`,
+`val_ca_drmsd=11.1927`, and C-alpha Rg `11.4700 / 16.3091`. Remote coherence
+passed, artifacts were pulled locally, and the local verifier passed with
+`completed_steps=8000`, 1000 eval-detail rows, one result row, history ending
+at step 8000, `effective_batch_size=8`, `parameters=3,201,970 <= 3,261,974`,
+`stopped_early=False`, and the intended pair-only ramp metadata. E123 beats
+E120 (`0.4248`) and E121b (`0.4223`) on primary C-alpha lDDT, but remains
+below the `0.45` short-gate threshold, worsens dRMSD, and softens selected
+face/tetra boundary lDDT (`0.7447` / `0.7280`) and contraction
+(`0.6505` / `0.6494`) relative to E120. This suggests pair-only
+pre-triangle cochain injection is directionally useful but far too weak for a
+30,000-step spend by itself.
+
 Validation:
 
 - `python -m py_compile minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
@@ -5215,8 +5229,7 @@ Validation:
 
 ### E124: Face Boundary-Edge-Frame Gate
 
-Status: implemented locally as a parked fallback; consider only after the
-E123 ramped pair-only pre-triangle gate returns.
+Status: next queued short gate after E123 returned below the spend threshold.
 
 Hypothesis: the strongest portable topological idea from the paper reread is
 not just that higher-rank cells exist, but that their geometric content should

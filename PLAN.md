@@ -1,4 +1,4 @@
-## Current Plan: Monitor E123 Pair-Only Pre-Triangle Ramp
+## Current Plan: Launch E124 Face Boundary-Edge-Frame Gate
 
 E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
@@ -111,25 +111,25 @@ reject: `val_lddt_ca=0.4223`, FoldScore `0.4007`,
 E120's `0.4248` primary lDDT and below the `0.45` short-gate threshold, so do
 not spend 30,000 steps on abrupt eager pre-triangle injection.
 
-A ramped pair-only pre-triangle fallback is now the next queued short gate.
-E121b used the pre-triangle adapter with equal pair and single update scales,
-but the strongest topological claim is narrower: selected face/tetra boundary
-cochains should enter the pair edge tensor `Z_ij` before AF2 triangle updates.
-E123 holds the pre-triangle single update at `0.0` and ramps only the pair
-pre-triangle runtime scale from `0.0` to `0.25` over steps 7500-8000. This
-adds no parameters and keeps the experiment in the README's cochain
-communication view. Reject E123 unless it clears E120 by more than noise and
-shows a real move toward the `0.45`/`0.50` candidate gates.
+E123 returned on the owned Runpod pod `o1dy17ouv8w5mz` as
+`e123_ramped_pair_pre_triangle_from_e120_s8000_c256_m64`. Remote and local
+coherence passed: `completed_steps=8000`, one result row, 1000 eval-detail
+rows, history ending at step 8000, `effective_batch_size=8`,
+`parameters=3,201,970 <= 3,261,974`, `stopped_early=False`, and the intended
+pair-only runtime ramp metadata. The result is a tiny new primary-lDDT leader:
+`val_lddt_ca=0.4270`, FoldScore `0.3992`, `val_ca_drmsd=11.1927`, and
+C-alpha Rg `11.4700 / 16.3091`. It beats E120's `0.4248` C-alpha lDDT but
+does not clear the `0.45` short-gate threshold, worsens dRMSD, and softens
+selected face/tetra boundary geometry (`0.7447` / `0.7280` boundary lDDT and
+`0.6505` / `0.6494` contraction). Do not spend 30,000 steps on E123.
 
-E123 is active on the owned Runpod pod `o1dy17ouv8w5mz` as
-`e123_ramped_pair_pre_triangle_from_e120_s8000_c256_m64`, PID `21142`, with
-remote HEAD `5fce7f1`. Startup confirmed a clean resume from the E120
-checkpoint at step 7500/examples 60000, `1292` matching tensors loaded, `0`
-new/missing tensors initialized, `effective_batch_size=8`, and the intended
-runtime ramp: pair pre-triangle update `0.0 -> 0.25` over steps 7500-8000,
-pre-triangle single update held at `0.0`, vertex-star context `1.0`,
-edge-star context `0.5`, and sparse caps `24 / 48`. Do not launch E124 while
-E123 is active.
+The next short gate is E124 face boundary-edge-frame gating. This is not a
+generic output loss: it asks whether a learned 2-simplex can communicate more
+usefully through its own oriented boundary 1-simplices by gating selected
+face-to-edge messages with edge-frame scalarized face geometry. Keep it as a
+500-step topology-communication probe from the E120 checkpoint at small scale
+(`simplex_boundary_edge_frame_gate_scale=0.05`) and do not add the tetra gate
+without a fresh parameter audit.
 
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that

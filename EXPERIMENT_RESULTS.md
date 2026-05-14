@@ -2,8 +2,8 @@
 
 Last updated: 2026-05-14.
 
-Best validation C-alpha lDDT so far: **E120**, `val_lddt_ca=0.4248` at step
-7500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E123**, `val_lddt_ca=0.4270` at step
+8000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
 and partial diagnostics belong in `EXPERIMENTS_NOTES.md` until a run returns a
@@ -138,3 +138,4 @@ recorded in the running notes for that run.
 | E120 mixed vertex/edge-star selected-complex context | returned | 7500 | 0.4248 | 0.4248 | 0.3983 | 11.1450 | 11.4973 / 16.3091 | New primary-lDDT and FoldScore leader: mixed residue vertex-star plus partial boundary-edge-star context beats E118/E119, with selected face/tetra boundary lDDT `0.7548` / `0.7383`, but remains in the low-0.4 band and is not a 30k candidate yet. |
 | E121 pre-triangle simplex injection | failed | - | - | - | - | - | - | Failed before step-8000 validation: activation checkpoint recomputation hit variable-size selected-complex tensor metadata mismatch (`4399` vs `4403` rows). No new score; corrective E121b reruns the same gate with active pre-triangle blocks executed eagerly. |
 | E121b eager pre-triangle simplex injection | returned | 8000 | 0.4223 | 0.4223 | 0.4007 | 11.1491 | 11.8330 / 16.3091 | Rejected: corrected eager pre-triangle injection returned below E120 on primary C-alpha lDDT and below the 0.45 short-gate threshold despite high selected face/tetra boundary lDDT; use E123 pair-only ramped pre-triangle injection as the next fallback rather than spending 30k on E121b. |
+| E123 ramped pair-only pre-triangle simplex injection | returned | 8000 | 0.4270 | 0.4270 | 0.3992 | 11.1927 | 11.4700 / 16.3091 | Tiny new primary-lDDT leader but rejected as a 30k candidate: ramped pair-only pre-triangle injection beats E120/E121b on C-alpha lDDT, but remains below the 0.45 short-gate threshold and softens selected-boundary geometry; use E124 only as a short topology-communication probe, not as a long spend. |
