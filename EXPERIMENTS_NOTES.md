@@ -5662,3 +5662,8 @@
   edge-centric scalarization onto boundary/outer-edge frames; and dense
   C-alpha/radius/all-pairs losses remain out of scope unless restricted to
   realization of the model-selected sparse complex.
+- E121 health poll after about 26 minutes: PID `1051` remains active on the
+  owned Runpod pod, `results.json` is still absent, and
+  `history_full_msa_to_face.json` still ends at the inherited E120 step-7500
+  row (`val_lddt_ca=0.4248279729783535`). This is expected until E121 reaches
+  its step-8000 eval/checkpoint boundary. Leave the run alone.
