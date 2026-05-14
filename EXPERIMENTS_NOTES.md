@@ -5255,3 +5255,10 @@
   the owned pod with state `Sl`, about `1015%` CPU, 178 threads, sampled GPU
   utilization `31%`, and `13593 MiB` GPU memory allocated. Still no result
   files, eval-detail file, or checkpoint; keep waiting and do not launch E118.
+- E117 health poll after about 37.5 minutes: PID `13554` remained active on
+  the owned pod with state `Sl`, about `1017%` CPU, 178 threads, sampled GPU
+  utilization `47%`, and `13593 MiB` GPU memory allocated. The remote checkout
+  is still at E117 launch commit `9548d5f` with only editable-install
+  `minalphafold.egg-info/` dirt. The artifact directory still contains only
+  `run_metadata.json` and inherited `history_full_msa_to_face.json`; no
+  `results.json`, `results.csv`, eval-detail file, or checkpoint has returned.
