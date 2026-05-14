@@ -5950,3 +5950,10 @@
   still the inherited E120 step-7500 row. Treat this as a slow active run;
   continue monitoring and do not stop the pod or launch any follow-up while
   E125 is still alive.
+- 2026-05-14T17:30Z E125 remains active after a third monitor window. PID
+  `46151` stayed alive across six checks, H100 memory remained allocated at
+  `13673 MiB`, and sampled GPU utilization ranged from `0%` to `55%`. No
+  final artifacts exist yet (`results.json`, `results.csv`, eval details, and
+  checkpoint all missing), and history still ends at the inherited E120
+  step-7500 row. Continue treating E125 as slow active training; leave the pod
+  running and do not update final results until coherent artifacts return.
