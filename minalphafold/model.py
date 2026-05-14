@@ -229,6 +229,8 @@ class AlphaFold2(torch.nn.Module):
             simplex_hodge_face_update_scale_override: torch.Tensor | None = None,
             simplex_edge_frame_message_scale_override: torch.Tensor | None = None,
             simplex_boundary_readout_directionality_override: torch.Tensor | None = None,
+            simplex_vertex_star_context_scale_override: torch.Tensor | None = None,
+            simplex_edge_star_context_scale_override: torch.Tensor | None = None,
             simplex_segment_cell_scale_override: torch.Tensor | None = None,
             simplex_msa_feedback_scale_override: torch.Tensor | None = None,
             simplex_boundary_pair_feedback_scale_override: torch.Tensor | None = None,
@@ -449,6 +451,12 @@ class AlphaFold2(torch.nn.Module):
                                         simplex_boundary_readout_directionality_override=(
                                             simplex_boundary_readout_directionality_override
                                         ),
+                                        simplex_vertex_star_context_scale_override=(
+                                            simplex_vertex_star_context_scale_override
+                                        ),
+                                        simplex_edge_star_context_scale_override=(
+                                            simplex_edge_star_context_scale_override
+                                        ),
                                         simplex_segment_cell_scale_override=simplex_segment_cell_scale_override,
                                         simplex_msa_feedback_scale_override=simplex_msa_feedback_scale_override,
                                         simplex_boundary_pair_feedback_scale_override=(
@@ -498,6 +506,12 @@ class AlphaFold2(torch.nn.Module):
                                     ),
                                     simplex_boundary_readout_directionality_override=(
                                         simplex_boundary_readout_directionality_override
+                                    ),
+                                    simplex_vertex_star_context_scale_override=(
+                                        simplex_vertex_star_context_scale_override
+                                    ),
+                                    simplex_edge_star_context_scale_override=(
+                                        simplex_edge_star_context_scale_override
                                     ),
                                     simplex_segment_cell_scale_override=simplex_segment_cell_scale_override,
                                     simplex_msa_feedback_scale_override=simplex_msa_feedback_scale_override,

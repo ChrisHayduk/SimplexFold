@@ -307,8 +307,19 @@ global-to-tetra adapters introduced for E116.
 
 Gate: launch only after E117 returns. If E117 is stable but still stuck near
 the `0.40` band, run a short E118 gate from the best E116/E117 checkpoint with
-the E117 recipe plus `--simplex-vertex-star-context-scale 1.0`. If the source
-is the E117 step-6500 checkpoint, target step 7000; only target step 6500 when
+the E117 recipe plus `--simplex-vertex-star-context-scale 1.0`. Use the
+runtime star-context ramp to avoid an abrupt route change when resuming from
+the E116/E117 global-context checkpoint:
+
+```text
+--simplex-vertex-star-context-runtime-scale 0.0
+--simplex-vertex-star-context-runtime-scale-final 1.0
+--simplex-vertex-star-context-runtime-scale-ramp-start-step <source_step>
+--simplex-vertex-star-context-runtime-scale-ramp-steps 500
+```
+
+If the source is the E117 step-6500 checkpoint, target step 7000 with
+`<source_step>=6500`; only target step 6500 and use `<source_step>=6000` when
 falling back to the E116 step-6000 checkpoint. Keep
 `--simplex-global-context-scale 0.10` so the new flag changes only which
 selected-complex context is routed through the existing modules.
@@ -319,6 +330,11 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py::test_vertex_star_cell_mean_pools_incident_selected_cells tests/test_simplex.py::test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `4 passed`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters`: `66 passed`
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model_config.py minalphafold/simplex.py scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py`: passed
+- Runtime ramp support added for the vertex-star route:
+  `--simplex-vertex-star-context-runtime-scale`,
+  `--simplex-vertex-star-context-runtime-scale-final`,
+  `--simplex-vertex-star-context-runtime-scale-ramp-start-step`, and
+  `--simplex-vertex-star-context-runtime-scale-ramp-steps`.
 
 ### E119 Idea: Edge-Star Selected-Complex Context
 
@@ -354,9 +370,18 @@ been explicitly skipped. If the source is the E117 step-6500 checkpoint,
 target step 7000; if E118 has already produced a stable step-7000 checkpoint,
 target the next 500-step gate from there. Use the E117/E118 recipe with
 `--simplex-global-context-scale 0.10` and
-`--simplex-edge-star-context-scale 1.0`. Do not combine with
-`--simplex-vertex-star-context-scale` in the first E119 gate; isolate whether
-the boundary-edge star is better than residue-star routing.
+`--simplex-edge-star-context-scale 1.0`, plus the same runtime-ramp pattern:
+
+```text
+--simplex-edge-star-context-runtime-scale 0.0
+--simplex-edge-star-context-runtime-scale-final 1.0
+--simplex-edge-star-context-runtime-scale-ramp-start-step <source_step>
+--simplex-edge-star-context-runtime-scale-ramp-steps 500
+```
+
+Do not combine with `--simplex-vertex-star-context-scale` in the first E119
+gate; isolate whether the boundary-edge star is better than residue-star
+routing.
 
 Validation so far:
 
@@ -368,6 +393,11 @@ Validation so far:
   and `--simplex-edge-star-context-scale`.
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `197 passed`
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model_config.py minalphafold/simplex.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py`: passed
+- Runtime ramp support added for the edge-star route:
+  `--simplex-edge-star-context-runtime-scale`,
+  `--simplex-edge-star-context-runtime-scale-final`,
+  `--simplex-edge-star-context-runtime-scale-ramp-start-step`, and
+  `--simplex-edge-star-context-runtime-scale-ramp-steps`.
 
 ### E100: Bidirectional Simplex-MSA Feedback
 

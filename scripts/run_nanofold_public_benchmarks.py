@@ -71,6 +71,7 @@ from minalphafold.trainer import (  # noqa: E402
     simplex_boundary_pair_gate_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
     simplex_cell_score_outer_edge_weight_at_step,
+    simplex_edge_star_context_runtime_scale_at_step,
     simplex_edge_frame_message_runtime_scale_at_step,
     simplex_face_top_k_at_step,
     simplex_geometry_distance_weight_at_step,
@@ -82,6 +83,7 @@ from minalphafold.trainer import (  # noqa: E402
     simplex_segment_cell_runtime_scale_at_step,
     simplex_single_update_runtime_scale_at_step,
     simplex_tetra_top_k_at_step,
+    simplex_vertex_star_context_runtime_scale_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     simplex_update_scale_at_step,
     zero_dropout_model_config,
@@ -643,6 +645,8 @@ def _evaluate(
                         use_simplex_hodge_face_runtime_scale=True,
                         use_simplex_edge_frame_message_runtime_scale=True,
                         use_simplex_boundary_readout_directionality_runtime_scale=True,
+                        use_simplex_vertex_star_context_runtime_scale=True,
+                        use_simplex_edge_star_context_runtime_scale=True,
                         use_simplex_segment_cell_runtime_scale=True,
                         use_simplex_msa_feedback_runtime_scale=True,
                         use_simplex_boundary_pair_feedback_runtime_scale=True,
@@ -1206,6 +1210,14 @@ def _train_variant(
         simplex_boundary_readout_directionality_runtime_scale = (
             simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, step)
         )
+        simplex_vertex_star_context_runtime_scale = simplex_vertex_star_context_runtime_scale_at_step(
+            training_config,
+            step,
+        )
+        simplex_edge_star_context_runtime_scale = simplex_edge_star_context_runtime_scale_at_step(
+            training_config,
+            step,
+        )
         simplex_hodge_face_runtime_scale = simplex_hodge_face_runtime_scale_at_step(training_config, step)
         simplex_segment_cell_runtime_scale = simplex_segment_cell_runtime_scale_at_step(training_config, step)
         simplex_msa_feedback_runtime_scale = simplex_msa_feedback_runtime_scale_at_step(training_config, step)
@@ -1258,6 +1270,8 @@ def _train_variant(
                         use_simplex_hodge_face_runtime_scale=True,
                         use_simplex_edge_frame_message_runtime_scale=True,
                         use_simplex_boundary_readout_directionality_runtime_scale=True,
+                        use_simplex_vertex_star_context_runtime_scale=True,
+                        use_simplex_edge_star_context_runtime_scale=True,
                         use_simplex_segment_cell_runtime_scale=True,
                         use_simplex_msa_feedback_runtime_scale=True,
                         use_simplex_boundary_pair_feedback_runtime_scale=True,
@@ -1391,6 +1405,16 @@ def _train_variant(
                     float("nan")
                     if simplex_boundary_readout_directionality_runtime_scale is None
                     else simplex_boundary_readout_directionality_runtime_scale
+                ),
+                "simplex_vertex_star_context_runtime_scale": (
+                    float("nan")
+                    if simplex_vertex_star_context_runtime_scale is None
+                    else simplex_vertex_star_context_runtime_scale
+                ),
+                "simplex_edge_star_context_runtime_scale": (
+                    float("nan")
+                    if simplex_edge_star_context_runtime_scale is None
+                    else simplex_edge_star_context_runtime_scale
                 ),
                 "simplex_hodge_face_runtime_scale": (
                     float("nan")
@@ -1671,6 +1695,26 @@ def _train_variant(
             training_config.simplex_hodge_face_runtime_scale_ramp_start_step
         ),
         "simplex_hodge_face_runtime_scale_ramp_steps": training_config.simplex_hodge_face_runtime_scale_ramp_steps,
+        "simplex_vertex_star_context_runtime_scale": training_config.simplex_vertex_star_context_runtime_scale,
+        "simplex_vertex_star_context_runtime_scale_final": (
+            training_config.simplex_vertex_star_context_runtime_scale_final
+        ),
+        "simplex_vertex_star_context_runtime_scale_ramp_start_step": (
+            training_config.simplex_vertex_star_context_runtime_scale_ramp_start_step
+        ),
+        "simplex_vertex_star_context_runtime_scale_ramp_steps": (
+            training_config.simplex_vertex_star_context_runtime_scale_ramp_steps
+        ),
+        "simplex_edge_star_context_runtime_scale": training_config.simplex_edge_star_context_runtime_scale,
+        "simplex_edge_star_context_runtime_scale_final": (
+            training_config.simplex_edge_star_context_runtime_scale_final
+        ),
+        "simplex_edge_star_context_runtime_scale_ramp_start_step": (
+            training_config.simplex_edge_star_context_runtime_scale_ramp_start_step
+        ),
+        "simplex_edge_star_context_runtime_scale_ramp_steps": (
+            training_config.simplex_edge_star_context_runtime_scale_ramp_steps
+        ),
         "simplex_segment_cell_runtime_scale": training_config.simplex_segment_cell_runtime_scale,
         "simplex_segment_cell_runtime_scale_final": training_config.simplex_segment_cell_runtime_scale_final,
         "simplex_segment_cell_runtime_scale_ramp_start_step": (
@@ -1988,6 +2032,14 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_boundary_readout_directionality_runtime_scale_final",
         "simplex_boundary_readout_directionality_runtime_scale_ramp_start_step",
         "simplex_boundary_readout_directionality_runtime_scale_ramp_steps",
+        "simplex_vertex_star_context_runtime_scale",
+        "simplex_vertex_star_context_runtime_scale_final",
+        "simplex_vertex_star_context_runtime_scale_ramp_start_step",
+        "simplex_vertex_star_context_runtime_scale_ramp_steps",
+        "simplex_edge_star_context_runtime_scale",
+        "simplex_edge_star_context_runtime_scale_final",
+        "simplex_edge_star_context_runtime_scale_ramp_start_step",
+        "simplex_edge_star_context_runtime_scale_ramp_steps",
         "simplex_hodge_face_runtime_scale",
         "simplex_hodge_face_runtime_scale_final",
         "simplex_hodge_face_runtime_scale_ramp_start_step",
@@ -2623,6 +2675,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Interpolate selected global-complex context toward boundary-edge star incidence context.",
     )
+    parser.add_argument("--simplex-vertex-star-context-runtime-scale", type=float, default=None)
+    parser.add_argument("--simplex-vertex-star-context-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-vertex-star-context-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-vertex-star-context-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument("--simplex-edge-star-context-runtime-scale", type=float, default=None)
+    parser.add_argument("--simplex-edge-star-context-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-edge-star-context-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-edge-star-context-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
         "--simplex-geometry-distance-weight",
         type=float,
@@ -2866,6 +2926,20 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_boundary_readout_directionality_runtime_scale_ramp_steps=(
             args.simplex_boundary_readout_directionality_runtime_scale_ramp_steps
         ),
+        simplex_vertex_star_context_runtime_scale=args.simplex_vertex_star_context_runtime_scale,
+        simplex_vertex_star_context_runtime_scale_final=args.simplex_vertex_star_context_runtime_scale_final,
+        simplex_vertex_star_context_runtime_scale_ramp_start_step=(
+            args.simplex_vertex_star_context_runtime_scale_ramp_start_step
+        ),
+        simplex_vertex_star_context_runtime_scale_ramp_steps=(
+            args.simplex_vertex_star_context_runtime_scale_ramp_steps
+        ),
+        simplex_edge_star_context_runtime_scale=args.simplex_edge_star_context_runtime_scale,
+        simplex_edge_star_context_runtime_scale_final=args.simplex_edge_star_context_runtime_scale_final,
+        simplex_edge_star_context_runtime_scale_ramp_start_step=(
+            args.simplex_edge_star_context_runtime_scale_ramp_start_step
+        ),
+        simplex_edge_star_context_runtime_scale_ramp_steps=args.simplex_edge_star_context_runtime_scale_ramp_steps,
         simplex_hodge_face_runtime_scale=args.simplex_hodge_face_runtime_scale,
         simplex_hodge_face_runtime_scale_final=args.simplex_hodge_face_runtime_scale_final,
         simplex_hodge_face_runtime_scale_ramp_start_step=args.simplex_hodge_face_runtime_scale_ramp_start_step,
@@ -3082,6 +3156,22 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         ),
         "simplex_boundary_readout_directionality_runtime_scale_ramp_steps": (
             args.simplex_boundary_readout_directionality_runtime_scale_ramp_steps
+        ),
+        "simplex_vertex_star_context_runtime_scale": args.simplex_vertex_star_context_runtime_scale,
+        "simplex_vertex_star_context_runtime_scale_final": args.simplex_vertex_star_context_runtime_scale_final,
+        "simplex_vertex_star_context_runtime_scale_ramp_start_step": (
+            args.simplex_vertex_star_context_runtime_scale_ramp_start_step
+        ),
+        "simplex_vertex_star_context_runtime_scale_ramp_steps": (
+            args.simplex_vertex_star_context_runtime_scale_ramp_steps
+        ),
+        "simplex_edge_star_context_runtime_scale": args.simplex_edge_star_context_runtime_scale,
+        "simplex_edge_star_context_runtime_scale_final": args.simplex_edge_star_context_runtime_scale_final,
+        "simplex_edge_star_context_runtime_scale_ramp_start_step": (
+            args.simplex_edge_star_context_runtime_scale_ramp_start_step
+        ),
+        "simplex_edge_star_context_runtime_scale_ramp_steps": (
+            args.simplex_edge_star_context_runtime_scale_ramp_steps
         ),
         "simplex_hodge_face_runtime_scale": args.simplex_hodge_face_runtime_scale,
         "simplex_hodge_face_runtime_scale_final": args.simplex_hodge_face_runtime_scale_final,

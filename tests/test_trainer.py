@@ -56,6 +56,7 @@ from minalphafold.trainer import (
     simplex_boundary_pair_gate_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
     simplex_cell_score_outer_edge_weight_at_step,
+    simplex_edge_star_context_runtime_scale_at_step,
     save_checkpoint,
     simplex_hodge_face_runtime_scale_at_step,
     simplex_local_neighbor_k_at_step,
@@ -65,6 +66,7 @@ from minalphafold.trainer import (
     simplex_single_update_runtime_scale_at_step,
     simplex_update_scale_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
+    simplex_vertex_star_context_runtime_scale_at_step,
     train_step,
     use_finetune_loss,
     zero_dropout_model_config,
@@ -189,6 +191,14 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_boundary_readout_directionality_runtime_scale_final=0.5,
         simplex_boundary_readout_directionality_runtime_scale_ramp_start_step=10,
         simplex_boundary_readout_directionality_runtime_scale_ramp_steps=10,
+        simplex_vertex_star_context_runtime_scale=0.0,
+        simplex_vertex_star_context_runtime_scale_final=1.0,
+        simplex_vertex_star_context_runtime_scale_ramp_start_step=10,
+        simplex_vertex_star_context_runtime_scale_ramp_steps=10,
+        simplex_edge_star_context_runtime_scale=1.0,
+        simplex_edge_star_context_runtime_scale_final=0.0,
+        simplex_edge_star_context_runtime_scale_ramp_start_step=10,
+        simplex_edge_star_context_runtime_scale_ramp_steps=10,
         simplex_segment_cell_runtime_scale=0.0,
         simplex_segment_cell_runtime_scale_final=0.1,
         simplex_segment_cell_runtime_scale_ramp_start_step=10,
@@ -233,6 +243,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_single_update_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_hodge_face_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, 15) == 0.25
+    assert simplex_vertex_star_context_runtime_scale_at_step(training_config, 15) == 0.5
+    assert simplex_edge_star_context_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_segment_cell_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_msa_feedback_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_boundary_pair_feedback_runtime_scale_at_step(training_config, 15) == 0.05
@@ -248,6 +260,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert "simplex_pair_update_scale_override" not in eval_inputs
     assert "simplex_hodge_face_update_scale_override" not in eval_inputs
     assert "simplex_boundary_readout_directionality_override" not in eval_inputs
+    assert "simplex_vertex_star_context_scale_override" not in eval_inputs
+    assert "simplex_edge_star_context_scale_override" not in eval_inputs
     assert "simplex_segment_cell_scale_override" not in eval_inputs
     assert "simplex_msa_feedback_scale_override" not in eval_inputs
     assert "simplex_boundary_pair_feedback_scale_override" not in eval_inputs
@@ -265,6 +279,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
         use_simplex_update_scale=True,
         use_simplex_hodge_face_runtime_scale=True,
         use_simplex_boundary_readout_directionality_runtime_scale=True,
+        use_simplex_vertex_star_context_runtime_scale=True,
+        use_simplex_edge_star_context_runtime_scale=True,
         use_simplex_segment_cell_runtime_scale=True,
         use_simplex_msa_feedback_runtime_scale=True,
         use_simplex_boundary_pair_feedback_runtime_scale=True,
@@ -283,6 +299,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_single_update_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
+    assert torch.allclose(train_inputs["simplex_vertex_star_context_scale_override"], torch.tensor(0.5))
+    assert torch.allclose(train_inputs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_segment_cell_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_msa_feedback_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_boundary_pair_feedback_scale_override"], torch.tensor(0.05))
@@ -459,6 +477,22 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.75",
             "--simplex-edge-star-context-scale",
             "0.5",
+            "--simplex-vertex-star-context-runtime-scale",
+            "0.0",
+            "--simplex-vertex-star-context-runtime-scale-final",
+            "1.0",
+            "--simplex-vertex-star-context-runtime-scale-ramp-start-step",
+            "6000",
+            "--simplex-vertex-star-context-runtime-scale-ramp-steps",
+            "500",
+            "--simplex-edge-star-context-runtime-scale",
+            "1.0",
+            "--simplex-edge-star-context-runtime-scale-final",
+            "0.0",
+            "--simplex-edge-star-context-runtime-scale-ramp-start-step",
+            "6000",
+            "--simplex-edge-star-context-runtime-scale-ramp-steps",
+            "500",
         ]
     )
 
@@ -467,6 +501,14 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_global_context_scale == 0.125
     assert cfg.simplex_vertex_star_context_scale == 0.75
     assert cfg.simplex_edge_star_context_scale == 0.5
+    assert args.simplex_vertex_star_context_runtime_scale == 0.0
+    assert args.simplex_vertex_star_context_runtime_scale_final == 1.0
+    assert args.simplex_vertex_star_context_runtime_scale_ramp_start_step == 6000
+    assert args.simplex_vertex_star_context_runtime_scale_ramp_steps == 500
+    assert args.simplex_edge_star_context_runtime_scale == 1.0
+    assert args.simplex_edge_star_context_runtime_scale_final == 0.0
+    assert args.simplex_edge_star_context_runtime_scale_ramp_start_step == 6000
+    assert args.simplex_edge_star_context_runtime_scale_ramp_steps == 500
 
 
 def test_load_model_config_raises_for_missing_profile():

@@ -21,10 +21,14 @@ the same idea: interpolate the selected global-complex cochain toward
 residue vertex-star cochains pooled by incidence from selected face/tetra
 cells. This keeps the intervention inside the topological cochain view and
 reuses the E116 global-context modules, so it should remain checkpoint- and
-budget-compatible. Do not launch E118 until E117 returns and is recorded.
-If E117 is the source checkpoint, E118 should run the next 500-step gate to
-step 7000; only use a step-6500 target if falling back to the E116 step-6000
-checkpoint.
+budget-compatible. The launch path now supports a runtime star-context ramp,
+so a resumed E118 gate can anneal from the proven E116 protein-level
+selected-complex cochain toward the vertex-star incidence cochain instead of
+switching the cochain routing abruptly. Do not launch E118 until E117 returns
+and is recorded. If E117 is the source checkpoint, E118 should run the next
+500-step gate to step 7000 with the vertex-star runtime scale ramped from
+`0.0` to `1.0` over steps 6500-7000; only use a step-6500 target and
+6000-6500 ramp if falling back to the E116 step-6000 checkpoint.
 
 E119 is now prepared locally as the edge-star analogue of E118, but it should
 stay parked until E117 is recorded and E118 is either run or explicitly
@@ -34,7 +38,9 @@ the average context of its own boundary-edge star before the same selected
 boundary-edge readout. This is closer to the pair tensor `Z_ij` and should be
 the follow-up only if the global-context family remains stable but still needs
 a sharper local-to-global bridge. It adds no parameters over E116/E118 because
-it reuses the existing global-context adapters.
+it reuses the existing global-context adapters. As with E118, the first E119
+gate should prefer the runtime ramp from `0.0` to `1.0` across the 500-step
+resume window rather than an abrupt star-context switch.
 
 The next branch should stay topology-native but move the feedback target back
 toward the pair/edge trunk rather than the target MSA row. E100 showed that

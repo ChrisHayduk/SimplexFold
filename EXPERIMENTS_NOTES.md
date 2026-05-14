@@ -5324,3 +5324,24 @@
   `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
   `python -m pytest tests/test_simplex.py::test_vertex_star_cell_mean_pools_incident_selected_cells tests/test_simplex.py::test_edge_star_cell_mean_pools_cells_through_boundary_edges tests/test_simplex.py::test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters tests/test_simplex.py::test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters tests/test_trainer.py::test_simplicial_edge_star_context_adds_no_parameters`
   reported `9 passed`.
+- 2026-05-14T03:09:21Z local prep while E117 runs: added runtime ramp support
+  for the E118/E119 star-context routes. The new training/benchmark CLI flags
+  are `--simplex-vertex-star-context-runtime-scale`,
+  `--simplex-vertex-star-context-runtime-scale-final`,
+  `--simplex-vertex-star-context-runtime-scale-ramp-start-step`,
+  `--simplex-vertex-star-context-runtime-scale-ramp-steps`,
+  `--simplex-edge-star-context-runtime-scale`,
+  `--simplex-edge-star-context-runtime-scale-final`,
+  `--simplex-edge-star-context-runtime-scale-ramp-start-step`, and
+  `--simplex-edge-star-context-runtime-scale-ramp-steps`. This lets a resumed
+  E118/E119 gate anneal from E116's protein-level selected-complex cochain
+  toward vertex-star or edge-star incidence cochains, instead of abruptly
+  changing the selected-complex routing at the checkpoint boundary. This adds
+  no parameters and stays in the topological cochain/inter-incidence view.
+- Star-context ramp validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_star_context_runtime_overrides_gate_context_route tests/test_simplex.py::test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters tests/test_simplex.py::test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`
+  reported `8 passed`; `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `198 passed`; and
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  passed.

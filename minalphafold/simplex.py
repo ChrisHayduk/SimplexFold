@@ -1814,6 +1814,8 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
+        simplex_vertex_star_context_scale_override: Optional[torch.Tensor] = None,
+        simplex_edge_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
         simplex_msa_feedback_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_pair_feedback_scale_override: Optional[torch.Tensor] = None,
@@ -1856,6 +1858,18 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_boundary_readout_directionality_override is not None:
             boundary_readout_directionality = min(
                 max(float(simplex_boundary_readout_directionality_override.detach().float().cpu().item()), 0.0),
+                1.0,
+            )
+        vertex_star_context_scale = self.vertex_star_context_scale
+        if simplex_vertex_star_context_scale_override is not None:
+            vertex_star_context_scale = min(
+                max(float(simplex_vertex_star_context_scale_override.detach().float().cpu().item()), 0.0),
+                1.0,
+            )
+        edge_star_context_scale = self.edge_star_context_scale
+        if simplex_edge_star_context_scale_override is not None:
+            edge_star_context_scale = min(
+                max(float(simplex_edge_star_context_scale_override.detach().float().cpu().item()), 0.0),
                 1.0,
             )
         segment_cell_scale = self.segment_cell_scale
@@ -2134,6 +2148,8 @@ class SimplicialAdapter(torch.nn.Module):
                 tetra_state,
                 topology.tetra_indices,
                 topology.tetra_mask,
+                vertex_star_context_scale=vertex_star_context_scale,
+                edge_star_context_scale=edge_star_context_scale,
             )
 
         face_edge_update = self.face_to_edge(face_state).reshape(*face_state.shape[:-1], 3, self.c_z)
@@ -2436,14 +2452,17 @@ class SimplicialAdapter(torch.nn.Module):
         tetra_state: torch.Tensor,
         tetra_indices: torch.Tensor,
         tetra_mask: torch.Tensor,
+        *,
+        vertex_star_context_scale: float,
+        edge_star_context_scale: float,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Route a protein-level selected-complex summary back into active cells."""
+        """Route selected-complex summary cochains back into active cells."""
 
         face_mean = masked_cell_mean(face_state, face_mask, self.c_face)
         tetra_mean = masked_cell_mean(tetra_state, tetra_mask, self.c_tetra)
         global_context = torch.cat([face_mean, tetra_mean], dim=-1)
         face_context = global_context[:, None, None, :].expand(*face_state.shape[:-1], -1)
-        if self.vertex_star_context_scale > 0.0:
+        if vertex_star_context_scale > 0.0:
             face_star = vertex_star_cell_mean(
                 face_state,
                 face_indices,
@@ -2465,8 +2484,8 @@ class SimplicialAdapter(torch.nn.Module):
                 ],
                 dim=-1,
             )
-            face_context = face_context + self.vertex_star_context_scale * (face_vertex_context - face_context)
-        if self.edge_star_context_scale > 0.0:
+            face_context = face_context + vertex_star_context_scale * (face_vertex_context - face_context)
+        if edge_star_context_scale > 0.0:
             face_edge_star = edge_star_cell_mean(
                 face_state,
                 face_indices,
@@ -2489,7 +2508,7 @@ class SimplicialAdapter(torch.nn.Module):
                 ],
                 dim=-1,
             )
-            face_context = face_context + self.edge_star_context_scale * (face_edge_context - face_context)
+            face_context = face_context + edge_star_context_scale * (face_edge_context - face_context)
         face_msg = self.global_to_face(torch.cat([face_state, face_context], dim=-1))
         face_state = face_state + self.dropout(
             self.global_context_scale
@@ -2501,7 +2520,7 @@ class SimplicialAdapter(torch.nn.Module):
 
         if tetra_state.numel() > 0 and self.use_tetra:
             tetra_context = global_context[:, None, None, :].expand(*tetra_state.shape[:-1], -1)
-            if self.vertex_star_context_scale > 0.0:
+            if vertex_star_context_scale > 0.0:
                 tetra_vertex_context = torch.cat(
                     [
                         gather_single(face_star, tetra_indices).mean(dim=-2),
@@ -2509,10 +2528,8 @@ class SimplicialAdapter(torch.nn.Module):
                     ],
                     dim=-1,
                 )
-                tetra_context = tetra_context + self.vertex_star_context_scale * (
-                    tetra_vertex_context - tetra_context
-                )
-            if self.edge_star_context_scale > 0.0:
+                tetra_context = tetra_context + vertex_star_context_scale * (tetra_vertex_context - tetra_context)
+            if edge_star_context_scale > 0.0:
                 tetra_edges = _cell_boundary_edges(tetra_indices)
                 tetra_edge_context = torch.cat(
                     [
@@ -2521,9 +2538,7 @@ class SimplicialAdapter(torch.nn.Module):
                     ],
                     dim=-1,
                 )
-                tetra_context = tetra_context + self.edge_star_context_scale * (
-                    tetra_edge_context - tetra_context
-                )
+                tetra_context = tetra_context + edge_star_context_scale * (tetra_edge_context - tetra_context)
             tetra_msg = self.global_to_tetra(torch.cat([tetra_state, tetra_context], dim=-1))
             tetra_state = tetra_state + self.dropout(
                 self.global_context_scale

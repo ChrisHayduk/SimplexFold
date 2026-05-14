@@ -813,6 +813,59 @@ def test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters
     assert not torch.allclose(star_single, global_single)
 
 
+def test_star_context_runtime_overrides_gate_context_route():
+    class GlobalContextConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_global_context_scale = 0.25
+
+    class StarContextConfig(GlobalContextConfig):
+        simplex_vertex_star_context_scale = 1.0
+        simplex_edge_star_context_scale = 1.0
+
+    torch.manual_seed(49)
+    global_adapter = SimplicialAdapter(GlobalContextConfig()).eval()
+    torch.manual_seed(49)
+    star_adapter = SimplicialAdapter(StarContextConfig()).eval()
+    with torch.no_grad():
+        torch.manual_seed(50)
+        face_weight = torch.randn_like(global_adapter.global_to_face.linear_2.weight) * 0.02
+        face_bias = torch.randn_like(global_adapter.global_to_face.linear_2.bias) * 0.01
+        tetra_weight = torch.randn_like(global_adapter.global_to_tetra.linear_2.weight) * 0.02
+        tetra_bias = torch.randn_like(global_adapter.global_to_tetra.linear_2.bias) * 0.01
+        for adapter in (global_adapter, star_adapter):
+            adapter.global_to_face.linear_2.weight.copy_(face_weight)
+            adapter.global_to_face.linear_2.bias.copy_(face_bias)
+            adapter.global_to_tetra.linear_2.weight.copy_(tetra_weight)
+            adapter.global_to_tetra.linear_2.bias.copy_(tetra_bias)
+    pair = torch.randn(1, 5, 5, GlobalContextConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, GlobalContextConfig.c_s)
+
+    global_pair, global_single, _ = global_adapter(pair, single)
+    zero_pair, zero_single, _ = star_adapter(
+        pair,
+        single,
+        simplex_vertex_star_context_scale_override=pair.new_tensor(0.0),
+        simplex_edge_star_context_scale_override=pair.new_tensor(0.0),
+    )
+    active_pair, active_single, _ = star_adapter(
+        pair,
+        single,
+        simplex_vertex_star_context_scale_override=pair.new_tensor(1.0),
+        simplex_edge_star_context_scale_override=pair.new_tensor(1.0),
+    )
+
+    assert torch.allclose(zero_pair, global_pair)
+    assert torch.allclose(zero_single, global_single)
+    assert not torch.allclose(active_pair, global_pair)
+    assert not torch.allclose(active_single, global_single)
+
+
 def test_face_tetra_coboundary_delta_uses_sibling_faces_in_selected_tetras():
     face_state = torch.tensor([[[[1.0, 0.0], [3.0, 0.0], [7.0, 0.0], [11.0, 0.0]]]])
     face_mask = torch.ones(1, 1, 4)
