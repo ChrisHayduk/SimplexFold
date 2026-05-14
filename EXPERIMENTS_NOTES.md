@@ -6195,3 +6195,13 @@
   ended at inherited step 8000, and no `results.csv` or checkpoint was present.
   Interpretation: active training/evaluation before the step-8500 writeout;
   leave the run alone and let the heartbeat catch the coherent result bundle.
+- 2026-05-14T21:47Z-21:58Z longer E128 watch on the owned pod: PID `1523`
+  remained alive from about `19:41` through `30:42` elapsed, process CPU stayed
+  around `755%`-`762%`, RSS stayed about `2.0 GiB`, and the process kept `178`
+  threads. H100 memory stayed allocated at `43353 MiB`; sampled GPU
+  utilization ranged from `0%` to `63%` while CPU stayed high. The artifact
+  directory still had only the two startup files, history still ended at
+  inherited step 8000, and neither `results.csv` nor
+  `checkpoints/full_msa_to_face_latest.pt` was present. Continue to wait; do
+  not pull, stop, or launch a follow-up until the coherent step-8500 bundle
+  appears or the process exits with a clear failure.
