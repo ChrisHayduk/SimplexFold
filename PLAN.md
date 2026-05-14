@@ -1,4 +1,4 @@
-## Current Plan: Monitor E124 Face Boundary-Edge-Frame Gate
+## Current Plan: Launch E125 Ramped Boundary-Edge-Frame Gate
 
 E120 is now the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
@@ -123,36 +123,33 @@ does not clear the `0.45` short-gate threshold, worsens dRMSD, and softens
 selected face/tetra boundary geometry (`0.7447` / `0.7280` boundary lDDT and
 `0.6505` / `0.6494` contraction). Do not spend 30,000 steps on E123.
 
-The next short gate is E124 face boundary-edge-frame gating. This is not a
+E124 face boundary-edge-frame gating is now returned. This is not a
 generic output loss: it asks whether a learned 2-simplex can communicate more
 usefully through its own oriented boundary 1-simplices by gating selected
 face-to-edge messages with edge-frame scalarized face geometry. Keep it as a
-500-step topology-communication probe from the E120 checkpoint at small scale
-(`simplex_boundary_edge_frame_gate_scale=0.05`) and do not add the tetra gate
-without a fresh parameter audit.
+500-step topology-communication probe from the E120 checkpoint at small scale.
+It returned at step 8000 with `val_lddt_ca=0.4280`, FoldScore `0.3979`,
+`val_ca_drmsd=11.2529`, and C-alpha Rg `11.3075 / 16.3091`. Remote and local
+coherence passed with `parameters=3,239,522 <= 3,261,974`,
+`effective_batch_size=8`, one result row, 1000 eval-detail rows, and history
+ending at step 8000. E124 is a tiny new primary-lDDT leader over E123
+(`0.4270`) and E120 (`0.4248`), and it improves selected face/tetra boundary
+lDDT (`0.7583` / `0.7406`) plus contraction (`0.5614` / `0.5611`), but it
+remains below the `0.45` short-gate threshold and worsens FoldScore/dRMSD
+versus E123/E120. Do not spend 30,000 steps on E124.
 
-E124 is active on the owned Runpod pod `o1dy17ouv8w5mz` as
-`e124_face_edge_frame_gate_from_e120_s8000_c256_m64`, PID `33724`, with
-remote HEAD `7cefa48`. Startup confirmed a clean weights-only resume from the
-E120 checkpoint at step 7500/examples 60000, `1292` matching tensors loaded,
-`24` new gate tensors initialized, `effective_batch_size=8`, and the intended
-metadata: boundary edge-frame gate scale `0.05`, directed boundary readout
-`0.25`, edge-frame message runtime `0.0125`, global context `0.1`,
-vertex-star context `1.0`, edge-star context `0.5`, and sparse caps
-`24 / 48`.
-
-While E124 runs, a no-science-change E125 fallback is now prepared locally:
+The next short gate is E125:
 `simplex_boundary_edge_frame_gate_runtime_scale` lets the same oriented
 face-boundary edge-frame gate ramp from `0.0` to the configured gate scale
 instead of switching on abruptly when resuming from E120. This stays inside the
 same selected-complex view as E124. The selected face cochain still writes
 through its directed boundary 1-simplices using edge-frame scalarized geometry;
-the only change is treating that inter-rank gate as a topology curriculum. If
-E124 returns below the short gate, E125 should be the first follow-up only if a
-smooth-on variant is scientifically useful after inspecting the E124 boundary
-diagnostics. A candidate launch would keep `simplex_boundary_edge_frame_gate_scale=0.05`
-for parameter allocation but add a runtime ramp from `0.0` to `0.05` over
-steps 7500-8000.
+the only change is treating that inter-rank gate as a topology curriculum.
+Because E124 improved local selected-complex geometry but worsened global
+FoldScore/dRMSD, E125 should test whether a smoother handoff preserves the
+local boundary signal without over-contracting the global C-alpha trace. Launch
+it from the E120 checkpoint to step 8000 with the E124 allocation scale fixed
+at `0.05` and runtime ramp `0.0 -> 0.05` over steps 7500-8000.
 
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that

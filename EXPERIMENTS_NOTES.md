@@ -5900,3 +5900,21 @@
   `results.csv`, eval details, and checkpoint all missing), so there is no
   returned metric to record. Continue waiting under the owned-pod-only
   heartbeat; do not stop the pod or launch E125 while E124 is still alive.
+- 2026-05-14T15:58Z E124 returned coherently on the owned Runpod pod at step
+  8000. The process exited, all required result/metadata/history/eval-detail/
+  checkpoint files were present, `results.csv` had one row, eval details had
+  1000 rows, history ended at step 8000, `effective_batch_size=8`,
+  `parameters=3,239,522 <= 3,261,974`, `stopped_early=False`, and the
+  intended E124 metadata was present. Artifacts, checkpoint, and log were
+  pulled locally; `scripts/verify_nanofold_benchmark_artifacts.py` passed with
+  the expected step, batch, result rows, eval rows, history endpoint,
+  parameter cap, stopped-early state, and metadata. Result:
+  `val_lddt_ca=0.42803398206830023`, FoldScore `0.39794732853770254`,
+  `val_ca_drmsd=11.252948240101338`, C-alpha Rg
+  `11.307547686100007 / 16.30911695623398`, selected face/tetra boundary
+  lDDT `0.758343939781189` / `0.7405965490937233`, and selected face/tetra
+  contraction `0.5614195781946182` / `0.561115251004696`. Decision: tiny new
+  primary-lDDT leader but reject as a 30k candidate because it remains below
+  the `0.45` short-gate threshold and worsens FoldScore/dRMSD versus E123/E120.
+  E124's stronger selected-boundary diagnostics justify E125 only as a short
+  smooth-on topology-curriculum probe, not as a long spend.

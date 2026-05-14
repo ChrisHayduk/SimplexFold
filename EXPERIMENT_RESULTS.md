@@ -2,7 +2,7 @@
 
 Last updated: 2026-05-14.
 
-Best validation C-alpha lDDT so far: **E123**, `val_lddt_ca=0.4270` at step
+Best validation C-alpha lDDT so far: **E124**, `val_lddt_ca=0.4280` at step
 8000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records only returned Runpod results. In-flight plans, launch notes,
@@ -139,3 +139,4 @@ recorded in the running notes for that run.
 | E121 pre-triangle simplex injection | failed | - | - | - | - | - | - | Failed before step-8000 validation: activation checkpoint recomputation hit variable-size selected-complex tensor metadata mismatch (`4399` vs `4403` rows). No new score; corrective E121b reruns the same gate with active pre-triangle blocks executed eagerly. |
 | E121b eager pre-triangle simplex injection | returned | 8000 | 0.4223 | 0.4223 | 0.4007 | 11.1491 | 11.8330 / 16.3091 | Rejected: corrected eager pre-triangle injection returned below E120 on primary C-alpha lDDT and below the 0.45 short-gate threshold despite high selected face/tetra boundary lDDT; use E123 pair-only ramped pre-triangle injection as the next fallback rather than spending 30k on E121b. |
 | E123 ramped pair-only pre-triangle simplex injection | returned | 8000 | 0.4270 | 0.4270 | 0.3992 | 11.1927 | 11.4700 / 16.3091 | Tiny new primary-lDDT leader but rejected as a 30k candidate: ramped pair-only pre-triangle injection beats E120/E121b on C-alpha lDDT, but remains below the 0.45 short-gate threshold and softens selected-boundary geometry; use E124 only as a short topology-communication probe, not as a long spend. |
+| E124 face boundary-edge-frame gate | returned | 8000 | 0.4280 | 0.4280 | 0.3979 | 11.2529 | 11.3075 / 16.3091 | Tiny new primary-lDDT leader but rejected as a 30k candidate: oriented face boundary-edge-frame gating improves selected face/tetra boundary lDDT (`0.7583` / `0.7406`) and contraction (`0.5614` / `0.5611`) but remains below the 0.45 short-gate threshold and worsens FoldScore/dRMSD versus E123/E120; use only as evidence for a smoother topology-curriculum probe. |

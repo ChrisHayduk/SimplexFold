@@ -5229,7 +5229,7 @@ Validation:
 
 ### E124: Face Boundary-Edge-Frame Gate
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: the strongest portable topological idea from the paper reread is
 not just that higher-rank cells exist, but that their geometric content should
@@ -5280,6 +5280,21 @@ clean weights-only resume from E120 at step 7500/examples 60000, `1292`
 matching tensors loaded, `24` new gate tensors initialized, and metadata
 matching the intended face boundary-edge-frame gate recipe.
 
+Result: tiny new primary-lDDT leader but reject as a 30k candidate. E124
+returned at step 8000 with `val_lddt_ca=0.4280`, FoldScore `0.3979`,
+`val_ca_drmsd=11.2529`, and C-alpha Rg `11.3075 / 16.3091`. Remote and
+local coherence passed: `completed_steps=8000`, one result row, 1000
+eval-detail rows, history ending at step 8000, `effective_batch_size=8`,
+`parameters=3,239,522 <= 3,261,974`, `stopped_early=False`, checkpoint
+present, and the intended face boundary-edge-frame metadata. The oriented
+face boundary-edge-frame gate improves selected face/tetra boundary lDDT
+(`0.7583` / `0.7406`) and contraction (`0.5614` / `0.5611`) versus E123, but
+the gain in primary C-alpha lDDT is only `+0.0010`, FoldScore and dRMSD both
+worsen, and the run remains below the `0.45` short-gate threshold. Do not
+spend 30,000 steps on E124. Use the result only as evidence that the
+face-boundary route can improve local selected-complex geometry while still
+needing a smoother or more globally useful handoff.
+
 Validation so far:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
@@ -5290,8 +5305,8 @@ Validation so far:
 
 ### E125: Ramped Face Boundary-Edge-Frame Gate
 
-Status: implemented locally as a queued fallback while E124 is still running;
-not launched.
+Status: queued as the next short Runpod gate after E124 returned below the
+`0.45` short-gate threshold; not launched yet.
 
 Hypothesis: if E124's abrupt face boundary-edge-frame gate is directionally
 helpful but unstable, the same topological route should be tested as a
@@ -5308,7 +5323,12 @@ benchmark runner, AlphaFold2 forward path, SimplicialEvoformer blocks, and the
 SimplicialAdapter. At runtime, the gate contribution can be `0.0` at resume
 and ramp to `0.05` by the step-8000 validation point.
 
-Candidate launch if E124 rejects but suggests abrupt-gate instability:
+Candidate launch after E124: E124 improved selected-boundary lDDT and
+contraction but worsened FoldScore/dRMSD and remained globally contracted.
+That is enough evidence to test whether a smoother topology curriculum can
+keep the local face-boundary geometry signal without disrupting global
+assembly as much. Launch E125 as the next short gate only after E124 results
+are committed and the owned pod has no active benchmark process:
 
 ```bash
 --run-name e125_ramped_boundary_edge_frame_gate_from_e120_s8000_c256_m64 \
