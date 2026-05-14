@@ -5236,3 +5236,8 @@
   utilization `53%` with `13593 MiB` allocated. No `results.json`,
   `results.csv`, eval-detail file, or new checkpoint yet; this matches the
   long compute-only phase seen in E116. Keep waiting and do not launch E118.
+- E117 health poll after about 21 minutes: PID `13554` remained active on the
+  owned pod with state `Rl`, about `1014%` CPU, 178 threads, and `13593 MiB`
+  GPU memory allocated. No `results.json`, `results.csv`, or eval-detail file
+  yet; remote git dirt remains only the editable-install
+  `minalphafold.egg-info/`. Continue waiting and leave E118 parked.
