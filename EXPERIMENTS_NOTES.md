@@ -5292,3 +5292,8 @@
   `minalphafold.egg-info/` dirt. The artifact directory still contains only
   `run_metadata.json` and inherited `history_full_msa_to_face.json`; no
   `results.json`, `results.csv`, eval-detail file, or checkpoint has returned.
+- Updated heartbeat `check-simplexfold-e57-runpod` to acknowledge that E119
+  edge-star selected-complex context is prepared, but to keep E119 parked
+  until E117 is recorded and E118 has either run or been explicitly skipped.
+  The heartbeat should still launch at most E118 after E117, and only if E117
+  stays stable near or above the E96/E116 lDDT band.
