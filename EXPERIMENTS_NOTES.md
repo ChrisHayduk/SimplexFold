@@ -6149,3 +6149,24 @@
   availability for E124 was confirmed, and the combined profile audits at
   `3,240,738 <= 3,261,974` parameters. Reject unless it beats E124 primary
   C-alpha lDDT and moves toward the `0.45` short-gate threshold.
+- 2026-05-14T21:29Z launched E128 on the owned Runpod pod
+  `o1dy17ouv8w5mz` only, after restart on SSH `root@103.207.149.82:10704`.
+  Because `/workspace` was empty after the restart, the SimplexFold repo was
+  recloned at commit `199d0ad`, public NanoFold manifests/code were restored,
+  and public `processed_features`/`processed_labels` were transferred via
+  `runpodctl` after raw SSH file streaming proved too slow. Prelaunch audit
+  passed: `processed_features=11000`, `processed_labels=11000`,
+  `train=10000`, `val=1000`, `all=11000`, hidden/private/salt path count
+  `0`, H100 `NVIDIA H100 80GB HBM3`, FoldScore import ok, no active benchmark
+  process, and E124 checkpoint present at
+  `36577263` bytes. Remote model audit for the E128 architecture returned
+  `3,240,738 <= 3,261,974` parameters.
+- E128 process details: run
+  `e128_damped_triangle_bias_from_e124_s8500_c256_m64`, PID `1523`, log
+  `logs/e128_damped_triangle_bias_from_e124.log`, artifact directory
+  `artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64`.
+  Startup log confirms resume from the E124 checkpoint at step 8000/examples
+  64000, `1316` matching tensors loaded, `16` new/missing tensors initialized,
+  and a fresh optimizer. Initial history currently ends at inherited E124 step
+  8000 with `val_lddt_ca=0.42803398206830023`; wait for the coherent step-8500
+  bundle before pulling or updating `EXPERIMENT_RESULTS.md`.
