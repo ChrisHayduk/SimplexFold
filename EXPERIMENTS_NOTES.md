@@ -5345,3 +5345,10 @@
   reported `198 passed`; and
   `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
   passed.
+- 2026-05-14T03:10:51Z heartbeat `check-simplexfold-e57-runpod` updated to
+  launch any post-E117 E118 gate with the new vertex-star runtime ramp after
+  fast-forwarding the remote checkout to the current branch tip. If E117 is
+  the source checkpoint, E118 should target step 7000 and ramp
+  `--simplex-vertex-star-context-runtime-scale` from `0.0` to `1.0` over
+  steps 6500-7000; if falling back to E116 step 6000, target step 6500 and
+  ramp over steps 6000-6500. E119 remains parked.
