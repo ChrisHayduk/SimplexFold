@@ -6085,3 +6085,9 @@
   E120 step-7500 row. Keep waiting for the coherent step-8000 bundle before
   pulling, updating `EXPERIMENT_RESULTS.md`, stopping the pod, or launching
   E127.
+- 2026-05-14T19:40Z-19:48Z E126 continued running on the owned pod. PID
+  `1120` remained active with process CPU around `751%`-`758%`, H100 memory
+  stayed allocated at `42899 MiB`, and sampled GPU utilization ranged from
+  `0%` to `54%`. No step-8000 artifacts have been written yet: `results.json`,
+  `results.csv`, eval details, and checkpoint are all still absent, and
+  history still ends at inherited E120 step 7500. Leave the job running.
