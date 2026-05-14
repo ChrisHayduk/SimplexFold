@@ -5770,3 +5770,11 @@
   passed; and the verifier accepted the known-good E120 artifact with
   `--expected-results-rows 1`. The E121b heartbeat now includes that stricter
   `--expected-results-rows 1` gate before any results-table update.
+- 2026-05-14T11:10Z E121b remains active on the owned Runpod pod after about
+  `01:11:07` elapsed. `results.json` is still absent, remote artifacts remain
+  `run_metadata.json` and `history_full_msa_to_face.json`, and the history
+  endpoint is still the inherited E120 step-7500 row. GPU utilization was
+  active at `48%` with `42,875 / 81,559` MiB allocated. The log still shows
+  only startup/resume lines, so treat this as a slow in-flight eager
+  pre-triangle gate rather than a returned or failed experiment. Do not launch
+  E123/E124 while this PID remains alive.
