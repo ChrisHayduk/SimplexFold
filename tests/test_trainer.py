@@ -33,6 +33,7 @@ from minalphafold.trainer import (
     build_optimizer,
     DataConfig,
     TrainingConfig,
+    apply_model_config_cli_overrides,
     apply_loss_weight_schedule,
     build_dataloader,
     evaluate,
@@ -47,6 +48,7 @@ from minalphafold.trainer import (
     load_training_protocol,
     main,
     model_inputs_from_batch,
+    parse_args,
     simplex_boundary_cochain_recycling_runtime_scale_at_step,
     simplex_boundary_metric_gate_runtime_scale_at_step,
     simplex_boundary_metric_recycling_runtime_scale_at_step,
@@ -446,6 +448,25 @@ def test_load_model_config_accepts_an_explicit_toml_path():
     path = CONFIGS_DIR / "tiny.toml"
     assert load_model_config(path).model_profile == "tiny"
     assert load_model_config(str(path)).model_profile == "tiny"
+
+
+def test_trainer_cli_accepts_simplex_star_context_overrides():
+    args = parse_args(
+        [
+            "--simplex-global-context-scale",
+            "0.125",
+            "--simplex-vertex-star-context-scale",
+            "0.75",
+            "--simplex-edge-star-context-scale",
+            "0.5",
+        ]
+    )
+
+    cfg = apply_model_config_cli_overrides(load_model_config("simplexfold_medium_param_matched"), args)
+
+    assert cfg.simplex_global_context_scale == 0.125
+    assert cfg.simplex_vertex_star_context_scale == 0.75
+    assert cfg.simplex_edge_star_context_scale == 0.5
 
 
 def test_load_model_config_raises_for_missing_profile():

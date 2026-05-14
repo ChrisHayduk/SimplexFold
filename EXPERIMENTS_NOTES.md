@@ -5285,6 +5285,18 @@
   reported `196 passed`;
   `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model_config.py minalphafold/simplex.py scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py`
   passed.
+- Added standalone trainer CLI consistency for
+  `--simplex-global-context-scale`, `--simplex-vertex-star-context-scale`,
+  and `--simplex-edge-star-context-scale`, so the non-benchmark trainer can
+  instantiate the same E116/E118/E119 context routes without requiring a
+  custom TOML profile. Validation passed:
+  `python -m py_compile minalphafold/trainer.py`;
+  `python -m pytest tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_edge_star_context_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`
+  reported `3 passed`;
+  `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/trainer.py tests/test_trainer.py`
+  passed; and
+  `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`
+  reported `197 passed`.
 - E117 health poll after about 55 minutes: PID `13554` remained active on the
   owned pod with state `Rl`, about `1008%` CPU, 178 threads, `13593 MiB` GPU
   memory allocated, and sampled GPU utilization `0%`. The remote checkout is

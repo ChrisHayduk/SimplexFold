@@ -482,6 +482,21 @@ def zero_dropout_model_config(model_config: ModelConfig) -> ModelConfig:
     )
 
 
+def apply_model_config_cli_overrides(model_config: ModelConfig, args: argparse.Namespace) -> ModelConfig:
+    """Apply optional architecture overrides from the trainer CLI."""
+
+    overrides: dict[str, Any] = {}
+    for field_name in (
+        "simplex_global_context_scale",
+        "simplex_vertex_star_context_scale",
+        "simplex_edge_star_context_scale",
+    ):
+        value = getattr(args, field_name, None)
+        if value is not None:
+            overrides[field_name] = value
+    return copy_model_config(model_config, **overrides) if overrides else model_config
+
+
 def set_seed(seed: int) -> None:
     random.seed(seed)
     np.random.seed(seed)
@@ -2291,6 +2306,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-tetra-top-k-final", type=float, default=None)
     parser.add_argument("--simplex-tetra-top-k-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-tetra-top-k-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-global-context-scale",
+        type=float,
+        default=None,
+        help="Override selected face/tetra global-complex context routed back into active cells.",
+    )
+    parser.add_argument(
+        "--simplex-vertex-star-context-scale",
+        type=float,
+        default=None,
+        help="Interpolate selected global-complex context toward residue vertex-star incidence context.",
+    )
+    parser.add_argument(
+        "--simplex-edge-star-context-scale",
+        type=float,
+        default=None,
+        help="Interpolate selected global-complex context toward boundary-edge star incidence context.",
+    )
     parser.add_argument("--simplex-cell-score-outer-edge-weight", type=float, default=None)
     parser.add_argument("--simplex-cell-score-outer-edge-weight-final", type=float, default=None)
     parser.add_argument("--simplex-cell-score-outer-edge-weight-ramp-start-step", type=int, default=None)
@@ -2538,8 +2571,10 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         resume_from_checkpoint=args.resume_from_checkpoint,
     )
 
+    model_config = apply_model_config_cli_overrides(load_model_config(args.model_config), args)
+
     return fit(
-        model_config=load_model_config(args.model_config),
+        model_config=model_config,
         data_config=data_config,
         training_config=training_config,
     )
