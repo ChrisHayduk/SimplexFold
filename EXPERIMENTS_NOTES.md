@@ -5760,3 +5760,13 @@
   `val_ca_drmsd=11.145049806624652`). GPU utilization was active at `35%`
   with `42,875 / 81,559` MiB allocated. Leave E121b running; do not launch
   E123/E124 until the step-8000 result is coherently returned.
+- 2026-05-14T10:58Z tightened the returned-artifact verifier to require a
+  matching `results.csv` row for the requested variant and to optionally
+  enforce the total `results.csv` row count. This closes a small gap where
+  `results.json` could be coherent while the CSV tracker artifact was merely
+  present. Validation passed: `python -m py_compile scripts/verify_nanofold_benchmark_artifacts.py tests/test_verify_nanofold_benchmark_artifacts.py`;
+  `python -m pytest tests/test_verify_nanofold_benchmark_artifacts.py`
+  reported `5 passed`; ruff undefined-name check passed; `git diff --check`
+  passed; and the verifier accepted the known-good E120 artifact with
+  `--expected-results-rows 1`. The E121b heartbeat now includes that stricter
+  `--expected-results-rows 1` gate before any results-table update.

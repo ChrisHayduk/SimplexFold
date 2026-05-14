@@ -42,6 +42,13 @@ def _csv_row_count(path: Path) -> int:
         return sum(1 for _ in csv.DictReader(handle))
 
 
+def _csv_rows(path: Path) -> list[dict[str, str]]:
+    if not path.exists():
+        raise FileNotFoundError(f"Missing required file: {path}")
+    with path.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
 def _finite_number(value: Any) -> float | None:
     try:
         result = float(value)
@@ -96,6 +103,7 @@ def verify_artifacts(
     expected_effective_batch_size: int | None = None,
     max_parameters: int | None = None,
     expect_stopped_early: bool | None = None,
+    expected_results_rows: int | None = None,
     expected_eval_rows: int | None = None,
     expected_history_last_step: int | None = None,
     require_checkpoint: bool = True,
@@ -107,8 +115,12 @@ def verify_artifacts(
     if not isinstance(metadata, dict):
         raise TypeError(f"run_metadata.json must contain an object in {run_dir}")
 
-    csv_results = run_dir / "results.csv"
-    _require(csv_results.exists(), f"Missing required file: {csv_results}")
+    results_csv_rows = _csv_rows(run_dir / "results.csv")
+    result_csv_matches = [row for row in results_csv_rows if row.get("variant", variant) == variant]
+    _require(
+        len(result_csv_matches) == 1,
+        f"Expected exactly one results.csv row for variant {variant!r}, found {len(result_csv_matches)}",
+    )
 
     history = _history_rows(run_dir / f"history_{variant}.json")
     _require(bool(history), f"History has no rows for variant {variant!r}")
@@ -139,6 +151,11 @@ def verify_artifacts(
         _require(parameters <= max_parameters, f"parameters={parameters} exceeds max {max_parameters}")
     if expect_stopped_early is not None:
         _require(stopped_early is expect_stopped_early, f"stopped_early={stopped_early}, expected {expect_stopped_early}")
+    if expected_results_rows is not None:
+        _require(
+            len(results_csv_rows) == expected_results_rows,
+            f"results.csv rows={len(results_csv_rows)}, expected {expected_results_rows}",
+        )
     if expected_eval_rows is not None:
         _require(eval_rows == expected_eval_rows, f"eval rows={eval_rows}, expected {expected_eval_rows}")
     if expected_history_last_step is not None:
@@ -162,6 +179,7 @@ def verify_artifacts(
         "effective_batch_size": effective_batch_size,
         "parameters": parameters,
         "stopped_early": stopped_early,
+        "results_rows": len(results_csv_rows),
         "eval_rows": eval_rows,
         "history_rows": len(history),
         "history_last_step": last_history_step,
@@ -178,6 +196,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--expected-completed-steps", type=int)
     parser.add_argument("--expected-effective-batch-size", type=int)
     parser.add_argument("--max-parameters", type=int)
+    parser.add_argument("--expected-results-rows", type=int)
     parser.add_argument("--expected-eval-rows", type=int)
     parser.add_argument("--expected-history-last-step", type=int)
     parser.add_argument("--expect-stopped-early", choices=("true", "false"))
@@ -198,6 +217,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         expected_effective_batch_size=args.expected_effective_batch_size,
         max_parameters=args.max_parameters,
         expect_stopped_early=stopped_early,
+        expected_results_rows=args.expected_results_rows,
         expected_eval_rows=args.expected_eval_rows,
         expected_history_last_step=args.expected_history_last_step,
         require_checkpoint=not args.allow_missing_checkpoint,

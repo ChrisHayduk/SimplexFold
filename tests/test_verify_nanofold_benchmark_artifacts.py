@@ -56,6 +56,7 @@ def test_verify_artifacts_accepts_coherent_run(tmp_path):
         expected_effective_batch_size=8,
         max_parameters=3_261_974,
         expect_stopped_early=False,
+        expected_results_rows=1,
         expected_eval_rows=3,
         expected_history_last_step=8000,
         metadata_expectations=[
@@ -66,6 +67,7 @@ def test_verify_artifacts_accepts_coherent_run(tmp_path):
 
     assert summary["val_lddt_ca"] == 0.51
     assert summary["parameters"] == 3_201_970
+    assert summary["results_rows"] == 1
 
 
 def test_verify_artifacts_rejects_wrong_eval_row_count(tmp_path):
@@ -74,6 +76,27 @@ def test_verify_artifacts_rejects_wrong_eval_row_count(tmp_path):
 
     with pytest.raises(ValueError, match="eval rows=2, expected 3"):
         verify_artifacts(run_dir, expected_eval_rows=3)
+
+
+def test_verify_artifacts_rejects_wrong_results_csv_row_count(tmp_path):
+    run_dir = tmp_path / "run"
+    _write_run(run_dir)
+    (run_dir / "results.csv").write_text(
+        "variant,completed_steps\nfull_msa_to_face,8000\nother_variant,8000\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="results.csv rows=2, expected 1"):
+        verify_artifacts(run_dir, expected_results_rows=1)
+
+
+def test_verify_artifacts_rejects_missing_results_csv_variant(tmp_path):
+    run_dir = tmp_path / "run"
+    _write_run(run_dir)
+    (run_dir / "results.csv").write_text("variant,completed_steps\nother_variant,8000\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Expected exactly one results.csv row"):
+        verify_artifacts(run_dir)
 
 
 def test_main_rejects_metadata_mismatch(tmp_path):
