@@ -5419,3 +5419,16 @@
   `--simplex-edge-star-context-runtime-scale` from `0.0` to `1.0` over
   steps 7000-7500. Do not also enable vertex-star context in this first
   edge-star gate.
+- 2026-05-14T05:03:44Z launched E119 on owned pod `o1dy17ouv8w5mz` after
+  fast-forwarding the remote checkout to commit `91ebe38`. Run name:
+  `e119_edge_star_context_from_e118_s7500_c256_m64`; PID `38461`; log
+  `/workspace/SimplexFold/logs/e119_edge_star_context_from_e118.log`;
+  artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e119_edge_star_context_from_e118_s7500_c256_m64/`.
+  The source checkpoint is the returned E118 step-7000 checkpoint. Startup
+  confirmed resume at step 7000/examples 56000, `1292` matching tensors loaded,
+  and `0` new/missing tensors. Metadata confirmed `steps=7500`,
+  `effective_batch_size=8`, `max_parameters=3261974`,
+  `simplex_global_context_scale=0.1`, `simplex_edge_star_context_scale=1.0`,
+  `simplex_vertex_star_context_scale=null`, and the edge-star runtime ramp
+  from `0.0` to `1.0` over steps 7000-7500.

@@ -369,7 +369,7 @@ Validation so far:
 
 ### E119 Idea: Edge-Star Selected-Complex Context
 
-Status: ready to launch from the returned E118 checkpoint.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E118's residue vertex-star context is a cleaner topological
 local-to-global bridge than E116's single protein-level mean, but the final
@@ -411,6 +411,17 @@ E117/E118 recipe with
 Set `<source_step>=7000`. Do not combine with
 `--simplex-vertex-star-context-scale` in the first E119 gate; isolate whether
 the boundary-edge star is better than residue-star routing.
+
+Launch: E119 is running as
+`e119_edge_star_context_from_e118_s7500_c256_m64` on owned Runpod pod
+`o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `91ebe38`
+before launch. Startup confirmed PID `38461`, resume from the E118 checkpoint
+at step 7000/examples 56000, `1292` matching tensors loaded, and `0`
+new/missing tensors initialized. The first health poll confirmed
+`steps=7500`, `effective_batch_size=8`, `max_parameters=3261974`,
+`simplex_global_context_scale=0.1`, `simplex_edge_star_context_scale=1.0`,
+`simplex_vertex_star_context_scale=null`, and the edge-star runtime ramp from
+`0.0` to `1.0` over steps 7000-7500.
 
 Validation so far:
 

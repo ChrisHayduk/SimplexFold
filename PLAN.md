@@ -1,4 +1,4 @@
-## Current Plan: Launch E119 Edge-Star Selected-Complex Context
+## Current Plan: Monitor E119 Edge-Star Selected-Complex Context
 
 E118 is now the primary-lDDT leader at `val_lddt_ca=0.4190` at step 7000.
 It continued the selected-complex global-context family and replaced the
@@ -32,12 +32,14 @@ boundary-edge star before the same selected boundary-edge readout. This is
 closer to the pair tensor `Z_ij` and is the right follow-up because the
 global-context family remains stable but still needs a sharper local-to-global
 bridge. It adds no parameters over E116/E118 because it reuses the existing
-global-context adapters. Launch it only after the remote checkout is
-fast-forwarded to the current branch tip, using the E118 checkpoint as source,
-target step 7500, `--simplex-global-context-scale 0.10`,
-`--simplex-edge-star-context-scale 1.0`, and an edge-star runtime ramp from
+global-context adapters. E119 is now running on owned pod `o1dy17ouv8w5mz`
+after the remote checkout fast-forwarded to commit `91ebe38`. It resumed the
+E118 checkpoint at step 7000/examples 56000, targets step 7500, keeps
+`--simplex-global-context-scale 0.10`, uses
+`--simplex-edge-star-context-scale 1.0`, and ramps edge-star runtime scale from
 `0.0` to `1.0` over steps 7000-7500. Do not combine vertex-star and edge-star
-in the first E119 gate.
+in this first E119 gate. When it returns, record it before deciding whether
+this global/star-context family has earned a longer spend.
 
 The next branch should stay topology-native but move the feedback target back
 toward the pair/edge trunk rather than the target MSA row. E100 showed that
