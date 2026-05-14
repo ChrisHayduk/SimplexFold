@@ -5309,3 +5309,18 @@
   until E117 is recorded and E118 has either run or been explicitly skipped.
   The heartbeat should still launch at most E118 after E117, and only if E117
   stays stable near or above the E96/E116 lDDT band.
+- E117 health poll at `2026-05-14T02:56:20Z`: PID `13554` remained active on
+  owned pod `o1dy17ouv8w5mz` after about 66.7 minutes, with state `Rl`, about
+  `1053%` CPU, 178 threads, `13593 MiB` GPU memory allocated, and sampled GPU
+  utilization `33%`. The remote checkout is still at E117 launch commit
+  `9548d5f` with only editable-install `minalphafold.egg-info/` dirt. The
+  artifact directory still has `run_metadata.json` and inherited
+  `history_full_msa_to_face.json`; no `results.json`, `results.csv`,
+  eval-detail file, or checkpoint has returned. Keep E118 and E119 parked.
+- E118/E119 readiness audit while E117 runs: config, benchmark runner CLI,
+  standalone trainer CLI, metadata/results fields, docs, and tests all still
+  reference the selected-complex global, vertex-star, and edge-star context
+  flags. Fresh validation passed:
+  `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`;
+  `python -m pytest tests/test_simplex.py::test_vertex_star_cell_mean_pools_incident_selected_cells tests/test_simplex.py::test_edge_star_cell_mean_pools_cells_through_boundary_edges tests/test_simplex.py::test_vertex_star_context_routes_incident_cell_summary_without_extra_parameters tests/test_simplex.py::test_edge_star_context_routes_boundary_edge_summary_without_extra_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_global_context_stays_inside_af2_medium_budget tests/test_trainer.py::test_simplicial_vertex_star_context_adds_no_parameters tests/test_trainer.py::test_simplicial_edge_star_context_adds_no_parameters`
+  reported `9 passed`.
