@@ -5241,3 +5241,8 @@
   GPU memory allocated. No `results.json`, `results.csv`, or eval-detail file
   yet; remote git dirt remains only the editable-install
   `minalphafold.egg-info/`. Continue waiting and leave E118 parked.
+- E117 health poll after about 22 minutes: PID `13554` remained active on the
+  owned pod with state `Sl`, about `1014%` CPU, 178 threads, sampled GPU
+  utilization `28%`, and `13593 MiB` GPU memory allocated. No result files,
+  eval-detail file, or `full_msa_to_face_latest.pt` checkpoint yet. Leave the
+  process alone and keep E118 parked until E117 returns and is recorded.
