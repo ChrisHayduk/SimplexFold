@@ -5211,3 +5211,8 @@
   undefined-name gate
   `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/model_config.py minalphafold/simplex.py scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py`
   passed.
+- E117 health poll after about 12 minutes: PID `13554` remained active on the
+  owned pod, GPU memory was allocated (`13593 MiB`) and utilization sampled at
+  `43%`. No `results.json` yet, and the artifact directory still contains
+  only the inherited history plus run metadata. Continue waiting; do not
+  launch E118 while E117 is active.
