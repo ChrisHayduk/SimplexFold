@@ -1,42 +1,43 @@
-## Current Plan: Monitor E118 Vertex-Star Selected-Complex Context
+## Current Plan: Launch E119 Edge-Star Selected-Complex Context
 
-E117 is now the primary-lDDT leader at `val_lddt_ca=0.4151` at step 6500.
-It continued E116's selected-complex global context: active face and tetra
-cochains are pooled into one protein-level cochain, then routed back into
-active cells before their boundary-edge readout. This branch has now beaten
-E96's `0.4043` twice without relying on the lost E96/E97 checkpoint family,
-so it is the current best topology-native lead.
+E118 is now the primary-lDDT leader at `val_lddt_ca=0.4190` at step 7000.
+It continued the selected-complex global-context family and replaced the
+protein-level broadcast with a ramped residue vertex-star cochain: selected
+face and tetra states pool through incident residues, then route back into
+active cells before boundary-edge readout. This branch has now beaten E96's
+`0.4043` across E116, E117, and E118 without relying on the lost E96/E97
+checkpoint family, so it is the current best topology-native lead.
 
 The target remains far away. To reach `0.7` from the current best near
-`0.415`, the model still needs roughly `+0.285` validation C-alpha lDDT. Do
-not spend 30,000 steps yet: E117 confirmed that the global-context gain is not
-a one-gate spike, but it is still in the low-0.4 lDDT band. E118 is now running
-from the E117 step-6500 checkpoint to step 7000 with effective batch 8, the
-same parameter cap, and a runtime ramp from the protein-level selected complex
-cochain toward residue vertex-star incidence cochains.
+`0.419`, the model still needs roughly `+0.281` validation C-alpha lDDT. Do
+not spend 30,000 steps yet: E118 confirmed that vertex-star incidence routing
+helps, but the branch is still in the low-0.4 lDDT band. The next gate is E119
+from the E118 step-7000 checkpoint to step 7500 with effective batch 8, the
+same parameter cap, and a runtime ramp from the protein-level selected-complex
+cochain toward boundary-edge-star incidence cochains.
 
-E118 is a zero-parameter refinement of the same idea: interpolate the selected
-global-complex cochain toward residue vertex-star cochains pooled by incidence
-from selected face/tetra cells. This keeps the intervention inside the
-topological cochain view and reuses the E116/E117 global-context modules, so
-it remains checkpoint- and budget-compatible. It launched after the remote
-checkout fast-forwarded to commit `3013d4f`. Monitor only owned pod
-`o1dy17ouv8w5mz`; when E118 returns, run remote coherence, pull
-non-checkpoint artifacts and the log, run local coherence, then update
-`EXPERIMENT_RESULTS.md`, `PLAN.md`, `EXPERIMENTS.md`, and
-`EXPERIMENTS_NOTES.md` before deciding whether E119 is warranted.
+E118 returned with remote and local coherence passing: `completed_steps=7000`,
+1000 eval-detail rows, history ending at step 7000, `effective_batch_size=8`,
+`parameters=3,201,970` under the `3,261,974` cap, and the intended
+vertex-star runtime ramp from `0.0` to `1.0` over steps 6500-7000. It improved
+E117's primary C-alpha lDDT from `0.4151` to `0.4190` and FoldScore from
+`0.3927` to `0.3955`, while selected face/tetra boundary lDDT stayed high
+(`0.7404` / `0.7238`). That is enough to test the adjacent edge-star route,
+but not enough to promote the branch to a 30k confirmation run.
 
-E119 is now prepared locally as the edge-star analogue of E118, but it should
-stay parked until E118 is either run or explicitly skipped. Where E118 pools
-selected cell cochains through incident residues,
-E119 pools them through incident boundary edges, then routes each active cell
-the average context of its own boundary-edge star before the same selected
-boundary-edge readout. This is closer to the pair tensor `Z_ij` and should be
-the follow-up only if the global-context family remains stable but still needs
-a sharper local-to-global bridge. It adds no parameters over E116/E118 because
-it reuses the existing global-context adapters. As with E118, the first E119
-gate should prefer the runtime ramp from `0.0` to `1.0` across the 500-step
-resume window rather than an abrupt star-context switch.
+E119 is the edge-star analogue of E118. Where E118 pools selected cell
+cochains through incident residues, E119 pools them through incident boundary
+edges, then routes each active cell the average context of its own
+boundary-edge star before the same selected boundary-edge readout. This is
+closer to the pair tensor `Z_ij` and is the right follow-up because the
+global-context family remains stable but still needs a sharper local-to-global
+bridge. It adds no parameters over E116/E118 because it reuses the existing
+global-context adapters. Launch it only after the remote checkout is
+fast-forwarded to the current branch tip, using the E118 checkpoint as source,
+target step 7500, `--simplex-global-context-scale 0.10`,
+`--simplex-edge-star-context-scale 1.0`, and an edge-star runtime ramp from
+`0.0` to `1.0` over steps 7000-7500. Do not combine vertex-star and edge-star
+in the first E119 gate.
 
 The next branch should stay topology-native but move the feedback target back
 toward the pair/edge trunk rather than the target MSA row. E100 showed that

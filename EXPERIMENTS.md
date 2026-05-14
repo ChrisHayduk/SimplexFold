@@ -292,7 +292,7 @@ bridge, not as a 30k confirmation run yet.
 
 ### E118 Idea: Vertex-Star Selected-Complex Context
 
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
+Status: returned and recorded.
 
 Hypothesis: E116's protein-level selected-complex cochain finally improved
 primary lDDT, but a single mean context may be too coarse to help each
@@ -334,7 +334,7 @@ the E117 checkpoint becomes unavailable and the run must fall back to E116. Keep
 `--simplex-global-context-scale 0.10` so the new flag changes only which
 selected-complex context is routed through the existing modules.
 
-Launch: E118 is running as
+Launch: E118 ran as
 `e118_vertex_star_context_from_e117_s7000_c256_m64` on owned Runpod pod
 `o1dy17ouv8w5mz`. The remote checkout fast-forwarded to commit `3013d4f`
 before launch. Startup confirmed PID `26269`, resume from the E117 checkpoint
@@ -343,6 +343,17 @@ new/missing tensors initialized. The first health poll confirmed
 `steps=7000`, `effective_batch_size=8`, `max_parameters=3261974`,
 `simplex_global_context_scale=0.1`, `simplex_vertex_star_context_scale=1.0`,
 and the runtime ramp from `0.0` to `1.0` over steps 6500-7000.
+
+Result: keep as the new primary-lDDT leader. E118 returned at step 7000 with
+`val_lddt_ca=0.4190`, FoldScore `0.3955`, `val_ca_drmsd=11.2342`, and
+C-alpha Rg `11.3877 / 16.3091`. Remote and local coherence passed: one result
+row, 15 history rows ending at step 7000, 1000 final eval-detail rows,
+`parameters=3,201,970` under the `3,261,974` cap, `effective_batch_size=8`,
+`simplex_global_context_scale=0.1`, `simplex_vertex_star_context_scale=1.0`,
+the vertex-star runtime ramp from `0.0` to `1.0` over steps 6500-7000, and
+`stopped_early=False`. The selected face/tetra boundary lDDT stayed high
+(`0.7404` / `0.7238`), but primary lDDT remains in the low-0.4 band. Launch
+E119 as the boundary-edge-star analogue before considering any 30k spend.
 
 Validation so far:
 
@@ -358,8 +369,7 @@ Validation so far:
 
 ### E119 Idea: Edge-Star Selected-Complex Context
 
-Status: implemented locally; keep parked until E118 has either returned or
-been explicitly skipped.
+Status: ready to launch from the returned E118 checkpoint.
 
 Hypothesis: E118's residue vertex-star context is a cleaner topological
 local-to-global bridge than E116's single protein-level mean, but the final
@@ -385,10 +395,9 @@ persistent higher-rank cochains through the selected 1-skeleton before the
 existing boundary-edge readout. It adds no parameters because it reuses the
 E116 global-context MLPs.
 
-Gate: launch only after E117 is fully recorded and E118 has either run or
-been explicitly skipped. If the source is the E117 step-6500 checkpoint,
-target step 7000; if E118 has already produced a stable step-7000 checkpoint,
-target the next 500-step gate from there. Use the E117/E118 recipe with
+Gate: E118 returned stable and improved E117, so launch E119 from the E118
+step-7000 checkpoint and target the next 500-step gate to step 7500. Use the
+E117/E118 recipe with
 `--simplex-global-context-scale 0.10` and
 `--simplex-edge-star-context-scale 1.0`, plus the same runtime-ramp pattern:
 
@@ -399,9 +408,9 @@ target the next 500-step gate from there. Use the E117/E118 recipe with
 --simplex-edge-star-context-runtime-scale-ramp-steps 500
 ```
 
-Do not combine with `--simplex-vertex-star-context-scale` in the first E119
-gate; isolate whether the boundary-edge star is better than residue-star
-routing.
+Set `<source_step>=7000`. Do not combine with
+`--simplex-vertex-star-context-scale` in the first E119 gate; isolate whether
+the boundary-edge star is better than residue-star routing.
 
 Validation so far:
 

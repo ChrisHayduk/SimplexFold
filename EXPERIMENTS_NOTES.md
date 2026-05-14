@@ -5391,3 +5391,31 @@
   `simplex_vertex_star_context_scale=1.0`, and the vertex-star runtime ramp
   from `0.0` to `1.0` over steps 6500-7000. E119 remains parked until E118
   returns or is explicitly skipped.
+- 2026-05-14T04:58:51Z E118 returned on owned pod `o1dy17ouv8w5mz`.
+  Remote coherence passed before pulling artifacts: `results.json`,
+  `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`, and the source
+  checkpoint were present; `completed_steps=7000`, `effective_batch_size=8`,
+  `parameters=3,201,970 <= 3,261,974`,
+  `simplex_global_context_scale=0.1`,
+  `simplex_vertex_star_context_scale=1.0`, vertex-star runtime ramp `0.0` to
+  `1.0` over steps 6500-7000, `stopped_early=False`, 1000 eval-detail rows,
+  and history ended at step 7000. Final metrics: `val_lddt_ca=0.4190`,
+  FoldScore `0.3955`, `val_ca_drmsd=11.2342`, C-alpha Rg
+  `11.3877 / 16.3091`, selected face/tetra boundary lDDT
+  `0.7404 / 0.7238`, and selected face/tetra contraction
+  `0.6120 / 0.6125`.
+- Pulled E118 non-checkpoint artifacts and log locally. Local coherence passed
+  with the same checks and confirmed no checkpoint directory was pulled. E118
+  is the new primary-lDDT leader and improves E117, so it is stable enough to
+  launch E119 from the returned step-7000 checkpoint. It remains far below the
+  0.7 target and is still not a 30k candidate.
+- Updated `EXPERIMENT_RESULTS.md`, `PLAN.md`, and `EXPERIMENTS.md` to record
+  E118 as final and to make E119 the next active gate. The E119 launch should
+  fast-forward the remote checkout to the current branch tip, resume from the
+  E118 step-7000 checkpoint, target step 7500, keep
+  `--simplex-global-context-scale 0.10`,
+  `--simplex-edge-star-context-scale 1.0`, and ramp
+  `--simplex-edge-star-context-runtime-scale` from `0.0` to `1.0` over
+  steps 7000-7500. Do not also enable vertex-star context in this first
+  edge-star gate.
