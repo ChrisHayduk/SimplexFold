@@ -19,6 +19,10 @@ pair-only baseline.
   3,106,690 parameters.
 - Validation target: `val_lddt_ca`.
 - Control variants: `no_simplex`, `faces`, `full`.
+- Returned Runpod artifacts must pass
+  `scripts/verify_nanofold_benchmark_artifacts.py` before a row is added to
+  `EXPERIMENT_RESULTS.md`. This keeps the results table tied to complete
+  result, metadata, history, eval-detail, and checkpoint evidence.
 
 ## Reference-Paper Design Rules
 
