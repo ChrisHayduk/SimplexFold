@@ -5127,3 +5127,10 @@
   `simplex_global_context_scale=0.1`, `simplex_face_top_k=24`, and
   `simplex_tetra_top_k=48`. The inherited history had 12 rows ending at E72
   step 5500 and no `results.json` yet.
+- E116 health poll after about 13.5 minutes: PID `1566` remained active with
+  GPU utilization around `41%` and `13589 MiB` allocated. The run metadata and
+  inherited history were still present, history still had 12 rows ending at
+  E72 step 5500, and `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv` were not written yet. Continue waiting
+  for the step-6000 validation result; do not touch the remote checkout or
+  launch a follow-up while this run is active.
