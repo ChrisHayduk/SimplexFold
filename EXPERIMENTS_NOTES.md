@@ -5517,3 +5517,21 @@
   reported `200 passed`;
   `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check --select F821,F822,F823 minalphafold/evoformer.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
   passed. Park E121 until E120 returns and is recorded.
+- E120 health at `2026-05-14T07:25:45Z`: PID `1274` still active on owned
+  pod `o1dy17ouv8w5mz`, no `results.json`, artifacts still limited to
+  `history_full_msa_to_face.json` and `run_metadata.json`, and history still
+  ends at inherited step 7000 with `val_lddt_ca=0.4190087939500809`. A
+  spot-check of `nvidia-smi` at `2026-05-14T07:26:43Z` showed the H100 memory
+  allocated (`13599 / 81559` MiB) while the process was in a high-CPU quiet
+  training phase. Continue monitoring only this pod; do not touch other
+  Runpod instances.
+- 30k candidate assessment while E120 is active: no returned candidate has
+  earned a 30,000-step spend yet. The best returned primary metric is E118's
+  `0.4190` at step 7000, so reaching `0.7` by step 30000 would require about
+  `+0.281` absolute validation C-alpha lDDT, or roughly `+0.0122` per 1000
+  steps over the remaining 23000 steps. Recent star-context gains are below
+  that slope and noisy: E116 -> E118 gained about `+0.0095` across 1000 steps,
+  then E119 improved several geometric diagnostics while slightly regressing
+  primary lDDT. Treat E120 as a short gate only; if it does not beat E118 and
+  leave the low-0.4 band, the next topology-native test is the parked E121
+  pre-triangle simplex update rather than a longer continuation.
