@@ -5370,8 +5370,7 @@ Validation so far:
 
 ### E126: Sparse Simplex Triangle-Attention Bias
 
-Status: launched on the owned Runpod pod for a short gate; no returned result
-yet.
+Status: returned on the owned Runpod pod and rejected as a 30k candidate.
 
 Hypothesis: the selected face/tetra complex is learning useful local boundary
 geometry, but pair readouts and MSA feedback have not forced that signal into
@@ -5406,10 +5405,17 @@ degree-penalized plus outer-edge-supported selection, incidence normalization
 --simplex-triangle-attention-bias-scale 0.05
 ```
 
-Decision rule: reject as a 30k candidate if it remains below the `0.45` short
-gate or worsens FoldScore/dRMSD in the same pattern as E124/E125. Consider a
-longer confirmation only if it shows a qualitative local-to-global assembly
-gain.
+Result: reject as a 30k candidate. E126 returned coherently at step 8000 with
+`val_lddt_ca=0.4254`, FoldScore `0.3992`, `val_ca_drmsd=11.1227`, and
+C-alpha Rg `11.6615 / 16.3091`. Remote and local coherence passed:
+`completed_steps=8000`, one result row, 1000 eval-detail rows, history ending
+at step 8000, `effective_batch_size=8`, `parameters=3,203,186 <= 3,261,974`,
+`stopped_early=False`, checkpoint present, and the intended
+triangle-attention-bias metadata. The logit-bias route slightly improved
+FoldScore and dRMSD versus E120/E124/E125, but it reduced primary C-alpha
+lDDT below E124/E125, softened selected-boundary lDDT versus E124, and stayed
+below the `0.45` short-gate threshold. This is not enough evidence for a
+30,000-step spend, and not enough to automatically launch E127.
 
 Validation so far:
 
@@ -5421,8 +5427,8 @@ Validation so far:
 
 ### E127: Sparse Simplex Triangle-Attention Value Residual
 
-Status: implemented locally as a parked fallback while E126 is running. Do not
-launch until E126 returns and is pulled/verified.
+Status: implemented locally as a parked fallback; do not launch automatically
+from the E126 result.
 
 Hypothesis: E126 gives selected face/tetra cochains control over triangle
 attention weights, but it still relies on existing pair values as the content
@@ -5442,8 +5448,9 @@ attention value aggregation. This remains topology-native: persistent 2- and
 3-simplex states write through their own represented triangle incidences,
 instead of adding a generic coordinate or lDDT objective.
 
-Candidate launch, only if E126 warrants it: use the E126 recipe and add a
-small value residual alongside the logit bias:
+Candidate launch, only if a later decision explicitly reopens the
+triangle-attention route: use the E126 recipe and add a small value residual
+alongside the logit bias:
 
 ```bash
 --simplex-triangle-attention-bias-scale 0.05 \
@@ -5454,6 +5461,11 @@ The audited E120 selected-complex profile with E126+E127 has
 `3,215,346 <= 3,261,974` parameters. Reject unless it improves the E126/E124
 short-gate result with coherent FoldScore/dRMSD; a pure selected-boundary
 geometry improvement without C-alpha assembly is not enough.
+
+Post-E126 decision: keep E127 parked for now. E126 did not improve primary
+C-alpha lDDT, despite slightly better FoldScore/dRMSD, so the value-side
+triangle-attention residual is not justified as the next automatic Runpod
+spend.
 
 Validation so far:
 

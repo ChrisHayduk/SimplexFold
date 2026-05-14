@@ -1,18 +1,22 @@
-## Current Plan: Pivot Beyond Boundary-Edge-Frame Gate
+## Current Plan: After E126 Triangle-Attention Bias
 
-Current status after E125: the best returned validation C-alpha lDDT remains
-E124 at `0.4280` at step 8000, with E125 slightly lower at `0.4275`. The
-boundary-edge-frame schedule family improved local selected-complex geometry
-but did not translate into better global C-alpha assembly, so it should not
-receive a 30,000-step spend.
+Current status after E126: the best returned validation C-alpha lDDT remains
+E124 at `0.4280` at step 8000. E126 returned at step 8000 with
+`val_lddt_ca=0.4254`, FoldScore `0.3992`, and `val_ca_drmsd=11.1227`.
+The sparse simplex triangle-attention logit bias improved FoldScore/dRMSD
+slightly versus the preceding short gates, but it reduced the primary
+C-alpha lDDT below E124/E125 and stayed below the `0.45` short-gate threshold.
 
-The next concrete mechanism is E126 sparse simplex triangle-attention bias.
-It is a default-off architecture hook, not a loss change: selected face
-cochains `F_ijk` and tetra boundary-face cochains derived from `U_ijkl`
-produce sparse per-head biases for AF2 triangle-attention logits on the
-triples they explicitly represent. This tests the README thesis more directly
-than another pair readout, because persistent filled triangle/tetra states
-now steer the trunk's triangle consistency operation itself:
+Interpretation: the selected-complex-to-triangle-attention route is
+topology-native and well justified, but the logit-bias version is not yet a
+useful primary-lDDT mechanism. It can slightly improve global geometry metrics
+without translating the learned face/tetra cochains into better C-alpha
+assembly. Do not spend 30,000 steps on E126.
+
+The E126 mechanism was a default-off architecture hook, not a loss change:
+selected face cochains `F_ijk` and tetra boundary-face cochains derived from
+`U_ijkl` produced sparse per-head biases for AF2 triangle-attention logits on
+the triples they explicitly represent:
 
 ```text
 selected F_ijk / boundary faces of U_ijkl
@@ -21,19 +25,12 @@ selected F_ijk / boundary faces of U_ijkl
         -> structure module reads globally updated pair geometry
 ```
 
-E126 is now running as a short Runpod gate from the retained E120 checkpoint
-to step 8000 before any 30,000-step decision. The acceptance bar remains high:
-it should break out of the low-0.4 band, ideally clearing `0.45` while
-improving or at least not materially worsening FoldScore/dRMSD. A tiny
-E124-style primary-lDDT gain is not enough.
-
-While E126 runs, E127 is prepared locally as the value-side companion rather
-than a separate loss: selected face/tetra cochains can now scatter sparse
-value residuals into AF2 triangle-attention pair updates on the same represented
-triples. If E126 helps but looks too weak, E127 tests whether the issue is that
-filled cells need to contribute content to triangle reasoning, not merely bias
-attention weights. If E126 is flat or regresses, use the E126 result to decide
-whether this value path is still worth a short gate.
+E127 is prepared locally as the value-side companion rather than a separate
+loss: selected face/tetra cochains can scatter sparse value residuals into AF2
+triangle-attention pair updates on the same represented triples. Keep E127
+parked for now. E126 did not improve primary C-alpha lDDT, so the value-side
+path is not justified as an automatic follow-up spend unless we explicitly
+decide to reopen the triangle-attention route for diagnostic reasons.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best

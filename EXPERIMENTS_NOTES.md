@@ -6113,3 +6113,25 @@
   30 seconds while write counters and the log stayed unchanged. Interpretation:
   the process is still doing training/evaluation work before the step-8000
   validation/writeout, not an exited run waiting to be collected.
+- 2026-05-14T20:52Z E126 returned coherently on the owned Runpod pod at step
+  8000. The benchmark process exited and the required remote result bundle was
+  present: `results.json`, `results.csv`, history, eval details, metadata, and
+  `checkpoints/full_msa_to_face_latest.pt`. Remote coherence passed with one
+  result row, 1000 eval-detail rows, history ending at step 8000,
+  `effective_batch_size=8`, `parameters=3,203,186 <= 3,261,974`,
+  `stopped_early=False`, and the intended triangle-attention-bias metadata.
+  Artifacts, checkpoint, and log were pulled locally; local
+  `scripts/verify_nanofold_benchmark_artifacts.py` passed with the expected
+  step, batch, row counts, history endpoint, parameter cap, stopped-early
+  state, and metadata.
+- E126 result: `val_lddt_ca=0.4254467885494232`, FoldScore
+  `0.39922703403234483`, `val_ca_drmsd=11.122689092040062`, C-alpha Rg
+  `11.661468877792359 / 16.30911695623398`, selected face/tetra boundary
+  lDDT `0.7477853461503983` / `0.7309605762958526`, and selected face/tetra
+  contraction `0.5891976501345635` / `0.5890026765465737`.
+  Decision: reject as a 30k candidate. Sparse simplex triangle-attention
+  logit bias slightly improved FoldScore/dRMSD versus E120/E124/E125, but it
+  reduced primary C-alpha lDDT below E124/E125, softened selected-boundary
+  geometry versus E124, and stayed below the `0.45` short-gate threshold.
+  Keep E127 parked; do not launch it automatically from this weak
+  primary-lDDT signal.
