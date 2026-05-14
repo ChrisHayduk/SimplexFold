@@ -5739,3 +5739,16 @@
   low-0.4 branch; `0.45`-`0.50` needs another short confirmation; above
   `0.50` with coherent FoldScore/dRMSD improvement is the first credible
   30k-candidate signal. A tiny `0.005`-style gain over E120 is not enough.
+- 2026-05-14T10:44Z added a reusable returned-artifact verifier at
+  `scripts/verify_nanofold_benchmark_artifacts.py` so future E121b/E123
+  result handoffs can check the same coherence gates before editing
+  `EXPERIMENT_RESULTS.md`. The verifier checks required result, metadata,
+  history, eval-detail, and checkpoint files; expected step, effective batch
+  size, parameter cap, stopped-early state, eval-detail row count, history
+  endpoint, metadata key/value pairs, and finite primary metrics. Validation
+  passed: `python -m py_compile scripts/verify_nanofold_benchmark_artifacts.py tests/test_verify_nanofold_benchmark_artifacts.py`;
+  `python -m pytest tests/test_verify_nanofold_benchmark_artifacts.py`
+  reported `3 passed`; ruff undefined-name check passed; `git diff --check`
+  passed; and the verifier accepted the known-good E120 artifact directory
+  with `completed_steps=7500`, effective batch size `8`, `1000` eval-detail
+  rows, `3,201,970` parameters under cap, and history ending at step `7500`.
