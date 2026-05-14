@@ -5535,3 +5535,11 @@
   primary lDDT. Treat E120 as a short gate only; if it does not beat E118 and
   leave the low-0.4 band, the next topology-native test is the parked E121
   pre-triangle simplex update rather than a longer continuation.
+- E120 health at `2026-05-14T07:57:49Z`: still active on owned pod
+  `o1dy17ouv8w5mz` with PID `1274`, elapsed `49:08`, accumulated process CPU
+  time `07:45:27`, and no `results.json`. The history file still ends at step
+  7000. This is slower than earlier short gates, but a non-invasive health
+  snapshot showed continuing process reads and live H100 activity with
+  utilization samples between `29%` and `52%` around 13.6 GiB allocated. Treat
+  the run as long-running rather than stalled; leave it alive and let the
+  heartbeat or next manual poll catch the 7500-step return.
