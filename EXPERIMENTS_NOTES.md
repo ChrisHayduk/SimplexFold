@@ -5467,3 +5467,11 @@
   Both are about 35 MB and remain outside git. Paused the E119 heartbeat and
   stopped only the owned Runpod pod `o1dy17ouv8w5mz` after verifying no Python
   benchmark process was active.
+- Prepared E120 as a mixed star-context short gate rather than a longer E118
+  or E119 continuation. The run should resume the E118 step-7000 checkpoint,
+  keep `--simplex-vertex-star-context-scale 1.0` with runtime scale `1.0`,
+  allocate edge-star context with `--simplex-edge-star-context-scale 1.0`, and
+  ramp `--simplex-edge-star-context-runtime-scale` from `0.0` to `0.5` over
+  steps 7000-7500. This tests whether the edge-star route's better
+  pair-interface packing signal can help without replacing the vertex-star
+  route that currently gives the best primary C-alpha lDDT.

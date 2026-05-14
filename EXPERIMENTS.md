@@ -454,6 +454,54 @@ Validation so far:
   `--simplex-edge-star-context-runtime-scale-ramp-start-step`, and
   `--simplex-edge-star-context-runtime-scale-ramp-steps`.
 
+### E120 Idea: Mixed Vertex-Star and Edge-Star Context
+
+Status: queued for owned Runpod pod `o1dy17ouv8w5mz`.
+
+Hypothesis: E118's residue vertex-star context is still the best primary-lDDT
+route, while E119's boundary-edge-star route improved FoldScore, dRMSD,
+C-alpha expansion, and selected-boundary diagnostics but lost a small amount
+of primary C-alpha lDDT. The two effects are not interchangeable:
+vertex-stars route selected face/tetra cochains through residue incidences,
+whereas edge-stars route them through the selected boundary 1-skeleton that
+writes into `Z_ij`. A partial edge-star correction on top of vertex-star
+context may preserve the residue-level assembly signal while adding the
+edge-interface packing signal.
+
+Mechanism: use the existing E116 global-context adapters, but compose the
+context routes instead of isolating them. Resume from the E118 checkpoint,
+hold `simplex_vertex_star_context_scale=1.0`, and ramp
+`simplex_edge_star_context_scale` from `0.0` to `0.5` over the gate:
+
+```text
+selected F_ijk / U_ijkl -> residue vertex-star cochains
+                         -> partial boundary-edge-star correction
+                         -> active F_ijk / U_ijkl
+                         -> selected boundary edges Z_ij
+```
+
+This adds no parameters and no new loss. It remains within the README's
+simplicial/topological view because the intervention changes how persistent
+face/tetra cochains route through vertex and edge stars before their selected
+boundary-edge readout.
+
+Gate: resume E118 at step 7000 and target step 7500 with effective batch 8,
+the same sparse selected-complex recipe, `--simplex-global-context-scale 0.10`,
+`--simplex-vertex-star-context-scale 1.0`,
+`--simplex-edge-star-context-scale 1.0`,
+`--simplex-vertex-star-context-runtime-scale 1.0`, and:
+
+```text
+--simplex-edge-star-context-runtime-scale 0.0
+--simplex-edge-star-context-runtime-scale-final 0.5
+--simplex-edge-star-context-runtime-scale-ramp-start-step 7000
+--simplex-edge-star-context-runtime-scale-ramp-steps 500
+```
+
+Reject unless it beats E118's `val_lddt_ca=0.4190`. Treat it as a 30k
+candidate only if it breaks out of the low-0.4 band rather than merely trading
+primary lDDT for better FoldScore or dRMSD.
+
 ### E100: Bidirectional Simplex-MSA Feedback
 
 Status: returned on owned Runpod pod `o1dy17ouv8w5mz`.

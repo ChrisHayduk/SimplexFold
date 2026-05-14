@@ -1,4 +1,4 @@
-## Current Plan: Post-E119 Plateau Audit
+## Current Plan: Launch E120 Mixed Star Context Gate
 
 E118 remains the primary-lDDT leader at `val_lddt_ca=0.4190` at step 7000.
 It continued the selected-complex global-context family and replaced the
@@ -31,6 +31,26 @@ C-alpha trace. Prefer a mechanism that changes how selected face/tetra
 cochains influence pair/edge geometry before the structure module, with a
 clear short gate before any 30,000-step spend. Do not launch a longer E118 or
 E119 continuation unless a new gate first breaks out of the low-0.4 lDDT band.
+
+E120 is the next short gate. It is not a blind continuation and not a new loss:
+resume the E118 checkpoint at step 7000, keep the winning vertex-star route at
+`1.0`, and ramp a partial edge-star context from `0.0` to `0.5` over steps
+7000-7500. Because the adapter composes star contexts by interpolation, this
+tests a mixed selected-complex context:
+
+```text
+selected F_ijk / U_ijkl -> residue vertex-star cochains
+                         -> partial boundary-edge-star correction
+                         -> active F_ijk / U_ijkl
+                         -> selected boundary edges Z_ij
+```
+
+The hypothesis is narrow: E119 improved FoldScore, dRMSD, expansion, and
+selected-boundary diagnostics but lost primary lDDT, while E118 had the best
+primary lDDT. A half-strength edge-star pull might add E119's pair-interface
+packing signal without overwriting the vertex-star assembly route. Reject it
+unless it beats E118 on primary `val_lddt_ca`; only consider a longer spend if
+it also breaks out of the low-0.4 band.
 
 The pair/edge-trunk direction remains the most relevant backlog. E100 showed
 that collapsed cell-to-residue MSA feedback is too blunt; E101 showed that
