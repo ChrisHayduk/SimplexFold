@@ -5216,3 +5216,8 @@
   `43%`. No `results.json` yet, and the artifact directory still contains
   only the inherited history plus run metadata. Continue waiting; do not
   launch E118 while E117 is active.
+- E117 health poll after about 15.5 minutes: PID `13554` remained active on
+  the owned pod. A sampled GPU utilization check happened to read `0%`, but
+  the process was still running with high CPU and `13593 MiB` GPU memory
+  allocated. No result artifacts yet; continue waiting for the step-6500
+  validation write.
