@@ -456,7 +456,7 @@ Validation so far:
 
 ### E120 Idea: Mixed Vertex-Star and Edge-Star Context
 
-Status: queued for owned Runpod pod `o1dy17ouv8w5mz`.
+Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
 
 Hypothesis: E118's residue vertex-star context is still the best primary-lDDT
 route, while E119's boundary-edge-star route improved FoldScore, dRMSD,
@@ -501,6 +501,24 @@ the same sparse selected-complex recipe, `--simplex-global-context-scale 0.10`,
 Reject unless it beats E118's `val_lddt_ca=0.4190`. Treat it as a 30k
 candidate only if it breaks out of the low-0.4 band rather than merely trading
 primary lDDT for better FoldScore or dRMSD.
+
+Launch: E120 is running as
+`e120_mixed_star_context_from_e118_s7500_c256_m64` on owned Runpod pod
+`o1dy17ouv8w5mz`. The zero-volume workspace was wiped when the stopped pod was
+restarted, so the pod was restaged from the pushed SimplexFold branch at
+commit `4e75148`, public NanoFold data were transferred, the nanoFold source
+repo was cloned at commit `96afc84` for FoldScore component imports, and the
+locally preserved E118 checkpoint was restored. Remote audit before launch
+confirmed `11000/11000` feature/label NPZs, `10000/1000/11000`
+train/val/all rows, zero `._*` sidecars, the E118 checkpoint present,
+py_compile passing, and a launch-style parameter count of `3,201,970` under
+the `3,261,974` cap. Startup confirmed PID `1274`, resume from the E118
+checkpoint at step 7000/examples 56000, `1292` matching tensors loaded, `0`
+new/missing tensors initialized, `effective_batch_size=8`,
+`simplex_global_context_scale=0.1`,
+`simplex_vertex_star_context_scale=1.0`, vertex-star runtime scale `1.0`,
+`simplex_edge_star_context_scale=1.0`, and edge-star runtime ramp `0.0` to
+`0.5` over steps 7000-7500.
 
 ### E100: Bidirectional Simplex-MSA Feedback
 

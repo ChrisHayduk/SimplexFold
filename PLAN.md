@@ -32,9 +32,10 @@ cochains influence pair/edge geometry before the structure module, with a
 clear short gate before any 30,000-step spend. Do not launch a longer E118 or
 E119 continuation unless a new gate first breaks out of the low-0.4 lDDT band.
 
-E120 is the next short gate. It is not a blind continuation and not a new loss:
-resume the E118 checkpoint at step 7000, keep the winning vertex-star route at
-`1.0`, and ramp a partial edge-star context from `0.0` to `0.5` over steps
+E120 is now running as the next short gate on owned Runpod pod
+`o1dy17ouv8w5mz`. It is not a blind continuation and not a new loss: it resumes
+the E118 checkpoint at step 7000, keeps the winning vertex-star route at `1.0`,
+and ramps a partial edge-star context from `0.0` to `0.5` over steps
 7000-7500. Because the adapter composes star contexts by interpolation, this
 tests a mixed selected-complex context:
 

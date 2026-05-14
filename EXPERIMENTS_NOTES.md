@@ -5475,3 +5475,26 @@
   steps 7000-7500. This tests whether the edge-star route's better
   pair-interface packing signal can help without replacing the vertex-star
   route that currently gives the best primary C-alpha lDDT.
+- 2026-05-14T07:08:41Z launched E120 on owned pod `o1dy17ouv8w5mz` after
+  restarting and restaging the zero-volume workspace. Current SSH endpoint:
+  `103.207.149.82:10779` with key
+  `/Users/christopherhayduk/.runpod/ssh/RunPod-Key-Go`. Run name:
+  `e120_mixed_star_context_from_e118_s7500_c256_m64`; PID `1274`; log
+  `/workspace/SimplexFold/logs/e120_mixed_star_context_from_e118.log`;
+  artifacts
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e120_mixed_star_context_from_e118_s7500_c256_m64/`.
+  The first launch was stopped immediately because the data-only restage left
+  `nanofold` unavailable for FoldScore component imports. The clean launch
+  cloned `nanoFold-Competition` source at commit `96afc84`, set
+  `PYTHONPATH=/workspace/nanoFold-Competition-src`, and no longer emitted the
+  missing-`nanofold` warning.
+- E120 remote prelaunch audit passed: SimplexFold commit `4e75148`, clean
+  remote status, `11000/11000` feature/label NPZs, manifest rows
+  `10000/1000/11000`, zero `._*` sidecars, restored E118 checkpoint present,
+  py_compile passed, and launch-style parameters were `3,201,970` under the
+  `3,261,974` cap. Startup health confirmed resume from E118 at step
+  7000/examples 56000, `1292` matching tensors loaded, `0` new/missing tensors
+  initialized, `effective_batch_size=8`, `simplex_global_context_scale=0.1`,
+  `simplex_vertex_star_context_scale=1.0`, vertex-star runtime scale `1.0`,
+  `simplex_edge_star_context_scale=1.0`, and edge-star runtime ramp `0.0` to
+  `0.5` over steps 7000-7500.
