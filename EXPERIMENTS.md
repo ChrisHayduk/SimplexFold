@@ -5124,23 +5124,6 @@ Validation:
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py scripts/run_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py::test_cell_score_degree_penalty_prefers_less_reused_boundary_edges tests/test_simplex.py::test_build_simplex_topology_cell_topk_caps_active_higher_rank_cells tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_trainer.py::test_simplicial_cell_degree_penalty_adds_no_parameters tests/test_trainer.py::test_simplicial_cell_topk_selector_adds_no_parameters`
 
-### E84: Continue Degree-Penalized Sparse Cell Scoring
-
-Status: running on owned Runpod pod `o1dy17ouv8w5mz`.
-
-Hypothesis: E81 improved both primary lDDT and selected-complex diagnostics by
-changing sparse cell construction. One short continuation should show whether
-the cleaner selected complex is stable before switching to incidence-normalized
-message transport.
-
-Mechanism: resume E81's checkpoint from step 8000 to step 8500 with fixed
-`--simplex-face-top-k 24`, `--simplex-tetra-top-k 48`, and
-`--simplex-cell-score-degree-penalty 0.75`.
-
-Launch: E84 is running as `e84_degree_penalty_from_e81_s8500_c256_m64`. Main
-Python PID is `4828`; a status poll at `2026-05-12T10:43:02Z` showed the
-process alive, GPU active, and no returned `results.json` yet.
-
 ### E123: Ramped Pair-Only Pre-Triangle Simplex Injection
 
 Status: implemented locally as a parked fallback while E121b runs.
