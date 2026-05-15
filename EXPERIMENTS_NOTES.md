@@ -6499,3 +6499,24 @@
   history still ended at inherited E128 step `8500` and no `results.json`,
   `results.csv`, eval-details file, or checkpoint existed. Interpretation:
   active compute, not a returned or idle bundle; leave the run undisturbed.
+- 2026-05-15T03:30Z E130 status refresh on the same owned pod: `runpodctl pod
+  get c67fbk189vnvfp` showed the pod still in desired `RUNNING` status, and
+  SSH inspection showed PID `4224` still running the intended
+  `e130_hodge_boundary_readout_from_e128_s9000_c256_m64` command. The remote
+  artifact directory still had only `run_metadata.json` and inherited
+  `history_full_msa_to_face.json`, with history length `18` ending at E128
+  step `8500` and no `results.json`, `results.csv`, eval-details file, or
+  checkpoint yet. The log still only shows launch/startup lines. Decision:
+  keep waiting for a coherent step-9000 bundle; do not update
+  `EXPERIMENT_RESULTS.md`, stop the pod, or launch E131 until E130 returns or
+  exits with a clear failure.
+- 2026-05-15 reference PDF check: the two user-provided PDFs remain saved in
+  `references/papers/` and hash-match the Downloads originals
+  (`hands_on_geometric_deep_learning_nodes_to_complexes.pdf` SHA-256
+  `11a87bfc6867cec432a2f9b8068212997e14acd5a2f0653944ed3ca17e3e3c60`;
+  `2509.03885v1.pdf` SHA-256
+  `676fd6764bb8a1788a6fbcf7a59edf831c23dd7f5661672a8b265ff397f9e4a7`).
+  `references/papers/READING_NOTES.md` already records full-text reading
+  passes and the current design rule: prefer selected-complex construction,
+  incidence, Hodge/co-boundary, outer-edge, and cochain-communication changes
+  over generic output-side lDDT or coordinate losses.
