@@ -7466,3 +7466,13 @@
   pytest set (`11 passed`), and the E128-style parameter audit remains
   `3,240,738 <= 3,261,974`. The heartbeat automation was updated to require
   these ramp flags for any future E145 launch.
+- 2026-05-15T12:05Z Added `scripts/summarize_nanofold_run_status.py`, a
+  read-only local artifact summarizer for live or returned benchmark run
+  directories. It reports active/returned/partial/startup state from
+  `status_*.json`, `results.json`, eval-detail row count, history last step,
+  and checkpoint presence without surfacing chain-level eval details. Focused
+  validation passed: `python -m pytest
+  tests/test_summarize_nanofold_run_status.py` (`3 passed`),
+  `python -m py_compile scripts/summarize_nanofold_run_status.py
+  tests/test_summarize_nanofold_run_status.py`, and
+  `ruff check --select F821,F822,F823` on the new script/test.
