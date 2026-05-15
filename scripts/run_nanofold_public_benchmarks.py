@@ -162,6 +162,27 @@ def _run_status_payload(
     return payload
 
 
+def _write_run_status_file(status_path: Path, payload: dict[str, Any]) -> bool:
+    """Write a live status file without letting heartbeat I/O kill training."""
+
+    tmp_path = status_path.with_name(f".{status_path.name}.tmp")
+    try:
+        tmp_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        tmp_path.replace(status_path)
+    except OSError as exc:
+        print(
+            f"[nanofold-public] warning: could not write run status {status_path}: {exc}",
+            file=sys.stderr,
+            flush=True,
+        )
+        try:
+            tmp_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+        return False
+    return True
+
+
 def _autocast_context(device: torch.device, mixed_precision: str) -> ContextManager[Any]:
     if mixed_precision == "off" or device.type not in {"cuda", "cpu"}:
         return nullcontext()
@@ -1269,30 +1290,28 @@ def _train_variant(
         now = time.perf_counter()
         if not force and now < next_status_write_at:
             return
-        status_path.write_text(
-            json.dumps(
-                _run_status_payload(
-                    variant=variant,
-                    phase=phase,
-                    completed_step=completed_step,
-                    target_steps=training_config.epochs,
-                    start_step=start_step,
-                    total_examples=total_examples,
-                    effective_batch_size=training_config.batch_size * grad_accum_steps,
-                    num_workers=training_config.num_workers,
-                    elapsed_seconds_total=elapsed_total(),
-                    elapsed_seconds_run=now - start_time,
-                    history=history,
-                    train_losses=train_losses,
-                    latest_checkpoint_path=latest_checkpoint_path,
-                    stopped_early=stopped_early,
-                    active_step=active_step,
-                    active_microbatch=active_microbatch,
-                    active_microbatches=active_microbatches,
-                ),
-                indent=2,
-            ),
-            encoding="utf-8",
+        payload = _run_status_payload(
+            variant=variant,
+            phase=phase,
+            completed_step=completed_step,
+            target_steps=training_config.epochs,
+            start_step=start_step,
+            total_examples=total_examples,
+            effective_batch_size=training_config.batch_size * grad_accum_steps,
+            num_workers=training_config.num_workers,
+            elapsed_seconds_total=elapsed_total(),
+            elapsed_seconds_run=now - start_time,
+            history=history,
+            train_losses=train_losses,
+            latest_checkpoint_path=latest_checkpoint_path,
+            stopped_early=stopped_early,
+            active_step=active_step,
+            active_microbatch=active_microbatch,
+            active_microbatches=active_microbatches,
+        )
+        _write_run_status_file(
+            status_path,
+            payload,
         )
         next_status_write_at = now + status_write_interval_seconds
 

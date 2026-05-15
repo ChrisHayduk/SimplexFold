@@ -1,5 +1,20 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 Runpod Status Heartbeat Hardening
+
+- Hardened `scripts/run_nanofold_public_benchmarks.py` against the E140
+  failure mode. Live `status_full_msa_to_face.json` updates now write through
+  a temporary file and atomically replace the prior status. If status I/O
+  raises `OSError`, the runner logs a warning, preserves the last good status
+  file, and keeps training instead of killing a multi-hour Runpod job.
+- Focused validation passed:
+  `python -m pytest tests/test_nanofold_public_benchmarks.py::test_run_status_payload_tracks_live_progress
+  tests/test_nanofold_public_benchmarks.py::test_write_run_status_file_is_best_effort_and_preserves_prior_status`,
+  `python -m py_compile scripts/run_nanofold_public_benchmarks.py
+  tests/test_nanofold_public_benchmarks.py`, and
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py`.
+
 ## 2026-05-15 E140 Failed Pre-Eval; E141 Still Active
 
 - Rechecked only the two owned Runpod pods. E140 on pod

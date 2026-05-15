@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import torch
 
@@ -45,6 +47,7 @@ from scripts.run_nanofold_public_benchmarks import (
     _enforce_parameter_budget,
     _evaluate,
     _run_status_payload,
+    _write_run_status_file,
     _simplex_boundary_geometry_metrics,
     _simplex_topology_metrics,
     _variant_config,
@@ -137,6 +140,23 @@ def test_run_status_payload_tracks_live_progress(tmp_path):
     assert payload["active_step"] == 126
     assert payload["active_microbatch"] == 3
     assert payload["active_microbatches"] == 8
+
+
+def test_write_run_status_file_is_best_effort_and_preserves_prior_status(tmp_path, monkeypatch, capsys):
+    status_path = tmp_path / "status_full_msa_to_face.json"
+    status_path.write_text('{"phase":"old"}', encoding="utf-8")
+    real_write_text = Path.write_text
+
+    def fail_tmp_write(self, data, *args, **kwargs):
+        if self.name == ".status_full_msa_to_face.json.tmp":
+            raise OSError("simulated status I/O")
+        return real_write_text(self, data, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "write_text", fail_tmp_write)
+
+    assert _write_run_status_file(status_path, {"phase": "new"}) is False
+    assert status_path.read_text(encoding="utf-8") == '{"phase":"old"}'
+    assert "warning: could not write run status" in capsys.readouterr().err
 
 
 def test_full_msa_to_face_aux_closure_variant_keeps_message_masks_unchanged():
