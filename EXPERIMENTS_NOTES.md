@@ -7155,3 +7155,44 @@
   `eval_details_full_msa_to_face.csv`, checkpoint, or status file existed.
   GPU memory was about `38.2 GiB` and utilization sampled at `12%`. Leave E139
   running while it remains below the documented cutoff.
+- 2026-05-15T09:48Z Retired E139 early as an infeasible short gate on the
+  owned pod. A final check at `09:47Z` showed Python PID `42517` still in the
+  same no-write first-step state after `00:44:14` elapsed and `09:08:39`
+  process CPU time: no `results.json`, `results.csv`,
+  `eval_details_full_msa_to_face.csv`, checkpoint, or status file existed, and
+  history still ended at inherited E128 step `8500`. Preserved the remote trace
+  locally under
+  `artifacts/nanofold_public_benchmarks/e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64/`
+  plus `logs/e139_no_hodge_oriented_boundary.log`, then stopped only E139
+  PIDs `42517` and `42514`. GPU memory returned to zero. Interpretation:
+  oriented selected-boundary cochain readout is not a viable short-gate path in
+  this implementation; pivot to E140, which targets the observed collapsed
+  selected-complex realization diagnostic instead of adding another boundary
+  readout.
+- 2026-05-15T09:51Z Launched E140 on owned pod `c67fbk189vnvfp` from
+  `/workspace/SimplexFold_e140` as
+  `e140_selected_boundary_expansion_from_e128_s9000_c256_m64`. The checkout was
+  fast-forwarded to pushed commit `050b954`, remote `python3 -m py_compile`
+  passed for `simplex.py`, `evoformer.py`, `model.py`, `trainer.py`, and the
+  NanoFold benchmark runner, and the run uses effective batch size `8`, crop
+  `256`, MSA depth `64`, no extra MSA/templates, `n_cycles=4`, and max
+  parameters `3261974`. E140 resumes the E128 checkpoint at step `8500` with
+  weights only, keeps the E128 selected-complex recipe, and adds only
+  selected face/tetra coordinate-expansion weights `0.05` with tolerance
+  `0.05`.
+- 2026-05-15T09:52Z E140 startup verification passed. Remote log shows
+  `train=10000`, `val=1000`, resumed E128 at `step=8500` /
+  `examples=68000`, loaded `1332` matching model tensors, and initialized `0`
+  new/missing tensors. The runner wrote `run_metadata.json`, inherited
+  `history_full_msa_to_face.json` ending at step `8500`
+  (`val_lddt_ca=0.4311057258844376`), and wrote the new
+  `status_full_msa_to_face.json`; the status heartbeat reported active step
+  `8501`, microbatch `1`, and effective batch size `8`. The active E140 Python
+  PID is `55949`; GPU memory was about `18.0 GiB` at the startup check.
+- 2026-05-15T09:57Z E140 remained active and was making step progress on the
+  owned pod: PID `55949` had elapsed `00:05:34`, process CPU time was
+  `01:08:06`, `status_full_msa_to_face.json` reported active step `8503`,
+  microbatch `4`, and effective batch size `8`, while history still correctly
+  ended at inherited E128 step `8500` until the next evaluation/checkpoint.
+  GPU memory was about `18.8 GiB`. This confirms E140 is not showing the
+  immediate no-write pathology seen in E130/E138/E139.

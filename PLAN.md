@@ -1,4 +1,4 @@
-## 2026-05-15 Operating Plan Update: E139 Active After E138 Failure
+## 2026-05-15 Operating Plan Update: E140 After E139 Runtime Failure
 
 Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,
 well below the `0.7` goal and below the `0.45` short-gate threshold for a
@@ -9,41 +9,39 @@ step-9000 result bundle, eval details, or checkpoint. Its trace was preserved
 locally and only E138 PID `24980` was stopped. E138 is therefore a terminal
 runtime-failed branch, not a returned score.
 
-E139 is now the active Runpod gate on the same owned pod from the separate
-`/workspace/SimplexFold_e139` checkout as
-`e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64`, Python PID
-`42517`. It resumes the E128 checkpoint at step `8500`, keeps the E128/E138
-selected-complex recipe, leaves Hodge and face-cyclic readout disabled, and
-ramps the no-Hodge oriented boundary-cochain readout from `0.0` to `0.25` over
-steps `8500`-`9000`. Startup verification passed: the runner saw
-`train=10000`, `val=1000`, crop `256`, MSA depth `64`, resumed E128 at
-`step=8500` / `examples=68000`, loaded `1332` matching tensors, initialized
-`0` new/missing tensors, and wrote run metadata plus inherited history.
+E139 then tested a no-Hodge oriented boundary-cochain readout from E128, but
+it reproduced the same no-write first-step failure pattern. It was stopped on
+the same owned pod after `00:45:26` elapsed because it had burned `09:08:39`
+process CPU time without writing a new history row, result bundle, eval
+details, checkpoint, or status file. Its trace was preserved locally and only
+E139 PIDs `42517` / `42514` were stopped. Treat the oriented boundary-cochain
+route as runtime failed in this implementation, not as a scored branch.
 
-While E139 runs, keep preparing only topology-native, parameter-neutral
-fallbacks that can explain why selected face/tetra geometry has strong local
-diagnostics but has not yet translated into global C-alpha lDDT.
-E141 is already staged as a signed face-cyclic boundary-readout candidate.
-E142 is staged as the complementary upper-coboundary candidate: selected tetra
-cofaces update maintained face cochains using the oriented tetra boundary
-signs `[-, +, -]` for anchored faces `(i,j,k)`, `(i,j,l)`, `(i,k,l)`. E143 is
-now prepared locally for the same incidence problem on the learned
-tetra-to-face readout: it ramps a signed blend on `tetra_to_face` messages
-before they scatter back into face cochains. These are topology-native
-architecture changes and add no parameters or generic metric losses.
+Active gate: E140 is running from the separate `/workspace/SimplexFold_e140`
+checkout on the same owned pod as
+`e140_selected_boundary_expansion_from_e128_s9000_c256_m64`, Python PID
+`55949`. E140 keeps the E128 selected-complex recipe and adds only the existing
+small selected-boundary coordinate-expansion terms for model-selected
+face/tetra boundary edges. Startup verification passed: it resumed E128 at
+step `8500` / `examples=68000`, wrote `run_metadata.json`, inherited history,
+and wrote the live `status_full_msa_to_face.json` heartbeat showing active
+step `8501`, microbatch `1`, and effective batch size `8`.
+
+This is the most direct probe of the current bottleneck: local selected
+face/tetra boundary lDDT is already high (`0.7559` / `0.7385`), while predicted
+C-alpha Rg remains too compact (`11.7198 / 16.3091`). E140 should tell us
+whether the learned sparse complex can realize its own 1-skeleton without
+collapsing before the structure module assembles global geometry.
 
 Next actions:
 
-1. Leave E139 running until it returns coherently or reaches the same
-   no-write runtime failure cutoff.
-2. If E139 returns coherently, verify and pull artifacts, update
-   `EXPERIMENT_RESULTS.md`, commit/push, then decide whether E141, E142, or
-   E143 is the better next short gate from the returned signal.
-3. If E139 fails without a coherent bundle, preserve its trace, document the
-   terminal failure, stop only the E139 process, and choose the next staged
-   topology-native fallback rather than stacking experiments on the same
-   checkout.
-4. Do not spend 30,000 steps on any branch until a short gate clears `0.45`,
+1. Monitor E140 through the owned pod and its `status_full_msa_to_face.json`
+   heartbeat.
+2. When E140 returns, verify and pull artifacts, update
+   `EXPERIMENT_RESULTS.md`, commit/push, then decide whether the next gate
+   should continue selected-boundary realization or pivot back to the signed
+   incidence queue.
+3. Do not spend 30,000 steps on any branch until a short gate clears `0.45`,
    with FoldScore, dRMSD, and C-alpha Rg remaining coherent.
 
 E128 validation-detail audit: the top 100 chains by C-alpha lDDT average
@@ -55,7 +53,11 @@ selected face boundary lDDT (`r=0.5969`), and selected tetra boundary lDDT
 high-quality local face/tetra cochains assemble global C-alpha geometry rather
 than adding an output-side metric shortcut.
 
-## Current Plan: E139 No-Hodge Oriented Boundary-Cochain Readout
+## Superseded Plan: E139 No-Hodge Oriented Boundary-Cochain Readout
+
+This section is retained for provenance. E139 has now been stopped as a
+runtime-failed branch, and E140 is the active gate described in the operating
+plan above.
 
 Current status after E138: the best returned validation C-alpha lDDT remains
 E128 at `0.4311` at step 8500. E129 resumed the verified E128 checkpoint and
@@ -68,20 +70,19 @@ checkpoint. E138 then removed Hodge and tested face-cyclic boundary readout
 from E128, but it also reached the roughly three-hour no-write cutoff with no
 step-9000 bundle and was stopped as a runtime-failed branch.
 
-Active short gate: E139 is running on the same owned Runpod pod
+The planned E139 short gate ran on the same owned Runpod pod
 `c67fbk189vnvfp` from the separate `/workspace/SimplexFold_e139` checkout as
 `e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64`, Python PID
-`42517`. It resumes E128 at step `8500`, keeps E128's oriented face gate and
-damped simplex triangle-attention bias, removes E130's Hodge readout and
-E138's face-cyclic readout, and ramps only the selected boundary
+`42517`. It resumed E128 at step `8500`, kept E128's oriented face gate and
+damped simplex triangle-attention bias, removed E130's Hodge readout and
+E138's face-cyclic readout, and ramped only the selected boundary
 oriented-cochain readout from `0.0` to `0.25` over steps `8500`-`9000`.
 Startup verification passed: the runner saw `train=10000`, `val=1000`, crop
 `256`, MSA depth `64`, resumed the E128 checkpoint at `step=8500` /
 `examples=68000`, loaded `1332` matching model tensors, initialized `0`
 new/missing tensors, and recorded `effective_batch_size=8` with
-`max_parameters=3261974`. Keep `EXPERIMENT_RESULTS.md` unchanged for E139
-until a coherent step-9000 result bundle is verified, or until the run is
-explicitly stopped as a terminal failure.
+`max_parameters=3261974`. It was later stopped as a terminal runtime failure
+after remaining in a no-write first-step state.
 
 E129 tested this topology-native route:
 
@@ -139,16 +140,14 @@ three-hour no-write cutoff with only inherited E128 history, so treat the
 face-cyclic route as runtime-failed unless a later implementation fixes the
 runtime path.
 
-E139 is the active no-Hodge oriented boundary-cochain fallback. E138 tested
+E139 was the no-Hodge oriented boundary-cochain fallback. E138 tested
 orientation at the level of each selected face's 2-simplex boundary cycle;
 E139 instead tests the induced selected boundary 1-cochain after face/tetra
 scatter by subtracting reverse selected-edge common mode,
 `cochain(i,j) - cochain(j,i)`, while preserving one-way directed boundary
-edges. This keeps the change in the explicit simplicial boundary pathway and
-still avoids the slow Hodge double-centering path. Reject unless E139 beats
-E128 and any returned E138-family result on primary C-alpha lDDT while keeping
-FoldScore/dRMSD/Rg coherent; do not consider a 30,000-step spend until the
-branch clearly breaks above `0.45` in the short gate.
+edges. This kept the change in the explicit simplicial boundary pathway and
+avoided the slow Hodge double-centering path, but the run failed before
+producing a scored step-9000 point.
 
 Second parked fallback if E138/E139 are coherent but still too collapsed:
 E140 selected-boundary realization anti-collapse. This is the only loss-side
@@ -160,32 +159,30 @@ diagnostic split: selected face/tetra boundary lDDT is already high
 (`0.7559` / `0.7385`), but predicted C-alpha Rg is still much smaller than
 truth (`11.7198 / 16.3091`). A small selected-boundary expansion term could
 test whether local higher-rank cells are being realized too compactly before
-their geometry reaches the structure module. Launch only after E139 is either
-returned or deliberately skipped; keep it as a topology realization probe, not
+their geometry reaches the structure module. Now launched as E140; keep it as a topology realization probe, not
 as a generic score-chasing loss.
 
-Local next candidate parked while E139 runs: E141 signed face-cyclic
+Local next candidate parked while E140 runs: E141 signed face-cyclic
 boundary readout. E138's face-cyclic readout preserves the directed
 2-simplex boundary cycle, but it is unsigned. The actual oriented boundary of
 face `[i,j,k]` is `[j,k] - [i,k] + [i,j]`, so the `(i,k)` boundary slot should
 enter the reverse `(k,i)` edge with a negative incidence coefficient. E141
 adds a parameter-neutral signed version of the face-cyclic readout with the
 same runtime-ramp pattern. It is the more faithful topology test of the
-E138 idea, not a metric-side loss. Do not launch it while E139 is active.
+E138 idea, not a metric-side loss. Do not launch it while E140 is active.
 The parked E141/E142/E143 Runpod checkouts have been fast-forwarded to
 `fd65f74` so future launches inherit the live `status_<variant>.json`
 heartbeat; their candidate-specific topology flags and effective batch size
 `8` were rechecked by the remote parser.
-E140 is now staged as `/workspace/SimplexFold_e140` at `b0a7806` as well:
-remote py_compile passed, the full E128-style launch recipe parses with
-effective batch size `8`, and the architecture audit remains within cap at
-`3,240,738 <= 3,261,974`. It remains parked until E139 is documented.
+E140 was staged as `/workspace/SimplexFold_e140`, then launched after E139 was
+documented as runtime failed. Remote py_compile passed, the full E128-style
+launch recipe parses with effective batch size `8`, and the architecture audit
+remains within cap at `3,240,738 <= 3,261,974`.
 E144 is also staged as `/workspace/SimplexFold_e144`: it is a no-Hodge
 boundary edge-star residual readout from the E128 checkpoint. This projects
 the selected boundary 1-cochain away from residue edge-star common modes
 without adding parameters, losses, or dense all-pairs supervision. It should
-remain parked behind E139 and the signed-boundary candidates unless E139
-returns flat or terminally fails.
+remain parked behind E140 and the signed-boundary candidates.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best

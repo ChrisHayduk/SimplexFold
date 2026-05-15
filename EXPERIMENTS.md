@@ -6184,11 +6184,13 @@ the Runpod checkout.
 
 ### E139: No-Hodge Oriented Boundary-Cochain Readout
 
-Status: running on owned Runpod pod `c67fbk189vnvfp` from
+Status: runtime failed on owned Runpod pod `c67fbk189vnvfp`. E139 ran from
 `/workspace/SimplexFold_e139` as
-`e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64`, Python PID
-`42517`. This reuses the already implemented E136 oriented boundary-cochain
-operator but removes E130's Hodge double-centering from the launch recipe.
+`e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64`, then was stopped
+after `00:45:26` elapsed because it remained in the same no-write first-step
+state as E130/E138 while burning `09:08:39` process CPU time. This reuses the
+already implemented E136 oriented boundary-cochain operator but removes E130's
+Hodge double-centering from the launch recipe.
 
 Hypothesis: E138 tests orientation at the level of each selected triangular
 face's boundary cycle `(i->j, j->k, k->i)`. If E138 is coherent but flat, the
@@ -6301,17 +6303,18 @@ Parameter audit: no new trainable modules beyond the already-tested E136
 operator; the E128-family architecture remains under the AF2-medium +5% cap
 at the existing audited `3,240,738 <= 3,261,974`.
 
-Runpod startup status: remote `python3 -m py_compile` passed in
+Runpod terminal status: remote `python3 -m py_compile` passed in
 `/workspace/SimplexFold_e139`, the run wrote `run_metadata.json` and inherited
 history at `2026-05-15T09:03Z`, and the log confirms `train=10000`,
 `val=1000`, crop `256`, MSA depth `64`, resume from the E128 checkpoint at
 step `8500` / examples `68000`, `1332` matching tensors loaded, and `0`
-new/missing tensors initialized. The actual Python process is PID `42517`,
-with GPU memory allocated.
+new/missing tensors initialized. It never wrote a new history row, result
+bundle, eval details, checkpoint, or status file. The remote trace was
+preserved locally, then only E139 PIDs `42517` and `42514` were stopped.
 
-Decision rule: reject unless E139 beats E128 and any returned E138 result on
-primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg coherent.
-It still needs to clear `0.45` before any 30k-step consideration.
+Decision: reject as a runtime-failed branch with no scored result. Use E140 as
+the next active gate because it tests selected-complex realization rather than
+another boundary-readout transform.
 
 Validation status: E139 is a launch-recipe subset of the already-tested E136
 operator with Hodge disabled. On the branch tip after documenting E139:
@@ -6333,10 +6336,10 @@ operator with Hodge disabled. On the branch tip after documenting E139:
 
 ### E140: Selected-Boundary Realization Anti-Collapse
 
-Status: launch recipe staged and remotely validated; do not launch while E139
-is active. Use only if E139 returns coherent but remains in the collapsed
-low-0.4 C-alpha lDDT band, or if E139 is deliberately skipped after a
-documented terminal state.
+Status: launched on the owned Runpod pod after E139 was documented as runtime
+failed. E140 is the active gate as
+`e140_selected_boundary_expansion_from_e128_s9000_c256_m64` from the staged
+`/workspace/SimplexFold_e140` checkout.
 
 Hypothesis: the current best E128 branch shows a useful but incomplete
 local-to-global split. The selected higher-order complex is learning local
@@ -6354,7 +6357,7 @@ pairs, C-alpha radius, validation lDDT, or a full distance matrix. In
 topological terms, it asks the learned sparse complex to realize its own
 selected 2- and 3-cells without collapsing their 1-skeleton.
 
-Candidate launch only after E139 is either returned or explicitly skipped:
+Candidate launch used after E139 was explicitly stopped as runtime failed:
 
 ```bash
 --run-name e140_selected_boundary_expansion_from_e128_s9000_c256_m64 \
@@ -6368,8 +6371,8 @@ Candidate launch only after E139 is either returned or explicitly skipped:
 --simplex-coordinate-expansion-tolerance 0.05
 ```
 
-Full same-pod launch skeleton, using the staged checkout that does not disturb
-the active E139 tree:
+Full same-pod launch skeleton, using the staged checkout that keeps each
+candidate isolated from the other Runpod trees:
 
 ```bash
 cd /workspace/SimplexFold_e140
@@ -6451,20 +6454,25 @@ checks after documenting the parked recipe:
 
 - `python - <<'PY' ... AlphaFold2(load_model_config("simplexfold_medium_param_matched")) ... PY`: parameter count `3,106,690 <= 3,261,974`
 - `python -m pytest tests/test_trainer.py::test_simplicial_expansion_hinge_adds_no_parameters tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights tests/test_nanofold_public_benchmarks.py::test_benchmark_loss_builder_applies_topology_margin_config tests/test_nanofold_public_benchmarks.py::test_full_msa_to_face_expansion_hinge_variant_is_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_full_msa_to_face_expansion_hinge_variant_keeps_base_topology`: `5 passed`
-- Remote readiness: `/workspace/SimplexFold_e140` is clean at heartbeat commit
-  `b0a7806`; remote `python3 -m py_compile` passed for the
+- Remote launch: `/workspace/SimplexFold_e140` was fast-forwarded to pushed
+  commit `050b954`; remote `python3 -m py_compile` passed for the
   model/trainer/runner files; `/workspace/nanoFold-Competition` and the E128
   checkpoint both exist; parser validation accepted the full documented E140
   command with effective batch size `8`, max-parameter cap `3261974`, selected
   face/tetra coordinate-expansion weights `0.05`, and expansion tolerance
   `0.05`. The full E128-style architecture audit counted `3,240,738`
   parameters, still under the cap.
+- Startup verification at `2026-05-15T09:52Z`: the remote run wrote
+  `run_metadata.json`, inherited `history_full_msa_to_face.json`, and wrote
+  `status_full_msa_to_face.json`; the log confirms resume from E128 step
+  `8500` / examples `68000`, `1332` matching tensors loaded, and `0`
+  new/missing tensors initialized. The status heartbeat showed active step
+  `8501`, microbatch `1`, and effective batch size `8`.
 
 ### E141: Signed Face-Cyclic Boundary Readout
 
-Status: locally implemented, validated, and staged; do not launch while E139
-is active. E138 has already been documented as a terminal failure, and E139 is
-now the active fallback.
+Status: locally implemented, validated, and staged; do not launch while E140
+is active. E138 and E139 have already been documented as runtime failures.
 
 Hypothesis: E138 tests whether selected face cochains should write back into
 pair state through each triangular boundary cycle `(i->j, j->k, k->i)`.
@@ -6499,8 +6507,8 @@ Candidate launch after E139 is documented:
 --simplex-boundary-signed-face-cyclic-readout-runtime-scale-ramp-steps 500
 ```
 
-Full same-pod launch skeleton, using the staged checkout that does not disturb
-the active E139 tree:
+Full same-pod launch skeleton, using the staged checkout that keeps each
+candidate isolated from the other Runpod trees:
 
 ```bash
 cd /workspace/SimplexFold_e141
@@ -6604,9 +6612,9 @@ Validation status on the local branch from the E138/E139 staging window:
 
 ### E142: Signed Tetra Coboundary Face Update
 
-Status: locally implemented, validated, and staged; do not launch while the
-active E139 process is still running. Treat this as a parked topology-native
-fallback after E139/E141 are documented or deliberately skipped.
+Status: locally implemented, validated, and staged; do not launch while E140
+is active. Treat this as a parked topology-native fallback after E140/E141 are
+documented or deliberately skipped.
 
 Hypothesis: the selected tetra cofaces should update face cochains through the
 oriented tetra boundary operator, not through an unsigned sibling-face mean.
@@ -6642,8 +6650,8 @@ Candidate launch only after the active Runpod branch is documented:
 --simplex-signed-tetra-coboundary-runtime-scale-ramp-steps 500
 ```
 
-Full same-pod launch skeleton, using the staged checkout that does not disturb
-the active E139 tree:
+Full same-pod launch skeleton, using the staged checkout that keeps each
+candidate isolated from the other Runpod trees:
 
 ```bash
 cd /workspace/SimplexFold_e142
@@ -6738,9 +6746,8 @@ Validation status on the local branch from the E138/E139 staging window:
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 
-Status: locally implemented, validated, and staged on the owned Runpod pod
-while E139 is active; do not launch while the active E139 process is still
-running.
+Status: locally implemented, validated, and staged on the owned Runpod pod;
+do not launch while E140 is active.
 
 Hypothesis: E142 signs the tetra coface-to-face residual, but the learned
 `tetra_to_face` readout still scatters one message to each anchored face with
@@ -6772,8 +6779,8 @@ Candidate launch only after the active Runpod branch is documented:
 --simplex-signed-tetra-to-face-runtime-scale-ramp-steps 500
 ```
 
-Full same-pod launch skeleton, using the staged checkout that does not disturb
-the active E139 tree:
+Full same-pod launch skeleton, using the staged checkout that keeps each
+candidate isolated from the other Runpod trees:
 
 ```bash
 cd /workspace/SimplexFold_e143
@@ -6871,8 +6878,8 @@ Validation status on the local branch from the E138/E139 staging window:
 
 ### E144: No-Hodge Edge-Star Residual Boundary Readout
 
-Status: launch recipe staged and remotely validated; do not launch while E139
-is active. Treat this as a parked fallback after E139 and the signed-boundary
+Status: launch recipe staged and remotely validated; do not launch while E140
+is active. Treat this as a parked fallback after E140 and the signed-boundary
 queue are documented or deliberately skipped.
 
 Hypothesis: E139 tests an oriented antisymmetric selected boundary 1-cochain,
@@ -6906,8 +6913,8 @@ Candidate launch only after the active Runpod branch is documented:
 --simplex-boundary-edge-star-residual-runtime-scale-ramp-steps 500
 ```
 
-Full same-pod launch skeleton, using the staged checkout that does not disturb
-the active E139 tree:
+Full same-pod launch skeleton, using the staged checkout that keeps each
+candidate isolated from the other Runpod trees:
 
 ```bash
 cd /workspace/SimplexFold_e144
