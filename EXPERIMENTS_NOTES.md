@@ -6806,3 +6806,20 @@
   inherited E128 step `8500` with `val_lddt_ca=0.4311057258844376`. No
   `results.json`, `results.csv`, eval-details file, or checkpoint exists yet.
   Interpretation: normal early active compute, not a returned result.
+- 2026-05-15T06:20Z Prepared E139 as a launch-recipe-only fallback while E138
+  runs; no Runpod launch. E139 reuses the already implemented oriented
+  boundary-cochain readout from E136, but removes E130's Hodge
+  double-centering from the recipe. If E138's face-cyclic 2-simplex boundary
+  route returns flat but coherent, E139 will test orientation after face/tetra
+  cochains have been pooled onto the selected boundary 1-skeleton by ramping
+  `simplex_boundary_oriented_cochain_scale` from `0.0` to `0.25` over steps
+  `8500`-`9000`. It adds no parameters and no output-side loss. Launch only
+  after E138 returns and is documented.
+- 2026-05-15T06:21Z E139 fallback validation passed locally while E138
+  continued running. Checks: `python -m py_compile` for `simplex.py`,
+  `evoformer.py`, `model.py`, `trainer.py`, and the NanoFold runner; the nine
+  focused E136/E139 parser/runtime tests covering oriented boundary-cochain
+  helpers, adapter effect, runtime signatures, trainer parser/input plumbing,
+  parameter audit, benchmark parser, and benchmark validation-time override
+  path (`9 passed`); focused ruff undefined-name/syntax-risk checks; and
+  `git diff --check`. No Runpod launch and no `EXPERIMENT_RESULTS.md` update.

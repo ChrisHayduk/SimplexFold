@@ -80,6 +80,15 @@ primary C-alpha lDDT while keeping FoldScore/dRMSD/Rg coherent; do not
 consider a 30,000-step spend until the branch clearly breaks above `0.45` in
 the short gate.
 
+Parked follow-up if E138 is flat but not runtime-failed: E139 no-Hodge
+oriented boundary-cochain readout. E138 tests orientation at the level of each
+selected face's 2-simplex boundary cycle. E139 instead tests the induced
+selected boundary 1-cochain after face/tetra scatter by subtracting reverse
+selected-edge common mode, `cochain(i,j) - cochain(j,i)`, while preserving
+one-way directed boundary edges. This keeps the change in the explicit
+simplicial boundary pathway and still avoids the slow Hodge double-centering
+path. Launch only after E138 returns and is documented.
+
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
 E118 residue vertex-star route with a half-strength boundary-edge-star

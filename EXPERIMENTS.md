@@ -6166,3 +6166,68 @@ operator with Hodge disabled. On the branch tip after documenting E138:
 
 Before launch, still run `git diff --check` on the exact branch tip used by
 the Runpod checkout.
+
+### E139: No-Hodge Oriented Boundary-Cochain Readout
+
+Status: planned launch recipe only; do not launch while E138 is active. This
+reuses the already implemented E136 oriented boundary-cochain operator but
+removes E130's Hodge double-centering from the launch recipe.
+
+Hypothesis: E138 tests orientation at the level of each selected triangular
+face's boundary cycle `(i->j, j->k, k->i)`. If E138 is coherent but flat, the
+orientation bottleneck may instead live after face and tetra states have been
+pooled onto the selected boundary 1-skeleton. E139 tests that induced
+boundary-edge cochain directly by subtracting reverse-edge common mode:
+`cochain(i,j) - cochain(j,i)` when both directed selected edges exist, while
+preserving one-way selected directed edges.
+
+Mechanism: use `simplex_boundary_oriented_cochain_scale` with a runtime ramp,
+but leave `simplex_boundary_hodge_readout_scale` at zero. The transform acts
+after selected face/tetra messages scatter to boundary edges and before the
+pair update. It is a simplicial/topological architecture change on the
+selected boundary 1-cochain, not an output-side C-alpha lDDT, radius,
+distance-matrix, or coordinate loss.
+
+Candidate launch only after E138 returns and is documented:
+
+```bash
+--run-name e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-boundary-readout-directionality 0.25 \
+--simplex-boundary-oriented-cochain-scale 0.25 \
+--simplex-boundary-oriented-cochain-runtime-scale 0.0 \
+--simplex-boundary-oriented-cochain-runtime-scale-final 0.25 \
+--simplex-boundary-oriented-cochain-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-oriented-cochain-runtime-scale-ramp-steps 500
+```
+
+Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, edge-frame message runtime scale `0.0125`, global context
+`0.1`, vertex-star context `1.0`, and edge-star runtime `0.5`. Do not include
+E129's triangle-attention value residual, E130's Hodge readout, or E138's
+face-cyclic readout unless a returned E138 result specifically justifies a
+combined orientation gate.
+
+Parameter audit: no new trainable modules beyond the already-tested E136
+operator; the E128-family architecture remains under the AF2-medium +5% cap
+at the existing audited `3,240,738 <= 3,261,974`.
+
+Decision rule: reject unless E139 beats E128 and any returned E138 result on
+primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg coherent.
+It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation status: E139 is a launch-recipe subset of the already-tested E136
+operator with Hodge disabled. On the branch tip after documenting E139:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py::test_oriented_boundary_cochain_readout_subtracts_reverse_edges tests/test_simplex.py::test_simplicial_adapter_oriented_cochain_changes_boundary_pair_update tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_hodge_readout_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `git diff --check`: passed
+
+Before launch, still run `git diff --check` on the exact branch tip used by
+the Runpod checkout.
