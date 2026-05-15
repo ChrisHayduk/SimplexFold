@@ -180,6 +180,12 @@ E140 is now staged as `/workspace/SimplexFold_e140` at `b0a7806` as well:
 remote py_compile passed, the full E128-style launch recipe parses with
 effective batch size `8`, and the architecture audit remains within cap at
 `3,240,738 <= 3,261,974`. It remains parked until E139 is documented.
+E144 is also staged as `/workspace/SimplexFold_e144`: it is a no-Hodge
+boundary edge-star residual readout from the E128 checkpoint. This projects
+the selected boundary 1-cochain away from residue edge-star common modes
+without adding parameters, losses, or dense all-pairs supervision. It should
+remain parked behind E139 and the signed-boundary candidates unless E139
+returns flat or terminally fails.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best

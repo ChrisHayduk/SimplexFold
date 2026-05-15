@@ -7125,3 +7125,33 @@
   full E128-style architecture audit counted `3,240,738` parameters, still
   under the `3,261,974` cap. E140 remains a parked selected-complex
   realization probe; no Runpod experiment was launched.
+- 2026-05-15T09:38Z E139 remained active and below the no-write cutoff on
+  owned pod `c67fbk189vnvfp`: Python PID `42517` had elapsed `00:34:37`,
+  process CPU time was `07:11:48`, the artifact directory still contained only
+  startup `run_metadata.json` and inherited `history_full_msa_to_face.json`,
+  history length remained `18` ending at E128 step `8500`
+  (`val_lddt_ca=0.4311057258844376`, FoldScore `0.4025340421795845`), and no
+  `results.json`, `results.csv`, eval details, checkpoint, or status file
+  existed. GPU memory was about `38.2 GiB` with `0%` utilization. Leave E139
+  running.
+- 2026-05-15T09:40Z Staged E144 on the owned Runpod pod without touching
+  active E139. E144 uses the existing no-Hodge selected boundary edge-star
+  residual readout: a parameter-neutral projection of the selected boundary
+  1-cochain away from source/target residue edge-star common modes, not a
+  metric-side loss. Cloned `/workspace/SimplexFold_e144`, remote
+  `python3 -m py_compile` passed for `simplex.py`, `evoformer.py`, `model.py`,
+  `trainer.py`, and `scripts/run_nanofold_public_benchmarks.py`, and remote
+  parser validation accepted the full E144 launch recipe with effective batch
+  size `8`, max-parameter cap `3261974`, static residual scale `0.25`, and
+  runtime final scale `0.25`. The full E128-style architecture audit counted
+  `3,240,738` parameters, still under the cap. No Runpod experiment was
+  launched.
+- 2026-05-15T09:45Z E139 remained active and below the no-write cutoff on
+  owned pod `c67fbk189vnvfp`: Python PID `42517` had elapsed `00:42:06`,
+  process CPU time was `08:41:53`, and the artifact directory still contained
+  only startup `run_metadata.json` plus inherited history ending at E128 step
+  `8500` (`val_lddt_ca=0.4311057258844376`, FoldScore
+  `0.4025340421795845`). No `results.json`, `results.csv`,
+  `eval_details_full_msa_to_face.csv`, checkpoint, or status file existed.
+  GPU memory was about `38.2 GiB` and utilization sampled at `12%`. Leave E139
+  running while it remains below the documented cutoff.

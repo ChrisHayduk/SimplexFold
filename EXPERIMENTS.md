@@ -6868,3 +6868,128 @@ Validation status on the local branch from the E138/E139 staging window:
   validation accepted the documented E143 command with effective batch size
   `8`, max-parameter cap `3261974`, signed static scale `0.25`, and signed
   runtime final scale `0.25`.
+
+### E144: No-Hodge Edge-Star Residual Boundary Readout
+
+Status: launch recipe staged and remotely validated; do not launch while E139
+is active. Treat this as a parked fallback after E139 and the signed-boundary
+queue are documented or deliberately skipped.
+
+Hypothesis: E139 tests an oriented antisymmetric selected boundary 1-cochain,
+but the selected boundary readout may also carry residue-star common modes
+that dilute directional geometric signal before it enters the pair trunk. In
+topological language, E144 keeps the boundary as a 1-cochain and projects it
+away from lower-star means over source and target residue edge-stars. This is
+not Hodge double-centering over all selected edges, and it avoids generic
+C-alpha lDDT, radius, or all-pairs distance losses.
+
+Mechanism: use the existing parameter-neutral
+`simplex_boundary_edge_star_residual_scale` path with a runtime ramp from
+`0.0` to `0.25` over steps `8500`-`9000`. The adapter computes the selected
+boundary-edge pair readout, estimates source/target residue edge-star means,
+and blends the readout toward the residual cochain
+`cochain(i,j) - 0.5 * (star(i) + star(j))`.
+
+Candidate launch only after the active Runpod branch is documented:
+
+```bash
+--run-name e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-boundary-edge-star-residual-scale 0.25 \
+--simplex-boundary-edge-star-residual-runtime-scale 0.0 \
+--simplex-boundary-edge-star-residual-runtime-scale-final 0.25 \
+--simplex-boundary-edge-star-residual-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-edge-star-residual-runtime-scale-ramp-steps 500
+```
+
+Full same-pod launch skeleton, using the staged checkout that does not disturb
+the active E139 tree:
+
+```bash
+cd /workspace/SimplexFold_e144
+mkdir -p logs
+python3 -m py_compile \
+  minalphafold/simplex.py \
+  minalphafold/evoformer.py \
+  minalphafold/model.py \
+  minalphafold/trainer.py \
+  scripts/run_nanofold_public_benchmarks.py
+nohup python -u scripts/run_nanofold_public_benchmarks.py \
+  --nanofold-root /workspace/nanoFold-Competition \
+  --model-config simplexfold_medium_param_matched \
+  --variants full_msa_to_face \
+  --run-name e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64 \
+  --output-dir artifacts/nanofold_public_benchmarks \
+  --resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+  --resume-model-weights-only \
+  --steps 9000 \
+  --batch-size 1 \
+  --grad-accum-steps 8 \
+  --crop-size 256 \
+  --msa-depth 64 \
+  --extra-msa-depth 0 \
+  --max-templates 0 \
+  --eval-every 500 \
+  --checkpoint-every 500 \
+  --final-max-val-batches 0 \
+  --eval-max-val-batches 0 \
+  --max-parameters 3261974 \
+  --n-cycles 4 \
+  --device cuda \
+  --simplex-face-coordinate-weight 1.0 \
+  --simplex-face-coordinate-distance-weight 0.5 \
+  --simplex-face-boundary-lddt-weight 0.05 \
+  --simplex-tetra-coordinate-weight 1.0 \
+  --simplex-tetra-coordinate-distance-weight 0.5 \
+  --simplex-tetra-boundary-lddt-weight 0.05 \
+  --simplex-geometry-distance-weight 0.025 \
+  --simplex-face-top-k 24 \
+  --simplex-tetra-top-k 48 \
+  --simplex-cell-score-degree-penalty 0.75 \
+  --simplex-cell-score-outer-edge-weight 0.25 \
+  --simplex-edge-frame-message-scale 0.025 \
+  --simplex-edge-frame-message-runtime-scale 0.0125 \
+  --simplex-boundary-edge-frame-gate-scale 0.05 \
+  --simplex-boundary-readout-directionality 0.25 \
+  --simplex-boundary-readout-directionality-runtime-scale 0.25 \
+  --simplex-boundary-incidence-normalization 1.0 \
+  --simplex-global-context-scale 0.1 \
+  --simplex-vertex-star-context-scale 1.0 \
+  --simplex-vertex-star-context-runtime-scale 1.0 \
+  --simplex-edge-star-context-scale 1.0 \
+  --simplex-edge-star-context-runtime-scale 0.5 \
+  --simplex-triangle-attention-bias-scale 0.0125 \
+  --simplex-boundary-edge-star-residual-scale 0.25 \
+  --simplex-boundary-edge-star-residual-runtime-scale 0.0 \
+  --simplex-boundary-edge-star-residual-runtime-scale-final 0.25 \
+  --simplex-boundary-edge-star-residual-runtime-scale-ramp-start-step 8500 \
+  --simplex-boundary-edge-star-residual-runtime-scale-ramp-steps 500 \
+  > logs/e144_no_hodge_edge_star_residual.log 2>&1 &
+echo $!
+```
+
+Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, edge-frame message runtime scale `0.0125`, directed
+boundary readout `0.25`, global context `0.1`, vertex-star context `1.0`,
+edge-star context runtime `0.5`, and no Hodge readout.
+
+Decision rule: reject unless E144 beats E128 and any returned E139/E141/E142/E143
+result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
+coherent. It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation status:
+
+- Existing focused parser/runtime tests cover the edge-star residual override
+  path and ramp schedule.
+- Remote readiness: `/workspace/SimplexFold_e144` is clean at the branch tip;
+  remote `python3 -m py_compile` passed for the model/trainer/runner files;
+  `/workspace/nanoFold-Competition` and the E128 checkpoint both exist; parser
+  validation accepted the full documented E144 command with effective batch
+  size `8`, max-parameter cap `3261974`, static residual scale `0.25`, and
+  runtime final scale `0.25`. The full E128-style architecture audit counted
+  `3,240,738` parameters, still under the cap.
