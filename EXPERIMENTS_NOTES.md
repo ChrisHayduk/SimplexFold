@@ -7331,3 +7331,18 @@
   NanoFold runner config override (`5 passed`). Parameter audit for the full
   E128-style recipe plus E145 scale `0.25` remains `3,240,738`, with `21,236`
   parameters of headroom under the AF2-medium+5% cap.
+- 2026-05-15T11:05Z Rechecked only the two owned active Runpod pods after the
+  30k-candidate assessment. E140 on pod `c67fbk189vnvfp` remains active at
+  PID `55949`, elapsed `01:13:19`, process CPU `1251%`, status active step
+  `8538`, completed step `8537`, effective batch size `8`, and
+  `stopped_early=false`. E141 on pod `5ox436mhzej7j4` remains active at PID
+  `576`, elapsed `00:31:24`, process CPU `1179%`, status active step `8511`,
+  completed step `8510`, effective batch size `8`, and
+  `stopped_early=false`. Both runs remain pre-eval: inherited history still
+  ends at E128 step `8500`, with no `results.json`,
+  `eval_details_full_msa_to_face.csv`, or new checkpoint yet. Current
+  candidate read: E140 and especially the staged E145 are plausible
+  topology-native routes to test because they target the local-to-global
+  assembly/Rg-collapse gap, but no branch should receive a 30k confirmation
+  spend unless a short gate first clears about `0.45` C-alpha lDDT with
+  coherent FoldScore, dRMSD, and C-alpha radius.
