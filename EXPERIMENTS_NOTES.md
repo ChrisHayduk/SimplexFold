@@ -6858,3 +6858,14 @@
   preservation all passed (`5 passed in 1.31s`). This confirms E140 can be
   launched later using existing selected-complex loss plumbing if the active
   orientation/readout branches return flat.
+- 2026-05-15T06:42Z E138 was still active on owned pod `c67fbk189vnvfp`, but
+  the runtime profile now looks CPU-bound: six repeated `nvidia-smi` samples
+  from `06:41:57`-`06:42:24Z` showed `0%` GPU utilization and `0%` GPU memory
+  utilization while PID `24980` held about `38.2 GiB` of A100 memory and used
+  about `1249%` CPU. The process remained alive with elapsed `00:40:42`,
+  CPU time `08:28:42`, RSS about `1.9 GiB`, and `194` threads. The artifact
+  directory still contained only `run_metadata.json` and the inherited
+  `history_full_msa_to_face.json`; no result bundle, eval details, or
+  checkpoint existed. Treat this as an active warning, not a returned result;
+  if the same no-write state persists to the E130-style cutoff, classify E138
+  as a runtime-failed branch before launching E139.
