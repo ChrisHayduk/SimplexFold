@@ -6665,3 +6665,13 @@
   `history_full_msa_to_face.json` and `run_metadata.json`. No result bundle,
   eval-details file, or checkpoint existed, so `EXPERIMENT_RESULTS.md` remains
   unchanged and E130 should continue under the heartbeat.
+- 2026-05-15T04:53Z-04:54Z Bounded E130 health sample on owned pod
+  `c67fbk189vnvfp`: PID `4224` remained active, elapsed time advanced from
+  `01:53:16` to `01:54:16`, process CPU time advanced from `23:32:33` to
+  `23:45:00`, `%CPU` stayed at `1247`, RSS stayed near `1.9 GiB`, and
+  `/proc/4224/io` read counters advanced (`rchar` `149909441` -> `150573956`,
+  `syscr` `17812` -> `17917`). A100 memory remained allocated at
+  `43091 MiB`, and instantaneous GPU utilization sampled `4%` then `59%`.
+  The artifact directory still had only `history_full_msa_to_face.json` and
+  `run_metadata.json`; no result bundle, eval-details file, or checkpoint
+  existed. Interpretation: active compute, not returned or idle.
