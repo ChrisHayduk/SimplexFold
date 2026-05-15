@@ -7115,3 +7115,13 @@
   static scale `0.25`, and runtime final scale `0.25` for the candidate-specific
   signed face-cyclic, signed tetra-coboundary, or signed tetra-to-face flag.
   E139 remained active during this refresh and no new experiment was launched.
+- 2026-05-15T09:35Z Staged E140 on the owned Runpod pod without touching
+  active E139. Cloned `/workspace/SimplexFold_e140` at commit `b0a7806`,
+  remote `python3 -m py_compile` passed for `simplex.py`, `evoformer.py`,
+  `model.py`, `trainer.py`, and `scripts/run_nanofold_public_benchmarks.py`,
+  and remote parser validation accepted the full E140 launch recipe with
+  effective batch size `8`, max-parameter cap `3261974`, selected face/tetra
+  coordinate-expansion weights `0.05`, and expansion tolerance `0.05`. The
+  full E128-style architecture audit counted `3,240,738` parameters, still
+  under the `3,261,974` cap. E140 remains a parked selected-complex
+  realization probe; no Runpod experiment was launched.

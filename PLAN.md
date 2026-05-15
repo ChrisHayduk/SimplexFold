@@ -176,6 +176,10 @@ The parked E141/E142/E143 Runpod checkouts have been fast-forwarded to
 `fd65f74` so future launches inherit the live `status_<variant>.json`
 heartbeat; their candidate-specific topology flags and effective batch size
 `8` were rechecked by the remote parser.
+E140 is now staged as `/workspace/SimplexFold_e140` at `b0a7806` as well:
+remote py_compile passed, the full E128-style launch recipe parses with
+effective batch size `8`, and the architecture audit remains within cap at
+`3,240,738 <= 3,261,974`. It remains parked until E139 is documented.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
