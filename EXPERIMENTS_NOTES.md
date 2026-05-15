@@ -6369,3 +6369,13 @@
   `history_full_msa_to_face.json`. Interpretation: the long quiet period is
   active compute/read-side work before writeout, not an idle completed bundle;
   keep waiting and do not intervene.
+- 2026-05-15T01:43Z-01:50Z E129 remained active through an 8-sample bounded
+  watch on the owned pod. PID `1033` stayed alive from `01:48:50` through
+  `01:55:51` elapsed, process CPU rose from `14:42:20` to `15:55:19`, process
+  CPU utilization stayed around `810%`-`824%`, RSS stayed about `2.0 GiB`, and
+  `178` threads remained open. H100 memory stayed allocated at `43687 MiB`,
+  with sampled GPU utilization ranging from `0%` to `58%`. The artifact
+  directory still contained only `run_metadata.json` and
+  `history_full_msa_to_face.json`; history still ended at inherited step 8500,
+  with no `results.csv` and no checkpoint. Interpretation: still active,
+  still no coherent step-9000 bundle; let the heartbeat continue monitoring.
