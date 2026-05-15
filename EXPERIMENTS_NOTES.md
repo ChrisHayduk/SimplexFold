@@ -6877,3 +6877,12 @@
   history ending at step `8500`, no result/eval/checkpoint files). Keep E138
   running under the heartbeat; do not classify it failed solely from the
   earlier zero-utilization burst.
+- 2026-05-15T06:47Z Updated heartbeat automation
+  `check-simplexfold-e57-runpod` to reflect the E138 state nuance and next
+  action. The automation remains scoped only to owned pod `c67fbk189vnvfp`.
+  It should leave E138 running while active before the roughly 3-hour no-write
+  cutoff, verify/pull/document/commit/push if E138 returns, and only if E138
+  reaches the E130-style no-write cutoff or fails without a coherent result
+  should it document E138 as runtime failed, terminate only the E138 process,
+  and launch the already documented E139 no-Hodge oriented boundary-cochain
+  fallback on the same healthy pod.
