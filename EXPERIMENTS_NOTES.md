@@ -6608,3 +6608,19 @@
   `tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
   slice (`223 passed`), focused ruff undefined-name/syntax-risk checks, and
   `git diff --check`.
+- 2026-05-15T04:25Z E130 remained active on owned pod `c67fbk189vnvfp` with
+  PID `4224`, elapsed `01:25:26`, `%CPU=1246`, RSS about `1.9 GiB`, and still
+  only `history_full_msa_to_face.json` plus `run_metadata.json` in the remote
+  artifact directory. No result bundle was present, so leave E130 running and
+  keep `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-15T04:30Z Began E135 local candidate while E130 runs; no Runpod
+  launch. E135 adds runtime scheduling for
+  `simplex_boundary_edge_star_residual_scale`, so E134's high-pass selected
+  boundary 1-cochain can ramp into a resumed checkpoint rather than switch on
+  abruptly. This keeps the change inside the simplex boundary/cochain pathway
+  and adds no parameters or output-side loss. Validation passed: py_compile for
+  `simplex.py`, `evoformer.py`, `model.py`, `trainer.py`, and the NanoFold
+  runner; five focused runtime-plumbing pytest checks; the broader
+  `tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  slice (`223 passed`); focused ruff undefined-name/syntax-risk checks; and
+  `git diff --check`.

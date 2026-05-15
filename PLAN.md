@@ -2389,3 +2389,32 @@ smoothing scale and add only the residual scale:
 Decision rule is unchanged: reject unless it beats E128 and any returned
 E130/E131/E132 result on primary C-alpha lDDT while keeping FoldScore, dRMSD,
 and C-alpha Rg coherent. It still must clear `0.45` before any 30k-step spend.
+
+## 2026-05-15 E135 Ramped Edge-Star Residual Readout Prepared
+
+E135 extends E134 with runtime scheduling for
+`simplex_boundary_edge_star_residual_scale`. The motivation is the same
+resume-safety lesson as E132/E133: a high-pass selected boundary 1-cochain may
+be useful, but abruptly activating it in a checkpoint already tuned around
+smooth boundary readout could destabilize global assembly.
+
+This remains a topology-native change. The model still computes selected
+face/tetra cochains, scatters them through boundary incidence to selected
+edges, then transforms that boundary-edge cochain before writing into `Z_ij`.
+The runtime schedule changes only the strength of the edge-star residual
+operation. It adds no parameters and no output-side loss.
+
+Do not launch E135 while E130 is active. If E134 is the right next gate after
+E130 returns, prefer the ramped version first:
+
+```bash
+--simplex-boundary-edge-star-residual-scale 0.25 \
+--simplex-boundary-edge-star-residual-runtime-scale 0.0 \
+--simplex-boundary-edge-star-residual-runtime-scale-final 0.25 \
+--simplex-boundary-edge-star-residual-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-edge-star-residual-runtime-scale-ramp-steps 500
+```
+
+Decision rule is the same as E134: beat E128 and any returned E130/E131/E132
+result on primary C-alpha lDDT, keep FoldScore/dRMSD/Rg coherent, and clear
+`0.45` before any 30k-step spend.

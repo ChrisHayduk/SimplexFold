@@ -5913,3 +5913,50 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `223 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - `git diff --check`: passed
+
+### E135: Ramped Edge-Star Residual Boundary Readout
+
+Status: implemented locally as a parked scheduling fallback while E130 runs;
+not launched on Runpod.
+
+Hypothesis: if E134's high-pass lower-star residual is useful, a resumed
+checkpoint may still need the residual contribution introduced gradually. E135
+tests the same selected-boundary 1-cochain operation with runtime scheduling,
+so a short gate can distinguish "wrong topology signal" from "right topology
+signal, introduced too abruptly."
+
+Mechanism: add training/evaluation runtime overrides for
+`simplex_boundary_edge_star_residual_scale`. Static nonzero config still
+selects the residual operation; the runtime override controls the active
+strength at a given step and is passed through the trainer, benchmark runner,
+model, Evoformer, and simplicial adapter. No trainable parameters or generic
+output-side losses are added.
+
+Candidate launch only after E130 returns and is verified:
+
+```bash
+--run-name e135_ramped_edge_star_residual_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-boundary-hodge-readout-scale 0.25 \
+--simplex-boundary-edge-star-residual-scale 0.25 \
+--simplex-boundary-edge-star-residual-runtime-scale 0.0 \
+--simplex-boundary-edge-star-residual-runtime-scale-final 0.25 \
+--simplex-boundary-edge-star-residual-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-edge-star-residual-runtime-scale-ramp-steps 500
+```
+
+Decision rule: reject unless E135 beats E128 and any returned E130/E131/E132
+result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
+coherent. It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `5 passed`
+- `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `223 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `git diff --check`: passed

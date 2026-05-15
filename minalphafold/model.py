@@ -269,6 +269,7 @@ class AlphaFold2(torch.nn.Module):
             simplex_boundary_readout_directionality_override: torch.Tensor | None = None,
             simplex_boundary_hodge_readout_scale_override: torch.Tensor | None = None,
             simplex_boundary_edge_star_readout_scale_override: torch.Tensor | None = None,
+            simplex_boundary_edge_star_residual_scale_override: torch.Tensor | None = None,
             simplex_vertex_star_context_scale_override: torch.Tensor | None = None,
             simplex_edge_star_context_scale_override: torch.Tensor | None = None,
             simplex_pre_triangle_update_scale_override: torch.Tensor | None = None,
@@ -523,6 +524,9 @@ class AlphaFold2(torch.nn.Module):
                                         simplex_boundary_edge_star_readout_scale_override=(
                                             simplex_boundary_edge_star_readout_scale_override
                                         ),
+                                        simplex_boundary_edge_star_residual_scale_override=(
+                                            simplex_boundary_edge_star_residual_scale_override
+                                        ),
                                         simplex_vertex_star_context_scale_override=(
                                             simplex_vertex_star_context_scale_override
                                         ),
@@ -599,6 +603,9 @@ class AlphaFold2(torch.nn.Module):
                                     ),
                                     simplex_boundary_edge_star_readout_scale_override=(
                                         simplex_boundary_edge_star_readout_scale_override
+                                    ),
+                                    simplex_boundary_edge_star_residual_scale_override=(
+                                        simplex_boundary_edge_star_residual_scale_override
                                     ),
                                     simplex_vertex_star_context_scale_override=(
                                         simplex_vertex_star_context_scale_override

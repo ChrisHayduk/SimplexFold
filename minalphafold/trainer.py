@@ -257,6 +257,10 @@ class TrainingConfig:
     simplex_boundary_edge_star_readout_runtime_scale_final: float | None = None
     simplex_boundary_edge_star_readout_runtime_scale_ramp_start_step: int | None = None
     simplex_boundary_edge_star_readout_runtime_scale_ramp_steps: int = 1
+    simplex_boundary_edge_star_residual_runtime_scale: float | None = None
+    simplex_boundary_edge_star_residual_runtime_scale_final: float | None = None
+    simplex_boundary_edge_star_residual_runtime_scale_ramp_start_step: int | None = None
+    simplex_boundary_edge_star_residual_runtime_scale_ramp_steps: int = 1
     simplex_vertex_star_context_runtime_scale: float | None = None
     simplex_vertex_star_context_runtime_scale_final: float | None = None
     simplex_vertex_star_context_runtime_scale_ramp_start_step: int | None = None
@@ -1102,6 +1106,23 @@ def simplex_boundary_edge_star_readout_runtime_scale_at_step(
     )
 
 
+def simplex_boundary_edge_star_residual_runtime_scale_at_step(
+    training_config: TrainingConfig,
+    step: int | None,
+) -> float | None:
+    if training_config.simplex_boundary_edge_star_residual_runtime_scale is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_boundary_edge_star_residual_runtime_scale)
+    return _ramped_value(
+        training_config.simplex_boundary_edge_star_residual_runtime_scale,
+        training_config.simplex_boundary_edge_star_residual_runtime_scale_final,
+        step=step,
+        start_step=training_config.simplex_boundary_edge_star_residual_runtime_scale_ramp_start_step,
+        ramp_steps=training_config.simplex_boundary_edge_star_residual_runtime_scale_ramp_steps,
+    )
+
+
 def simplex_vertex_star_context_runtime_scale_at_step(
     training_config: TrainingConfig,
     step: int | None,
@@ -1409,6 +1430,7 @@ def model_inputs_from_batch(
     use_simplex_boundary_readout_directionality_runtime_scale: bool = False,
     use_simplex_boundary_hodge_readout_runtime_scale: bool = False,
     use_simplex_boundary_edge_star_readout_runtime_scale: bool = False,
+    use_simplex_boundary_edge_star_residual_runtime_scale: bool = False,
     use_simplex_vertex_star_context_runtime_scale: bool = False,
     use_simplex_edge_star_context_runtime_scale: bool = False,
     use_simplex_pre_triangle_runtime_scale: bool = False,
@@ -1521,6 +1543,17 @@ def model_inputs_from_batch(
     ):
         inputs["simplex_boundary_edge_star_readout_scale_override"] = batch["target_feat"].new_tensor(
             float(boundary_edge_star_readout_scale)
+        )
+    boundary_edge_star_residual_scale = simplex_boundary_edge_star_residual_runtime_scale_at_step(
+        training_config,
+        step,
+    )
+    if (
+        use_simplex_boundary_edge_star_residual_runtime_scale
+        and boundary_edge_star_residual_scale is not None
+    ):
+        inputs["simplex_boundary_edge_star_residual_scale_override"] = batch["target_feat"].new_tensor(
+            float(boundary_edge_star_residual_scale)
         )
     vertex_star_context_scale = simplex_vertex_star_context_runtime_scale_at_step(training_config, step)
     if use_simplex_vertex_star_context_runtime_scale and vertex_star_context_scale is not None:
@@ -1729,6 +1762,7 @@ def train_step(
             use_simplex_boundary_readout_directionality_runtime_scale=True,
             use_simplex_boundary_hodge_readout_runtime_scale=True,
             use_simplex_boundary_edge_star_readout_runtime_scale=True,
+            use_simplex_boundary_edge_star_residual_runtime_scale=True,
             use_simplex_vertex_star_context_runtime_scale=True,
             use_simplex_edge_star_context_runtime_scale=True,
             use_simplex_pre_triangle_runtime_scale=True,
@@ -2077,6 +2111,7 @@ def fit(
                     use_simplex_boundary_readout_directionality_runtime_scale=True,
                     use_simplex_boundary_hodge_readout_runtime_scale=True,
                     use_simplex_boundary_edge_star_readout_runtime_scale=True,
+                    use_simplex_boundary_edge_star_residual_runtime_scale=True,
                     use_simplex_vertex_star_context_runtime_scale=True,
                     use_simplex_edge_star_context_runtime_scale=True,
                     use_simplex_pre_triangle_runtime_scale=True,
@@ -2532,6 +2567,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--simplex-boundary-edge-star-readout-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
+        "--simplex-boundary-edge-star-residual-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for edge-star residualizing the selected boundary-edge readout.",
+    )
+    parser.add_argument("--simplex-boundary-edge-star-residual-runtime-scale-final", type=float, default=None)
+    parser.add_argument(
+        "--simplex-boundary-edge-star-residual-runtime-scale-ramp-start-step",
+        type=int,
+        default=None,
+    )
+    parser.add_argument("--simplex-boundary-edge-star-residual-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-segment-cell-runtime-scale",
         type=float,
         default=None,
@@ -2893,6 +2941,16 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         ),
         simplex_boundary_edge_star_readout_runtime_scale_ramp_steps=(
             args.simplex_boundary_edge_star_readout_runtime_scale_ramp_steps
+        ),
+        simplex_boundary_edge_star_residual_runtime_scale=args.simplex_boundary_edge_star_residual_runtime_scale,
+        simplex_boundary_edge_star_residual_runtime_scale_final=(
+            args.simplex_boundary_edge_star_residual_runtime_scale_final
+        ),
+        simplex_boundary_edge_star_residual_runtime_scale_ramp_start_step=(
+            args.simplex_boundary_edge_star_residual_runtime_scale_ramp_start_step
+        ),
+        simplex_boundary_edge_star_residual_runtime_scale_ramp_steps=(
+            args.simplex_boundary_edge_star_residual_runtime_scale_ramp_steps
         ),
         simplex_vertex_star_context_runtime_scale=args.simplex_vertex_star_context_runtime_scale,
         simplex_vertex_star_context_runtime_scale_final=args.simplex_vertex_star_context_runtime_scale_final,
