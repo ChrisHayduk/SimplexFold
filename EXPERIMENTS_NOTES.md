@@ -7657,3 +7657,13 @@
   with the exact E140/E141 templates, run the eval-detail analyzer, then call
   `scripts/record_experiment_result.py` to update `EXPERIMENT_RESULTS.md`.
   Owned-pod scope and the 30-minute schedule are unchanged.
+- 2026-05-15T13:19Z Dry-ran the full returned-result handoff on the existing
+  local E128 artifact bundle without modifying tracked files. The artifact
+  verifier passed with `completed_steps=8500`, effective batch size `8`,
+  parameters `3,240,738 <= 3,261,974`, `1000` eval rows, history ending at
+  step `8500`, and `stopped_early=false`. The eval-detail analyzer reproduced
+  the known E128 diagnostics (`mean val_lddt_ca=0.4311`, length/global-assembly
+  failure, and high-boundary/low-global subset). The
+  `scripts/record_experiment_result.py` dry-run on a temporary copy of
+  `EXPERIMENT_RESULTS.md` preserved the E128 best-summary header and generated
+  the expected table row with C-alpha Rg intact.
