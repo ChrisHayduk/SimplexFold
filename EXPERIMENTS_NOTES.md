@@ -6788,3 +6788,12 @@
   effective batch size `8`, max parameters `3261974`, Hodge readout disabled,
   face-cyclic readout scale `0.5`, and damped simplex triangle-attention bias
   `0.0125`. No E138 result has returned yet.
+- 2026-05-15T06:06Z E138 startup health sample on owned pod
+  `c67fbk189vnvfp`: PID `24980` remained active with elapsed `00:05:05`,
+  process CPU time `01:01:58`, `%CPU=1217`, RSS about `1.9 GiB`, and
+  `194` threads. Remote artifacts contained `run_metadata.json` and
+  `history_full_msa_to_face.json`; history length was still `18`, ending at
+  inherited E128 step `8500` with `val_lddt_ca=0.4311057258844376`. No
+  `results.json`, `results.csv`, eval-details file, or checkpoint existed
+  yet, which is normal for the first few minutes of this 500-step resumed
+  gate. Leave E138 running under the heartbeat.
