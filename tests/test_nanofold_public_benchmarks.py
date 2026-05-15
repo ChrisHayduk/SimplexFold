@@ -95,6 +95,12 @@ def test_max_parameters_guard_is_accepted_and_enforced():
         )
 
 
+def test_num_workers_guardrail_is_accepted_by_cli_parser():
+    args = parse_args(["--num-workers", "4"])
+
+    assert args.num_workers == 4
+
+
 def test_run_status_payload_tracks_live_progress(tmp_path):
     payload = _run_status_payload(
         variant="full_msa_to_face",
@@ -104,6 +110,7 @@ def test_run_status_payload_tracks_live_progress(tmp_path):
         start_step=101,
         total_examples=1000,
         effective_batch_size=8,
+        num_workers=4,
         elapsed_seconds_total=12.5,
         history=[{"step": 100}, {"step": 125}],
         train_losses=[3.2, 3.0],
@@ -119,6 +126,7 @@ def test_run_status_payload_tracks_live_progress(tmp_path):
     assert payload["completed_step"] == 125
     assert payload["target_steps"] == 9000
     assert payload["effective_batch_size"] == 8
+    assert payload["num_workers"] == 4
     assert payload["last_history_step"] == 125
     assert payload["last_train_loss"] == 3.0
     assert payload["latest_checkpoint"].endswith("full_msa_to_face_latest.pt")

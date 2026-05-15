@@ -7417,3 +7417,14 @@
   `git diff --check`. A local CPU smoke for a representative
   `[1, 256, 48, 128] -> 32` fold matched the reference exactly and measured
   about `0.95 ms` vectorized versus `10.54 ms` for the prior loop.
+- 2026-05-15T11:36Z Added artifact-level auditability for the future
+  `--num-workers` throughput knob. The NanoFold benchmark runner now records
+  `num_workers` in live status JSON, final `results.json`/`results.csv`, and
+  `run_metadata.json`, so a returned E145-style gate can prove whether it used
+  the worker-count path. Focused validation passed:
+  `python -m pytest
+  tests/test_nanofold_public_benchmarks.py::test_num_workers_guardrail_is_accepted_by_cli_parser
+  tests/test_nanofold_public_benchmarks.py::test_run_status_payload_tracks_live_progress`
+  (`2 passed`), `python -m py_compile
+  scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py`,
+  and a `_write_csv` smoke showing the `num_workers` column.

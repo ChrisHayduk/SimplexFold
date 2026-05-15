@@ -7072,7 +7072,8 @@ edge-star context runtime `0.5`, damped triangle-attention bias `0.0125`, and
 no Hodge readout. Include a small DataLoader worker count such as
 `--num-workers 4` for future launches after a startup smoke; this should only
 change host-side throughput, not the model, loss, data split, or parameter
-budget.
+budget. New runner metadata/result/status artifacts record `num_workers`, so
+returned runs can be audited for this runtime knob.
 
 Decision rule: E145 should not receive a 30k spend unless a short gate clears
 `0.45` primary C-alpha lDDT and preserves coherent FoldScore, dRMSD, and
