@@ -7031,3 +7031,19 @@
   NanoFold checkout and E128 resume checkpoint were verified present. No
   Runpod experiment was launched from this checkout. At the same remote check,
   E138 PID `24980` remained active at elapsed `02:10:33`.
+- 2026-05-15T08:15Z E138 remained active and below cutoff on the same owned
+  pod: PID `24980` had elapsed `02:13:21`, GPU memory remained allocated at
+  about `43.1 GiB`, and the artifact directory still contained only
+  `run_metadata.json` plus inherited step-8500 history. No result bundle,
+  eval-details file, or checkpoint existed, so leave E138 running.
+- 2026-05-15T08:18Z E128 validation-detail diagnostic from the local
+  `eval_details_full_msa_to_face.csv`: over 1000 validation chains, C-alpha
+  lDDT correlates with predicted C-alpha Rg (`r=0.5958`), selected face
+  boundary lDDT (`r=0.5969`), and selected tetra boundary lDDT (`r=0.6270`),
+  while dRMSD correlation is weak (`r=-0.0693`). The bottom 100 chains average
+  `lddt_ca=0.3404`, Rg ratio `0.6919`, face/tetra boundary lDDT
+  `0.6859` / `0.6633`; the top 100 average `lddt_ca=0.6381`, Rg ratio
+  `0.8252`, and face/tetra boundary lDDT `0.8206` / `0.8115`. Interpretation:
+  the target is not purely impossible for this parameter budget on favorable
+  chains, but the branch still needs topology-to-global-assembly improvements
+  that raise the low tail and expansion, not a generic output-side lDDT hack.

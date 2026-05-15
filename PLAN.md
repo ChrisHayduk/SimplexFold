@@ -37,6 +37,15 @@ Next actions:
 4. Do not spend 30,000 steps on any branch until a short gate clears `0.45`,
    with FoldScore, dRMSD, and C-alpha Rg remaining coherent.
 
+E128 validation-detail audit: the top 100 chains by C-alpha lDDT average
+`0.6381`, so the current architecture can approach the target on favorable
+examples, but the lower tail is still collapsed. Across all 1000 validation
+chains, C-alpha lDDT correlates with predicted C-alpha radius (`r=0.5958`),
+selected face boundary lDDT (`r=0.5969`), and selected tetra boundary lDDT
+(`r=0.6270`). This supports the current topology-native queue: improve how
+high-quality local face/tetra cochains assemble global C-alpha geometry rather
+than adding an output-side metric shortcut.
+
 ## Current Plan: E138 No-Hodge Face-Cyclic Boundary Readout
 
 Current status after E130: the best returned validation C-alpha lDDT remains
