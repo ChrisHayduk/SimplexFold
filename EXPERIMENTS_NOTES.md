@@ -7600,3 +7600,10 @@
   with a regression test based on the E128-style metric names. Without this,
   a coherent returned result could have been verified correctly but still
   formatted with a blank Rg column in `EXPERIMENT_RESULTS.md`.
+- 2026-05-15T12:59Z Updated the heartbeat automation
+  `check-simplexfold-e57-runpod` in place. It still monitors only the owned
+  E140 pod `c67fbk189vnvfp` and E141 pod `5ox436mhzej7j4`, but now points the
+  returned-result handoff at the exact E140/E141 verifier templates in
+  `EXPERIMENTS.md`, the variant-aware row formatter, the E145 full launch and
+  verifier template, and latest pushed branch tip `9fe602a`. The schedule
+  remains `FREQ=MINUTELY;INTERVAL=30`.
