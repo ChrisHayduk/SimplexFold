@@ -7394,3 +7394,13 @@
   small DataLoader worker count, e.g. `--num-workers 4`, and verify the usual
   run metadata/status before letting it continue. This is a throughput knob,
   not an architecture/loss/data change.
+- 2026-05-15T11:26Z Added a focused dataloader regression test backing the
+  future `--num-workers` runtime knob:
+  `test_build_dataloader_worker_count_preserves_first_training_batch` compares
+  the first seeded training batch for `num_workers=0` and `num_workers=2`.
+  Validation passed: the new test alone (`1 passed`), the three nearby
+  dataloader feature tests (`3 passed`), `git diff --check`, and
+  `ruff check --select F821,F822,F823 tests/test_trainer.py`. Full-file ruff
+  still flags pre-existing import-order/unused-import/zip-style cleanup in
+  `tests/test_trainer.py`, so this change keeps the verification scoped to the
+  new guard and syntax/name errors.

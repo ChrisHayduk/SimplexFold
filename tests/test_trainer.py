@@ -2195,6 +2195,61 @@ def test_build_dataloader_can_fix_training_features(tmp_path):
     assert torch.equal(first["masked_msa_mask"], second["masked_msa_mask"])
 
 
+def test_build_dataloader_worker_count_preserves_first_training_batch(tmp_path):
+    feature_dir, label_dir = make_processed_cache_dirs(tmp_path)
+    data_config = DataConfig(
+        processed_features_dir=feature_dir,
+        processed_labels_dir=label_dir,
+        val_fraction=0.0,
+        crop_size=8,
+        msa_depth=3,
+        extra_msa_depth=2,
+        max_templates=1,
+        fixed_feature_seed=17,
+    )
+
+    single_worker_batch = next(
+        iter(
+            build_dataloader(
+                "all",
+                data_config,
+                training=True,
+                batch_size=1,
+                num_workers=0,
+                device="cpu",
+                seed=23,
+                n_cycles=2,
+            )
+        )
+    )
+    multi_worker_batch = next(
+        iter(
+            build_dataloader(
+                "all",
+                data_config,
+                training=True,
+                batch_size=1,
+                num_workers=2,
+                device="cpu",
+                seed=23,
+                n_cycles=2,
+            )
+        )
+    )
+
+    for key in (
+        "aatype",
+        "target_feat",
+        "msa_feat",
+        "extra_msa_feat",
+        "masked_msa_mask",
+        "masked_msa_target",
+        "true_atom_positions",
+        "true_atom_mask",
+    ):
+        assert torch.equal(single_worker_batch[key], multi_worker_batch[key])
+
+
 def test_build_dataloader_can_emit_recycling_feature_samples(tmp_path):
     feature_dir, label_dir = make_processed_cache_dirs(tmp_path)
     data_config = DataConfig(
