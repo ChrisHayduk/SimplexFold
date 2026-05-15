@@ -7643,3 +7643,11 @@
   tests/test_refresh_experiment_results_summary.py` (`4 passed`),
   `py_compile` on the helper/test, ruff `F821/F822/F823` on the helper/test,
   and `git diff --check`.
+- 2026-05-15T13:14Z Added `scripts/record_experiment_result.py`, a thin
+  post-verification wrapper that formats one returned artifact directory,
+  upserts the corresponding `EXPERIMENT_RESULTS.md` table row, and refreshes
+  the best-score summary header. This does not replace the artifact verifier
+  or eval-detail analyzer; it is the final recording step after those pass.
+  Focused validation passed: `python -m pytest
+  tests/test_record_experiment_result.py` (`2 passed`), `py_compile` on the
+  helper/test, ruff `F821/F822/F823` on the helper/test, and `git diff --check`.

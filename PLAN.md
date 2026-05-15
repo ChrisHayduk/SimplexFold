@@ -49,12 +49,11 @@ Next actions:
    `EXPERIMENT_RESULTS.md`, commit/push, then decide whether the returned
    score justifies a continuation or pivot. Use the exact E140/E141
    recipe-metadata verifier templates now recorded in `EXPERIMENTS.md`.
-   Generate the table row with `scripts/format_experiment_result_row.py` and
-   insert/replace it with `scripts/upsert_experiment_result_row.py`, then
-   refresh the summary header with
-   `scripts/refresh_experiment_results_summary.py`. Review the refreshed
-   `Last updated` and `Best validation C-alpha lDDT` text against the verified
-   metrics before committing. For future `--num-workers 4` launches, include
+   After verifier and eval-detail analysis pass, record the row/header update
+   with `scripts/record_experiment_result.py`, which composes the formatter,
+   row upsert, and summary-refresh helpers. Review the refreshed
+   `EXPERIMENT_RESULTS.md` text against the verified metrics before
+   committing. For future `--num-workers 4` launches, include
    `--expected-num-workers 4` in `scripts/verify_nanofold_benchmark_artifacts.py`
    verification.
 3. If E140/E141 remain below `0.45`, launch only a short E145 gate around the
