@@ -1085,6 +1085,29 @@ def edge_star_residual_boundary_readout(
     return pair_readout + pair_readout.new_tensor(scale) * edge_masked_delta
 
 
+def oriented_boundary_cochain_readout(
+    pair_readout: torch.Tensor,
+    pair_counts: torch.Tensor,
+    *,
+    pair_mask: torch.Tensor | None = None,
+    scale: float,
+) -> torch.Tensor:
+    """Blend a selected boundary 1-cochain toward its oriented difference."""
+
+    scale = min(max(float(scale), 0.0), 1.0)
+    if scale <= 0.0:
+        return pair_readout
+    edge_mask = (pair_counts > 0).to(pair_readout.dtype)
+    if pair_mask is not None:
+        edge_mask = edge_mask * pair_mask[..., None].to(pair_readout.dtype)
+
+    reverse_mask = edge_mask.transpose(1, 2)
+    reverse_readout = pair_readout.transpose(1, 2)
+    oriented = edge_mask * (pair_readout - reverse_mask * reverse_readout)
+    edge_masked_delta = edge_mask * (oriented - pair_readout)
+    return pair_readout + pair_readout.new_tensor(scale) * edge_masked_delta
+
+
 def boundary_incidence_weights(
     edge_indices: torch.Tensor,
     edge_mask: torch.Tensor,
@@ -1793,6 +1816,10 @@ class SimplicialAdapter(torch.nn.Module):
             max(float(getattr(config, "simplex_boundary_edge_star_residual_scale", 0.0)), 0.0),
             1.0,
         )
+        self.boundary_oriented_cochain_scale = min(
+            max(float(getattr(config, "simplex_boundary_oriented_cochain_scale", 0.0)), 0.0),
+            1.0,
+        )
         self.triangle_attention_bias_scale = float(
             getattr(config, "simplex_triangle_attention_bias_scale", 0.0)
         )
@@ -2004,6 +2031,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_boundary_hodge_readout_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_edge_star_readout_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_edge_star_residual_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_oriented_cochain_scale_override: Optional[torch.Tensor] = None,
         simplex_vertex_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
@@ -2075,6 +2103,15 @@ class SimplicialAdapter(torch.nn.Module):
             boundary_edge_star_residual_scale = min(
                 max(
                     float(simplex_boundary_edge_star_residual_scale_override.detach().float().cpu().item()),
+                    0.0,
+                ),
+                1.0,
+            )
+        boundary_oriented_cochain_scale = self.boundary_oriented_cochain_scale
+        if simplex_boundary_oriented_cochain_scale_override is not None:
+            boundary_oriented_cochain_scale = min(
+                max(
+                    float(simplex_boundary_oriented_cochain_scale_override.detach().float().cpu().item()),
                     0.0,
                 ),
                 1.0,
@@ -2616,6 +2653,12 @@ class SimplicialAdapter(torch.nn.Module):
             directionality = pair_readout.new_tensor(boundary_readout_directionality)
             pair_readout = (1.0 - directionality) * pair_readout + directionality * directed_pair_readout
             pair_counts = (1.0 - directionality) * pair_counts + directionality * directed_pair_counts
+        pair_readout = oriented_boundary_cochain_readout(
+            pair_readout,
+            pair_counts,
+            pair_mask=pair_mask,
+            scale=boundary_oriented_cochain_scale,
+        )
         pair_readout = hodge_center_boundary_readout(
             pair_readout,
             pair_counts,

@@ -78,6 +78,17 @@ returns and is documented; the candidate should only run if E130 confirms that
 boundary cochain stabilization is promising but still under-assembles the
 global backbone.
 
+Additional parked candidate while E130 runs: E136 oriented boundary-cochain
+readout. E124/E128 already suggest that preserving boundary-edge orientation
+matters, but the selected face/tetra readout still mixes common-mode reverse
+edge content before updating `Z_ij`. E136 treats the selected boundary message
+as an oriented 1-cochain: for selected edges that also have a selected reverse
+edge, it blends the readout toward `cochain(i,j) - cochain(j,i)`, while
+leaving one-way selected directed edges intact. This is a topology-native
+boundary/cochain operation, not a metric loss or output-side lDDT hack. Use it
+only after E130 returns and is documented; require an improvement over E128
+and any returned E130-family result before considering further continuation.
+
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
 E118 residue vertex-star route with a half-strength boundary-edge-star

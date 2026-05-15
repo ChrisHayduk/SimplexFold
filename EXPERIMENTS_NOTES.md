@@ -6636,3 +6636,32 @@
   eval-details file, or checkpoint existed. Interpretation: active but not
   returned; leave the run undisturbed and keep `EXPERIMENT_RESULTS.md`
   unchanged.
+- 2026-05-15T04:44Z E130 refresh on owned pod `c67fbk189vnvfp`: PID `4224`
+  remained active with elapsed `01:44:54`, `%CPU=1246`, RSS about `1.8 GiB`,
+  and the expected E130 command line. Remote artifacts still contained only
+  `history_full_msa_to_face.json` and `run_metadata.json`; the log still
+  showed launch/startup lines only. No `results.json`, `results.csv`,
+  eval-details file, or step-9000 checkpoint existed, so no result was pulled
+  and `EXPERIMENT_RESULTS.md` remains unchanged.
+- 2026-05-15T04:45Z Prepared E136 local candidate while E130 runs; no Runpod
+  launch. E136 adds `simplex_boundary_oriented_cochain_scale` plus runtime
+  scheduling so the selected face/tetra boundary readout can be blended toward
+  an oriented 1-cochain difference before Hodge/readout stabilization and
+  before updating `Z_ij`. This is a topology-native boundary-cochain change:
+  it subtracts reverse selected-edge content when both directions exist while
+  preserving one-way selected directed edges. It adds no output-side lDDT,
+  radius, all-pairs distance, or coordinate loss. Local validation passed:
+  py_compile for `simplex.py`, `evoformer.py`, `model.py`, `trainer.py`, and
+  the NanoFold runner; nine focused pytest checks covering the oriented
+  cochain helper, adapter effect, runtime signatures, trainer parser/input
+  plumbing, parameter audit, benchmark parser, and benchmark validation-time
+  override path; the broader
+  `tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  slice (`225 passed`); focused ruff undefined-name/syntax-risk checks; and
+  `git diff --check`.
+- 2026-05-15T04:50Z E130 remained active on owned pod `c67fbk189vnvfp` after
+  E136 validation: PID `4224` had elapsed `01:50:47`, `%CPU=1246`, RSS about
+  `1.8 GiB`, and the remote artifact directory still contained only
+  `history_full_msa_to_face.json` and `run_metadata.json`. No result bundle,
+  eval-details file, or checkpoint existed, so `EXPERIMENT_RESULTS.md` remains
+  unchanged and E130 should continue under the heartbeat.

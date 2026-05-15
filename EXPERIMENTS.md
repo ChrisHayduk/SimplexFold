@@ -5960,3 +5960,70 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `223 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - `git diff --check`: passed
+
+### E136: Oriented Boundary-Cochain Readout
+
+Status: implemented locally as a parked boundary-cochain fallback while E130
+runs; not launched on Runpod.
+
+Hypothesis: E124/E128 suggest that the selected face boundary-edge-frame gate
+helps because it preserves oriented boundary information from explicit
+2-simplices before the AF2 pair trunk globalizes it. E130/E134 then test how
+to normalize or decompose the selected boundary 1-cochain. A remaining failure
+mode is common-mode reverse-edge contamination: messages on `(i, j)` and
+`(j, i)` can reinforce symmetric local magnitude while losing the directed
+incidence signal that a boundary operator should carry.
+
+Mechanism: add `simplex_boundary_oriented_cochain_scale`, a parameter-neutral
+readout transform on the selected boundary 1-skeleton. After selected
+face/tetra cochains scatter to boundary edges, but before Hodge centering or
+edge-star readout, the adapter blends each selected directed edge toward the
+oriented 1-cochain difference `cochain(i,j) - cochain(j,i)` when the reverse
+edge is also selected. One-way selected directed edges are preserved rather
+than cancelled. This is a simplicial/topological architecture change: it
+acts on the boundary cochain induced by explicit face/tetra cells and changes
+how that cochain writes into `Z_ij`. It adds no C-alpha lDDT, radius, all-pairs
+distance, or coordinate loss.
+
+Candidate launch only after E130 returns and is verified. A conservative
+ramped gate from the E128/E130-family checkpoint keeps the E128 selected
+complex recipe fixed and adds:
+
+```bash
+--run-name e136_ramped_oriented_boundary_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-boundary-hodge-readout-scale 0.25 \
+--simplex-boundary-oriented-cochain-scale 0.25 \
+--simplex-boundary-oriented-cochain-runtime-scale 0.0 \
+--simplex-boundary-oriented-cochain-runtime-scale-final 0.25 \
+--simplex-boundary-oriented-cochain-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-oriented-cochain-runtime-scale-ramp-steps 500
+```
+
+Keep the rest of the E128/E130 recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, directed boundary readout `0.25`, edge-frame message
+runtime scale `0.0125`, global context `0.1`, vertex-star context `1.0`, and
+edge-star runtime `0.5`. Do not include E129's triangle-attention value
+residual unless a returned ramped boundary-cochain result first improves
+primary C-alpha lDDT.
+
+Parameter audit: no new trainable modules. The E128-family architecture should
+remain at `3,240,738 <= 3,261,974`; verify with the local parameter regression
+before launch.
+
+Decision rule: reject unless E136 beats E128 and any returned E130-family
+result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
+coherent. It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py::test_oriented_boundary_cochain_readout_subtracts_reverse_edges tests/test_simplex.py::test_simplicial_adapter_oriented_cochain_changes_boundary_pair_update tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_hodge_readout_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`
+- `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `225 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `git diff --check`: passed

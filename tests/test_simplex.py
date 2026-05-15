@@ -24,6 +24,7 @@ from minalphafold.simplex import (
     face_tetra_coboundary_delta,
     face_geometry_features,
     hodge_center_boundary_readout,
+    oriented_boundary_cochain_readout,
     scatter_directed_edges_to_residue,
     segment_cell_indices,
     segment_geometry_features,
@@ -102,6 +103,7 @@ class SimplexConfig:
     simplex_boundary_hodge_readout_scale = 0.0
     simplex_boundary_edge_star_readout_scale = 0.0
     simplex_boundary_edge_star_residual_scale = 0.0
+    simplex_boundary_oriented_cochain_scale = 0.0
     simplex_global_context_scale = 0.0
     simplex_vertex_star_context_scale = 0.0
     simplex_edge_star_context_scale = 0.0
@@ -1982,6 +1984,28 @@ def test_edge_star_residual_boundary_readout_keeps_deviation_from_star_mean():
     assert torch.isclose(half_residual[0, 0, 2, 0], torch.tensor(5.25))
 
 
+def test_oriented_boundary_cochain_readout_subtracts_reverse_edges():
+    pair_readout = torch.zeros(1, 3, 3, 1)
+    pair_readout[0, 0, 1, 0] = 5.0
+    pair_readout[0, 1, 0, 0] = 2.0
+    pair_readout[0, 0, 2, 0] = 7.0
+    pair_counts = torch.zeros(1, 3, 3, 1)
+    pair_counts[0, 0, 1, 0] = 1.0
+    pair_counts[0, 1, 0, 0] = 1.0
+    pair_counts[0, 0, 2, 0] = 1.0
+
+    oriented = oriented_boundary_cochain_readout(pair_readout, pair_counts, scale=1.0)
+
+    assert torch.isclose(oriented[0, 0, 1, 0], torch.tensor(3.0))
+    assert torch.isclose(oriented[0, 1, 0, 0], torch.tensor(-3.0))
+    assert torch.isclose(oriented[0, 0, 2, 0], torch.tensor(7.0))
+    assert torch.isclose(oriented[0, 2, 0, 0], torch.tensor(0.0))
+    half_oriented = oriented_boundary_cochain_readout(pair_readout, pair_counts, scale=0.5)
+    assert torch.isclose(half_oriented[0, 0, 1, 0], torch.tensor(4.0))
+    assert torch.isclose(half_oriented[0, 1, 0, 0], torch.tensor(-0.5))
+    assert torch.isclose(half_oriented[0, 0, 2, 0], torch.tensor(7.0))
+
+
 def test_simplicial_adapter_hodge_centers_boundary_pair_update():
     class BaseHodgeConfig(SimplexConfig):
         simplex_neighbor_k = 4
@@ -2076,6 +2100,41 @@ def test_simplicial_adapter_edge_star_residual_changes_boundary_pair_update():
     assert not torch.allclose(pair_residual, pair_base)
     assert torch.allclose(pair_override, pair_residual)
     assert pair_residual.shape == pair_base.shape
+
+
+def test_simplicial_adapter_oriented_cochain_changes_boundary_pair_update():
+    class BaseOrientedConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_boundary_readout_directionality = 0.25
+
+    class OrientedConfig(BaseOrientedConfig):
+        simplex_boundary_oriented_cochain_scale = 0.5
+
+    torch.manual_seed(88)
+    pair = torch.randn(1, 6, 6, OrientedConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 6, OrientedConfig.c_s)
+    base = SimplicialAdapter(BaseOrientedConfig()).eval()
+    oriented = SimplicialAdapter(OrientedConfig()).eval()
+    oriented.load_state_dict(base.state_dict())
+
+    with torch.no_grad():
+        pair_base, single_base, _ = base(pair, single)
+        pair_oriented, single_oriented, _ = oriented(pair, single)
+        pair_override, single_override, _ = base(
+            pair,
+            single,
+            simplex_boundary_oriented_cochain_scale_override=pair.new_tensor(0.5),
+        )
+
+    assert not torch.allclose(pair_oriented, pair_base)
+    assert torch.allclose(pair_override, pair_oriented)
+    assert torch.allclose(single_override, single_oriented)
+    assert pair_oriented.shape == pair_base.shape
+    assert single_oriented.shape == single_base.shape
 
 
 def test_simplex_boundary_metric_recycling_bins_scatter_selected_boundary_edges():
