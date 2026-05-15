@@ -7212,3 +7212,10 @@
   ends at inherited E128 step `8500` until the next step-9000 evaluation; no
   `results.json` exists yet. GPU memory was about `19.7 GiB`. Leave E140
   running.
+- 2026-05-15T10:07Z Evaluated whether to launch a parallel E141 short gate
+  while E140 continues. The prepared workspace is small (`32M` NanoFold,
+  `100M` base SimplexFold, `105M` E141 checkout), so a second pod would be
+  practical. Runpod capacity attempts for a same-image A100-SXM4-80GB secure
+  pod and an RTX 5090 pod both failed with no deployable capacity/resources.
+  No new pod was created. Keep only owned pod `c67fbk189vnvfp` running E140 and
+  retry parallel capacity later only if useful.
