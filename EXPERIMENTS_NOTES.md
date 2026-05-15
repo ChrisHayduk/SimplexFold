@@ -7346,3 +7346,20 @@
   assembly/Rg-collapse gap, but no branch should receive a 30k confirmation
   spend unless a short gate first clears about `0.45` C-alpha lDDT with
   coherent FoldScore, dRMSD, and C-alpha radius.
+- 2026-05-15T11:08Z Re-audited the returned E128 eval-detail CSV while
+  E140/E141 continue. The failure is strongly length/global-assembly shaped,
+  not simply a missing local simplex metric. Mean C-alpha lDDT by length bin:
+  `<80`: `0.5096`, `80-119`: `0.4546`, `120-159`: `0.4171`,
+  `160-219`: `0.3979`, `>=220`: `0.3919`. The corresponding mean selected
+  boundary lDDT stays nearly flat around `0.744-0.753`, while mean predicted
+  C-alpha Rg ratio drops from `0.9126` for `<80` residues to `0.6229` for
+  `>=220` residues. Across all 1000 chains, primary lDDT correlates with mean
+  selected boundary lDDT (`r=0.6128`) and predicted C-alpha Rg (`r=0.5958`),
+  but only weakly with Rg ratio (`r=0.2133`) and not meaningfully with dRMSD
+  (`r=-0.0693`). The top 100 chains average length `82.9`, boundary lDDT
+  `0.8160`, and lDDT `0.6381`; the bottom 100 average length `176.6`,
+  boundary lDDT `0.6746`, and lDDT `0.3404`. There are also 75 chains with
+  high selected-boundary lDDT (`>=0.75`) but low global lDDT (`<0.4`), so a
+  local-boundary-only objective is unlikely to solve the gap by itself. This
+  supports prioritizing E140/E145-style selected-complex realization and
+  outer-neighborhood communication over generic C-alpha lDDT/Rg losses.

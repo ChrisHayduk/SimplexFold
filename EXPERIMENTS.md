@@ -7029,6 +7029,15 @@ through external incidence neighborhoods into the selected 2- and 3-cells. It
 is not an lDDT/radius loss and does not use hidden labels or external
 structure information.
 
+Additional E128 eval-detail audit supports this exact failure target. C-alpha
+lDDT falls sharply with chain length (`0.5096` for `<80` residues to `0.3919`
+for `>=220` residues), while selected boundary lDDT remains nearly flat across
+those same bins. The model can learn local selected face/tetra boundary
+geometry, but the longer-chain global assembly and expansion remain weak. E145
+therefore tests whether higher-rank cells need external directed-edge
+neighborhoods before their boundary information is written back into the pair
+trunk.
+
 Implementation: E145 adds `simplex_outer_edge_residual_context_scale`, a
 parameter-free outer-neighborhood path. For each selected face/tetra cell it
 pools directed external pair edges with `cell_outer_edge_context`, splits them
