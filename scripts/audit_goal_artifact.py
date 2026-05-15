@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.verify_nanofold_benchmark_artifacts import verify_artifacts
+from scripts.verify_nanofold_benchmark_artifacts import parse_metadata_expectation, verify_artifacts
 
 
 @dataclass(frozen=True)
@@ -45,6 +45,7 @@ def audit_goal_artifact(
     expected_history_last_step: int | None = None,
     expect_stopped_early: bool | None = None,
     require_checkpoint: bool = True,
+    metadata_expectations: list[tuple[str, Any]] | None = None,
 ) -> GoalArtifactAudit:
     verified = verify_artifacts(
         run_dir,
@@ -58,6 +59,7 @@ def audit_goal_artifact(
         expected_eval_rows=expected_eval_rows,
         expected_history_last_step=expected_history_last_step,
         require_checkpoint=require_checkpoint,
+        metadata_expectations=metadata_expectations,
     )
     target_pass = float(verified["val_lddt_ca"]) > float(target)
     confirmation_step_pass = int(verified["completed_steps"]) >= int(confirmation_steps)
@@ -126,6 +128,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--expected-eval-rows", type=int)
     parser.add_argument("--expected-history-last-step", type=int)
     parser.add_argument("--expect-stopped-early", choices=("true", "false"))
+    parser.add_argument("--metadata", action="append", default=[], help="Require a run_metadata.json KEY=VALUE pair.")
     parser.add_argument("--allow-missing-checkpoint", action="store_true")
     parser.add_argument("--json", action="store_true")
     return parser.parse_args(argv)
@@ -150,6 +153,7 @@ def main(argv: list[str] | None = None) -> GoalArtifactAudit:
         expected_history_last_step=args.expected_history_last_step,
         expect_stopped_early=stopped_early,
         require_checkpoint=not args.allow_missing_checkpoint,
+        metadata_expectations=[parse_metadata_expectation(raw) for raw in args.metadata],
     )
     if args.json:
         print(json.dumps(_audit_as_dict(audit), indent=2, sort_keys=True))

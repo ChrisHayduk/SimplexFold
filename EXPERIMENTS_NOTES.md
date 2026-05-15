@@ -101,6 +101,29 @@
   scripts/verify_nanofold_benchmark_artifacts.py
   tests/test_verify_nanofold_benchmark_artifacts.py`,
   the E128 artifact-audit dry run, and `git diff --check`.
+- Extended the artifact goal audit with the same `--metadata KEY=VALUE`
+  expectations used by `scripts/verify_nanofold_benchmark_artifacts.py`, via
+  the public `parse_metadata_expectation` helper. This lets a future returned
+  candidate be checked for score/steps/parameter cap and for exact
+  topology-recipe metadata in one artifact-level audit command.
+- Metadata dry-run behavior is intentionally strict. Asking E128 to prove the
+  absent key `simplex_outer_edge_residual_context_scale=null` failed with
+  `Missing metadata key`, while checking present E128 metadata
+  (`run_name`, `model_config`, `simplex_face_top_k`, `simplex_tetra_top_k`,
+  and `simplex_triangle_attention_bias_scale`) passed artifact verification
+  and still failed the goal gates for the right reasons:
+  `val_lddt_ca=0.4311 < 0.7` and `8500 < 30000` steps.
+- Focused validation passed after the metadata-threading change:
+  `python -m pytest tests/test_audit_goal_artifact.py
+  tests/test_verify_nanofold_benchmark_artifacts.py` (`18 passed`),
+  `python -m py_compile scripts/audit_goal_artifact.py
+  tests/test_audit_goal_artifact.py scripts/verify_nanofold_benchmark_artifacts.py
+  tests/test_verify_nanofold_benchmark_artifacts.py`,
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/audit_goal_artifact.py tests/test_audit_goal_artifact.py
+  scripts/verify_nanofold_benchmark_artifacts.py
+  tests/test_verify_nanofold_benchmark_artifacts.py`, the E128 metadata audit
+  dry run, and `git diff --check`.
 
 ## 2026-05-15 Owned Runpod Heartbeat
 

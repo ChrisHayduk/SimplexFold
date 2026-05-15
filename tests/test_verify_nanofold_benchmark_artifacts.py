@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from scripts.verify_nanofold_benchmark_artifacts import main, verify_artifacts
+from scripts.verify_nanofold_benchmark_artifacts import main, parse_metadata_expectation, verify_artifacts
 
 
 def _write_run(run_dir, *, eval_rows=3, metadata=None, result=None):
@@ -162,3 +162,9 @@ def test_main_accepts_null_metadata_expectation(tmp_path, capsys):
 
     assert summary["run_dir"] == str(run_dir.resolve())
     assert json.loads(output)["run_dir"] == str(run_dir.resolve())
+
+
+def test_parse_metadata_expectation_is_public_for_wrappers():
+    assert parse_metadata_expectation("flag=true") == ("flag", True)
+    assert parse_metadata_expectation("disabled=null") == ("disabled", None)
+    assert parse_metadata_expectation("scale=0.25") == ("scale", 0.25)

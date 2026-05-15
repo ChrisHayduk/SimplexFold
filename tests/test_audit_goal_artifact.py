@@ -39,6 +39,9 @@ def _write_run(run_dir, *, completed_steps=30_000, val_lddt_ca=0.705, parameters
     metadata = {
         "effective_batch_size": 8,
         "num_workers": 4,
+        "run_name": "test_goal_artifact",
+        "simplex_outer_edge_residual_context_scale": 0.25,
+        "disabled_gate": None,
     }
     (run_dir / "run_metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
     status = {
@@ -109,6 +112,35 @@ def test_goal_artifact_audit_uses_verifier_parameter_cap(tmp_path):
         audit_goal_artifact(run_dir, max_parameters=3_261_974)
 
 
+def test_goal_artifact_audit_accepts_metadata_expectations(tmp_path):
+    run_dir = tmp_path / "run"
+    _write_run(run_dir)
+
+    audit = audit_goal_artifact(
+        run_dir,
+        max_parameters=3_261_974,
+        metadata_expectations=[
+            ("run_name", "test_goal_artifact"),
+            ("simplex_outer_edge_residual_context_scale", 0.25),
+            ("disabled_gate", None),
+        ],
+    )
+
+    assert audit.goal_ready is True
+
+
+def test_goal_artifact_audit_rejects_metadata_mismatch(tmp_path):
+    run_dir = tmp_path / "run"
+    _write_run(run_dir)
+
+    with pytest.raises(ValueError, match="metadata run_name"):
+        audit_goal_artifact(
+            run_dir,
+            max_parameters=3_261_974,
+            metadata_expectations=[("run_name", "wrong")],
+        )
+
+
 def test_format_goal_audit_mentions_all_completion_gates(tmp_path):
     run_dir = tmp_path / "run"
     _write_run(run_dir, completed_steps=9000, val_lddt_ca=0.71)
@@ -122,11 +154,24 @@ def test_format_goal_audit_mentions_all_completion_gates(tmp_path):
     assert "Goal-ready candidate: FAIL" in text
 
 
-def test_main_can_emit_json(tmp_path, capsys):
+def test_main_accepts_metadata_and_can_emit_json(tmp_path, capsys):
     run_dir = tmp_path / "run"
     _write_run(run_dir)
 
-    audit = main([str(run_dir), "--max-parameters", "3261974", "--expected-eval-rows", "1", "--json"])
+    audit = main(
+        [
+            str(run_dir),
+            "--max-parameters",
+            "3261974",
+            "--expected-eval-rows",
+            "1",
+            "--metadata",
+            "run_name=test_goal_artifact",
+            "--metadata",
+            "disabled_gate=null",
+            "--json",
+        ]
+    )
     output = json.loads(capsys.readouterr().out)
 
     assert audit.goal_ready is True

@@ -75,7 +75,7 @@ def _parse_expected_value(raw: str) -> Any:
         return raw
 
 
-def _parse_metadata_expectation(raw: str) -> tuple[str, Any]:
+def parse_metadata_expectation(raw: str) -> tuple[str, Any]:
     if "=" not in raw:
         raise ValueError(f"Metadata expectation must be KEY=VALUE, got {raw!r}")
     key, value = raw.split("=", 1)
@@ -260,7 +260,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         expected_eval_rows=args.expected_eval_rows,
         expected_history_last_step=args.expected_history_last_step,
         require_checkpoint=not args.allow_missing_checkpoint,
-        metadata_expectations=[_parse_metadata_expectation(raw) for raw in args.metadata],
+        metadata_expectations=[parse_metadata_expectation(raw) for raw in args.metadata],
     )
     print(json.dumps(summary, indent=2, sort_keys=True))
     return summary
