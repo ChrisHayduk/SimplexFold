@@ -6458,3 +6458,14 @@
   parameter audit remained `3,240,738 <= 3,261,974`. Leave E130 running until
   a coherent step-9000 result bundle appears, then pull, locally verify,
   update `EXPERIMENT_RESULTS.md`, commit/push, and stop only this owned pod.
+- 2026-05-15T03:04Z-03:05Z E130 health check on owned pod `c67fbk189vnvfp`:
+  PID `4224` stayed active about 5 minutes after launch, process CPU time
+  advanced from `00:48:35` to `01:01:20` over one wall-clock minute, CPU
+  utilization stayed around `1192%`-`1207%`, `/proc/4224/io` read counters
+  advanced (`rchar` `84688609` -> `85452340`, `syscr` `5621` -> `5735`), and
+  A100 memory stayed allocated around `17885`-`19131 MiB`. Artifacts still
+  contain only `run_metadata.json` and inherited `history_full_msa_to_face.json`
+  ending at E128 step `8500`; no `results.json`, eval details, or checkpoint
+  have returned yet. Interpretation: active early compute, not a coherent
+  result bundle. Keep monitoring and do not update `EXPERIMENT_RESULTS.md`
+  until the step-9000 bundle exists and verifies.

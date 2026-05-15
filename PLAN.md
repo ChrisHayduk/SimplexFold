@@ -42,9 +42,10 @@ change, not a generic C-alpha lDDT loss: it removes vertex-star offset
 components from the selected boundary 1-skeleton so the structure trunk sees a
 more globally reconciled edge cochain. It adds no parameters.
 
-Prepared short gate, if/when a new Runpod run is explicitly requested:
-resume E128, keep the E128 recipe fixed, disable E129's value residual, and
-add `--simplex-boundary-hodge-readout-scale 0.25`:
+Active short gate: E130 is running on owned Runpod pod `c67fbk189vnvfp` as
+`e130_hodge_boundary_readout_from_e128_s9000_c256_m64`. It resumes E128,
+keeps the E128 recipe fixed, disables E129's value residual, and adds
+`--simplex-boundary-hodge-readout-scale 0.25`:
 
 ```text
 selected F_ijk / U_ijkl
@@ -58,6 +59,13 @@ selected F_ijk / U_ijkl
 Gate rule: reject unless E130 beats E128's `0.4311` primary C-alpha lDDT and
 keeps FoldScore/dRMSD/Rg coherent. Do not consider a 30,000-step spend until
 the branch clearly breaks above `0.45` in a short gate.
+
+Current Runpod status: startup and early health checks passed. The runner saw
+`train=10000`, `val=1000`, resumed the E128 checkpoint at `step=8500` and
+`examples=68000`, loaded `1332` matching model tensors, initialized `0`
+new/missing tensors, and started a fresh optimizer. The process is active and
+has not yet produced a returned result bundle, so `EXPERIMENT_RESULTS.md`
+must remain unchanged until remote coherence and local verification pass.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best

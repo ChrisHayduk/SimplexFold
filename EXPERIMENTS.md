@@ -5606,7 +5606,8 @@ stabilization or assembly mechanism.
 
 ### E130: Hodge-Centered Boundary Readout
 
-Status: implemented locally as a prepared short-gate candidate; not launched.
+Status: running as a short gate on owned Runpod pod `c67fbk189vnvfp` as
+`e130_hodge_boundary_readout_from_e128_s9000_c256_m64`.
 
 Hypothesis: E128/E129 show that explicit face/tetra states can learn strong
 local selected-boundary geometry, but the pair trunk still under-assembles the
@@ -5627,7 +5628,7 @@ projected away from vertex-star offset components before global structure
 readout. It does not add an output-side lDDT, radius, or all-pairs coordinate
 loss.
 
-Candidate launch, only after an explicit Runpod go-ahead:
+Active launch recipe:
 
 ```bash
 --run-name e130_hodge_boundary_readout_from_e128_s9000_c256_m64 \
@@ -5652,6 +5653,15 @@ Parameter audit: unchanged from E128, `3,240,738 <= 3,261,974`.
 Decision rule: reject unless E130 beats E128's `0.4311` primary C-alpha lDDT
 and keeps FoldScore, dRMSD, and C-alpha Rg coherent. It still needs to clear
 `0.45` before any longer-run consideration.
+
+Runpod launch status: startup verification passed. E130 resumed the E128
+checkpoint at `step=8500` / `examples=68000`, loaded `1332` matching model
+tensors, initialized `0` new/missing tensors, and started a fresh optimizer.
+An early health check showed the process active with advancing CPU and read
+counters plus A100 memory allocation around `18`-`19` GiB. No `results.json`,
+`results.csv`, eval-details file, or step-9000 checkpoint has returned yet;
+keep this experiment out of `EXPERIMENT_RESULTS.md` until remote coherence and
+local verification pass.
 
 Validation so far:
 
