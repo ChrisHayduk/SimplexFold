@@ -1,12 +1,16 @@
-## 2026-05-15 Operating Plan Update: E140/E141 Active, PDF-Informed Queue
+## 2026-05-15 Operating Plan Update: E140 Failed, E141 Active
 
 Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,
 well below the `0.7` goal and below the `0.45` short-gate threshold for a
-credible 30k-step spend. E140 and E141 are both active on owned Runpod pods
-and remain pre-eval: their histories still correctly end at inherited E128
-step `8500`, with no result or eval-detail bundle yet. Do not update
-`EXPERIMENT_RESULTS.md` for them until a scored result or explicit stopped-run
-outcome returns.
+credible 30k-step spend. E140 has now failed pre-eval on owned Runpod pod
+`c67fbk189vnvfp`: the trace was preserved locally and the pod was stopped
+afterward, but it produced no
+`results.json`, eval-detail CSV, result CSV, checkpoint, or new history row.
+The log ends with `OSError: [Errno 5] Input/output error` while writing
+`status_full_msa_to_face.json`, so treat E140 as an infrastructure failure
+with no scored architectural evidence. E141 remains active on owned Runpod pod
+`5ox436mhzej7j4`; its history still correctly ends at inherited E128 step
+`8500`, with no result or eval-detail bundle yet.
 
 The two user-provided PDFs are saved for later reference:
 
@@ -25,10 +29,10 @@ external directed edges without echoing messages only inside the same cell.
 It also warns that superficial higher-rank features without dedicated update
 mechanisms can be counterproductive.
 
-Near-term implication: E140/E141 should finish first because they are already
-running and directly probe selected-complex realization and signed oriented
-boundary incidence. The next parked idea, if both fail to clear the short-gate
-threshold, is now staged as E145: a Topotein-style outer-neighborhood
+Near-term implication: E141 should finish before launching another branch
+because it is already running and directly probes signed oriented boundary
+incidence. The next parked idea, if E141 fails to clear the short-gate
+threshold, remains E145: a Topotein-style outer-neighborhood
 transport probe. The clean version is not a generic metric loss; it is a
 topological architecture question: selected face/tetra cochains should update
 through directed residue-to-external-edge neighborhoods before their boundary
@@ -43,9 +47,10 @@ new outer-neighborhood cochain update.
 
 Next actions:
 
-1. Keep monitoring only the owned E140 pod `c67fbk189vnvfp` and E141 pod
-   `5ox436mhzej7j4` through their `status_full_msa_to_face.json` heartbeats.
-2. When either returns, verify and pull artifacts, update
+1. Keep monitoring only the owned E141 pod `5ox436mhzej7j4` through its
+   `status_full_msa_to_face.json` heartbeat. E140 has no live Python process
+   and no scored result.
+2. When E141 returns, verify and pull artifacts, update
    `EXPERIMENT_RESULTS.md`, commit/push, then decide whether the returned
    score justifies a continuation or pivot. Use the exact E140/E141
    recipe-metadata verifier templates now recorded in `EXPERIMENTS.md`.
@@ -56,10 +61,10 @@ Next actions:
    committing. For future `--num-workers 4` launches, include
    `--expected-num-workers 4` in `scripts/verify_nanofold_benchmark_artifacts.py`
    verification.
-3. If E140/E141 remain below `0.45`, launch only a short E145 gate around the
-   ramped parameter-free outer-neighborhood selected-cell transport; avoid
-   spending 30,000 steps unless a short gate clears `0.45` with coherent
-   FoldScore, dRMSD, and C-alpha Rg. Use the full E145 launch and verifier
+3. If E141 remains below `0.45` or fails coherently, launch only a short E145
+   gate around the ramped parameter-free outer-neighborhood selected-cell
+   transport; avoid spending 30,000 steps unless a short gate clears `0.45`
+   with coherent FoldScore, dRMSD, and C-alpha Rg. Use the full E145 launch and verifier
    templates now recorded in `EXPERIMENTS.md`, including `--num-workers 4`
    and returned-artifact `--expected-num-workers 4`.
 4. For the next launched short gate, run a startup smoke with a small

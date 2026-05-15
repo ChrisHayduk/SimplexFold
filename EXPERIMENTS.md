@@ -6345,10 +6345,10 @@ operator with Hodge disabled. On the branch tip after documenting E139:
 
 ### E140: Selected-Boundary Realization Anti-Collapse
 
-Status: launched on the owned Runpod pod after E139 was documented as stopped
-pre-eval. E140 is the active gate as
+Status: failed pre-eval on the owned Runpod pod after E139 was documented as
+stopped pre-eval. E140 ran as
 `e140_selected_boundary_expansion_from_e128_s9000_c256_m64` from the staged
-`/workspace/SimplexFold_e140` checkout.
+`/workspace/SimplexFold_e140` checkout, but produced no new scored result.
 
 Hypothesis: the current best E128 branch shows a useful but incomplete
 local-to-global split. The selected higher-order complex is learning local
@@ -6452,10 +6452,11 @@ edge-star runtime `0.5`. Do not combine with E138/E139 orientation readouts
 unless one of those returned results specifically shows that orientation helps
 primary lDDT but worsens contraction.
 
-Decision rule: reject unless E140 beats E128 and any returned E138/E139 result
-on primary C-alpha lDDT while also improving the collapsed-global diagnostics:
-predicted C-alpha Rg should move toward true Rg without worsening dRMSD or
-FoldScore. It must still clear `0.45` before any 30k-step consideration.
+Terminal decision: no architectural conclusion. E140 failed before any new
+validation row, result bundle, eval details, or checkpoint were written. Do
+not continue or reject the selected-boundary expansion idea from this failed
+run alone; wait for E141, then use E145 as the next short topology-native gate
+if E141 stays below the `0.45` short-gate threshold or fails coherently.
 
 Validation status: E140 uses existing loss/parser plumbing and adds no model
 parameters beyond the already-audited E128-style topology architecture. Local
@@ -6483,6 +6484,14 @@ checks after documenting the parked recipe:
   settings, parameter cap, default `num_workers=0`, selected-boundary
   coordinate-expansion weights, coordinate-expansion tolerance, and absence of
   signed face-cyclic readout for the active E140 gate.
+- Terminal trace at `2026-05-15T13:56Z`: the E140 Python process exited with
+  no result bundle, eval details, result CSV, checkpoint, or new history row.
+  The pulled log ends with `OSError: [Errno 5] Input/output error` inside
+  `write_run_status` while writing `status_full_msa_to_face.json`; the pulled
+  status file is empty. Preserve the pulled trace locally, but do not run the
+  returned-artifact verifier because the required returned-run files do not
+  exist. After pulling the trace, stopped only the owned E140 pod
+  `c67fbk189vnvfp`.
 
 Returned-artifact verification template, after pulling the completed remote
 artifact directory locally:
@@ -6722,8 +6731,8 @@ single-process DataLoader path.
 
 ### E142: Signed Tetra Coboundary Face Update
 
-Status: locally implemented, validated, and staged; do not launch while E140
-is active. Treat this as a parked topology-native fallback after E140/E141 are
+Status: locally implemented, validated, and staged; do not launch while E141
+is active. Treat this as a parked topology-native fallback after E141 is
 documented or deliberately skipped.
 
 Hypothesis: the selected tetra cofaces should update face cochains through the
@@ -6857,7 +6866,7 @@ Validation status on the local branch from the E138/E139 staging window:
 ### E143: Signed Tetra-to-Face Boundary Readout
 
 Status: locally implemented, validated, and staged on the owned Runpod pod;
-do not launch while E140 is active.
+do not launch while E141 is active.
 
 Hypothesis: E142 signs the tetra coface-to-face residual, but the learned
 `tetra_to_face` readout still scatters one message to each anchored face with
@@ -7113,9 +7122,10 @@ Validation status:
 
 ### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
 
-Status: code staged and locally validated; do not launch until E140/E141
-return. The two Runpod pods already running should finish before we spend
-capacity on a third branch.
+Status: code staged and locally validated; do not launch until E141 returns
+or fails coherently. E140 failed pre-eval with no scored result, and E141 is
+still using the active Runpod capacity that should finish before we spend on
+a third branch.
 
 Source motivation: the saved Topotein PDF (`references/papers/2509.03885v1.pdf`)
 argues that protein topological networks need persistent multi-rank states and
@@ -7160,7 +7170,7 @@ recipe (`3,317,330 > 3,261,974`). The new E145 path adds zero parameters: the
 full E128-style recipe plus `simplex_outer_edge_residual_context_scale=0.25`
 remains `3,240,738`, with `21,236` parameters of headroom.
 
-Candidate flag, only after E140/E141 return below threshold:
+Candidate flag, only after E141 returns below threshold or fails coherently:
 
 ```bash
 --run-name e145_outer_residual_context_from_e128_s9000_c256_m64 \
@@ -7171,9 +7181,9 @@ Candidate flag, only after E140/E141 return below threshold:
 --simplex-outer-edge-residual-context-runtime-scale-ramp-steps 500
 ```
 
-Full launch skeleton, only after E140/E141 return below threshold and suitable
-80GB-class Runpod capacity is available. Use a fresh checkout at the latest
-pushed branch tip; do not reuse an active E140/E141 tree.
+Full launch skeleton, only after E141 returns below threshold or fails
+coherently and suitable 80GB-class Runpod capacity is available. Use a fresh
+checkout at the latest pushed branch tip; do not reuse an active E141 tree.
 
 ```bash
 cd /workspace/SimplexFold_e145

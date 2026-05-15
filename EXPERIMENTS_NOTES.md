@@ -1,8 +1,32 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 E140 Failed Pre-Eval; E141 Still Active
+
+- Rechecked only the two owned Runpod pods. E140 on pod
+  `c67fbk189vnvfp` has no live Python PID `55949`, no `results.json`, no
+  `results.csv`, no `eval_details_full_msa_to_face.csv`, and no checkpoint.
+  Its pulled history still ends at inherited E128 step `8500` with
+  `val_lddt_ca=0.4311057258844376`; the pulled status file is empty after a
+  failed write.
+- The preserved E140 log ends with `OSError: [Errno 5] Input/output error`
+  inside `write_run_status` while writing `status_full_msa_to_face.json`.
+  Record E140 as a failed pre-eval/no-score outcome, not as evidence that the
+  selected-boundary expansion objective helped or hurt. After pulling the
+  trace, stopped only the owned E140 pod `c67fbk189vnvfp`; E141 was left
+  running.
+- E141 on pod `5ox436mhzej7j4` remains alive with PID `576`, completed step
+  `8577`, active step `8578`, active microbatch `1/8`, effective batch size
+  `8`, and no result bundle, eval details, result CSV, or checkpoint yet.
+  Continue monitoring E141 only; do not launch E145 while E141 is slow but
+  coherent.
+- Updated heartbeat automation `check-simplexfold-e57-runpod` to monitor only
+  E141 as the active run. It now treats E140 as documented/stopped, preserves
+  the E141 verifier/audit handoff, and keeps E145 gated behind a returned
+  below-threshold or coherent failed E141 outcome.
+
 ## 2026-05-15 E145 Branch-Tip Audit
 
-- Re-audited the parked E145 path while E140/E141 continue running. The
+- Re-audited the parked E145 path while E140/E141 were being monitored. The
   implementation remains topology-native: `cell_outer_edge_context` pools
   directed external edges for each selected face/tetra cell,
   `parameter_free_outer_edge_context_delta` splits symmetric versus oriented
