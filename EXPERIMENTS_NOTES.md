@@ -1,5 +1,40 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 E145 Branch-Tip Audit
+
+- Re-audited the parked E145 path while E140/E141 continue running. The
+  implementation remains topology-native: `cell_outer_edge_context` pools
+  directed external edges for each selected face/tetra cell,
+  `parameter_free_outer_edge_context_delta` splits symmetric versus oriented
+  pair context and folds it into the active cochain width without learned
+  weights, and the adapter RMS-matches/gates that update into face/tetra
+  states before their boundary information returns to the pair trunk.
+- The branch-tip checks still support the AF2-medium budget claim:
+  `simplex_outer_edge_residual_context_scale=0.25` changes the cochain path
+  but adds no parameters to `simplexfold_medium_param_matched`; the documented
+  E145 recipe remains guarded at effective batch size `8`, crop `256`, MSA
+  `64`, no templates, `--num-workers 4`, max-parameter cap `3261974`, and the
+  `8500`-to-`9000` runtime ramp.
+- Validation passed:
+  `python -m pytest tests/test_simplex.py::test_parameter_free_outer_edge_context_delta_uses_external_directed_edges
+  tests/test_simplex.py::test_parameter_free_outer_edge_context_adapter_scale_changes_outputs_without_new_parameters
+  tests/test_simplex.py::test_outer_edge_residual_context_runtime_scale_gates_parameter_free_path
+  tests/test_trainer.py::test_simplicial_parameter_free_outer_edge_context_adds_no_parameters
+  tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path
+  tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula
+  tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides
+  tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser
+  tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs
+  tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation
+  tests/test_nanofold_public_benchmarks.py::test_model_config_overrides_preserve_resume_compatible_variant_name
+  tests/test_nanofold_public_benchmarks.py::test_e145_outer_residual_context_recipe_matches_documented_gate`
+  (`12 passed`), `python -m py_compile minalphafold/simplex.py
+  minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py
+  tests/test_simplex.py tests/test_trainer.py
+  tests/test_nanofold_public_benchmarks.py`,
+  `../../.venv/bin/ruff check --select F821,F822,F823` on the same
+  model/runner/test files, and `git diff --check`.
+
 ## 2026-05-15 Result-Table Audit Helper
 
 - Added `scripts/audit_experiment_results.py`, a read-only audit helper for
