@@ -7568,3 +7568,12 @@
   tests/test_summarize_nanofold_run_status.py`, and `../../.venv/bin/ruff
   check --select F821,F822,F823 scripts/summarize_nanofold_run_status.py
   tests/test_summarize_nanofold_run_status.py`.
+- 2026-05-15T12:50Z Rechecked only the two owned active Runpod pods by
+  snapshotting their small status/history/metadata artifacts into `/tmp` and
+  running the local summarizer. Neither run has returned a result bundle,
+  eval-details CSV, or checkpoint. E140 is active at completed step `8591`
+  with estimated rate `30.4` steps/hour and ETA `13.5h`; E141 is active at
+  completed step `8549` with estimated rate `21.3` steps/hour and ETA `21.2h`.
+  Both snapshots correctly show inherited history ending at E128 step `8500`
+  with aggregate `val_lddt_ca=0.4311057258844376`, so the best scored result
+  remains E128 until a new eval row returns.
