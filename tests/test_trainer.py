@@ -510,6 +510,8 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.025",
             "--simplex-boundary-edge-frame-gate-scale",
             "0.05",
+            "--simplex-boundary-hodge-readout-scale",
+            "0.25",
             "--simplex-boundary-edge-frame-gate-runtime-scale",
             "0.0",
             "--simplex-boundary-edge-frame-gate-runtime-scale-final",
@@ -563,6 +565,7 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_triangle_attention_bias_scale == 0.05
     assert cfg.simplex_triangle_attention_value_scale == 0.025
     assert cfg.simplex_boundary_edge_frame_gate_scale == 0.05
+    assert cfg.simplex_boundary_hodge_readout_scale == 0.25
     assert args.simplex_boundary_edge_frame_gate_runtime_scale == 0.0
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_final == 0.05
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step == 6000
@@ -1266,6 +1269,33 @@ def test_simplicial_triangle_attention_value_stays_inside_medium_budget():
     assert triangle_value_params == 3_215_346
     assert triangle_value_params > 3_203_186
     assert triangle_value_params <= int(af2_params * 1.05)
+
+
+def test_simplicial_boundary_hodge_readout_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    base_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_face_top_k=24,
+        simplex_tetra_top_k=48,
+        simplex_cell_score_degree_penalty=0.75,
+        simplex_cell_score_outer_edge_weight=0.25,
+        simplex_edge_frame_message_scale=0.025,
+        simplex_boundary_edge_frame_gate_scale=0.05,
+        simplex_boundary_readout_directionality=0.25,
+        simplex_boundary_incidence_normalization=1.0,
+        simplex_global_context_scale=0.10,
+        simplex_vertex_star_context_scale=1.0,
+        simplex_edge_star_context_scale=1.0,
+        simplex_triangle_attention_bias_scale=0.0125,
+    )
+    hodge_medium = replace(base_medium, simplex_boundary_hodge_readout_scale=0.25)
+
+    base_params = sum(parameter.numel() for parameter in AlphaFold2(base_medium).parameters())
+    hodge_params = sum(parameter.numel() for parameter in AlphaFold2(hodge_medium).parameters())
+
+    assert base_params == 3_240_738
+    assert hodge_params == base_params
 
 
 def test_pre_triangle_simplex_update_runs_evoformer_block_eagerly(monkeypatch):

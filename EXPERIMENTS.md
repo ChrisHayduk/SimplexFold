@@ -5603,3 +5603,60 @@ selected-complex geometry is not the limiting signal by itself; the bottleneck
 is still global backbone assembly. Do not continue E129 or scale the
 triangle-attention value path for 30k steps without a new topology-native
 stabilization or assembly mechanism.
+
+### E130: Hodge-Centered Boundary Readout
+
+Status: implemented locally as a prepared short-gate candidate; not launched.
+
+Hypothesis: E128/E129 show that explicit face/tetra states can learn strong
+local selected-boundary geometry, but the pair trunk still under-assembles the
+global C-alpha trace. The problem may be that selected boundary messages carry
+large residue-star offsets: local face/tetra cochains look good on their own
+boundaries, but the induced sparse 1-cochain is not globally reconciled before
+it is written into `Z_ij`.
+
+Mechanism: add `simplex_boundary_hodge_readout_scale`, a parameter-neutral
+double-centering step on the selected boundary-edge pair readout. After face
+and tetra messages are scattered to the selected boundary graph, the adapter
+treats the result as a boundary-edge 1-cochain, subtracts source and target
+vertex-star means, adds back the global selected-boundary mean, and blends
+that Hodge-centered cochain into the normal pair readout. This is a
+simplicial/topological architecture change: higher-rank cells still communicate
+only through their selected boundary 1-simplices, but the boundary cochain is
+projected away from vertex-star offset components before global structure
+readout. It does not add an output-side lDDT, radius, or all-pairs coordinate
+loss.
+
+Candidate launch, only after an explicit Runpod go-ahead:
+
+```bash
+--run-name e130_hodge_boundary_readout_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-boundary-hodge-readout-scale 0.25
+```
+
+Keep the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, directed boundary readout `0.25`, edge-frame message
+runtime scale `0.0125`, global context `0.1`, vertex-star context `1.0`, and
+edge-star runtime `0.5`. Do not include E129's
+`simplex_triangle_attention_value_scale`; E129 showed that adding value
+content improved local boundary diagnostics but worsened global assembly.
+
+Parameter audit: unchanged from E128, `3,240,738 <= 3,261,974`.
+
+Decision rule: reject unless E130 beats E128's `0.4311` primary C-alpha lDDT
+and keeps FoldScore, dRMSD, and C-alpha Rg coherent. It still needs to clear
+`0.45` before any longer-run consideration.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_hodge_center_boundary_readout_removes_vertex_star_offsets tests/test_simplex.py::test_simplicial_adapter_hodge_centers_boundary_pair_update tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_hodge_readout_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `5 passed`
+- `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `218 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/model_config.py minalphafold/simplex.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `git diff --check`: passed

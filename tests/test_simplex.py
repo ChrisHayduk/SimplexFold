@@ -21,6 +21,7 @@ from minalphafold.simplex import (
     face_outer_edge_delta,
     face_tetra_coboundary_delta,
     face_geometry_features,
+    hodge_center_boundary_readout,
     scatter_directed_edges_to_residue,
     segment_cell_indices,
     segment_geometry_features,
@@ -96,6 +97,7 @@ class SimplexConfig:
     simplex_boundary_message_degree_attenuation = 0.0
     simplex_boundary_incidence_normalization = 0.0
     simplex_boundary_readout_directionality = 0.0
+    simplex_boundary_hodge_readout_scale = 0.0
     simplex_global_context_scale = 0.0
     simplex_vertex_star_context_scale = 0.0
     simplex_edge_star_context_scale = 0.0
@@ -1894,6 +1896,45 @@ def test_simplicial_adapter_can_emit_pair_only_structure_readout():
     assert aux["simplex_structure_pair_readout"].shape == pair.shape
     assert "simplex_structure_single_readout" not in aux
     assert not torch.allclose(aux["simplex_structure_pair_readout"], torch.zeros_like(pair))
+
+
+def test_hodge_center_boundary_readout_removes_vertex_star_offsets():
+    source = torch.tensor([0.0, 1.0, -2.0])
+    target = torch.tensor([3.0, -1.0, 2.0])
+    pair_readout = source[None, :, None, None] + target[None, None, :, None]
+    pair_counts = torch.ones(1, 3, 3, 1)
+
+    centered = hodge_center_boundary_readout(pair_readout, pair_counts, scale=1.0)
+
+    assert torch.allclose(centered, torch.zeros_like(centered), atol=1e-6)
+    half_centered = hodge_center_boundary_readout(pair_readout, pair_counts, scale=0.5)
+    assert torch.allclose(half_centered, 0.5 * pair_readout, atol=1e-6)
+
+
+def test_simplicial_adapter_hodge_centers_boundary_pair_update():
+    class BaseHodgeConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class HodgeConfig(BaseHodgeConfig):
+        simplex_boundary_hodge_readout_scale = 0.5
+
+    torch.manual_seed(83)
+    pair = torch.randn(1, 6, 6, HodgeConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 6, HodgeConfig.c_s)
+    base = SimplicialAdapter(BaseHodgeConfig()).eval()
+    hodge = SimplicialAdapter(HodgeConfig()).eval()
+    hodge.load_state_dict(base.state_dict())
+
+    with torch.no_grad():
+        pair_base, _, _ = base(pair, single)
+        pair_hodge, _, _ = hodge(pair, single)
+
+    assert not torch.allclose(pair_hodge, pair_base)
+    assert pair_hodge.shape == pair_base.shape
 
 
 def test_simplex_boundary_metric_recycling_bins_scatter_selected_boundary_edges():

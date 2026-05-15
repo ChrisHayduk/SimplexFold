@@ -515,6 +515,7 @@ def apply_model_config_cli_overrides(model_config: ModelConfig, args: argparse.N
         "simplex_triangle_attention_bias_scale",
         "simplex_triangle_attention_value_scale",
         "simplex_boundary_edge_frame_gate_scale",
+        "simplex_boundary_hodge_readout_scale",
     ):
         value = getattr(args, field_name, None)
         if value is not None:
@@ -2517,6 +2518,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Gate selected simplex boundary-edge messages with oriented edge-frame scalar features.",
+    )
+    parser.add_argument(
+        "--simplex-boundary-hodge-readout-scale",
+        type=float,
+        default=None,
+        help="Double-center selected boundary-edge readout over residue vertex stars before pair update.",
     )
     parser.add_argument("--simplex-vertex-star-context-runtime-scale", type=float, default=None)
     parser.add_argument("--simplex-vertex-star-context-runtime-scale-final", type=float, default=None)

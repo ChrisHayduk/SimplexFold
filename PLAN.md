@@ -1,4 +1,4 @@
-## Current Plan: After E129 Triangle-Attention Value Residual
+## Current Plan: E130 Boundary Hodge Readout
 
 Current status after E129: the best returned validation C-alpha lDDT remains
 E128 at `0.4311` at step 8500. E129 resumed the verified E128 checkpoint and
@@ -32,6 +32,32 @@ readout, not merely add more value content. Prefer a mechanism that preserves
 E128's successful oriented boundary-edge realization while adding a
 stability/normalization path for global assembly, and require a clear break
 above the `0.45` short-gate threshold before any longer-run consideration.
+
+E130 implements the next local candidate: Hodge-centered selected-boundary
+readout. Treat the face/tetra boundary messages as a sparse boundary-edge
+1-cochain on the selected complex, double-center that cochain over source and
+target residue vertex stars, and blend the centered cochain back into the pair
+readout before `Z_ij` is updated. This is a topology-native global-assembly
+change, not a generic C-alpha lDDT loss: it removes vertex-star offset
+components from the selected boundary 1-skeleton so the structure trunk sees a
+more globally reconciled edge cochain. It adds no parameters.
+
+Prepared short gate, if/when a new Runpod run is explicitly requested:
+resume E128, keep the E128 recipe fixed, disable E129's value residual, and
+add `--simplex-boundary-hodge-readout-scale 0.25`:
+
+```text
+selected F_ijk / U_ijkl
+        -> oriented boundary-edge-frame gate
+        -> weak triangle-attention bias
+        -> selected boundary 1-cochain readout
+        -> Hodge-style vertex-star double centering
+        -> Z_ij / structure module
+```
+
+Gate rule: reject unless E130 beats E128's `0.4311` primary C-alpha lDDT and
+keeps FoldScore/dRMSD/Rg coherent. Do not consider a 30,000-step spend until
+the branch clearly breaks above `0.45` in a short gate.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best

@@ -6402,3 +6402,19 @@
   pod `o1dy17ouv8w5mz` was stopped at 2026-05-15T01:58Z. The E129 heartbeat
   automation `check-simplexfold-e57-runpod` was paused. No follow-up Runpod
   experiment is active.
+- 2026-05-15T02:10Z Prepared E130 locally without launching Runpod. E130 adds
+  `simplex_boundary_hodge_readout_scale`, a parameter-neutral Hodge-style
+  double-centering step on the selected boundary-edge 1-cochain before it is
+  written into `Z_ij`. This directly targets the E128/E129 diagnosis: local
+  selected face/tetra boundary lDDT is strong, but the global C-alpha trace is
+  still under-assembled. The hook subtracts source/target residue vertex-star
+  means and restores the global selected-boundary mean, so it is a
+  simplicial/topological boundary-cochain assembly mechanism rather than a
+  generic lDDT/radius/coordinate loss. Candidate launch is documented as E130
+  from the E128 checkpoint with E129's triangle-attention value residual
+  disabled and `--simplex-boundary-hodge-readout-scale 0.25`. Local validation
+  passed: py_compile for modified modules, 5 targeted pytest checks including
+  the no-parameter audit (`3,240,738` unchanged from E128), the broader
+  `tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  slice (`218 passed`), focused ruff checks via `../../.venv/bin/ruff`, and
+  `git diff --check`.

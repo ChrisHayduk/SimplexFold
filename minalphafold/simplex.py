@@ -1007,6 +1007,33 @@ def coface_degree_attenuate_pair_readout(
     return pair_readout / degree.pow(strength)
 
 
+def hodge_center_boundary_readout(
+    pair_readout: torch.Tensor,
+    pair_counts: torch.Tensor,
+    *,
+    pair_mask: torch.Tensor | None = None,
+    scale: float,
+) -> torch.Tensor:
+    """Double-center a selected boundary 1-cochain over residue vertex stars."""
+
+    scale = min(max(float(scale), 0.0), 1.0)
+    if scale <= 0.0:
+        return pair_readout
+    edge_mask = (pair_counts > 0).to(pair_readout.dtype)
+    if pair_mask is not None:
+        edge_mask = edge_mask * pair_mask[..., None].to(pair_readout.dtype)
+
+    row_count = edge_mask.sum(dim=2).clamp_min(1.0)
+    col_count = edge_mask.sum(dim=1).clamp_min(1.0)
+    global_count = edge_mask.sum(dim=(1, 2)).clamp_min(1.0)
+    row_mean = (pair_readout * edge_mask).sum(dim=2) / row_count
+    col_mean = (pair_readout * edge_mask).sum(dim=1) / col_count
+    global_mean = (pair_readout * edge_mask).sum(dim=(1, 2)) / global_count
+    centered = pair_readout - row_mean[:, :, None, :] - col_mean[:, None, :, :] + global_mean[:, None, None, :]
+    centered = centered * edge_mask
+    return pair_readout + pair_readout.new_tensor(scale) * (centered - pair_readout)
+
+
 def boundary_incidence_weights(
     edge_indices: torch.Tensor,
     edge_mask: torch.Tensor,
@@ -1701,6 +1728,10 @@ class SimplicialAdapter(torch.nn.Module):
         )
         self.boundary_readout_directionality = min(
             max(float(getattr(config, "simplex_boundary_readout_directionality", 0.0)), 0.0),
+            1.0,
+        )
+        self.boundary_hodge_readout_scale = min(
+            max(float(getattr(config, "simplex_boundary_hodge_readout_scale", 0.0)), 0.0),
             1.0,
         )
         self.triangle_attention_bias_scale = float(
@@ -2495,6 +2526,12 @@ class SimplicialAdapter(torch.nn.Module):
             directionality = pair_readout.new_tensor(boundary_readout_directionality)
             pair_readout = (1.0 - directionality) * pair_readout + directionality * directed_pair_readout
             pair_counts = (1.0 - directionality) * pair_counts + directionality * directed_pair_counts
+        pair_readout = hodge_center_boundary_readout(
+            pair_readout,
+            pair_counts,
+            pair_mask=pair_mask,
+            scale=self.boundary_hodge_readout_scale,
+        )
         pair_readout = coface_degree_attenuate_pair_readout(
             pair_readout,
             pair_counts,

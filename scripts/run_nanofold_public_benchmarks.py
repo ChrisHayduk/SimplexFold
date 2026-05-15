@@ -996,6 +996,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_boundary_message_degree_attenuation", args.simplex_boundary_message_degree_attenuation),
         ("simplex_boundary_incidence_normalization", args.simplex_boundary_incidence_normalization),
         ("simplex_boundary_readout_directionality", args.simplex_boundary_readout_directionality),
+        ("simplex_boundary_hodge_readout_scale", args.simplex_boundary_hodge_readout_scale),
         ("simplex_global_context_scale", args.simplex_global_context_scale),
         ("simplex_vertex_star_context_scale", args.simplex_vertex_star_context_scale),
         ("simplex_edge_star_context_scale", args.simplex_edge_star_context_scale),
@@ -2025,6 +2026,11 @@ def _train_variant(
             if use_simplicial
             else 0.0
         ),
+        "simplex_boundary_hodge_readout_scale": (
+            float(getattr(model_config, "simplex_boundary_hodge_readout_scale", 0.0))
+            if use_simplicial
+            else 0.0
+        ),
         "simplex_triangle_attention_bias_scale": (
             float(getattr(model_config, "simplex_triangle_attention_bias_scale", 0.0))
             if use_simplicial
@@ -2259,6 +2265,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_boundary_message_degree_attenuation",
         "simplex_boundary_incidence_normalization",
         "simplex_boundary_readout_directionality",
+        "simplex_boundary_hodge_readout_scale",
         "simplex_segment_cell_scale",
         "simplex_segment_radius",
         "simplex_c_segment",
@@ -2782,6 +2789,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Blend simplex pair readout toward directed boundary-edge scatter; 0 keeps symmetric scatter.",
+    )
+    parser.add_argument(
+        "--simplex-boundary-hodge-readout-scale",
+        type=float,
+        default=None,
+        help="Double-center selected boundary-edge readout over residue vertex stars before pair update.",
     )
     parser.add_argument(
         "--simplex-global-context-scale",
@@ -3486,6 +3499,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_boundary_message_degree_attenuation": args.simplex_boundary_message_degree_attenuation,
         "simplex_boundary_incidence_normalization": args.simplex_boundary_incidence_normalization,
         "simplex_boundary_readout_directionality": args.simplex_boundary_readout_directionality,
+        "simplex_boundary_hodge_readout_scale": args.simplex_boundary_hodge_readout_scale,
         "simplex_global_context_scale": args.simplex_global_context_scale,
         "simplex_vertex_star_context_scale": args.simplex_vertex_star_context_scale,
         "simplex_edge_star_context_scale": args.simplex_edge_star_context_scale,
