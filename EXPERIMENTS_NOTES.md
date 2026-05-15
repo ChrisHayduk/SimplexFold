@@ -7205,3 +7205,10 @@
   not as evidence that Hodge, face-cyclic, or oriented boundary-cochain
   readouts are architecturally bad. Future long-running gates should rely on
   `status_full_msa_to_face.json` heartbeat progress before any stop decision.
+- 2026-05-15T10:05Z E140 remained active on owned pod `c67fbk189vnvfp`: PID
+  `55949` had elapsed `00:13:37`, process CPU time was `02:49:22`, and the
+  status heartbeat reported active step `8507`, microbatch `4`,
+  `stopped_early=false`, and effective batch size `8`. History still correctly
+  ends at inherited E128 step `8500` until the next step-9000 evaluation; no
+  `results.json` exists yet. GPU memory was about `19.7 GiB`. Leave E140
+  running.
