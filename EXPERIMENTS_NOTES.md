@@ -7001,5 +7001,15 @@
   parameters and remains under the `3,261,974` cap. Local parser validation
   accepted the full E143 launch command with effective batch size `8`,
   max-parameter cap `3261974`, signed static scale `0.25`, and signed runtime
-  final scale `0.25`. E143 still needs a pushed commit and remote staging
-  before it can be launched later.
+  final scale `0.25`.
+- 2026-05-15T08:00Z Staged E143 on the owned Runpod pod without disturbing
+  the active E138 checkout. Cloned the pushed branch into
+  `/workspace/SimplexFold_e143`, reset it to commit `f931bed`, confirmed a
+  clean checkout, and ran remote `python3 -m py_compile` for `simplex.py`,
+  `evoformer.py`, `model.py`, `trainer.py`, and the NanoFold runner. Remote
+  parser validation accepted the full E143 launch command with run name
+  `e143_signed_tetra_to_face_from_e128_s9000_c256_m64`, variant
+  `full_msa_to_face`, effective batch size `8`, max-parameter cap `3261974`,
+  signed static scale `0.25`, and signed runtime final scale `0.25`. The
+  NanoFold checkout and E128 resume checkpoint were verified present. No
+  Runpod experiment was launched from this checkout.
