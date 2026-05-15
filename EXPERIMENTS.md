@@ -6477,6 +6477,12 @@ checks after documenting the parked recipe:
   `8500` / examples `68000`, `1332` matching tensors loaded, and `0`
   new/missing tensors initialized. The status heartbeat showed active step
   `8501`, microbatch `1`, and effective batch size `8`.
+- Launch-recipe guard:
+  `test_e140_selected_boundary_expansion_recipe_matches_running_gate` locks
+  the documented run name, step target, effective batch size, crop/MSA/template
+  settings, parameter cap, default `num_workers=0`, selected-boundary
+  coordinate-expansion weights, coordinate-expansion tolerance, and absence of
+  signed face-cyclic readout for the active E140 gate.
 
 Returned-artifact verification template, after pulling the completed remote
 artifact directory locally:
@@ -6644,6 +6650,12 @@ Validation status on the local branch from the E138/E139 staging window:
   documented E141 command with effective batch size `8`, max-parameter cap
   `3261974`, signed static scale `0.25`, and signed runtime final scale
   `0.25`.
+- Launch-recipe guard:
+  `test_e141_signed_face_cyclic_recipe_matches_running_gate` locks the
+  documented run name, step target, effective batch size, crop/MSA/template
+  settings, parameter cap, default `num_workers=0`, absence of
+  selected-boundary coordinate expansion, signed face-cyclic static scale, and
+  the runtime ramp from `0.0` at step `8500` to `0.25` at step `9000`.
 
 Returned-artifact verification template, after pulling the completed remote
 artifact directory locally:

@@ -7607,3 +7607,13 @@
   `EXPERIMENTS.md`, the variant-aware row formatter, the E145 full launch and
   verifier template, and latest pushed branch tip `9fe602a`. The schedule
   remains `FREQ=MINUTELY;INTERVAL=30`.
+- 2026-05-15T13:01Z Added launch-recipe regression tests for the two active
+  gates. `test_e140_selected_boundary_expansion_recipe_matches_running_gate`
+  locks E140's selected-boundary coordinate-expansion recipe, default
+  `num_workers=0`, and absence of signed face-cyclic readout.
+  `test_e141_signed_face_cyclic_recipe_matches_running_gate` locks E141's
+  signed face-cyclic static scale and `8500`-to-`9000` runtime ramp while
+  confirming coordinate expansion stays disabled. Focused validation passed:
+  the E140/E141/E145 recipe-guard pytest set (`3 passed`), `py_compile` on
+  `tests/test_nanofold_public_benchmarks.py`, ruff `F821/F822/F823` on the
+  same test file, and `git diff --check`.
