@@ -6397,6 +6397,72 @@ Candidate launch after E138 is documented:
 --simplex-boundary-signed-face-cyclic-readout-runtime-scale-ramp-steps 500
 ```
 
+Full same-pod launch skeleton, using the staged checkout that does not disturb
+the active E138 tree:
+
+```bash
+cd /workspace/SimplexFold_e141
+mkdir -p logs
+python3 -m py_compile \
+  minalphafold/simplex.py \
+  minalphafold/evoformer.py \
+  minalphafold/model.py \
+  minalphafold/trainer.py \
+  scripts/run_nanofold_public_benchmarks.py
+nohup python -u scripts/run_nanofold_public_benchmarks.py \
+  --nanofold-root /workspace/nanoFold-Competition \
+  --model-config simplexfold_medium_param_matched \
+  --variants full_msa_to_face \
+  --run-name e141_signed_face_cyclic_boundary_from_e128_s9000_c256_m64 \
+  --output-dir artifacts/nanofold_public_benchmarks \
+  --resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+  --resume-model-weights-only \
+  --steps 9000 \
+  --batch-size 1 \
+  --grad-accum-steps 8 \
+  --crop-size 256 \
+  --msa-depth 64 \
+  --extra-msa-depth 0 \
+  --max-templates 0 \
+  --eval-every 500 \
+  --checkpoint-every 500 \
+  --final-max-val-batches 0 \
+  --eval-max-val-batches 0 \
+  --max-parameters 3261974 \
+  --n-cycles 4 \
+  --device cuda \
+  --simplex-face-coordinate-weight 1.0 \
+  --simplex-face-coordinate-distance-weight 0.5 \
+  --simplex-face-boundary-lddt-weight 0.05 \
+  --simplex-tetra-coordinate-weight 1.0 \
+  --simplex-tetra-coordinate-distance-weight 0.5 \
+  --simplex-tetra-boundary-lddt-weight 0.05 \
+  --simplex-geometry-distance-weight 0.025 \
+  --simplex-face-top-k 24 \
+  --simplex-tetra-top-k 48 \
+  --simplex-cell-score-degree-penalty 0.75 \
+  --simplex-cell-score-outer-edge-weight 0.25 \
+  --simplex-edge-frame-message-scale 0.025 \
+  --simplex-edge-frame-message-runtime-scale 0.0125 \
+  --simplex-boundary-edge-frame-gate-scale 0.05 \
+  --simplex-boundary-readout-directionality 0.25 \
+  --simplex-boundary-readout-directionality-runtime-scale 0.25 \
+  --simplex-boundary-incidence-normalization 1.0 \
+  --simplex-global-context-scale 0.1 \
+  --simplex-vertex-star-context-scale 1.0 \
+  --simplex-vertex-star-context-runtime-scale 1.0 \
+  --simplex-edge-star-context-scale 1.0 \
+  --simplex-edge-star-context-runtime-scale 0.5 \
+  --simplex-triangle-attention-bias-scale 0.0125 \
+  --simplex-boundary-signed-face-cyclic-readout-scale 0.25 \
+  --simplex-boundary-signed-face-cyclic-readout-runtime-scale 0.0 \
+  --simplex-boundary-signed-face-cyclic-readout-runtime-scale-final 0.25 \
+  --simplex-boundary-signed-face-cyclic-readout-runtime-scale-ramp-start-step 8500 \
+  --simplex-boundary-signed-face-cyclic-readout-runtime-scale-ramp-steps 500 \
+  > logs/e141_signed_face_cyclic_boundary.log 2>&1 &
+echo $!
+```
+
 Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
 degree-penalized plus outer-edge-supported cell scoring, incidence
 normalization `1.0`, edge-frame message runtime scale `0.0125`, global context
@@ -6423,3 +6489,7 @@ Validation status on the local branch while E138 runs:
 - `python - <<'PY' ... parse_args(E141 full launch flags) ... PY`: accepted
   the documented E141 flags, with effective batch size `8` and signed
   face-cyclic runtime final scale `0.25`.
+- After adding the full same-pod `/workspace/SimplexFold_e141` launch
+  skeleton, reran the same parser check: run name, variant, effective batch
+  size `8`, max-parameter cap `3261974`, signed static scale `0.25`, and
+  signed runtime final scale `0.25` all matched the documented command.

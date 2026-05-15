@@ -6929,3 +6929,10 @@
   `trainer.py`, and the NanoFold runner successfully. No Runpod experiment
   was launched from this checkout; E138 PID `24980` continues to own the
   active GPU run from `/workspace/SimplexFold_next`.
+- 2026-05-15T07:13Z Added a full same-pod launch skeleton for E141 in
+  `EXPERIMENTS.md`, using `/workspace/SimplexFold_e141` so the active E138
+  tree stays untouched. Parser validation accepted the documented command
+  shape with run name
+  `e141_signed_face_cyclic_boundary_from_e128_s9000_c256_m64`, variant
+  `full_msa_to_face`, effective batch size `8`, max-parameter cap `3261974`,
+  signed static scale `0.25`, and signed runtime final scale `0.25`.
