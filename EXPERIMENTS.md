@@ -6169,9 +6169,9 @@ the Runpod checkout.
 
 ### E139: No-Hodge Oriented Boundary-Cochain Readout
 
-Status: planned launch recipe only; do not launch while E138 is active. This
-reuses the already implemented E136 oriented boundary-cochain operator but
-removes E130's Hodge double-centering from the launch recipe.
+Status: launch recipe staged on the owned Runpod pod; do not launch while E138
+is active. This reuses the already implemented E136 oriented boundary-cochain
+operator but removes E130's Hodge double-centering from the launch recipe.
 
 Hypothesis: E138 tests orientation at the level of each selected triangular
 face's boundary cycle `(i->j, j->k, k->i)`. If E138 is coherent but flat, the
@@ -6206,10 +6206,11 @@ Candidate launch only after E138 returns and is documented:
 ```
 
 Full same-pod launch skeleton if E138 is documented as flat/runtime-failed
-and the owned pod remains healthy:
+and the owned pod remains healthy. Use the separate staged checkout so the
+active E138 tree is not disturbed:
 
 ```bash
-cd /workspace/SimplexFold_next
+cd /workspace/SimplexFold_e139
 mkdir -p logs
 python3 -m py_compile \
   minalphafold/simplex.py \
@@ -6296,6 +6297,13 @@ operator with Hodge disabled. On the branch tip after documenting E139:
 - `python - <<'PY' ... parse_args(E139 full launch flags) ... PY`: accepted
   the documented full command flags, with effective batch size `8` and
   oriented-cochain runtime final scale `0.25`
+- Remote readiness: `/workspace/SimplexFold_e139` is clean at commit
+  `83deaf0`; remote `python3 -m py_compile` passed for the
+  model/trainer/runner files; parser validation accepted the documented E139
+  command with effective batch size `8`, max-parameter cap `3261974`, oriented
+  static scale `0.25`, and oriented runtime final scale `0.25`; the NanoFold
+  checkout and E128 checkpoint were verified present. No Runpod experiment was
+  launched from this checkout.
 - `git diff --check`: passed
 
 Before launch, still run `git diff --check` on the exact branch tip used by

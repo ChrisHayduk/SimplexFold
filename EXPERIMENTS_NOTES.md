@@ -7019,3 +7019,15 @@
   directory still contained only `run_metadata.json` plus inherited
   `history_full_msa_to_face.json`; no result bundle, eval-details file, or
   checkpoint existed yet. Leave E138 running.
+- 2026-05-15T08:12Z Staged E139 on the owned Runpod pod without disturbing
+  the active E138 checkout. Cloned the pushed branch into
+  `/workspace/SimplexFold_e139`, confirmed a clean checkout at commit
+  `83deaf0`, and ran remote `python3 -m py_compile` for `simplex.py`,
+  `evoformer.py`, `model.py`, `trainer.py`, and the NanoFold runner. Remote
+  parser validation accepted the full E139 launch command with run name
+  `e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64`, variant
+  `full_msa_to_face`, effective batch size `8`, max-parameter cap `3261974`,
+  oriented static scale `0.25`, and oriented runtime final scale `0.25`. The
+  NanoFold checkout and E128 resume checkpoint were verified present. No
+  Runpod experiment was launched from this checkout. At the same remote check,
+  E138 PID `24980` remained active at elapsed `02:10:33`.
