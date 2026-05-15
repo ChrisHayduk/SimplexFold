@@ -7277,3 +7277,12 @@
   `status_full_msa_to_face.json` reported active step `8501`, microbatch `1`,
   `stopped_early=false`, and effective batch size `8`. No result or
   eval-detail files exist yet, as expected before the step-9000 evaluation.
+- 2026-05-15T10:39Z Both owned active runs are coherent and pre-eval. E140 on
+  pod `c67fbk189vnvfp` had PID `55949`, elapsed `00:47:51`, process CPU time
+  `09:57:45`, status active step `8525`, microbatch `1`, effective batch size
+  `8`, and `stopped_early=false`; history still ends at E128 step `8500` and
+  no result/eval-detail files exist. E141 on pod `5ox436mhzej7j4` had PID
+  `576`, elapsed `00:05:57`, process CPU time `00:44:30`, status active step
+  `8502`, microbatch `1`, effective batch size `8`, and
+  `stopped_early=false`; history also still ends at E128 step `8500` with no
+  result/eval-detail files. Leave both running.
