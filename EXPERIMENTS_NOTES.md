@@ -6757,3 +6757,12 @@
   override path (`9 passed`); and focused ruff undefined-name/syntax-risk
   checks. This does not change `EXPERIMENT_RESULTS.md` because no Runpod
   result has returned.
+- 2026-05-15T05:35Z Fast-forwarded the separate remote checkout
+  `/workspace/SimplexFold_next` on owned pod `c67fbk189vnvfp` from `8debc35`
+  to `3778ea4` and reran remote `python3 -m py_compile` for the modified
+  runtime modules plus the NanoFold runner. This checkout is not the active
+  E130 working tree and does not affect PID `4224`; it only keeps a clean
+  branch tip ready for an E138-style launch if E130 times out or returns
+  unusably. The E128 checkpoint and NanoFold checkout were present. At the
+  same sample, E130 remained active with elapsed `02:34:57`, process CPU time
+  `1-08:13:37`, `%CPU=1247`, and no result writeout yet.
