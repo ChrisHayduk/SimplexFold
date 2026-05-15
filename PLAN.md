@@ -48,8 +48,12 @@ Next actions:
 2. When either returns, verify and pull artifacts, update
    `EXPERIMENT_RESULTS.md`, commit/push, then decide whether the returned
    score justifies a continuation or pivot. Use the exact E140/E141
-   recipe-metadata verifier templates now recorded in `EXPERIMENTS.md`. For
-   future `--num-workers 4` launches, include `--expected-num-workers 4` in
+   recipe-metadata verifier templates now recorded in `EXPERIMENTS.md`.
+   Generate the table row with `scripts/format_experiment_result_row.py` and
+   insert/replace it with `scripts/upsert_experiment_result_row.py`, then
+   explicitly update the `Last updated` and `Best validation C-alpha lDDT`
+   header text based on the verified metrics. For future `--num-workers 4`
+   launches, include `--expected-num-workers 4` in
    `scripts/verify_nanofold_benchmark_artifacts.py` verification.
 3. If E140/E141 remain below `0.45`, launch only a short E145 gate around the
    ramped parameter-free outer-neighborhood selected-cell transport; avoid

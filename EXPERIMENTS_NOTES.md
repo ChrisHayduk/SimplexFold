@@ -7625,3 +7625,12 @@
   the active/parked launch-recipe guards, exact verifier templates,
   variant-aware row formatter, and C-alpha Rg key compatibility. Owned-pod
   scope and the 30-minute schedule are unchanged.
+- 2026-05-15T13:06Z Added `scripts/upsert_experiment_result_row.py`, a small
+  helper that mechanically inserts or replaces one Markdown table row in
+  `EXPERIMENT_RESULTS.md`. This reduces manual row-editing risk after a
+  returned run is verified, while still leaving the `Last updated` and
+  `Best validation C-alpha lDDT` header text as an explicit post-verification
+  decision. Focused validation passed: `python -m pytest
+  tests/test_upsert_experiment_result_row.py` (`3 passed`), `py_compile` on
+  the helper/test, ruff `F821/F822/F823` on the helper/test, and
+  `git diff --check`.
