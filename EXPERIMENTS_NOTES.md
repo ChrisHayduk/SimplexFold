@@ -7617,3 +7617,11 @@
   the E140/E141/E145 recipe-guard pytest set (`3 passed`), `py_compile` on
   `tests/test_nanofold_public_benchmarks.py`, ruff `F821/F822/F823` on the
   same test file, and `git diff --check`.
+- 2026-05-15T13:04Z Updated heartbeat automation
+  `check-simplexfold-e57-runpod` in place after the E140/E141 recipe-guard
+  commit. The heartbeat no longer pins a specific branch SHA; it now tells the
+  worker to use the latest pushed
+  `codex/simplexfold-topology-e07-boundary-coordinate` commit, which includes
+  the active/parked launch-recipe guards, exact verifier templates,
+  variant-aware row formatter, and C-alpha Rg key compatibility. Owned-pod
+  scope and the 30-minute schedule are unchanged.
