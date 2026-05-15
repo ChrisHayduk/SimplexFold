@@ -6312,3 +6312,14 @@
   and no `results.csv` or checkpoint was present. Interpretation: active
   training/evaluation before the step-9000 writeout; leave the run alone and
   let the heartbeat catch the coherent result bundle.
+- 2026-05-15T00:15Z-00:29Z E129 remained active on the owned pod. A bounded
+  watch plus a final status probe found PID `1033` alive from about `20:28`
+  through `34:19` elapsed, process CPU around `720%`-`726%`, RSS about
+  `2.0 GiB`, and `178` threads. H100 memory stayed allocated at `43687 MiB`,
+  with sampled GPU utilization ranging from `0%` to `96%`; the final probe
+  sampled `46%`. The artifact directory still contained only
+  `run_metadata.json` and `history_full_msa_to_face.json`, history still ended
+  at the inherited E128 step 8500 row, and no `results.csv` or checkpoint was
+  present. Interpretation: E129 is still computing before the step-9000
+  writeout; do not pull, stop, or launch a follow-up until the coherent result
+  bundle appears or the process exits with a clear failure.
