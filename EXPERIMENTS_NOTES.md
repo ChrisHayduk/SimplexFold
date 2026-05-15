@@ -1,5 +1,20 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 E141 Owned-Pod Heartbeat
+
+- Rechecked only the owned E141 Runpod pod `5ox436mhzej7j4` at
+  `2026-05-15T15:02:29Z`. The process is still alive as PID `576`, elapsed
+  `04:29:09`, with `completed_step=8600`, `active_step=8601`, active
+  microbatch `1/8`, effective batch size `8`, target step `9000`, and
+  `stopped_early=false`.
+- No returned bundle exists yet: `results.json`, `results.csv`,
+  `eval_details_full_msa_to_face.csv`, and
+  `checkpoints/full_msa_to_face_latest.pt` are still absent. History still has
+  `18` rows and last history step `8500`, so `EXPERIMENT_RESULTS.md` remains
+  unchanged.
+- E141 is slow but coherent. Do not launch E145 or stop the E141 pod while
+  status heartbeats continue advancing.
+
 ## 2026-05-15 Goal Completion Audit
 
 - Objective decomposed into concrete gates: keep SimplexFold
