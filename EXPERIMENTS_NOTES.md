@@ -6696,3 +6696,11 @@
   `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
   reported `227 passed`, focused ruff undefined-name/syntax-risk checks
   passed, and `git diff --check` remained clean.
+- 2026-05-15T05:06Z E130 refresh on owned pod `c67fbk189vnvfp`: PID `4224`
+  remained active with elapsed `02:06:11`, process CPU time `1-02:13:02`,
+  `%CPU=1246`, RSS about `1.9 GiB`, and `194` threads. Remote artifacts still
+  contained only `history_full_msa_to_face.json` and `run_metadata.json`.
+  History length remained `18`, ending at inherited E128 step `8500` with
+  `val_lddt_ca=0.4311057258844376`. No `results.json`, `results.csv`,
+  eval-details file, or checkpoint existed, so no result was pulled and
+  `EXPERIMENT_RESULTS.md` remains unchanged.
