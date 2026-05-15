@@ -6489,3 +6489,13 @@
   `c67fbk189vnvfp` at the same time with no `results.json`, `results.csv`,
   eval-details file, or checkpoint yet, so E131 remains a parked fallback and
   `EXPERIMENT_RESULTS.md` remains unchanged.
+- 2026-05-15T03:16Z-03:17Z E130 bounded health sample on owned pod
+  `c67fbk189vnvfp`: PID `4224` stayed active, process CPU time advanced from
+  `03:19:17` to `03:32:00` over one wall-clock minute, CPU utilization stayed
+  around `1238%`-`1239%`, RSS moved from about `1.85 GiB` to `1.92 GiB`,
+  `/proc/4224/io` read counters advanced (`rchar` `92238968` -> `92942446`,
+  `syscr` `6968` -> `7087`), and A100 memory remained allocated at
+  `24033 MiB`. No result bundle was present immediately before this sample:
+  history still ended at inherited E128 step `8500` and no `results.json`,
+  `results.csv`, eval-details file, or checkpoint existed. Interpretation:
+  active compute, not a returned or idle bundle; leave the run undisturbed.
