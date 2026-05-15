@@ -1,5 +1,28 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 Goal Completion Audit
+
+- Objective decomposed into concrete gates: keep SimplexFold
+  AF2-medium-matched within `3,261,974` parameters, train/evaluate on NanoFold
+  with effective batch size `8`, confirm validation C-alpha lDDT `>0.7` at
+  `>=30000` completed steps, keep all candidate changes topology/simplicial in
+  spirit, run experiments on owned Runpod pods, and maintain `PLAN.md`,
+  `EXPERIMENTS.md`, `EXPERIMENTS_NOTES.md`, and final outcomes in
+  `EXPERIMENT_RESULTS.md`.
+- Current evidence says the goal is not achieved. `python
+  scripts/audit_experiment_results.py EXPERIMENT_RESULTS.md` reports best
+  returned score E128 at `val_lddt_ca=0.4311` / step `8500`, zero short gates
+  at or above `0.45`, and zero `>=30000`-step confirmations above `0.7`.
+- Artifact-level evidence for the current best E128 passes the verifier side
+  of the contract but fails the actual goal gates: `completed_steps=8500`,
+  effective batch size `8`, parameters `3,240,738 <= 3,261,974`, `1000` eval
+  rows, checkpoint present, and `stopped_early=false`; goal audit exits `1`
+  because `0.4311 < 0.7` and `8500 < 30000`.
+- Active next evidence source remains E141 on owned Runpod pod
+  `5ox436mhzej7j4`. It is still pre-eval, so no new result row or goal audit
+  exists yet. Do not mark the goal complete, launch a 30k confirmation, or
+  launch E145 until E141 returns or fails coherently.
+
 ## 2026-05-15 E141 Heartbeat After Goal-Audit Fix
 
 - Rechecked only the owned active E141 Runpod pod `5ox436mhzej7j4` after
