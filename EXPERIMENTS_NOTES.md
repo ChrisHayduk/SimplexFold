@@ -6398,3 +6398,7 @@
   E129 as a 30k candidate and do not continue this exact value-residual path;
   it improves local selected-boundary diagnostics but regresses primary
   C-alpha lDDT, FoldScore, dRMSD, and expansion versus E128.
+- After local verification, documentation, commit, and push, the owned Runpod
+  pod `o1dy17ouv8w5mz` was stopped at 2026-05-15T01:58Z. The E129 heartbeat
+  automation `check-simplexfold-e57-runpod` was paused. No follow-up Runpod
+  experiment is active.
