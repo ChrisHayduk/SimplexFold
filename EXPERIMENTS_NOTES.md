@@ -6302,3 +6302,13 @@
   files, history still ended at inherited step 8500, and no `results.csv` or
   checkpoint was present. Interpretation: normal early training before the
   step-9000 writeout.
+- 2026-05-15T00:03Z-00:12Z E129 remained active across a 10-sample watch on
+  the owned pod. PID `1033` stayed alive from about `08:54` through `17:56`
+  elapsed, process CPU stayed around `720%`-`733%`, RSS stayed about
+  `2.0 GiB`, and the process kept `178` threads. H100 memory stayed allocated
+  at `43687 MiB`, with sampled GPU utilization ranging from `0%` to `89%`.
+  The artifact directory still had only `run_metadata.json` and
+  `history_full_msa_to_face.json`, history still ended at inherited step 8500,
+  and no `results.csv` or checkpoint was present. Interpretation: active
+  training/evaluation before the step-9000 writeout; leave the run alone and
+  let the heartbeat catch the coherent result bundle.
