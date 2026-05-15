@@ -19,6 +19,12 @@
   scripts/audit_experiment_results.py tests/test_audit_experiment_results.py`,
   `python scripts/audit_experiment_results.py EXPERIMENT_RESULTS.md`, and
   `git diff --check`.
+- Updated heartbeat automation `check-simplexfold-e57-runpod` in place so a
+  coherent returned E140/E141 handoff now runs
+  `python scripts/audit_experiment_results.py EXPERIMENT_RESULTS.md` after
+  verifier/analyzer/recording, before committing. The owned-pod scope,
+  Runpod-management limits, E145 gating rule, and 30-minute schedule are
+  unchanged.
 
 ## 2026-05-15 Owned Runpod Heartbeat
 
