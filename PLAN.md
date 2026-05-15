@@ -162,14 +162,15 @@ test whether local higher-rank cells are being realized too compactly before
 their geometry reaches the structure module. Now launched as E140; keep it as a topology realization probe, not
 as a generic score-chasing loss.
 
-Local next candidate parked while E140 runs: E141 signed face-cyclic
+Parallel candidate now launched while E140 runs: E141 signed face-cyclic
 boundary readout. E138's face-cyclic readout preserves the directed
 2-simplex boundary cycle, but it is unsigned. The actual oriented boundary of
 face `[i,j,k]` is `[j,k] - [i,k] + [i,j]`, so the `(i,k)` boundary slot should
 enter the reverse `(k,i)` edge with a negative incidence coefficient. E141
 adds a parameter-neutral signed version of the face-cyclic readout with the
 same runtime-ramp pattern. It is the more faithful topology test of the
-E138 idea, not a metric-side loss. Do not launch it while E140 is active.
+E138 idea, not a metric-side loss. It is now running on a separate owned A100
+Runpod pod, leaving E140 undisturbed on its original pod.
 The parked E141/E142/E143 Runpod checkouts have been fast-forwarded to
 `fd65f74` so future launches inherit the live `status_<variant>.json`
 heartbeat; their candidate-specific topology flags and effective batch size

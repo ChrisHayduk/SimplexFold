@@ -7234,3 +7234,46 @@
   `8500`, so the current scored best remains E128 (`val_lddt_ca=0.4311057258844376`).
   No `results.json` or eval-detail CSV exists yet; wait for the step-9000
   evaluation before judging E140.
+- 2026-05-15T10:16Z Launched a second owned Runpod A100 pod for a parallel
+  E141 gate after capacity became available:
+  `5ox436mhzej7j4` (`codex-simplexfold-e141-parallel-runpod-20260515`), SSH
+  `root@216.81.248.113 -p 13046`, image
+  `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404`, A100-SXM4-80GB at
+  `$1.49/hr`. This is the only new pod launched for E141; continue to avoid
+  inspecting or managing unrelated Runpod instances.
+- 2026-05-15T10:30Z E141 pod setup completed with public-only data staging:
+  cloned SimplexFold branch `codex/simplexfold-topology-e07-boundary-coordinate`
+  at commit `208193a89d366191b9f9166ac1dbff0211a2f051`, cloned NanoFold at
+  commit `96afc8467a108aa8bee3b51cdf4a030cd656a960`, copied public NanoFold
+  data to `/root/nanofold_data/`, removed macOS sidecar files, and symlinked
+  the checkout data paths to the container-disk copies. Remote counts were
+  `11000` feature `.npz` files, `11000` label `.npz` files,
+  `preprocess_meta.json` present, and zero hidden sidecar files. The E128
+  resume checkpoint exists at
+  `/workspace/SimplexFold_e141/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+  with size `36627247` bytes.
+- 2026-05-15T10:33Z Launched E141 from the separate owned pod and checkout
+  `/workspace/SimplexFold_e141` as
+  `e141_signed_face_cyclic_boundary_from_e128_s9000_c256_m64`. Remote
+  `python3 -m py_compile` passed for `minalphafold/simplex.py`,
+  `minalphafold/evoformer.py`, `minalphafold/model.py`,
+  `minalphafold/trainer.py`, and the NanoFold benchmark runner. Parser
+  validation accepted the launch command with effective batch size `8`,
+  max-parameter cap `3261974`, E128 checkpoint present, and signed face-cyclic
+  runtime final scale `0.25`. The active E141 Python PID is `576`; the wrapper
+  shell was stopped after verifying PID `576` remained reparented to PID `1`.
+  Startup log currently contains artifact/train/val lines and `run_metadata.json`;
+  no heartbeat/history/result files have appeared yet.
+- 2026-05-15T10:35Z Updated heartbeat automation
+  `check-simplexfold-e57-runpod` to monitor only the two owned active pods:
+  E140 pod `c67fbk189vnvfp` and E141 pod `5ox436mhzej7j4`. E140 remained
+  active at PID `55949` with elapsed `00:44:17`, process CPU time `09:13:13`,
+  status active step `8523`, microbatch `1`, `stopped_early=false`, and
+  effective batch size `8`; history still ends at E128 step `8500` and no
+  result/eval-detail files exist yet.
+- 2026-05-15T10:37Z E141 startup verification passed. PID `576` remained
+  active and reparented to PID `1`, `history_full_msa_to_face.json` was
+  inherited from E128 ending at step `8500`, and
+  `status_full_msa_to_face.json` reported active step `8501`, microbatch `1`,
+  `stopped_early=false`, and effective batch size `8`. No result or
+  eval-detail files exist yet, as expected before the step-9000 evaluation.

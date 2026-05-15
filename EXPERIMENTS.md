@@ -6476,8 +6476,9 @@ checks after documenting the parked recipe:
 
 ### E141: Signed Face-Cyclic Boundary Readout
 
-Status: locally implemented, validated, and staged; do not launch while E140
-is active. E138 and E139 have already been documented as stopped pre-eval.
+Status: launched in parallel on a separate owned Runpod A100 pod while E140
+continues on its original pod. E138 and E139 have already been documented as
+stopped pre-eval.
 
 Hypothesis: E138 tests whether selected face cochains should write back into
 pair state through each triangular boundary cycle `(i->j, j->k, k->i)`.
