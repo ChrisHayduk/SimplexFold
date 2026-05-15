@@ -6704,3 +6704,19 @@
   `val_lddt_ca=0.4311057258844376`. No `results.json`, `results.csv`,
   eval-details file, or checkpoint existed, so no result was pulled and
   `EXPERIMENT_RESULTS.md` remains unchanged.
+- 2026-05-15T05:12Z E130 remained active on the owned Runpod pod
+  `c67fbk189vnvfp`: PID `4224` had elapsed `02:11:41` in the latest process
+  sample, process CPU time advanced past `1-03:22:33`, `%CPU` stayed near
+  `1247`, RSS stayed near `1.9 GiB`, and the A100 allocation remained at
+  `43091 MiB`. The log still
+  contained only startup/resume lines, and the artifact directory still had
+  only `history_full_msa_to_face.json` plus `run_metadata.json`; history
+  length stayed `18`, ending at the inherited E128 step `8500`. I also cloned
+  the current pushed branch into a separate remote checkout,
+  `/workspace/SimplexFold_next`, at commit
+  `8debc35bfdf33fd0be7119613103870188f0f034` and verified syntax with
+  `python3 -m py_compile` for the modified runtime modules and NanoFold
+  runner. This separate checkout leaves the active `/workspace/SimplexFold`
+  E130 process untouched while preparing E136/E137-style parked candidates for
+  later launch only after E130 returns and is documented. No result was pulled
+  and `EXPERIMENT_RESULTS.md` remains unchanged.
