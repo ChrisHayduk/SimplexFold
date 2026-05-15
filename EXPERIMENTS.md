@@ -5786,3 +5786,74 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `220 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - `git diff --check`: passed
+
+### E133: Ramped Sparse Simplex Triangle Attention
+
+Status: implemented locally as a parked scheduling fallback while E130 runs;
+not launched on Runpod.
+
+Hypothesis: E128's static damped triangle-attention bias improved the
+E124/E128 branch, while E129's static sparse value residual improved
+selected-boundary diagnostics but regressed primary C-alpha lDDT. This suggests
+the sparse selected-complex information is useful, but abrupt insertion into
+AF2 triangle attention may destabilize the resumed checkpoint. E133 tests the
+same simplicial route with runtime ramps.
+
+Mechanism: add training/evaluation runtime overrides for
+`simplex_triangle_attention_bias_scale` and
+`simplex_triangle_attention_value_scale`. Static nonzero model-config scales
+still allocate the sparse projection modules, so the parameter count is
+unchanged for a fixed candidate architecture. The runtime scale controls only
+how strongly selected face/tetra cochains contribute sparse ordered-triple
+bias/value payloads to AF2 triangle attention at a given step. No output-side
+loss, all-pairs distance loss, radius penalty, or generic C-alpha objective is
+added.
+
+Candidate launch only after E130 returns and is verified. The conservative
+first use is a bias-only ramp from the E128/E130 recipe:
+
+```bash
+--run-name e133_ramped_triangle_bias_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-triangle-attention-bias-runtime-scale 0.0 \
+--simplex-triangle-attention-bias-runtime-scale-final 0.0125 \
+--simplex-triangle-attention-bias-runtime-scale-ramp-start-step 8500 \
+--simplex-triangle-attention-bias-runtime-scale-ramp-steps 500
+```
+
+Retest the value route only if the bias ramp keeps the branch plausible:
+
+```bash
+--simplex-triangle-attention-value-scale 0.025 \
+--simplex-triangle-attention-value-runtime-scale 0.0 \
+--simplex-triangle-attention-value-runtime-scale-final 0.025 \
+--simplex-triangle-attention-value-runtime-scale-ramp-start-step 8500 \
+--simplex-triangle-attention-value-runtime-scale-ramp-steps 500
+```
+
+Keep the rest of the E128/E130 recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, directed boundary readout `0.25`, edge-frame message
+runtime scale `0.0125`, global context `0.1`, vertex-star context `1.0`, and
+edge-star runtime `0.5`.
+
+Parameter audit: no new parameters beyond whatever static triangle-attention
+modules are allocated. Bias-only E128-family architecture remains
+`3,240,738 <= 3,261,974`; adding the value module must keep the existing
+E129-style audit under the same cap before launch.
+
+Decision rule: reject unless E133 beats E128/E129 and any returned E130 result
+on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
+coherent. It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py::test_simplex_adapter_triangle_attention_runtime_overrides_gate_aux tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_value tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `6 passed`
+- `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `221 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `git diff --check`: passed

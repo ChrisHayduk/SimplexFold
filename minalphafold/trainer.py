@@ -273,6 +273,14 @@ class TrainingConfig:
     simplex_pre_triangle_single_update_runtime_scale_final: float | None = None
     simplex_pre_triangle_single_update_runtime_scale_ramp_start_step: int | None = None
     simplex_pre_triangle_single_update_runtime_scale_ramp_steps: int = 1
+    simplex_triangle_attention_bias_runtime_scale: float | None = None
+    simplex_triangle_attention_bias_runtime_scale_final: float | None = None
+    simplex_triangle_attention_bias_runtime_scale_ramp_start_step: int | None = None
+    simplex_triangle_attention_bias_runtime_scale_ramp_steps: int = 1
+    simplex_triangle_attention_value_runtime_scale: float | None = None
+    simplex_triangle_attention_value_runtime_scale_final: float | None = None
+    simplex_triangle_attention_value_runtime_scale_ramp_start_step: int | None = None
+    simplex_triangle_attention_value_runtime_scale_ramp_steps: int = 1
     simplex_segment_cell_runtime_scale: float | None = None
     simplex_segment_cell_runtime_scale_final: float | None = None
     simplex_segment_cell_runtime_scale_ramp_start_step: int | None = None
@@ -1161,6 +1169,40 @@ def simplex_pre_triangle_single_update_runtime_scale_at_step(
     )
 
 
+def simplex_triangle_attention_bias_runtime_scale_at_step(
+    training_config: TrainingConfig,
+    step: int | None,
+) -> float | None:
+    if training_config.simplex_triangle_attention_bias_runtime_scale is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_triangle_attention_bias_runtime_scale)
+    return _ramped_value(
+        training_config.simplex_triangle_attention_bias_runtime_scale,
+        training_config.simplex_triangle_attention_bias_runtime_scale_final,
+        step=step,
+        start_step=training_config.simplex_triangle_attention_bias_runtime_scale_ramp_start_step,
+        ramp_steps=training_config.simplex_triangle_attention_bias_runtime_scale_ramp_steps,
+    )
+
+
+def simplex_triangle_attention_value_runtime_scale_at_step(
+    training_config: TrainingConfig,
+    step: int | None,
+) -> float | None:
+    if training_config.simplex_triangle_attention_value_runtime_scale is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_triangle_attention_value_runtime_scale)
+    return _ramped_value(
+        training_config.simplex_triangle_attention_value_runtime_scale,
+        training_config.simplex_triangle_attention_value_runtime_scale_final,
+        step=step,
+        start_step=training_config.simplex_triangle_attention_value_runtime_scale_ramp_start_step,
+        ramp_steps=training_config.simplex_triangle_attention_value_runtime_scale_ramp_steps,
+    )
+
+
 def simplex_segment_cell_runtime_scale_at_step(
     training_config: TrainingConfig,
     step: int | None,
@@ -1369,6 +1411,7 @@ def model_inputs_from_batch(
     use_simplex_vertex_star_context_runtime_scale: bool = False,
     use_simplex_edge_star_context_runtime_scale: bool = False,
     use_simplex_pre_triangle_runtime_scale: bool = False,
+    use_simplex_triangle_attention_runtime_scale: bool = False,
     use_simplex_segment_cell_runtime_scale: bool = False,
     use_simplex_msa_feedback_runtime_scale: bool = False,
     use_simplex_boundary_pair_feedback_runtime_scale: bool = False,
@@ -1500,6 +1543,22 @@ def model_inputs_from_batch(
     if use_simplex_pre_triangle_runtime_scale and pre_triangle_single_update_scale is not None:
         inputs["simplex_pre_triangle_single_update_scale_override"] = batch["target_feat"].new_tensor(
             float(pre_triangle_single_update_scale)
+        )
+    triangle_attention_bias_scale = simplex_triangle_attention_bias_runtime_scale_at_step(
+        training_config,
+        step,
+    )
+    if use_simplex_triangle_attention_runtime_scale and triangle_attention_bias_scale is not None:
+        inputs["simplex_triangle_attention_bias_scale_override"] = batch["target_feat"].new_tensor(
+            float(triangle_attention_bias_scale)
+        )
+    triangle_attention_value_scale = simplex_triangle_attention_value_runtime_scale_at_step(
+        training_config,
+        step,
+    )
+    if use_simplex_triangle_attention_runtime_scale and triangle_attention_value_scale is not None:
+        inputs["simplex_triangle_attention_value_scale_override"] = batch["target_feat"].new_tensor(
+            float(triangle_attention_value_scale)
         )
     segment_cell_scale = simplex_segment_cell_runtime_scale_at_step(training_config, step)
     if use_simplex_segment_cell_runtime_scale and segment_cell_scale is not None:
@@ -1671,6 +1730,8 @@ def train_step(
             use_simplex_boundary_edge_star_readout_runtime_scale=True,
             use_simplex_vertex_star_context_runtime_scale=True,
             use_simplex_edge_star_context_runtime_scale=True,
+            use_simplex_pre_triangle_runtime_scale=True,
+            use_simplex_triangle_attention_runtime_scale=True,
             use_simplex_segment_cell_runtime_scale=True,
             use_simplex_msa_feedback_runtime_scale=True,
             use_simplex_boundary_pair_feedback_runtime_scale=True,
@@ -2018,6 +2079,7 @@ def fit(
                     use_simplex_vertex_star_context_runtime_scale=True,
                     use_simplex_edge_star_context_runtime_scale=True,
                     use_simplex_pre_triangle_runtime_scale=True,
+                    use_simplex_triangle_attention_runtime_scale=True,
                     use_simplex_segment_cell_runtime_scale=True,
                     use_simplex_msa_feedback_runtime_scale=True,
                     use_simplex_boundary_pair_feedback_runtime_scale=True,

@@ -68,6 +68,8 @@ from minalphafold.trainer import (
     simplex_pre_triangle_update_runtime_scale_at_step,
     simplex_segment_cell_runtime_scale_at_step,
     simplex_single_update_runtime_scale_at_step,
+    simplex_triangle_attention_bias_runtime_scale_at_step,
+    simplex_triangle_attention_value_runtime_scale_at_step,
     simplex_update_scale_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     simplex_vertex_star_context_runtime_scale_at_step,
@@ -225,6 +227,14 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_pre_triangle_single_update_runtime_scale_final=0.0,
         simplex_pre_triangle_single_update_runtime_scale_ramp_start_step=10,
         simplex_pre_triangle_single_update_runtime_scale_ramp_steps=10,
+        simplex_triangle_attention_bias_runtime_scale=0.0,
+        simplex_triangle_attention_bias_runtime_scale_final=0.04,
+        simplex_triangle_attention_bias_runtime_scale_ramp_start_step=10,
+        simplex_triangle_attention_bias_runtime_scale_ramp_steps=10,
+        simplex_triangle_attention_value_runtime_scale=0.02,
+        simplex_triangle_attention_value_runtime_scale_final=0.0,
+        simplex_triangle_attention_value_runtime_scale_ramp_start_step=10,
+        simplex_triangle_attention_value_runtime_scale_ramp_steps=10,
         simplex_segment_cell_runtime_scale=0.0,
         simplex_segment_cell_runtime_scale_final=0.1,
         simplex_segment_cell_runtime_scale_ramp_start_step=10,
@@ -275,6 +285,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_edge_star_context_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_pre_triangle_update_runtime_scale_at_step(training_config, 15) == 0.125
     assert simplex_pre_triangle_single_update_runtime_scale_at_step(training_config, 15) == 0.0
+    assert simplex_triangle_attention_bias_runtime_scale_at_step(training_config, 15) == 0.02
+    assert simplex_triangle_attention_value_runtime_scale_at_step(training_config, 15) == 0.01
     assert simplex_segment_cell_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_msa_feedback_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_boundary_pair_feedback_runtime_scale_at_step(training_config, 15) == 0.05
@@ -296,6 +308,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert "simplex_edge_star_context_scale_override" not in eval_inputs
     assert "simplex_pre_triangle_update_scale_override" not in eval_inputs
     assert "simplex_pre_triangle_single_update_scale_override" not in eval_inputs
+    assert "simplex_triangle_attention_bias_scale_override" not in eval_inputs
+    assert "simplex_triangle_attention_value_scale_override" not in eval_inputs
     assert "simplex_segment_cell_scale_override" not in eval_inputs
     assert "simplex_msa_feedback_scale_override" not in eval_inputs
     assert "simplex_boundary_pair_feedback_scale_override" not in eval_inputs
@@ -318,6 +332,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
         use_simplex_vertex_star_context_runtime_scale=True,
         use_simplex_edge_star_context_runtime_scale=True,
         use_simplex_pre_triangle_runtime_scale=True,
+        use_simplex_triangle_attention_runtime_scale=True,
         use_simplex_segment_cell_runtime_scale=True,
         use_simplex_msa_feedback_runtime_scale=True,
         use_simplex_boundary_pair_feedback_runtime_scale=True,
@@ -342,6 +357,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_pre_triangle_update_scale_override"], torch.tensor(0.125))
     assert torch.allclose(train_inputs["simplex_pre_triangle_single_update_scale_override"], torch.tensor(0.0))
+    assert torch.allclose(train_inputs["simplex_triangle_attention_bias_scale_override"], torch.tensor(0.02))
+    assert torch.allclose(train_inputs["simplex_triangle_attention_value_scale_override"], torch.tensor(0.01))
     assert torch.allclose(train_inputs["simplex_segment_cell_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_msa_feedback_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_boundary_pair_feedback_scale_override"], torch.tensor(0.05))

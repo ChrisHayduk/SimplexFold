@@ -28,6 +28,8 @@ from minalphafold.trainer import (
     simplex_segment_cell_runtime_scale_at_step,
     simplex_single_update_runtime_scale_at_step,
     simplex_tetra_top_k_at_step,
+    simplex_triangle_attention_bias_runtime_scale_at_step,
+    simplex_triangle_attention_value_runtime_scale_at_step,
     simplex_vertex_star_context_runtime_scale_at_step,
 )
 from scripts.run_nanofold_public_benchmarks import (
@@ -530,6 +532,22 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.05",
             "--simplex-triangle-attention-value-scale",
             "0.025",
+            "--simplex-triangle-attention-bias-runtime-scale",
+            "0.0",
+            "--simplex-triangle-attention-bias-runtime-scale-final",
+            "0.0125",
+            "--simplex-triangle-attention-bias-runtime-scale-ramp-start-step",
+            "3000",
+            "--simplex-triangle-attention-bias-runtime-scale-ramp-steps",
+            "500",
+            "--simplex-triangle-attention-value-runtime-scale",
+            "0.025",
+            "--simplex-triangle-attention-value-runtime-scale-final",
+            "0.0",
+            "--simplex-triangle-attention-value-runtime-scale-ramp-start-step",
+            "3000",
+            "--simplex-triangle-attention-value-runtime-scale-ramp-steps",
+            "500",
             "--simplex-vertex-star-context-runtime-scale",
             "0.0",
             "--simplex-vertex-star-context-runtime-scale-final",
@@ -688,6 +706,14 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_pre_triangle_single_update_runtime_scale_ramp_steps == 500
     assert args.simplex_triangle_attention_bias_scale == 0.05
     assert args.simplex_triangle_attention_value_scale == 0.025
+    assert args.simplex_triangle_attention_bias_runtime_scale == 0.0
+    assert args.simplex_triangle_attention_bias_runtime_scale_final == 0.0125
+    assert args.simplex_triangle_attention_bias_runtime_scale_ramp_start_step == 3000
+    assert args.simplex_triangle_attention_bias_runtime_scale_ramp_steps == 500
+    assert args.simplex_triangle_attention_value_runtime_scale == 0.025
+    assert args.simplex_triangle_attention_value_runtime_scale_final == 0.0
+    assert args.simplex_triangle_attention_value_runtime_scale_ramp_start_step == 3000
+    assert args.simplex_triangle_attention_value_runtime_scale_ramp_steps == 500
     assert args.simplex_vertex_star_context_runtime_scale == 0.0
     assert args.simplex_vertex_star_context_runtime_scale_final == 1.0
     assert args.simplex_vertex_star_context_runtime_scale_ramp_start_step == 3000
@@ -797,6 +823,14 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         simplex_pre_triangle_single_update_runtime_scale_final=0.0,
         simplex_pre_triangle_single_update_runtime_scale_ramp_start_step=3000,
         simplex_pre_triangle_single_update_runtime_scale_ramp_steps=500,
+        simplex_triangle_attention_bias_runtime_scale=0.0,
+        simplex_triangle_attention_bias_runtime_scale_final=0.0125,
+        simplex_triangle_attention_bias_runtime_scale_ramp_start_step=3000,
+        simplex_triangle_attention_bias_runtime_scale_ramp_steps=500,
+        simplex_triangle_attention_value_runtime_scale=0.025,
+        simplex_triangle_attention_value_runtime_scale_final=0.0,
+        simplex_triangle_attention_value_runtime_scale_ramp_start_step=3000,
+        simplex_triangle_attention_value_runtime_scale_ramp_steps=500,
         simplex_hodge_face_runtime_scale=0.0,
         simplex_hodge_face_runtime_scale_final=0.05,
         simplex_hodge_face_runtime_scale_ramp_start_step=3000,
@@ -897,6 +931,12 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert simplex_pre_triangle_single_update_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_pre_triangle_single_update_runtime_scale_at_step(cfg, 3250) == 0.0
     assert simplex_pre_triangle_single_update_runtime_scale_at_step(cfg, 3500) == 0.0
+    assert simplex_triangle_attention_bias_runtime_scale_at_step(cfg, 3000) == 0.0
+    assert simplex_triangle_attention_bias_runtime_scale_at_step(cfg, 3250) == 0.00625
+    assert simplex_triangle_attention_bias_runtime_scale_at_step(cfg, 3500) == 0.0125
+    assert simplex_triangle_attention_value_runtime_scale_at_step(cfg, 3000) == 0.025
+    assert simplex_triangle_attention_value_runtime_scale_at_step(cfg, 3250) == 0.0125
+    assert simplex_triangle_attention_value_runtime_scale_at_step(cfg, 3500) == 0.0
     assert simplex_hodge_face_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_hodge_face_runtime_scale_at_step(cfg, 3250) == 0.025
     assert simplex_hodge_face_runtime_scale_at_step(cfg, 3500) == 0.05
@@ -946,6 +986,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         use_simplex_vertex_star_context_runtime_scale=True,
         use_simplex_edge_star_context_runtime_scale=True,
         use_simplex_pre_triangle_runtime_scale=True,
+        use_simplex_triangle_attention_runtime_scale=True,
         use_simplex_hodge_face_runtime_scale=True,
         use_simplex_segment_cell_runtime_scale=True,
         use_simplex_msa_feedback_runtime_scale=True,
@@ -971,6 +1012,8 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert torch.isclose(inputs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
     assert torch.isclose(inputs["simplex_pre_triangle_update_scale_override"], torch.tensor(0.125))
     assert torch.isclose(inputs["simplex_pre_triangle_single_update_scale_override"], torch.tensor(0.0))
+    assert torch.isclose(inputs["simplex_triangle_attention_bias_scale_override"], torch.tensor(0.00625))
+    assert torch.isclose(inputs["simplex_triangle_attention_value_scale_override"], torch.tensor(0.0125))
     assert torch.isclose(inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_segment_cell_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_msa_feedback_scale_override"], torch.tensor(0.025))
@@ -1042,6 +1085,14 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
         simplex_pre_triangle_single_update_runtime_scale_final=0.0,
         simplex_pre_triangle_single_update_runtime_scale_ramp_start_step=3000,
         simplex_pre_triangle_single_update_runtime_scale_ramp_steps=500,
+        simplex_triangle_attention_bias_runtime_scale=0.0,
+        simplex_triangle_attention_bias_runtime_scale_final=0.0125,
+        simplex_triangle_attention_bias_runtime_scale_ramp_start_step=3000,
+        simplex_triangle_attention_bias_runtime_scale_ramp_steps=500,
+        simplex_triangle_attention_value_runtime_scale=0.025,
+        simplex_triangle_attention_value_runtime_scale_final=0.0,
+        simplex_triangle_attention_value_runtime_scale_ramp_start_step=3000,
+        simplex_triangle_attention_value_runtime_scale_ramp_steps=500,
         simplex_segment_cell_runtime_scale=0.0,
         simplex_segment_cell_runtime_scale_final=0.05,
         simplex_segment_cell_runtime_scale_ramp_start_step=3000,
@@ -1141,6 +1192,8 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
     assert torch.isclose(model.kwargs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
     assert torch.isclose(model.kwargs["simplex_pre_triangle_update_scale_override"], torch.tensor(0.125))
     assert torch.isclose(model.kwargs["simplex_pre_triangle_single_update_scale_override"], torch.tensor(0.0))
+    assert torch.isclose(model.kwargs["simplex_triangle_attention_bias_scale_override"], torch.tensor(0.00625))
+    assert torch.isclose(model.kwargs["simplex_triangle_attention_value_scale_override"], torch.tensor(0.0125))
     assert torch.isclose(model.kwargs["simplex_segment_cell_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_msa_feedback_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_boundary_pair_feedback_scale_override"], torch.tensor(0.0125))

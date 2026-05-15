@@ -1074,6 +1074,40 @@ def test_simplex_adapter_emits_sparse_triangle_attention_value():
     assert "simplex_triangle_attention_start_bias" not in aux
 
 
+def test_simplex_adapter_triangle_attention_runtime_overrides_gate_aux():
+    class TriangleAttentionConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_triangle_attention_bias_scale = 0.25
+        simplex_triangle_attention_value_scale = 0.125
+
+    torch.manual_seed(79)
+    adapter = SimplicialAdapter(TriangleAttentionConfig()).eval()
+    pair = torch.randn(1, 6, 6, TriangleAttentionConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 6, TriangleAttentionConfig.c_s)
+
+    with torch.no_grad():
+        _, _, off_aux = adapter(
+            pair,
+            single,
+            simplex_triangle_attention_bias_scale_override=pair.new_tensor(0.0),
+            simplex_triangle_attention_value_scale_override=pair.new_tensor(0.0),
+        )
+        _, _, on_aux = adapter(
+            pair,
+            single,
+            simplex_triangle_attention_bias_scale_override=pair.new_tensor(0.125),
+            simplex_triangle_attention_value_scale_override=pair.new_tensor(0.0625),
+        )
+
+    assert "simplex_triangle_attention_indices" not in off_aux
+    assert "simplex_triangle_attention_start_bias" in on_aux
+    assert "simplex_triangle_attention_start_value" in on_aux
+
+
 def test_triangle_attention_uses_sparse_simplex_bias():
     torch.manual_seed(67)
     start_attention = TriangleAttentionStartingNode(SimplexConfig()).eval()

@@ -1981,6 +1981,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_boundary_pair_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_metric_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_triangle_attention_bias_scale_override: Optional[torch.Tensor] = None,
+        simplex_triangle_attention_value_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
@@ -2089,6 +2090,12 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_triangle_attention_bias_scale_override is not None:
             triangle_attention_bias_scale = max(
                 float(simplex_triangle_attention_bias_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
+        triangle_attention_value_scale = self.triangle_attention_value_scale
+        if simplex_triangle_attention_value_scale_override is not None:
+            triangle_attention_value_scale = max(
+                float(simplex_triangle_attention_value_scale_override.detach().float().cpu().item()),
                 0.0,
             )
         local_neighbor_k = self.local_neighbor_k
@@ -2339,7 +2346,7 @@ class SimplicialAdapter(torch.nn.Module):
         triangle_attention_aux: dict[str, torch.Tensor] | None = None
         if (
             (self.triangle_attention_bias_scale > 0.0 and triangle_attention_bias_scale > 0.0)
-            or self.triangle_attention_value_scale > 0.0
+            or (self.triangle_attention_value_scale > 0.0 and triangle_attention_value_scale > 0.0)
         ):
             triangle_attention_aux = self._triangle_attention_aux(
                 face_state,
@@ -2349,7 +2356,7 @@ class SimplicialAdapter(torch.nn.Module):
                 topology.tetra_indices,
                 topology.tetra_mask,
                 bias_scale=triangle_attention_bias_scale,
-                value_scale=self.triangle_attention_value_scale,
+                value_scale=triangle_attention_value_scale,
             )
 
         face_edge_update = self.face_to_edge(face_state).reshape(*face_state.shape[:-1], 3, self.c_z)

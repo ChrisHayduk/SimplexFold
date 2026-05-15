@@ -268,6 +268,7 @@ class SimplicialEvoformer(torch.nn.Module):
         simplex_boundary_pair_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_metric_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_triangle_attention_bias_scale_override: Optional[torch.Tensor] = None,
+        simplex_triangle_attention_value_scale_override: Optional[torch.Tensor] = None,
         simplex_local_neighbor_k_override: Optional[torch.Tensor] = None,
         simplex_geometry_distance_weight_override: Optional[torch.Tensor] = None,
         simplex_face_top_k_override: Optional[torch.Tensor] = None,
@@ -309,12 +310,18 @@ class SimplicialEvoformer(torch.nn.Module):
                 float(simplex_triangle_attention_bias_scale_override.detach().float().cpu().item()),
                 0.0,
             )
+        triangle_value_scale_value = max(self.simplex_triangle_attention_value_scale, 0.0)
+        if simplex_triangle_attention_value_scale_override is not None:
+            triangle_value_scale_value = max(
+                float(simplex_triangle_attention_value_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
         pre_simplex_aux: dict[str, torch.Tensor] = {}
         if self.enable_simplex and (
             pre_pair_scale_value > 0.0
             or pre_single_scale_value > 0.0
             or triangle_bias_scale_value > 0.0
-            or self.simplex_triangle_attention_value_scale > 0.0
+            or triangle_value_scale_value > 0.0
         ):
             pre_pair_scale = pair_representation.new_tensor(pre_pair_scale_value)
             pre_single_scale = pair_representation.new_tensor(pre_single_scale_value)
@@ -354,6 +361,9 @@ class SimplicialEvoformer(torch.nn.Module):
                 simplex_boundary_metric_gate_scale_override=simplex_boundary_metric_gate_scale_override,
                 simplex_triangle_attention_bias_scale_override=(
                     simplex_triangle_attention_bias_scale_override
+                ),
+                simplex_triangle_attention_value_scale_override=(
+                    simplex_triangle_attention_value_scale_override
                 ),
                 simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
                 simplex_geometry_distance_weight_override=simplex_geometry_distance_weight_override,
@@ -450,6 +460,9 @@ class SimplicialEvoformer(torch.nn.Module):
                 simplex_boundary_metric_gate_scale_override=simplex_boundary_metric_gate_scale_override,
                 simplex_triangle_attention_bias_scale_override=(
                     simplex_triangle_attention_bias_scale_override
+                ),
+                simplex_triangle_attention_value_scale_override=(
+                    simplex_triangle_attention_value_scale_override
                 ),
                 simplex_local_neighbor_k_override=simplex_local_neighbor_k_override,
                 simplex_geometry_distance_weight_override=simplex_geometry_distance_weight_override,

@@ -88,6 +88,8 @@ from minalphafold.trainer import (  # noqa: E402
     simplex_segment_cell_runtime_scale_at_step,
     simplex_single_update_runtime_scale_at_step,
     simplex_tetra_top_k_at_step,
+    simplex_triangle_attention_bias_runtime_scale_at_step,
+    simplex_triangle_attention_value_runtime_scale_at_step,
     simplex_vertex_star_context_runtime_scale_at_step,
     simplex_topology_teacher_forcing_weight_at_step,
     simplex_update_scale_at_step,
@@ -656,6 +658,7 @@ def _evaluate(
                         use_simplex_vertex_star_context_runtime_scale=True,
                         use_simplex_edge_star_context_runtime_scale=True,
                         use_simplex_pre_triangle_runtime_scale=True,
+                        use_simplex_triangle_attention_runtime_scale=True,
                         use_simplex_segment_cell_runtime_scale=True,
                         use_simplex_msa_feedback_runtime_scale=True,
                         use_simplex_boundary_pair_feedback_runtime_scale=True,
@@ -1252,6 +1255,12 @@ def _train_variant(
             training_config,
             step,
         )
+        simplex_triangle_attention_bias_runtime_scale = (
+            simplex_triangle_attention_bias_runtime_scale_at_step(training_config, step)
+        )
+        simplex_triangle_attention_value_runtime_scale = (
+            simplex_triangle_attention_value_runtime_scale_at_step(training_config, step)
+        )
         simplex_hodge_face_runtime_scale = simplex_hodge_face_runtime_scale_at_step(training_config, step)
         simplex_segment_cell_runtime_scale = simplex_segment_cell_runtime_scale_at_step(training_config, step)
         simplex_msa_feedback_runtime_scale = simplex_msa_feedback_runtime_scale_at_step(training_config, step)
@@ -1310,6 +1319,7 @@ def _train_variant(
                         use_simplex_vertex_star_context_runtime_scale=True,
                         use_simplex_edge_star_context_runtime_scale=True,
                         use_simplex_pre_triangle_runtime_scale=True,
+                        use_simplex_triangle_attention_runtime_scale=True,
                         use_simplex_segment_cell_runtime_scale=True,
                         use_simplex_msa_feedback_runtime_scale=True,
                         use_simplex_boundary_pair_feedback_runtime_scale=True,
@@ -1478,6 +1488,16 @@ def _train_variant(
                     float("nan")
                     if simplex_pre_triangle_single_update_runtime_scale is None
                     else simplex_pre_triangle_single_update_runtime_scale
+                ),
+                "simplex_triangle_attention_bias_runtime_scale": (
+                    float("nan")
+                    if simplex_triangle_attention_bias_runtime_scale is None
+                    else simplex_triangle_attention_bias_runtime_scale
+                ),
+                "simplex_triangle_attention_value_runtime_scale": (
+                    float("nan")
+                    if simplex_triangle_attention_value_runtime_scale is None
+                    else simplex_triangle_attention_value_runtime_scale
                 ),
                 "simplex_hodge_face_runtime_scale": (
                     float("nan")
@@ -1837,6 +1857,30 @@ def _train_variant(
         ),
         "simplex_pre_triangle_single_update_runtime_scale_ramp_steps": (
             training_config.simplex_pre_triangle_single_update_runtime_scale_ramp_steps
+        ),
+        "simplex_triangle_attention_bias_runtime_scale": (
+            training_config.simplex_triangle_attention_bias_runtime_scale
+        ),
+        "simplex_triangle_attention_bias_runtime_scale_final": (
+            training_config.simplex_triangle_attention_bias_runtime_scale_final
+        ),
+        "simplex_triangle_attention_bias_runtime_scale_ramp_start_step": (
+            training_config.simplex_triangle_attention_bias_runtime_scale_ramp_start_step
+        ),
+        "simplex_triangle_attention_bias_runtime_scale_ramp_steps": (
+            training_config.simplex_triangle_attention_bias_runtime_scale_ramp_steps
+        ),
+        "simplex_triangle_attention_value_runtime_scale": (
+            training_config.simplex_triangle_attention_value_runtime_scale
+        ),
+        "simplex_triangle_attention_value_runtime_scale_final": (
+            training_config.simplex_triangle_attention_value_runtime_scale_final
+        ),
+        "simplex_triangle_attention_value_runtime_scale_ramp_start_step": (
+            training_config.simplex_triangle_attention_value_runtime_scale_ramp_start_step
+        ),
+        "simplex_triangle_attention_value_runtime_scale_ramp_steps": (
+            training_config.simplex_triangle_attention_value_runtime_scale_ramp_steps
         ),
         "simplex_segment_cell_runtime_scale": training_config.simplex_segment_cell_runtime_scale,
         "simplex_segment_cell_runtime_scale_final": training_config.simplex_segment_cell_runtime_scale_final,
@@ -2211,6 +2255,14 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_pre_triangle_single_update_runtime_scale_final",
         "simplex_pre_triangle_single_update_runtime_scale_ramp_start_step",
         "simplex_pre_triangle_single_update_runtime_scale_ramp_steps",
+        "simplex_triangle_attention_bias_runtime_scale",
+        "simplex_triangle_attention_bias_runtime_scale_final",
+        "simplex_triangle_attention_bias_runtime_scale_ramp_start_step",
+        "simplex_triangle_attention_bias_runtime_scale_ramp_steps",
+        "simplex_triangle_attention_value_runtime_scale",
+        "simplex_triangle_attention_value_runtime_scale_final",
+        "simplex_triangle_attention_value_runtime_scale_ramp_start_step",
+        "simplex_triangle_attention_value_runtime_scale_ramp_steps",
         "simplex_hodge_face_runtime_scale",
         "simplex_hodge_face_runtime_scale_final",
         "simplex_hodge_face_runtime_scale_ramp_start_step",
@@ -2955,6 +3007,32 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--simplex-pre-triangle-single-update-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
+        "--simplex-triangle-attention-bias-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for sparse simplex triangle-attention logit bias.",
+    )
+    parser.add_argument("--simplex-triangle-attention-bias-runtime-scale-final", type=float, default=None)
+    parser.add_argument(
+        "--simplex-triangle-attention-bias-runtime-scale-ramp-start-step",
+        type=int,
+        default=None,
+    )
+    parser.add_argument("--simplex-triangle-attention-bias-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-triangle-attention-value-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for sparse simplex triangle-attention value residuals.",
+    )
+    parser.add_argument("--simplex-triangle-attention-value-runtime-scale-final", type=float, default=None)
+    parser.add_argument(
+        "--simplex-triangle-attention-value-runtime-scale-ramp-start-step",
+        type=int,
+        default=None,
+    )
+    parser.add_argument("--simplex-triangle-attention-value-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-geometry-distance-weight",
         type=float,
         default=None,
@@ -3261,6 +3339,26 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_pre_triangle_single_update_runtime_scale_ramp_steps=(
             args.simplex_pre_triangle_single_update_runtime_scale_ramp_steps
         ),
+        simplex_triangle_attention_bias_runtime_scale=args.simplex_triangle_attention_bias_runtime_scale,
+        simplex_triangle_attention_bias_runtime_scale_final=(
+            args.simplex_triangle_attention_bias_runtime_scale_final
+        ),
+        simplex_triangle_attention_bias_runtime_scale_ramp_start_step=(
+            args.simplex_triangle_attention_bias_runtime_scale_ramp_start_step
+        ),
+        simplex_triangle_attention_bias_runtime_scale_ramp_steps=(
+            args.simplex_triangle_attention_bias_runtime_scale_ramp_steps
+        ),
+        simplex_triangle_attention_value_runtime_scale=args.simplex_triangle_attention_value_runtime_scale,
+        simplex_triangle_attention_value_runtime_scale_final=(
+            args.simplex_triangle_attention_value_runtime_scale_final
+        ),
+        simplex_triangle_attention_value_runtime_scale_ramp_start_step=(
+            args.simplex_triangle_attention_value_runtime_scale_ramp_start_step
+        ),
+        simplex_triangle_attention_value_runtime_scale_ramp_steps=(
+            args.simplex_triangle_attention_value_runtime_scale_ramp_steps
+        ),
         simplex_hodge_face_runtime_scale=args.simplex_hodge_face_runtime_scale,
         simplex_hodge_face_runtime_scale_final=args.simplex_hodge_face_runtime_scale_final,
         simplex_hodge_face_runtime_scale_ramp_start_step=args.simplex_hodge_face_runtime_scale_ramp_start_step,
@@ -3525,6 +3623,26 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         ),
         "simplex_pre_triangle_single_update_runtime_scale_ramp_steps": (
             args.simplex_pre_triangle_single_update_runtime_scale_ramp_steps
+        ),
+        "simplex_triangle_attention_bias_runtime_scale": args.simplex_triangle_attention_bias_runtime_scale,
+        "simplex_triangle_attention_bias_runtime_scale_final": (
+            args.simplex_triangle_attention_bias_runtime_scale_final
+        ),
+        "simplex_triangle_attention_bias_runtime_scale_ramp_start_step": (
+            args.simplex_triangle_attention_bias_runtime_scale_ramp_start_step
+        ),
+        "simplex_triangle_attention_bias_runtime_scale_ramp_steps": (
+            args.simplex_triangle_attention_bias_runtime_scale_ramp_steps
+        ),
+        "simplex_triangle_attention_value_runtime_scale": args.simplex_triangle_attention_value_runtime_scale,
+        "simplex_triangle_attention_value_runtime_scale_final": (
+            args.simplex_triangle_attention_value_runtime_scale_final
+        ),
+        "simplex_triangle_attention_value_runtime_scale_ramp_start_step": (
+            args.simplex_triangle_attention_value_runtime_scale_ramp_start_step
+        ),
+        "simplex_triangle_attention_value_runtime_scale_ramp_steps": (
+            args.simplex_triangle_attention_value_runtime_scale_ramp_steps
         ),
         "simplex_hodge_face_runtime_scale": args.simplex_hodge_face_runtime_scale,
         "simplex_hodge_face_runtime_scale_final": args.simplex_hodge_face_runtime_scale_final,

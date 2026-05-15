@@ -6554,3 +6554,26 @@
   same time showed E130 still active with no `results.json`, `results.csv`,
   eval-details file, or checkpoint and history still ending at step `8500`,
   so E132 remains parked and `EXPERIMENT_RESULTS.md` remains unchanged.
+- 2026-05-15T04:05Z E130 remained active on owned pod `c67fbk189vnvfp`:
+  PID `4224` had elapsed `01:05:06`, `%CPU=1245`, RSS about `1.8 GiB`, and
+  the remote log still showed only launch/startup lines. The artifact
+  directory still had no `results.json`, `results.csv`, eval-details file, or
+  step-9000 checkpoint, so no result was pulled and `EXPERIMENT_RESULTS.md`
+  remains unchanged.
+- 2026-05-15T04:05Z Prepared E133 locally; no Runpod launch. E133 adds runtime
+  schedules for sparse simplex triangle-attention bias and value payloads.
+  This is a topological communication change rather than a metric hack:
+  selected face/tetra cochains modulate AF2 triangle attention through sparse
+  ordered triples, and the runtime schedule controls only how strongly that
+  cochain path is activated in a resumed checkpoint. Static nonzero
+  triangle-attention scales still allocate the projection modules; runtime
+  zero suppresses the aux payload. Local validation so far: py_compile for
+  `simplex.py`, `evoformer.py`, `model.py`, `trainer.py`, and the NanoFold
+  runner passed, `git diff --check` passed, and focused pytest for triangle
+  runtime aux gating plus trainer/runner runtime override plumbing reported
+  `6 passed`.
+- 2026-05-15T04:07Z E133 broader validation passed:
+  `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  reported `221 passed`; focused ruff checks for undefined-name/syntax-risk
+  rules passed; `git diff --check` passed. E133 remains a parked fallback
+  while E130 is active.

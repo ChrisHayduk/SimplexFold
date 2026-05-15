@@ -2306,3 +2306,48 @@ or the E131 combination:
 Decision rule is unchanged: a short gate must beat E128/E130/E131 on primary
 C-alpha lDDT, keep FoldScore/dRMSD/Rg coherent, and clear `0.45` before any
 30k-step spend.
+
+## 2026-05-15 E133 Runtime Triangle-Attention Ramp Prepared
+
+E130 remains active on the owned Runpod pod, so E133 is only a parked local
+candidate. It extends the runtime scheduling idea to the sparse
+simplex-to-triangle-attention route: keep the projection modules allocated by
+the static triangle-attention bias/value config, but let training-time
+overrides ramp the actual sparse selected face/tetra bias or value
+contribution during a resumed gate.
+
+This stays inside the SimplexFold motivation. The operation is not an
+output-side lDDT or coordinate hack; it asks whether explicit higher-order
+cochains can enter the same AF2 triangle-reasoning pathway more gently. E128
+showed that a damped sparse simplex triangle-attention bias can help global
+C-alpha lDDT, while E129 showed that abruptly adding value content improved
+selected-boundary diagnostics but worsened global assembly. E133 tests whether
+the problem is the simplicial route itself or the sudden activation of that
+route in a resumed checkpoint.
+
+Do not launch E133 while E130 is active. If E130 returns weakly and E132-style
+readout ramps do not look like the next best use of the pod, the clean E133
+gate is a ramped triangle-attention probe from E128/E130-family weights with
+the E128 selected-complex recipe fixed. Candidate examples:
+
+```bash
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-triangle-attention-bias-runtime-scale 0.0 \
+--simplex-triangle-attention-bias-runtime-scale-final 0.0125 \
+--simplex-triangle-attention-bias-runtime-scale-ramp-start-step 8500 \
+--simplex-triangle-attention-bias-runtime-scale-ramp-steps 500
+```
+
+or, only if retesting the E129 value route deliberately:
+
+```bash
+--simplex-triangle-attention-value-scale 0.025 \
+--simplex-triangle-attention-value-runtime-scale 0.0 \
+--simplex-triangle-attention-value-runtime-scale-final 0.025 \
+--simplex-triangle-attention-value-runtime-scale-ramp-start-step 8500 \
+--simplex-triangle-attention-value-runtime-scale-ramp-steps 500
+```
+
+Decision rule is still strict: the branch must beat E128/E130/E129 on primary
+C-alpha lDDT and keep FoldScore, dRMSD, and C-alpha Rg coherent. It must clear
+`0.45` in the short gate before any 30k-step spend.
