@@ -94,8 +94,8 @@ def format_result_row(
     start_after_step: int | None = None,
 ) -> str:
     best_step, best_lddt = _best_from_history(result, history or [], start_after_step=start_after_step)
-    rg_pred = _metric(result, "val_pred_ca_rg")
-    rg_true = _metric(result, "val_true_ca_rg")
+    rg_pred = _metric(result, "val_pred_ca_rg", "val_ca_pred_rg")
+    rg_true = _metric(result, "val_true_ca_rg", "val_ca_true_rg")
     rg = (
         f"{_format_float(rg_pred)} / {_format_float(rg_true)}"
         if _finite_float(rg_pred) is not None or _finite_float(rg_true) is not None

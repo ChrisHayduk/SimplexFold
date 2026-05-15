@@ -7593,3 +7593,10 @@
   returned-artifact verification with `--expected-num-workers 4`. This is a
   launch-safety/documentation update only; E145 remains parked until E140/E141
   return below the short-gate threshold or fail coherently.
+- 2026-05-15T12:57Z Fixed a result-row formatting handoff issue before
+  E140/E141 return. `scripts/format_experiment_result_row.py` now accepts both
+  historical `val_pred_ca_rg` / `val_true_ca_rg` keys and canonical
+  `val_ca_pred_rg` / `val_ca_true_rg` keys when filling the C-alpha Rg column,
+  with a regression test based on the E128-style metric names. Without this,
+  a coherent returned result could have been verified correctly but still
+  formatted with a blank Rg column in `EXPERIMENT_RESULTS.md`.

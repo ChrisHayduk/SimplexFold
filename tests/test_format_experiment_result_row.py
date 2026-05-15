@@ -119,3 +119,26 @@ def test_main_selects_requested_variant_from_multirow_results(tmp_path, capsys):
         capsys.readouterr().out.strip()
         == "| E-test | completed | 9000 | 0.4600 | 0.4600 | 0.4100 | 10.5000 | - | pending |"
     )
+
+
+def test_format_result_row_accepts_canonical_ca_rg_keys():
+    result = {
+        "completed_steps": 9000,
+        "val_lddt_ca": 0.4311057258844376,
+        "val_foldscore": 0.4025340421795845,
+        "val_ca_drmsd": 11.004606088757514,
+        "val_ca_pred_rg": 11.719762571811676,
+        "val_ca_true_rg": 16.30911695623398,
+    }
+
+    row = format_result_row(
+        result,
+        run_label="E128 damped triangle-attention bias from E124",
+        status="returned",
+        decision="leader",
+    )
+
+    assert row == (
+        "| E128 damped triangle-attention bias from E124 | returned | 9000 | "
+        "0.4311 | 0.4311 | 0.4025 | 11.0046 | 11.7198 / 16.3091 | leader |"
+    )
