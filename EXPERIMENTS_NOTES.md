@@ -7634,3 +7634,12 @@
   tests/test_upsert_experiment_result_row.py` (`3 passed`), `py_compile` on
   the helper/test, ruff `F821/F822/F823` on the helper/test, and
   `git diff --check`.
+- 2026-05-15T13:11Z Added
+  `scripts/refresh_experiment_results_summary.py`, which refreshes the
+  `EXPERIMENT_RESULTS.md` date and best-score summary from the Markdown table
+  after verified rows are inserted. It ignores nonnumeric stopped-pre-eval
+  rows and treats a short-gate score above `0.7` as still needing the
+  30,000-step confirmation. Focused validation passed: `python -m pytest
+  tests/test_refresh_experiment_results_summary.py` (`4 passed`),
+  `py_compile` on the helper/test, ruff `F821/F822/F823` on the helper/test,
+  and `git diff --check`.

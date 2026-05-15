@@ -51,10 +51,12 @@ Next actions:
    recipe-metadata verifier templates now recorded in `EXPERIMENTS.md`.
    Generate the table row with `scripts/format_experiment_result_row.py` and
    insert/replace it with `scripts/upsert_experiment_result_row.py`, then
-   explicitly update the `Last updated` and `Best validation C-alpha lDDT`
-   header text based on the verified metrics. For future `--num-workers 4`
-   launches, include `--expected-num-workers 4` in
-   `scripts/verify_nanofold_benchmark_artifacts.py` verification.
+   refresh the summary header with
+   `scripts/refresh_experiment_results_summary.py`. Review the refreshed
+   `Last updated` and `Best validation C-alpha lDDT` text against the verified
+   metrics before committing. For future `--num-workers 4` launches, include
+   `--expected-num-workers 4` in `scripts/verify_nanofold_benchmark_artifacts.py`
+   verification.
 3. If E140/E141 remain below `0.45`, launch only a short E145 gate around the
    ramped parameter-free outer-neighborhood selected-cell transport; avoid
    spending 30,000 steps unless a short gate clears `0.45` with coherent
