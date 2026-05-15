@@ -261,6 +261,7 @@ class SimplicialEvoformer(torch.nn.Module):
         simplex_boundary_edge_star_residual_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_oriented_cochain_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_face_cyclic_readout_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_signed_face_cyclic_readout_scale_override: Optional[torch.Tensor] = None,
         simplex_vertex_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_pre_triangle_update_scale_override: Optional[torch.Tensor] = None,
@@ -363,6 +364,9 @@ class SimplicialEvoformer(torch.nn.Module):
                 ),
                 simplex_boundary_face_cyclic_readout_scale_override=(
                     simplex_boundary_face_cyclic_readout_scale_override
+                ),
+                simplex_boundary_signed_face_cyclic_readout_scale_override=(
+                    simplex_boundary_signed_face_cyclic_readout_scale_override
                 ),
                 simplex_vertex_star_context_scale_override=simplex_vertex_star_context_scale_override,
                 simplex_edge_star_context_scale_override=simplex_edge_star_context_scale_override,
@@ -471,6 +475,9 @@ class SimplicialEvoformer(torch.nn.Module):
                 ),
                 simplex_boundary_face_cyclic_readout_scale_override=(
                     simplex_boundary_face_cyclic_readout_scale_override
+                ),
+                simplex_boundary_signed_face_cyclic_readout_scale_override=(
+                    simplex_boundary_signed_face_cyclic_readout_scale_override
                 ),
                 simplex_vertex_star_context_scale_override=simplex_vertex_star_context_scale_override,
                 simplex_edge_star_context_scale_override=simplex_edge_star_context_scale_override,

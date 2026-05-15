@@ -161,6 +161,7 @@ class ModelConfig:
     simplex_boundary_edge_star_residual_scale: float = 0.0
     simplex_boundary_oriented_cochain_scale: float = 0.0
     simplex_boundary_face_cyclic_readout_scale: float = 0.0
+    simplex_boundary_signed_face_cyclic_readout_scale: float = 0.0
     simplex_global_context_scale: float = 0.0
     simplex_vertex_star_context_scale: float = 0.0
     simplex_edge_star_context_scale: float = 0.0

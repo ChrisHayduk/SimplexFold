@@ -60,6 +60,7 @@ from minalphafold.trainer import (
     simplex_boundary_hodge_readout_runtime_scale_at_step,
     simplex_boundary_oriented_cochain_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
+    simplex_boundary_signed_face_cyclic_readout_runtime_scale_at_step,
     simplex_cell_score_outer_edge_weight_at_step,
     simplex_edge_star_context_runtime_scale_at_step,
     save_checkpoint,
@@ -106,6 +107,7 @@ def test_simplicial_runtime_overrides_reach_model_path():
         "simplex_boundary_metric_gate_scale_override",
         "simplex_boundary_oriented_cochain_scale_override",
         "simplex_boundary_face_cyclic_readout_scale_override",
+        "simplex_boundary_signed_face_cyclic_readout_scale_override",
     ):
         assert parameter in inspect.signature(AlphaFold2.forward).parameters
         assert parameter in inspect.signature(SimplicialEvoformer.forward).parameters
@@ -228,6 +230,10 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_boundary_face_cyclic_readout_runtime_scale_final=0.5,
         simplex_boundary_face_cyclic_readout_runtime_scale_ramp_start_step=10,
         simplex_boundary_face_cyclic_readout_runtime_scale_ramp_steps=10,
+        simplex_boundary_signed_face_cyclic_readout_runtime_scale=0.0,
+        simplex_boundary_signed_face_cyclic_readout_runtime_scale_final=0.25,
+        simplex_boundary_signed_face_cyclic_readout_runtime_scale_ramp_start_step=10,
+        simplex_boundary_signed_face_cyclic_readout_runtime_scale_ramp_steps=10,
         simplex_vertex_star_context_runtime_scale=0.0,
         simplex_vertex_star_context_runtime_scale_final=1.0,
         simplex_vertex_star_context_runtime_scale_ramp_start_step=10,
@@ -301,6 +307,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_boundary_edge_star_residual_runtime_scale_at_step(training_config, 15) == 0.125
     assert simplex_boundary_oriented_cochain_runtime_scale_at_step(training_config, 15) == 0.125
     assert simplex_boundary_face_cyclic_readout_runtime_scale_at_step(training_config, 15) == 0.25
+    assert simplex_boundary_signed_face_cyclic_readout_runtime_scale_at_step(training_config, 15) == 0.125
     assert simplex_vertex_star_context_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_edge_star_context_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_pre_triangle_update_runtime_scale_at_step(training_config, 15) == 0.125
@@ -340,6 +347,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert "simplex_boundary_metric_gate_scale_override" not in eval_inputs
     assert "simplex_boundary_metric_recycling_scale_override" not in eval_inputs
     assert "simplex_boundary_cochain_recycling_scale_override" not in eval_inputs
+    assert "simplex_boundary_signed_face_cyclic_readout_scale_override" not in eval_inputs
     assert "simplex_local_neighbor_k_override" not in eval_inputs
     assert "simplex_cell_score_outer_edge_weight_override" not in eval_inputs
 
@@ -355,6 +363,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
         use_simplex_boundary_edge_star_residual_runtime_scale=True,
         use_simplex_boundary_oriented_cochain_runtime_scale=True,
         use_simplex_boundary_face_cyclic_readout_runtime_scale=True,
+        use_simplex_boundary_signed_face_cyclic_readout_runtime_scale=True,
         use_simplex_vertex_star_context_runtime_scale=True,
         use_simplex_edge_star_context_runtime_scale=True,
         use_simplex_pre_triangle_runtime_scale=True,
@@ -390,6 +399,10 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(
         train_inputs["simplex_boundary_face_cyclic_readout_scale_override"],
         torch.tensor(0.25),
+    )
+    assert torch.allclose(
+        train_inputs["simplex_boundary_signed_face_cyclic_readout_scale_override"],
+        torch.tensor(0.125),
     )
     assert torch.allclose(train_inputs["simplex_vertex_star_context_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
@@ -593,6 +606,8 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.25",
             "--simplex-boundary-face-cyclic-readout-scale",
             "0.5",
+            "--simplex-boundary-signed-face-cyclic-readout-scale",
+            "0.25",
             "--simplex-boundary-edge-star-residual-runtime-scale",
             "0.0",
             "--simplex-boundary-edge-star-residual-runtime-scale-final",
@@ -616,6 +631,14 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "--simplex-boundary-face-cyclic-readout-runtime-scale-ramp-start-step",
             "6000",
             "--simplex-boundary-face-cyclic-readout-runtime-scale-ramp-steps",
+            "500",
+            "--simplex-boundary-signed-face-cyclic-readout-runtime-scale",
+            "0.0",
+            "--simplex-boundary-signed-face-cyclic-readout-runtime-scale-final",
+            "0.25",
+            "--simplex-boundary-signed-face-cyclic-readout-runtime-scale-ramp-start-step",
+            "6000",
+            "--simplex-boundary-signed-face-cyclic-readout-runtime-scale-ramp-steps",
             "500",
             "--simplex-boundary-edge-frame-gate-runtime-scale",
             "0.0",
@@ -675,6 +698,7 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_boundary_edge_star_residual_scale == 0.25
     assert cfg.simplex_boundary_oriented_cochain_scale == 0.25
     assert cfg.simplex_boundary_face_cyclic_readout_scale == 0.5
+    assert cfg.simplex_boundary_signed_face_cyclic_readout_scale == 0.25
     assert args.simplex_boundary_edge_star_residual_runtime_scale == 0.0
     assert args.simplex_boundary_edge_star_residual_runtime_scale_final == 0.25
     assert args.simplex_boundary_edge_star_residual_runtime_scale_ramp_start_step == 6000
@@ -687,6 +711,10 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert args.simplex_boundary_face_cyclic_readout_runtime_scale_final == 0.5
     assert args.simplex_boundary_face_cyclic_readout_runtime_scale_ramp_start_step == 6000
     assert args.simplex_boundary_face_cyclic_readout_runtime_scale_ramp_steps == 500
+    assert args.simplex_boundary_signed_face_cyclic_readout_runtime_scale == 0.0
+    assert args.simplex_boundary_signed_face_cyclic_readout_runtime_scale_final == 0.25
+    assert args.simplex_boundary_signed_face_cyclic_readout_runtime_scale_ramp_start_step == 6000
+    assert args.simplex_boundary_signed_face_cyclic_readout_runtime_scale_ramp_steps == 500
     assert args.simplex_boundary_edge_frame_gate_runtime_scale == 0.0
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_final == 0.05
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step == 6000
@@ -1417,6 +1445,7 @@ def test_simplicial_boundary_hodge_readout_adds_no_parameters():
         simplex_boundary_edge_star_residual_scale=0.5,
         simplex_boundary_oriented_cochain_scale=0.5,
         simplex_boundary_face_cyclic_readout_scale=0.5,
+        simplex_boundary_signed_face_cyclic_readout_scale=0.5,
     )
 
     base_params = sum(parameter.numel() for parameter in AlphaFold2(base_medium).parameters())

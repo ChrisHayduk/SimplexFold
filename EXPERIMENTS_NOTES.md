@@ -6896,3 +6896,29 @@
   skeleton and validated the documented flags through the local
   `parse_args` path: run name accepted, variant `full_msa_to_face`, oriented
   cochain final runtime scale `0.25`, and effective batch size `8`.
+- 2026-05-15T07:02Z E138 remained active and below cutoff on the same owned
+  pod: PID `24980` had elapsed `01:00:16`, CPU time `12:35:02`, `%CPU=1252`,
+  RSS about `1.8 GiB`, and no new result bundle, eval details, or checkpoint.
+  Remote artifacts were still `run_metadata.json` plus inherited history
+  ending at E128 step `8500` with `val_lddt_ca=0.4311057258844376`; no
+  `EXPERIMENT_RESULTS.md` update is appropriate.
+- 2026-05-15T07:07Z Prepared E141 locally while E138 continues; no Runpod
+  launch. E141 is the signed version of E138's face-cyclic boundary readout:
+  it keeps the selected 2-simplex boundary cycle but applies the oriented
+  incidence sign, scattering face `[i,j,k]` updates as `(ij, jk, -ik -> ki)`.
+  This is a parameter-neutral simplicial cochain readout change, not an
+  output-side C-alpha lDDT/radius/distance loss. Local validation passed:
+  `python -m py_compile` for `simplex.py`, `evoformer.py`, `model.py`,
+  `trainer.py`, and the NanoFold runner; the nine focused signed-boundary
+  parser/runtime tests (`9 passed`); and the broader
+  `tests/test_simplex.py tests/test_nanofold_public_benchmarks.py
+  tests/test_trainer.py` slice (`228 passed`). Focused ruff
+  undefined-name/syntax-risk checks and `git diff --check` also passed.
+  Parameter audit counted `3,106,690` parameters with or without
+  `simplex_boundary_signed_face_cyclic_readout_scale=0.25`, so the operator
+  adds no parameters and remains under the `3,261,974` cap. The documented
+  E141 launch flags parse with effective batch size `8` and signed
+  face-cyclic runtime final scale `0.25`. E141 should stay parked until E138
+  returns or is terminally documented; if the current heartbeat has already
+  launched E139 by then, do not interrupt that fallback solely to run E141
+  first.

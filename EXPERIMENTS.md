@@ -6356,3 +6356,70 @@ model parameters. Local checks after documenting the parked recipe:
 
 - `python - <<'PY' ... AlphaFold2(load_model_config("simplexfold_medium_param_matched")) ... PY`: parameter count `3,106,690 <= 3,261,974`
 - `python -m pytest tests/test_trainer.py::test_simplicial_expansion_hinge_adds_no_parameters tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights tests/test_nanofold_public_benchmarks.py::test_benchmark_loss_builder_applies_topology_margin_config tests/test_nanofold_public_benchmarks.py::test_full_msa_to_face_expansion_hinge_variant_is_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_full_msa_to_face_expansion_hinge_variant_keeps_base_topology`: `5 passed`
+
+### E141: Signed Face-Cyclic Boundary Readout
+
+Status: locally implemented and validated while E138 is active; do not launch
+until E138 has returned or been documented as a terminal failure. If the
+current heartbeat has already launched the earlier E139 fallback, do not
+interrupt it just to run E141 first.
+
+Hypothesis: E138 tests whether selected face cochains should write back into
+pair state through each triangular boundary cycle `(i->j, j->k, k->i)`.
+However, that E138 cycle is unsigned. In an oriented simplicial complex, the
+boundary of face `[i,j,k]` is `[j,k] - [i,k] + [i,j]`; when the `(i,k)` slot
+is written as the reverse directed edge `(k,i)`, it should carry the negative
+incidence sign. E141 tests whether preserving that signed boundary operator
+helps the pair trunk use higher-order face orientation instead of receiving an
+unsigned cyclic average.
+
+Mechanism: add `simplex_boundary_signed_face_cyclic_readout_scale` and the
+matching runtime-ramp flags. The adapter computes the same selected
+face-edge updates as E138, but scatters them to the cyclic directed boundary
+edges as `(ij, jk, -ik -> ki)`. This is parameter-neutral and changes only
+the selected face-to-pair cochain readout. It adds no C-alpha lDDT, radius,
+all-pairs distance, or coordinate loss.
+
+Candidate launch after E138 is documented:
+
+```bash
+--run-name e141_signed_face_cyclic_boundary_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-boundary-readout-directionality 0.25 \
+--simplex-boundary-signed-face-cyclic-readout-scale 0.25 \
+--simplex-boundary-signed-face-cyclic-readout-runtime-scale 0.0 \
+--simplex-boundary-signed-face-cyclic-readout-runtime-scale-final 0.25 \
+--simplex-boundary-signed-face-cyclic-readout-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-signed-face-cyclic-readout-runtime-scale-ramp-steps 500
+```
+
+Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, edge-frame message runtime scale `0.0125`, global context
+`0.1`, vertex-star context `1.0`, and edge-star runtime `0.5`. Do not combine
+with E130's Hodge readout. Only combine with E138's unsigned face-cyclic path
+if E138 returns a coherent primary-lDDT improvement but seems under-signed by
+diagnostics.
+
+Parameter audit: no new trainable modules; the E128-family architecture
+remains under the AF2-medium +5% cap at the existing audited
+`3,240,738 <= 3,261,974`.
+
+Decision rule: reject unless E141 beats E128 and any returned E138/E139 result
+on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
+coherent. It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation status on the local branch while E138 runs:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py::test_cyclic_face_boundary_helpers_return_oriented_face_cycle tests/test_simplex.py::test_simplicial_adapter_signed_face_cyclic_readout_changes_directed_pair_update tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_hodge_readout_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `228 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- Parameter audit: `3,106,690` with or without `simplex_boundary_signed_face_cyclic_readout_scale=0.25`, so the change adds zero parameters and stays below `3,261,974`.
+- `python - <<'PY' ... parse_args(E141 full launch flags) ... PY`: accepted
+  the documented E141 flags, with effective batch size `8` and signed
+  face-cyclic runtime final scale `0.25`.

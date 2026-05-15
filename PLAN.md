@@ -103,6 +103,17 @@ their geometry reaches the structure module. Launch only after E138 returns
 and E139 is either returned or deliberately skipped; keep it as a topology
 realization probe, not as a generic score-chasing loss.
 
+Local next candidate prepared while E138 runs: E141 signed face-cyclic
+boundary readout. E138's face-cyclic readout preserves the directed
+2-simplex boundary cycle, but it is unsigned. The actual oriented boundary of
+face `[i,j,k]` is `[j,k] - [i,k] + [i,j]`, so the `(i,k)` boundary slot should
+enter the reverse `(k,i)` edge with a negative incidence coefficient. E141
+adds a parameter-neutral signed version of the face-cyclic readout with the
+same runtime-ramp pattern. It is the more faithful topology test of the
+E138 idea, not a metric-side loss. Do not launch it while E138 is active;
+prefer it only after E138 is documented, unless the existing heartbeat has
+already launched the previously documented E139 fallback.
+
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
 E118 residue vertex-star route with a half-strength boundary-edge-star

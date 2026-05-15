@@ -32,6 +32,7 @@ from minalphafold.simplex import (
     segment_geometry_features,
     simplex_boundary_metric_confidence_map,
     simplex_boundary_metric_recycling_bins,
+    signed_cyclic_face_boundary_updates,
     tetra_edge_frame_features,
     tetra_geometry_features,
     vertex_star_cell_mean,
@@ -2015,9 +2016,11 @@ def test_cyclic_face_boundary_helpers_return_oriented_face_cycle():
 
     edges = cyclic_face_boundary_edges(face_indices)
     cyclic_updates = cyclic_face_boundary_updates(updates)
+    signed_updates = signed_cyclic_face_boundary_updates(updates)
 
     assert edges.tolist() == [[[[[2, 5], [5, 7], [7, 2]]]]]
     assert cyclic_updates.flatten().tolist() == [1.0, 3.0, 2.0]
+    assert signed_updates.flatten().tolist() == [1.0, 3.0, -2.0]
 
 
 def test_simplicial_adapter_hodge_centers_boundary_pair_update():
@@ -2185,6 +2188,42 @@ def test_simplicial_adapter_face_cyclic_readout_changes_directed_pair_update():
     assert torch.allclose(single_override, single_cyclic)
     assert pair_cyclic.shape == pair_base.shape
     assert single_cyclic.shape == single_base.shape
+
+
+def test_simplicial_adapter_signed_face_cyclic_readout_changes_directed_pair_update():
+    class BaseCyclicConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_use_tetra = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_boundary_readout_directionality = 1.0
+
+    class SignedCyclicConfig(BaseCyclicConfig):
+        simplex_boundary_signed_face_cyclic_readout_scale = 1.0
+
+    torch.manual_seed(90)
+    pair = torch.randn(1, 6, 6, SignedCyclicConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 6, SignedCyclicConfig.c_s)
+    base = SimplicialAdapter(BaseCyclicConfig()).eval()
+    signed_cyclic = SimplicialAdapter(SignedCyclicConfig()).eval()
+    signed_cyclic.load_state_dict(base.state_dict())
+
+    with torch.no_grad():
+        pair_base, single_base, _ = base(pair, single)
+        pair_signed, single_signed, _ = signed_cyclic(pair, single)
+        pair_override, single_override, _ = base(
+            pair,
+            single,
+            simplex_boundary_signed_face_cyclic_readout_scale_override=pair.new_tensor(1.0),
+        )
+
+    assert not torch.allclose(pair_signed, pair_base)
+    assert torch.allclose(pair_override, pair_signed)
+    assert torch.allclose(single_override, single_signed)
+    assert pair_signed.shape == pair_base.shape
+    assert single_signed.shape == single_base.shape
 
 
 def test_simplex_boundary_metric_recycling_bins_scatter_selected_boundary_edges():
