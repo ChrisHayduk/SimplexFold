@@ -6869,3 +6869,11 @@
   checkpoint existed. Treat this as an active warning, not a returned result;
   if the same no-write state persists to the E130-style cutoff, classify E138
   as a runtime-failed branch before launching E139.
+- 2026-05-15T06:45Z E138 still had no writeout, but the next health sample
+  showed active GPU work again rather than a persistent stall: PID `24980`
+  was alive at elapsed `00:43:14`, CPU time `09:01:27`, `%CPU=1252`, RSS about
+  `1.9 GiB`, and `nvidia-smi` reported `58%` GPU utilization with `38.2 GiB`
+  allocated. Artifacts were unchanged (`run_metadata.json` plus inherited
+  history ending at step `8500`, no result/eval/checkpoint files). Keep E138
+  running under the heartbeat; do not classify it failed solely from the
+  earlier zero-utilization burst.
