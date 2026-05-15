@@ -7310,8 +7310,8 @@ python scripts/audit_goal_artifact.py \
 
 Decision rule: E145 should not receive a 30k spend unless a short gate clears
 `0.45` primary C-alpha lDDT and preserves coherent FoldScore, dRMSD, and
-C-alpha Rg. If E140 or E141 already clears the threshold, prioritize continuing
-that returned branch instead.
+C-alpha Rg. If E141 clears the threshold, prioritize continuing that returned
+branch instead.
 
 Validation status:
 

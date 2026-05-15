@@ -1,5 +1,13 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 Current Handoff Wording Cleanup
+
+- Rechecked the active handoff text while E141 continues. Updated the current
+  `PLAN.md` return handoff to point at the E141 verifier template rather than
+  the older E140/E141 pair, and updated E145's current decision rule so the
+  only active threshold-clearing branch it can defer to is E141. Historical
+  notes that describe past E140/E141 monitoring windows were left intact.
+
 ## 2026-05-15 Runpod Status Heartbeat Hardening
 
 - Hardened `scripts/run_nanofold_public_benchmarks.py` against the E140

@@ -52,8 +52,8 @@ Next actions:
    and no scored result.
 2. When E141 returns, verify and pull artifacts, update
    `EXPERIMENT_RESULTS.md`, commit/push, then decide whether the returned
-   score justifies a continuation or pivot. Use the exact E140/E141
-   recipe-metadata verifier templates now recorded in `EXPERIMENTS.md`.
+   score justifies a continuation or pivot. Use the exact E141
+   recipe-metadata verifier template now recorded in `EXPERIMENTS.md`.
    After verifier and eval-detail analysis pass, record the row/header update
    with `scripts/record_experiment_result.py`, which composes the formatter,
    row upsert, and summary-refresh helpers. Review the refreshed
