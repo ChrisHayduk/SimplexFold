@@ -6577,3 +6577,13 @@
   reported `221 passed`; focused ruff checks for undefined-name/syntax-risk
   rules passed; `git diff --check` passed. E133 remains a parked fallback
   while E130 is active.
+- 2026-05-15T04:10Z E130 continued active on owned pod `c67fbk189vnvfp`.
+  `runpodctl pod get c67fbk189vnvfp` reported desired status `RUNNING`; SSH
+  inspection showed PID `4224` still running the intended
+  `e130_hodge_boundary_readout_from_e128_s9000_c256_m64` command with elapsed
+  time `01:10:15`, `%CPU=1246`, and RSS about `1.9 GiB`. Remote artifacts
+  still contained only `history_full_msa_to_face.json` and `run_metadata.json`;
+  history length remained `18` ending at inherited E128 step `8500` with
+  `val_lddt_ca=0.4311057258844376`. No `results.json`, `results.csv`,
+  eval-details file, or step-9000 checkpoint existed, so leave the pod running
+  and do not update `EXPERIMENT_RESULTS.md` yet.
