@@ -68,6 +68,7 @@ from minalphafold.trainer import (
     simplex_local_neighbor_k_at_step,
     simplex_msa_feedback_runtime_scale_at_step,
     simplex_pair_update_runtime_scale_at_step,
+    simplex_outer_edge_residual_context_runtime_scale_at_step,
     simplex_pre_triangle_single_update_runtime_scale_at_step,
     simplex_pre_triangle_update_runtime_scale_at_step,
     simplex_segment_cell_runtime_scale_at_step,
@@ -112,6 +113,7 @@ def test_simplicial_runtime_overrides_reach_model_path():
         "simplex_boundary_signed_face_cyclic_readout_scale_override",
         "simplex_signed_tetra_coboundary_scale_override",
         "simplex_signed_tetra_to_face_scale_override",
+        "simplex_outer_edge_residual_context_scale_override",
     ):
         assert parameter in inspect.signature(AlphaFold2.forward).parameters
         assert parameter in inspect.signature(SimplicialEvoformer.forward).parameters
@@ -206,6 +208,10 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_single_update_runtime_scale_final=0.0,
         simplex_single_update_runtime_scale_ramp_start_step=10,
         simplex_single_update_runtime_scale_ramp_steps=10,
+        simplex_outer_edge_residual_context_runtime_scale=0.0,
+        simplex_outer_edge_residual_context_runtime_scale_final=0.25,
+        simplex_outer_edge_residual_context_runtime_scale_ramp_start_step=10,
+        simplex_outer_edge_residual_context_runtime_scale_ramp_steps=10,
         simplex_hodge_face_runtime_scale=0.0,
         simplex_hodge_face_runtime_scale_final=0.1,
         simplex_hodge_face_runtime_scale_ramp_start_step=10,
@@ -312,6 +318,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_update_scale_at_step(training_config, 15) == 0.625
     assert simplex_pair_update_runtime_scale_at_step(training_config, 15) == 0.75
     assert simplex_single_update_runtime_scale_at_step(training_config, 15) == 0.5
+    assert simplex_outer_edge_residual_context_runtime_scale_at_step(training_config, 15) == 0.125
     assert simplex_hodge_face_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_signed_tetra_coboundary_runtime_scale_at_step(training_config, 15) == 0.1
     assert simplex_signed_tetra_to_face_runtime_scale_at_step(training_config, 15) == 0.1
@@ -341,6 +348,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     eval_inputs = model_inputs_from_batch(batch, training_config)
     assert "simplex_teacher_ca_coords" not in eval_inputs
     assert "simplex_pair_update_scale_override" not in eval_inputs
+    assert "simplex_outer_edge_residual_context_scale_override" not in eval_inputs
     assert "simplex_hodge_face_update_scale_override" not in eval_inputs
     assert "simplex_signed_tetra_coboundary_scale_override" not in eval_inputs
     assert "simplex_signed_tetra_to_face_scale_override" not in eval_inputs
@@ -372,6 +380,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
         training_config,
         use_simplex_teacher_forcing=True,
         use_simplex_update_scale=True,
+        use_simplex_outer_edge_residual_context_runtime_scale=True,
         use_simplex_hodge_face_runtime_scale=True,
         use_simplex_signed_tetra_coboundary_runtime_scale=True,
         use_simplex_signed_tetra_to_face_runtime_scale=True,
@@ -402,6 +411,10 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_teacher_forcing_weight"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_pair_update_scale_override"], torch.tensor(0.75))
     assert torch.allclose(train_inputs["simplex_single_update_scale_override"], torch.tensor(0.5))
+    assert torch.allclose(
+        train_inputs["simplex_outer_edge_residual_context_scale_override"],
+        torch.tensor(0.125),
+    )
     assert torch.allclose(train_inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_signed_tetra_coboundary_scale_override"], torch.tensor(0.1))
     assert torch.allclose(train_inputs["simplex_signed_tetra_to_face_scale_override"], torch.tensor(0.1))
@@ -608,6 +621,14 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.5",
             "--simplex-outer-edge-residual-context-scale",
             "0.25",
+            "--simplex-outer-edge-residual-context-runtime-scale",
+            "0.0",
+            "--simplex-outer-edge-residual-context-runtime-scale-final",
+            "0.25",
+            "--simplex-outer-edge-residual-context-runtime-scale-ramp-start-step",
+            "6000",
+            "--simplex-outer-edge-residual-context-runtime-scale-ramp-steps",
+            "500",
             "--simplex-pre-triangle-update-scale",
             "0.25",
             "--simplex-pre-triangle-single-update-scale",
@@ -752,6 +773,10 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert args.simplex_signed_tetra_to_face_runtime_scale_final == 0.25
     assert args.simplex_signed_tetra_to_face_runtime_scale_ramp_start_step == 6000
     assert args.simplex_signed_tetra_to_face_runtime_scale_ramp_steps == 500
+    assert args.simplex_outer_edge_residual_context_runtime_scale == 0.0
+    assert args.simplex_outer_edge_residual_context_runtime_scale_final == 0.25
+    assert args.simplex_outer_edge_residual_context_runtime_scale_ramp_start_step == 6000
+    assert args.simplex_outer_edge_residual_context_runtime_scale_ramp_steps == 500
     assert args.simplex_boundary_edge_star_residual_runtime_scale == 0.0
     assert args.simplex_boundary_edge_star_residual_runtime_scale_final == 0.25
     assert args.simplex_boundary_edge_star_residual_runtime_scale_ramp_start_step == 6000

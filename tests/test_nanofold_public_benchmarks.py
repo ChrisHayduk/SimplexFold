@@ -26,6 +26,7 @@ from minalphafold.trainer import (
     simplex_hodge_face_runtime_scale_at_step,
     simplex_msa_feedback_runtime_scale_at_step,
     simplex_outer_edge_context_runtime_scale_at_step,
+    simplex_outer_edge_residual_context_runtime_scale_at_step,
     simplex_pair_update_runtime_scale_at_step,
     simplex_pre_triangle_single_update_runtime_scale_at_step,
     simplex_pre_triangle_update_runtime_scale_at_step,
@@ -407,6 +408,14 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "--simplex-outer-edge-context-runtime-scale-ramp-start-step",
             "3000",
             "--simplex-outer-edge-context-runtime-scale-ramp-steps",
+            "500",
+            "--simplex-outer-edge-residual-context-runtime-scale",
+            "0.0",
+            "--simplex-outer-edge-residual-context-runtime-scale-final",
+            "0.25",
+            "--simplex-outer-edge-residual-context-runtime-scale-ramp-start-step",
+            "3000",
+            "--simplex-outer-edge-residual-context-runtime-scale-ramp-steps",
             "500",
             "--simplex-edge-frame-message-runtime-scale",
             "0.0",
@@ -879,6 +888,10 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_cell_score_outer_edge_weight_final == 0.5
     assert args.simplex_cell_score_outer_edge_weight_ramp_start_step == 3500
     assert args.simplex_cell_score_outer_edge_weight_ramp_steps == 500
+    assert args.simplex_outer_edge_residual_context_runtime_scale == 0.0
+    assert args.simplex_outer_edge_residual_context_runtime_scale_final == 0.25
+    assert args.simplex_outer_edge_residual_context_runtime_scale_ramp_start_step == 3000
+    assert args.simplex_outer_edge_residual_context_runtime_scale_ramp_steps == 500
     assert args.resume_model_weights_only is True
 
     cfg = _apply_model_config_overrides(load_model_config("simplexfold_medium_param_matched"), args)
@@ -931,6 +944,10 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         simplex_outer_edge_context_runtime_scale_final=0.05,
         simplex_outer_edge_context_runtime_scale_ramp_start_step=3000,
         simplex_outer_edge_context_runtime_scale_ramp_steps=500,
+        simplex_outer_edge_residual_context_runtime_scale=0.0,
+        simplex_outer_edge_residual_context_runtime_scale_final=0.25,
+        simplex_outer_edge_residual_context_runtime_scale_ramp_start_step=3000,
+        simplex_outer_edge_residual_context_runtime_scale_ramp_steps=500,
         simplex_edge_frame_message_runtime_scale=0.0,
         simplex_edge_frame_message_runtime_scale_final=0.05,
         simplex_edge_frame_message_runtime_scale_ramp_start_step=3000,
@@ -1072,6 +1089,9 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert simplex_outer_edge_context_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_outer_edge_context_runtime_scale_at_step(cfg, 3250) == 0.025
     assert simplex_outer_edge_context_runtime_scale_at_step(cfg, 3500) == 0.05
+    assert simplex_outer_edge_residual_context_runtime_scale_at_step(cfg, 3000) == 0.0
+    assert simplex_outer_edge_residual_context_runtime_scale_at_step(cfg, 3250) == 0.125
+    assert simplex_outer_edge_residual_context_runtime_scale_at_step(cfg, 3500) == 0.25
     assert simplex_edge_frame_message_runtime_scale_at_step(cfg, 3000) == 0.0
     assert simplex_edge_frame_message_runtime_scale_at_step(cfg, 3250) == 0.025
     assert simplex_edge_frame_message_runtime_scale_at_step(cfg, 3500) == 0.05
@@ -1164,6 +1184,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
         cfg,
         use_simplex_update_scale=True,
         use_simplex_outer_edge_context_runtime_scale=True,
+        use_simplex_outer_edge_residual_context_runtime_scale=True,
         use_simplex_edge_frame_message_runtime_scale=True,
         use_simplex_boundary_edge_frame_gate_runtime_scale=True,
         use_simplex_boundary_readout_directionality_runtime_scale=True,
@@ -1195,6 +1216,7 @@ def test_runtime_simplex_message_scales_ramp_and_enter_model_inputs():
     assert torch.isclose(inputs["simplex_pair_update_scale_override"], torch.tensor(0.75))
     assert torch.isclose(inputs["simplex_single_update_scale_override"], torch.tensor(0.625))
     assert torch.isclose(inputs["simplex_outer_edge_context_scale_override"], torch.tensor(0.025))
+    assert torch.isclose(inputs["simplex_outer_edge_residual_context_scale_override"], torch.tensor(0.125))
     assert torch.isclose(inputs["simplex_edge_frame_message_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_boundary_edge_frame_gate_scale_override"], torch.tensor(0.025))
     assert torch.isclose(inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
@@ -1250,6 +1272,10 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
         simplex_single_update_runtime_scale_final=0.25,
         simplex_single_update_runtime_scale_ramp_start_step=3000,
         simplex_single_update_runtime_scale_ramp_steps=500,
+        simplex_outer_edge_residual_context_runtime_scale=0.0,
+        simplex_outer_edge_residual_context_runtime_scale_final=0.25,
+        simplex_outer_edge_residual_context_runtime_scale_ramp_start_step=3000,
+        simplex_outer_edge_residual_context_runtime_scale_ramp_steps=500,
         simplex_edge_frame_message_runtime_scale=0.0,
         simplex_edge_frame_message_runtime_scale_final=0.05,
         simplex_edge_frame_message_runtime_scale_ramp_start_step=3000,
@@ -1408,6 +1434,7 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
     assert result["val_lddt_ca"] == 0.1
     assert torch.isclose(model.kwargs["simplex_pair_update_scale_override"], torch.tensor(0.75))
     assert torch.isclose(model.kwargs["simplex_single_update_scale_override"], torch.tensor(0.625))
+    assert torch.isclose(model.kwargs["simplex_outer_edge_residual_context_scale_override"], torch.tensor(0.125))
     assert torch.isclose(model.kwargs["simplex_edge_frame_message_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_boundary_edge_frame_gate_scale_override"], torch.tensor(0.025))
     assert torch.isclose(model.kwargs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))

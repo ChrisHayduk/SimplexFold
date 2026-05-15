@@ -723,6 +723,37 @@ def test_parameter_free_outer_edge_context_adapter_scale_changes_outputs_without
     assert not torch.allclose(on_single, off_single)
 
 
+def test_outer_edge_residual_context_runtime_scale_gates_parameter_free_path():
+    class OuterResidualRuntimeConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_outer_edge_residual_context_scale = 0.25
+
+    torch.manual_seed(19)
+    adapter = SimplicialAdapter(OuterResidualRuntimeConfig()).eval()
+    pair = torch.randn(1, 5, 5, OuterResidualRuntimeConfig.c_z)
+    single = torch.randn(1, 5, OuterResidualRuntimeConfig.c_s)
+
+    with torch.no_grad():
+        off_pair, off_single, _ = adapter(
+            pair,
+            single,
+            simplex_outer_edge_residual_context_scale_override=pair.new_tensor(0.0),
+        )
+        on_pair, on_single, _ = adapter(
+            pair,
+            single,
+            simplex_outer_edge_residual_context_scale_override=pair.new_tensor(0.25),
+        )
+
+    assert not torch.allclose(on_pair, off_pair)
+    assert not torch.allclose(on_single, off_single)
+
+
 def test_fold_feature_channels_matches_offset_mean_reference():
     source = torch.arange(2 * 3 * 10, dtype=torch.float32).reshape(2, 3, 10)
     for channels in (1, 3, 4, 12):

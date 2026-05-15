@@ -233,6 +233,10 @@ class TrainingConfig:
     simplex_outer_edge_context_runtime_scale_final: float | None = None
     simplex_outer_edge_context_runtime_scale_ramp_start_step: int | None = None
     simplex_outer_edge_context_runtime_scale_ramp_steps: int = 1
+    simplex_outer_edge_residual_context_runtime_scale: float | None = None
+    simplex_outer_edge_residual_context_runtime_scale_final: float | None = None
+    simplex_outer_edge_residual_context_runtime_scale_ramp_start_step: int | None = None
+    simplex_outer_edge_residual_context_runtime_scale_ramp_steps: int = 1
     simplex_hodge_face_runtime_scale: float | None = None
     simplex_hodge_face_runtime_scale_final: float | None = None
     simplex_hodge_face_runtime_scale_ramp_start_step: int | None = None
@@ -1030,6 +1034,23 @@ def simplex_outer_edge_context_runtime_scale_at_step(
     )
 
 
+def simplex_outer_edge_residual_context_runtime_scale_at_step(
+    training_config: TrainingConfig,
+    step: int | None,
+) -> float | None:
+    if training_config.simplex_outer_edge_residual_context_runtime_scale is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_outer_edge_residual_context_runtime_scale)
+    return _ramped_value(
+        training_config.simplex_outer_edge_residual_context_runtime_scale,
+        training_config.simplex_outer_edge_residual_context_runtime_scale_final,
+        step=step,
+        start_step=training_config.simplex_outer_edge_residual_context_runtime_scale_ramp_start_step,
+        ramp_steps=training_config.simplex_outer_edge_residual_context_runtime_scale_ramp_steps,
+    )
+
+
 def simplex_edge_frame_message_runtime_scale_at_step(
     training_config: TrainingConfig,
     step: int | None,
@@ -1535,6 +1556,7 @@ def model_inputs_from_batch(
     use_simplex_teacher_forcing: bool = False,
     use_simplex_update_scale: bool = False,
     use_simplex_outer_edge_context_runtime_scale: bool = False,
+    use_simplex_outer_edge_residual_context_runtime_scale: bool = False,
     use_simplex_hodge_face_runtime_scale: bool = False,
     use_simplex_signed_tetra_coboundary_runtime_scale: bool = False,
     use_simplex_signed_tetra_to_face_runtime_scale: bool = False,
@@ -1608,6 +1630,11 @@ def model_inputs_from_batch(
     if use_simplex_outer_edge_context_runtime_scale and outer_context_scale is not None:
         inputs["simplex_outer_edge_context_scale_override"] = batch["target_feat"].new_tensor(
             float(outer_context_scale)
+        )
+    outer_residual_context_scale = simplex_outer_edge_residual_context_runtime_scale_at_step(training_config, step)
+    if use_simplex_outer_edge_residual_context_runtime_scale and outer_residual_context_scale is not None:
+        inputs["simplex_outer_edge_residual_context_scale_override"] = batch["target_feat"].new_tensor(
+            float(outer_residual_context_scale)
         )
     hodge_face_scale = simplex_hodge_face_runtime_scale_at_step(training_config, step)
     if use_simplex_hodge_face_runtime_scale and hodge_face_scale is not None:
@@ -1924,6 +1951,7 @@ def train_step(
             use_simplex_teacher_forcing=True,
             use_simplex_update_scale=True,
             use_simplex_outer_edge_context_runtime_scale=True,
+            use_simplex_outer_edge_residual_context_runtime_scale=True,
             use_simplex_hodge_face_runtime_scale=True,
             use_simplex_signed_tetra_coboundary_runtime_scale=True,
             use_simplex_signed_tetra_to_face_runtime_scale=True,
@@ -2278,6 +2306,7 @@ def fit(
                     use_simplex_teacher_forcing=True,
                     use_simplex_update_scale=True,
                     use_simplex_outer_edge_context_runtime_scale=True,
+                    use_simplex_outer_edge_residual_context_runtime_scale=True,
                     use_simplex_hodge_face_runtime_scale=True,
                     use_simplex_signed_tetra_coboundary_runtime_scale=True,
                     use_simplex_signed_tetra_to_face_runtime_scale=True,
@@ -2674,6 +2703,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-outer-edge-context-runtime-scale-final", type=float, default=None)
     parser.add_argument("--simplex-outer-edge-context-runtime-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-outer-edge-context-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
+        "--simplex-outer-edge-residual-context-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for parameter-free directed outer-edge residual context updates.",
+    )
+    parser.add_argument("--simplex-outer-edge-residual-context-runtime-scale-final", type=float, default=None)
+    parser.add_argument(
+        "--simplex-outer-edge-residual-context-runtime-scale-ramp-start-step",
+        type=int,
+        default=None,
+    )
+    parser.add_argument("--simplex-outer-edge-residual-context-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
         "--simplex-hodge-face-runtime-scale",
         type=float,
@@ -3165,6 +3207,16 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
             args.simplex_outer_edge_context_runtime_scale_ramp_start_step
         ),
         simplex_outer_edge_context_runtime_scale_ramp_steps=args.simplex_outer_edge_context_runtime_scale_ramp_steps,
+        simplex_outer_edge_residual_context_runtime_scale=args.simplex_outer_edge_residual_context_runtime_scale,
+        simplex_outer_edge_residual_context_runtime_scale_final=(
+            args.simplex_outer_edge_residual_context_runtime_scale_final
+        ),
+        simplex_outer_edge_residual_context_runtime_scale_ramp_start_step=(
+            args.simplex_outer_edge_residual_context_runtime_scale_ramp_start_step
+        ),
+        simplex_outer_edge_residual_context_runtime_scale_ramp_steps=(
+            args.simplex_outer_edge_residual_context_runtime_scale_ramp_steps
+        ),
         simplex_hodge_face_runtime_scale=args.simplex_hodge_face_runtime_scale,
         simplex_hodge_face_runtime_scale_final=args.simplex_hodge_face_runtime_scale_final,
         simplex_hodge_face_runtime_scale_ramp_start_step=args.simplex_hodge_face_runtime_scale_ramp_start_step,

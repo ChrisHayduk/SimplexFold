@@ -7454,3 +7454,15 @@
   coherently. The heartbeat now explicitly forbids launching E145 on
   undersized 24GB/32GB hardware and requires suitable 80GB-class capacity plus
   the audited `--num-workers 4` runtime knob for any future E145 short gate.
+- 2026-05-15T11:59Z Added runtime-ramp plumbing for the E145
+  parameter-free outer-edge residual context path. The new
+  `simplex_outer_edge_residual_context_runtime_scale*` flags thread through the
+  NanoFold runner, trainer schedules, model-input overrides, AlphaFold2,
+  Evoformer, and the SimplicialAdapter so the resumed E128 checkpoint can ramp
+  the Topotein-style external-edge cochain update from `0.0` to `0.25` across
+  steps `8500`-`9000`. This is still a topology-native cochain transport
+  change and adds zero parameters. Validation passed: py_compile for the
+  touched model/trainer/runner/test files, the focused E145/runtime plumbing
+  pytest set (`11 passed`), and the E128-style parameter audit remains
+  `3,240,738 <= 3,261,974`. The heartbeat automation was updated to require
+  these ramp flags for any future E145 launch.

@@ -37,6 +37,9 @@ hook was too expensive on top of the full E128 recipe, so E145 uses a new
 parameter-free `simplex_outer_edge_residual_context_scale` path that folds
 directed external pair-edge context into face/tetra cochain channels. Parameter
 audit: E128-style recipe with E145 scale `0.25` remains `3,240,738 <= 3,261,974`.
+The launch should use the runtime override ramp from `0.0` to `0.25` across
+steps `8500`-`9000`, so the resumed E128 checkpoint is not hit with an abrupt
+new outer-neighborhood cochain update.
 
 Next actions:
 
@@ -46,9 +49,9 @@ Next actions:
    `EXPERIMENT_RESULTS.md`, commit/push, then decide whether the returned
    score justifies a continuation or pivot.
 3. If E140/E141 remain below `0.45`, launch only a short E145 gate around the
-   parameter-free outer-neighborhood selected-cell transport; avoid spending
-   30,000 steps unless a short gate clears `0.45` with coherent FoldScore,
-   dRMSD, and C-alpha Rg.
+   ramped parameter-free outer-neighborhood selected-cell transport; avoid
+   spending 30,000 steps unless a short gate clears `0.45` with coherent
+   FoldScore, dRMSD, and C-alpha Rg.
 4. For the next launched short gate, run a startup smoke with a small
    DataLoader worker count such as `--num-workers 4`. E140/E141 inherited the
    runner default `0`, and both owned A100 pods have 128 CPU cores while the

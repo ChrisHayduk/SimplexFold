@@ -7049,7 +7049,10 @@ into symmetric and oriented context, folds that context into the active
 face/tetra cochain width without learned weights, RMS-matches it to the cell
 state, and gates it with the existing face/tetra gate. This preserves the full
 E128 boundary-realization stack instead of removing edge-frame or
-boundary-edge-frame paths.
+boundary-edge-frame paths. The parked launch now uses the matching runtime
+override to ramp this parameter-free cochain update from `0.0` to `0.25` over
+the resumed `8500`-`9000` window, avoiding an abrupt topology-message change
+at the E128 checkpoint boundary.
 
 Parameter constraint: the existing trainable `simplex_outer_edge_context_scale`
 module is semantically similar but too expensive on top of the full E128
@@ -7061,7 +7064,11 @@ Candidate flag, only after E140/E141 return below threshold:
 
 ```bash
 --run-name e145_outer_residual_context_from_e128_s9000_c256_m64 \
---simplex-outer-edge-residual-context-scale 0.25
+--simplex-outer-edge-residual-context-scale 0.25 \
+--simplex-outer-edge-residual-context-runtime-scale 0.0 \
+--simplex-outer-edge-residual-context-runtime-scale-final 0.25 \
+--simplex-outer-edge-residual-context-runtime-scale-ramp-start-step 8500 \
+--simplex-outer-edge-residual-context-runtime-scale-ramp-steps 500
 ```
 
 Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
@@ -7082,8 +7089,8 @@ that returned branch instead.
 
 Validation status:
 
-- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed.
-- `python -m pytest tests/test_simplex.py::test_parameter_free_outer_edge_context_delta_uses_external_directed_edges tests/test_simplex.py::test_parameter_free_outer_edge_context_adapter_scale_changes_outputs_without_new_parameters tests/test_trainer.py::test_simplicial_parameter_free_outer_edge_context_adds_no_parameters tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_nanofold_public_benchmarks.py::test_model_config_overrides_preserve_resume_compatible_variant_name`: `5 passed`.
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed.
+- `python -m pytest tests/test_simplex.py::test_parameter_free_outer_edge_context_delta_uses_external_directed_edges tests/test_simplex.py::test_parameter_free_outer_edge_context_adapter_scale_changes_outputs_without_new_parameters tests/test_simplex.py::test_outer_edge_residual_context_runtime_scale_gates_parameter_free_path tests/test_trainer.py::test_simplicial_parameter_free_outer_edge_context_adds_no_parameters tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation tests/test_nanofold_public_benchmarks.py::test_model_config_overrides_preserve_resume_compatible_variant_name`: `11 passed`.
 - Parameter audit: E128 recipe plus E145 scale `0.25` is `3,240,738 <= 3,261,974`.
 - Readiness cleanup: `_fold_feature_channels`, used by the parameter-free
   outer-neighborhood projection, is now vectorized and covered by

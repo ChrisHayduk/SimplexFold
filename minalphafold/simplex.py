@@ -2194,6 +2194,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_pair_update_scale_override: Optional[torch.Tensor] = None,
         simplex_single_update_scale_override: Optional[torch.Tensor] = None,
         simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
+        simplex_outer_edge_residual_context_scale_override: Optional[torch.Tensor] = None,
         simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_signed_tetra_coboundary_scale_override: Optional[torch.Tensor] = None,
         simplex_signed_tetra_to_face_scale_override: Optional[torch.Tensor] = None,
@@ -2235,6 +2236,15 @@ class SimplicialAdapter(torch.nn.Module):
             outer_edge_context_scale = max(
                 float(simplex_outer_edge_context_scale_override.detach().float().cpu().item()),
                 0.0,
+            )
+        outer_edge_residual_context_scale = self.outer_edge_residual_context_scale
+        if simplex_outer_edge_residual_context_scale_override is not None:
+            outer_edge_residual_context_scale = min(
+                max(
+                    float(simplex_outer_edge_residual_context_scale_override.detach().float().cpu().item()),
+                    0.0,
+                ),
+                1.0,
             )
         hodge_face_update_scale = self.hodge_face_update_scale
         if simplex_hodge_face_update_scale_override is not None:
@@ -2543,7 +2553,7 @@ class SimplicialAdapter(torch.nn.Module):
                 * topology.face_mask[..., None]
             )
             face_state = face_state * topology.face_mask[..., None]
-        if self.outer_edge_residual_context_scale > 0.0:
+        if outer_edge_residual_context_scale > 0.0:
             outer_msg = parameter_free_outer_edge_context_delta(
                 pair,
                 face_indices,
@@ -2553,7 +2563,7 @@ class SimplicialAdapter(torch.nn.Module):
             )
             outer_msg = _rms_match_update(outer_msg, face_state)
             face_state = face_state + self.dropout(
-                self.outer_edge_residual_context_scale
+                outer_edge_residual_context_scale
                 * torch.sigmoid(self.face_gate(face_state))
                 * outer_msg
                 * topology.face_mask[..., None]
@@ -2624,6 +2634,7 @@ class SimplicialAdapter(torch.nn.Module):
                 topology,
                 coords_for_geometry,
                 outer_edge_context_scale=outer_edge_context_scale,
+                outer_edge_residual_context_scale=outer_edge_residual_context_scale,
                 boundary_incidence_normalization=self.boundary_incidence_normalization,
             )
 
@@ -3321,6 +3332,7 @@ class SimplicialAdapter(torch.nn.Module):
         recycled_ca_coords: Optional[torch.Tensor],
         *,
         outer_edge_context_scale: float,
+        outer_edge_residual_context_scale: float,
         boundary_incidence_normalization: float,
     ) -> torch.Tensor:
         tet_i, tet_j, tet_k, tet_l = topology.tetra_indices.unbind(dim=-1)
@@ -3403,7 +3415,7 @@ class SimplicialAdapter(torch.nn.Module):
                 * topology.tetra_mask[..., None]
             )
             tetra_state = tetra_state * topology.tetra_mask[..., None]
-        if self.outer_edge_residual_context_scale > 0.0:
+        if outer_edge_residual_context_scale > 0.0:
             outer_msg = parameter_free_outer_edge_context_delta(
                 pair,
                 topology.tetra_indices,
@@ -3413,7 +3425,7 @@ class SimplicialAdapter(torch.nn.Module):
             )
             outer_msg = _rms_match_update(outer_msg, tetra_state)
             tetra_state = tetra_state + self.dropout(
-                self.outer_edge_residual_context_scale
+                outer_edge_residual_context_scale
                 * torch.sigmoid(self.tetra_gate(tetra_state))
                 * outer_msg
                 * topology.tetra_mask[..., None]
