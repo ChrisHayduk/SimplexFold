@@ -124,6 +124,16 @@
   scripts/verify_nanofold_benchmark_artifacts.py
   tests/test_verify_nanofold_benchmark_artifacts.py`, the E128 metadata audit
   dry run, and `git diff --check`.
+- Added explicit goal-level artifact audit command templates beside the
+  returned-artifact verifier templates for E140, E141, and E145 in
+  `EXPERIMENTS.md`. The E140/E141 templates intentionally omit
+  `--expected-num-workers`; the E145 template includes `--expected-num-workers
+  4` and the outer-edge residual context metadata.
+- Updated heartbeat automation `check-simplexfold-e57-runpod` in place so
+  returned E140/E141 handoffs now run the exact goal-audit templates in
+  `EXPERIMENTS.md` after verifier success, before eval-detail analysis and
+  result recording. Owned-pod scope, Runpod-management limits, E145 gating,
+  and the 30-minute schedule are unchanged.
 
 ## 2026-05-15 Owned Runpod Heartbeat
 
