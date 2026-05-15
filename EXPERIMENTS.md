@@ -43,6 +43,10 @@ on 2026-05-12. They sharpen the filter for future ideas:
   diagnostics alongside lDDT: selected-cell counts, boundary-edge reuse,
   outer-edge availability, selected boundary lDDT, boundary length error, and
   contraction fraction.
+- Use `scripts/analyze_nanofold_eval_details.py` on returned eval-detail CSVs
+  when a branch changes local-to-global assembly behavior. It reports
+  aggregate length-bin, lDDT-stratum, boundary-vs-global, Rg, and topology
+  diagnostics without printing chain identifiers.
 
 The 2026-05-12 full reread adds several concrete filters for the next queue:
 

@@ -7363,3 +7363,16 @@
   local-boundary-only objective is unlikely to solve the gap by itself. This
   supports prioritizing E140/E145-style selected-complex realization and
   outer-neighborhood communication over generic C-alpha lDDT/Rg losses.
+- 2026-05-15T11:15Z Added reusable aggregate eval-detail analyzer
+  `scripts/analyze_nanofold_eval_details.py` plus tests. The helper computes
+  length-bin metrics, lDDT strata, correlations against primary C-alpha lDDT,
+  Rg summaries, selected-boundary diagnostics, boundary/outer-edge degree
+  summaries, and the high-boundary/low-global subset without printing chain
+  identifiers. Focused validation passed: `python -m py_compile
+  scripts/analyze_nanofold_eval_details.py`; `python -m pytest
+  tests/test_analyze_nanofold_eval_details.py` (`3 passed`); and
+  `../../.venv/bin/ruff check scripts/analyze_nanofold_eval_details.py
+  tests/test_analyze_nanofold_eval_details.py`. A real E128 smoke reproduced
+  the documented aggregate signal: `1000` rows, mean lDDT `0.4311`, length-bin
+  lDDT from `0.5096` (`<80`) to `0.3919` (`>=220`), and 75
+  high-boundary/low-global rows.
