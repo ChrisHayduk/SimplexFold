@@ -1,9 +1,12 @@
 import csv
 import json
+from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
-from scripts.audit_goal_artifact import audit_goal_artifact, format_goal_audit, main
+from scripts.audit_goal_artifact import audit_goal_artifact, cli, format_goal_audit, main
 
 
 def _write_run(run_dir, *, completed_steps=30_000, val_lddt_ca=0.705, parameters=3_240_738):
@@ -177,3 +180,49 @@ def test_main_accepts_metadata_and_can_emit_json(tmp_path, capsys):
     assert audit.goal_ready is True
     assert output["goal_ready"] is True
     assert output["verified"]["parameters"] == 3_240_738
+
+
+def test_cli_returns_failure_when_goal_gates_fail(tmp_path, capsys):
+    run_dir = tmp_path / "run"
+    _write_run(run_dir, completed_steps=9000, val_lddt_ca=0.71)
+
+    exit_code = cli([str(run_dir), "--max-parameters", "3261974", "--expected-eval-rows", "1"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 1
+    assert "Goal-ready candidate: FAIL" in output
+
+
+def test_cli_returns_success_for_confirmed_goal_candidate(tmp_path, capsys):
+    run_dir = tmp_path / "run"
+    _write_run(run_dir)
+
+    exit_code = cli([str(run_dir), "--max-parameters", "3261974", "--expected-eval-rows", "1"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Goal-ready candidate: PASS" in output
+
+
+def test_script_entrypoint_exits_nonzero_when_goal_gates_fail(tmp_path):
+    run_dir = tmp_path / "run"
+    _write_run(run_dir, completed_steps=9000, val_lddt_ca=0.71)
+    script = Path(__file__).resolve().parents[1] / "scripts" / "audit_goal_artifact.py"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            str(run_dir),
+            "--max-parameters",
+            "3261974",
+            "--expected-eval-rows",
+            "1",
+        ],
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+
+    assert completed.returncode == 1
+    assert "Goal-ready candidate: FAIL" in completed.stdout

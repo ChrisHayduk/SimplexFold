@@ -1,5 +1,35 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 Artifact Goal Audit Exit-Code Fix
+
+- Fixed `scripts/audit_goal_artifact.py` so the script entry point exits
+  nonzero when the artifact verifies but fails any explicit goal gate. The
+  importable `main()` still returns the `GoalArtifactAudit` object for tests
+  and helper composition, while the new `cli()` wrapper returns `0` only for a
+  true goal-ready candidate.
+- Added regression coverage for the CLI wrapper and the exact
+  `python scripts/audit_goal_artifact.py ...` entry point. The real E128
+  metadata dry run now prints `Goal-ready candidate: FAIL` and exits with
+  code `1`, as expected for a below-target 8500-step short gate.
+- Updated the experiment contract in `EXPERIMENTS.md`: goal-audit nonzero
+  exits are expected for ordinary non-goal short gates, so returned results
+  should still be recorded after artifact verification passes.
+- Updated heartbeat automation `check-simplexfold-e57-runpod` with the same
+  interpretation: capture goal-audit output/exit code, but keep eval-detail
+  analysis and result recording moving after verifier success when a short
+  gate simply fails the full 30k/0.7 readiness criteria.
+- Focused validation passed:
+  `python -m pytest tests/test_audit_goal_artifact.py
+  tests/test_verify_nanofold_benchmark_artifacts.py` (`21 passed`),
+  `python -m py_compile scripts/audit_goal_artifact.py
+  tests/test_audit_goal_artifact.py scripts/verify_nanofold_benchmark_artifacts.py
+  tests/test_verify_nanofold_benchmark_artifacts.py`,
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/audit_goal_artifact.py tests/test_audit_goal_artifact.py
+  scripts/verify_nanofold_benchmark_artifacts.py
+  tests/test_verify_nanofold_benchmark_artifacts.py`, and the E128 artifact
+  goal-audit dry run with asserted exit code `1`.
+
 ## 2026-05-15 Current Handoff Wording Cleanup
 
 - Rechecked the active handoff text while E141 continues. Updated the current

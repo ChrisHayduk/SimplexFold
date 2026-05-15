@@ -162,5 +162,10 @@ def main(argv: list[str] | None = None) -> GoalArtifactAudit:
     return audit
 
 
+def cli(argv: list[str] | None = None) -> int:
+    audit = main(argv)
+    return 0 if audit.goal_ready else 1
+
+
 if __name__ == "__main__":
-    main()
+    raise SystemExit(cli())

@@ -23,6 +23,12 @@ pair-only baseline.
   `scripts/verify_nanofold_benchmark_artifacts.py` before a row is added to
   `EXPERIMENT_RESULTS.md`. This keeps the results table tied to complete
   result, metadata, history, eval-detail, and checkpoint evidence.
+- Goal readiness must be checked with `scripts/audit_goal_artifact.py`, which
+  exits successfully only when verifier constraints pass, validation
+  `val_lddt_ca` exceeds `0.7`, completed steps are at least `30,000`, and the
+  run did not stop early. A nonzero exit is expected for ordinary short gates
+  below the full goal; capture the output and still record the returned result
+  if artifact verification itself passed.
 
 ## Reference-Paper Design Rules
 
