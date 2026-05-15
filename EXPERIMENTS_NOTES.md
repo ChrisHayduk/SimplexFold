@@ -7428,3 +7428,11 @@
   (`2 passed`), `python -m py_compile
   scripts/run_nanofold_public_benchmarks.py tests/test_nanofold_public_benchmarks.py`,
   and a `_write_csv` smoke showing the `num_workers` column.
+- 2026-05-15T11:42Z Rechecked only the two owned active Runpod pods. E140 is
+  still pre-eval at active step `8556`, completed step `8555`, elapsed
+  `01:50:09`, with inherited history ending at E128 step `8500` and no
+  `results.json`, eval-details CSV, or new checkpoint. E141 is still pre-eval
+  at active step `8525`, completed step `8524`, elapsed `01:08:15`, also with
+  no returned result artifacts. Both status files still show effective batch
+  size `8` and `stopped_early=false`; continue waiting rather than treating
+  either as scored evidence.
