@@ -6335,3 +6335,15 @@
   checkpoint. Interpretation: active compute/evaluation before the step-9000
   writeout; leave the job running and let the heartbeat catch the coherent
   bundle.
+- 2026-05-15T00:55Z-01:19Z E129 remained active through a 25-sample bounded
+  watch on the owned pod. PID `1033` stayed alive from about `59:59` through
+  `01:24:01` elapsed, process CPU moved from about `715%` to `748%`, RSS stayed
+  about `1.98`-`2.12 GiB`, and the process kept `178` threads. H100 memory
+  remained allocated at `43687 MiB`, with sampled GPU utilization ranging from
+  `0%` to `67%`. Artifacts were still limited to `run_metadata.json` and
+  `history_full_msa_to_face.json`; history still ended at the inherited step
+  8500 E128 row (`val_lddt_ca=0.4311057258844376`,
+  `val_foldscore=0.4025340421795845`), with no `results.csv` and no checkpoint.
+  Interpretation: long but active compute/evaluation before the step-9000
+  writeout; do not intervene, pull, stop, or launch a follow-up until a
+  coherent result bundle appears or the process exits with a clear failure.
