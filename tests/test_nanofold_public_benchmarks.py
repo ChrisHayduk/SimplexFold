@@ -43,6 +43,7 @@ from scripts.run_nanofold_public_benchmarks import (
     _build_loss_fn,
     _enforce_parameter_budget,
     _evaluate,
+    _run_status_payload,
     _simplex_boundary_geometry_metrics,
     _simplex_topology_metrics,
     _variant_config,
@@ -92,6 +93,39 @@ def test_max_parameters_guard_is_accepted_and_enforced():
             parameter_count=3_261_975,
             max_parameters=args.max_parameters,
         )
+
+
+def test_run_status_payload_tracks_live_progress(tmp_path):
+    payload = _run_status_payload(
+        variant="full_msa_to_face",
+        phase="training",
+        completed_step=125,
+        target_steps=9000,
+        start_step=101,
+        total_examples=1000,
+        effective_batch_size=8,
+        elapsed_seconds_total=12.5,
+        history=[{"step": 100}, {"step": 125}],
+        train_losses=[3.2, 3.0],
+        latest_checkpoint_path=tmp_path / "full_msa_to_face_latest.pt",
+        stopped_early=False,
+        active_step=126,
+        active_microbatch=3,
+        active_microbatches=8,
+    )
+
+    assert payload["variant"] == "full_msa_to_face"
+    assert payload["phase"] == "training"
+    assert payload["completed_step"] == 125
+    assert payload["target_steps"] == 9000
+    assert payload["effective_batch_size"] == 8
+    assert payload["last_history_step"] == 125
+    assert payload["last_train_loss"] == 3.0
+    assert payload["latest_checkpoint"].endswith("full_msa_to_face_latest.pt")
+    assert payload["stopped_early"] is False
+    assert payload["active_step"] == 126
+    assert payload["active_microbatch"] == 3
+    assert payload["active_microbatches"] == 8
 
 
 def test_full_msa_to_face_aux_closure_variant_keeps_message_masks_unchanged():

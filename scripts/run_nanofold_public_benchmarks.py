@@ -112,6 +112,51 @@ def _prefix_metrics(metrics: dict[str, float], prefix: str) -> dict[str, float]:
     return {f"{prefix}{key}": value for key, value in metrics.items()}
 
 
+def _run_status_payload(
+    *,
+    variant: str,
+    phase: str,
+    completed_step: int,
+    target_steps: int,
+    start_step: int,
+    total_examples: int,
+    effective_batch_size: int,
+    elapsed_seconds_total: float,
+    history: list[dict[str, Any]],
+    train_losses: list[float],
+    latest_checkpoint_path: Path,
+    stopped_early: bool,
+    active_step: int | None = None,
+    active_microbatch: int | None = None,
+    active_microbatches: int | None = None,
+) -> dict[str, Any]:
+    """Build a lightweight live status payload for long NanoFold runs."""
+
+    payload: dict[str, Any] = {
+        "variant": variant,
+        "phase": phase,
+        "completed_step": int(completed_step),
+        "target_steps": int(target_steps),
+        "start_step": int(start_step),
+        "total_examples": int(total_examples),
+        "effective_batch_size": int(effective_batch_size),
+        "elapsed_seconds_total": float(elapsed_seconds_total),
+        "history_rows": len(history),
+        "last_history_step": history[-1].get("step") if history else None,
+        "latest_checkpoint": str(latest_checkpoint_path),
+        "stopped_early": bool(stopped_early),
+    }
+    if train_losses:
+        payload["last_train_loss"] = float(train_losses[-1])
+    if active_step is not None:
+        payload["active_step"] = int(active_step)
+    if active_microbatch is not None:
+        payload["active_microbatch"] = int(active_microbatch)
+    if active_microbatches is not None:
+        payload["active_microbatches"] = int(active_microbatches)
+    return payload
+
+
 def _autocast_context(device: torch.device, mixed_precision: str) -> ContextManager[Any]:
     if mixed_precision == "off" or device.type not in {"cuda", "cpu"}:
         return nullcontext()
@@ -1151,6 +1196,7 @@ def _train_variant(
 
     history: list[dict[str, Any]] = []
     history_path = output_dir / f"history_{variant}.json"
+    status_path = output_dir / f"status_{variant}.json"
     train_iter = iter(train_loader)
     train_losses: list[float] = []
     prior_elapsed_seconds = 0.0
@@ -1196,11 +1242,50 @@ def _train_variant(
             )
 
     start_time = time.perf_counter()
+    status_write_interval_seconds = 60.0
+    next_status_write_at = start_time
     stopped_early = False
     completed_step = start_step - 1
 
     def elapsed_total() -> float:
         return prior_elapsed_seconds + (time.perf_counter() - start_time)
+
+    def write_run_status(
+        phase: str,
+        *,
+        force: bool = False,
+        active_step: int | None = None,
+        active_microbatch: int | None = None,
+        active_microbatches: int | None = None,
+    ) -> None:
+        nonlocal next_status_write_at
+        now = time.perf_counter()
+        if not force and now < next_status_write_at:
+            return
+        status_path.write_text(
+            json.dumps(
+                _run_status_payload(
+                    variant=variant,
+                    phase=phase,
+                    completed_step=completed_step,
+                    target_steps=training_config.epochs,
+                    start_step=start_step,
+                    total_examples=total_examples,
+                    effective_batch_size=training_config.batch_size * grad_accum_steps,
+                    elapsed_seconds_total=elapsed_total(),
+                    history=history,
+                    train_losses=train_losses,
+                    latest_checkpoint_path=latest_checkpoint_path,
+                    stopped_early=stopped_early,
+                    active_step=active_step,
+                    active_microbatch=active_microbatch,
+                    active_microbatches=active_microbatches,
+                ),
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        next_status_write_at = now + status_write_interval_seconds
 
     def save_latest_checkpoint(*, stopped: bool) -> None:
         _save_training_checkpoint(
@@ -1219,6 +1304,9 @@ def _train_variant(
             stopped_early=stopped,
         )
         print(f"[{variant}] checkpoint -> {latest_checkpoint_path}", flush=True)
+        write_run_status("checkpointed", force=True)
+
+    write_run_status("starting", force=True)
 
     for step in range(start_step, training_config.epochs + 1):
         model.train()
@@ -1334,7 +1422,14 @@ def _train_variant(
         term_accum: dict[str, list[float]] = {}
         micro_examples = 0
         terms: dict[str, torch.Tensor] = {}
-        for _ in range(grad_accum_steps):
+        for microbatch_index in range(grad_accum_steps):
+            write_run_status(
+                "microbatch_start",
+                force=microbatch_index == 0,
+                active_step=step,
+                active_microbatch=microbatch_index + 1,
+                active_microbatches=grad_accum_steps,
+            )
             try:
                 batch = next(train_iter)
             except StopIteration:
@@ -1389,6 +1484,12 @@ def _train_variant(
                 mean_value = _tensor_mean(value)
                 if mean_value is not None:
                     term_accum.setdefault(key, []).append(mean_value)
+            write_run_status(
+                "microbatch_done",
+                active_step=step,
+                active_microbatch=microbatch_index + 1,
+                active_microbatches=grad_accum_steps,
+            )
 
         if training_config.grad_clip_norm is not None:
             grad_norm = float(
@@ -1416,6 +1517,7 @@ def _train_variant(
         train_losses.append(loss_value)
         total_examples += micro_examples
         completed_step = step
+        write_run_status("training")
 
         is_final_step = step == training_config.epochs
         should_eval = is_final_step or (eval_every > 0 and step % eval_every == 0)
@@ -1671,6 +1773,7 @@ def _train_variant(
                     last_eval.update(prefixed_ema_eval)
             history.append(row)
             history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
+            write_run_status("logged", force=True)
             val_parts = []
             for key in (
                 "grad_norm",
@@ -2330,6 +2433,7 @@ def _train_variant(
         **final_eval,
     }
     history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
+    write_run_status("finished", force=True)
     return result
 
 

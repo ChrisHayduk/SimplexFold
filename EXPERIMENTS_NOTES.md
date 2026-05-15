@@ -7095,3 +7095,12 @@
   documented no-write cutoff, so leave it running. `py-spy` is installed on
   the pod, but attaching to PID `42517` failed with container ptrace
   `Permission denied`; no process state was changed.
+- 2026-05-15T09:25Z Added future-run heartbeat instrumentation to the NanoFold
+  public benchmark runner. New checkouts will write `status_<variant>.json`
+  at startup, checkpoint/log/finish events, roughly every minute after step
+  progress, and at the start of each training step with the active gradient
+  accumulation microbatch. This is an experiment-ops change to make slow
+  topology gates diagnosable when a single step is CPU-heavy; it does not alter
+  model parameters, losses, training data, evaluation, or any active Runpod
+  process. The current E139 run is unaffected because it is running an older
+  staged checkout.
