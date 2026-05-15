@@ -1579,6 +1579,84 @@ def test_model_config_overrides_preserve_resume_compatible_variant_name():
     assert cfg.simplex_segment_radius == 5
 
 
+def test_e145_outer_residual_context_recipe_matches_documented_gate():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face",
+            "--run-name",
+            "e145_outer_residual_context_from_e128_s9000_c256_m64",
+            "--steps",
+            "9000",
+            "--batch-size",
+            "1",
+            "--grad-accum-steps",
+            "8",
+            "--crop-size",
+            "256",
+            "--msa-depth",
+            "64",
+            "--extra-msa-depth",
+            "0",
+            "--max-templates",
+            "0",
+            "--max-parameters",
+            "3261974",
+            "--num-workers",
+            "4",
+            "--resume-model-weights-only",
+            "--simplex-outer-edge-residual-context-scale",
+            "0.25",
+            "--simplex-outer-edge-residual-context-runtime-scale",
+            "0.0",
+            "--simplex-outer-edge-residual-context-runtime-scale-final",
+            "0.25",
+            "--simplex-outer-edge-residual-context-runtime-scale-ramp-start-step",
+            "8500",
+            "--simplex-outer-edge-residual-context-runtime-scale-ramp-steps",
+            "500",
+        ]
+    )
+
+    assert args.run_name == "e145_outer_residual_context_from_e128_s9000_c256_m64"
+    assert args.steps == 9000
+    assert args.batch_size * args.grad_accum_steps == 8
+    assert args.crop_size == 256
+    assert args.msa_depth == 64
+    assert args.extra_msa_depth == 0
+    assert args.max_templates == 0
+    assert args.max_parameters == 3_261_974
+    assert args.num_workers == 4
+    assert args.resume_model_weights_only is True
+
+    cfg = _apply_model_config_overrides(
+        _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face"),
+        args,
+    )
+    assert cfg.simplex_outer_edge_residual_context_scale == 0.25
+    _enforce_parameter_budget(
+        variant="full_msa_to_face",
+        parameter_count=3_240_738,
+        max_parameters=args.max_parameters,
+    )
+
+    training_config = TrainingConfig(
+        simplex_outer_edge_residual_context_runtime_scale=args.simplex_outer_edge_residual_context_runtime_scale,
+        simplex_outer_edge_residual_context_runtime_scale_final=(
+            args.simplex_outer_edge_residual_context_runtime_scale_final
+        ),
+        simplex_outer_edge_residual_context_runtime_scale_ramp_start_step=(
+            args.simplex_outer_edge_residual_context_runtime_scale_ramp_start_step
+        ),
+        simplex_outer_edge_residual_context_runtime_scale_ramp_steps=(
+            args.simplex_outer_edge_residual_context_runtime_scale_ramp_steps
+        ),
+    )
+    assert simplex_outer_edge_residual_context_runtime_scale_at_step(training_config, 8500) == 0.0
+    assert simplex_outer_edge_residual_context_runtime_scale_at_step(training_config, 8750) == 0.125
+    assert simplex_outer_edge_residual_context_runtime_scale_at_step(training_config, 9000) == 0.25
+
+
 def test_full_msa_to_face_edge_frame_messages_adds_local_frame_readout():
     cfg = _variant_config(
         load_model_config("simplexfold_medium_param_matched"),

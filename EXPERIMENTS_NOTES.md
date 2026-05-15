@@ -7533,3 +7533,16 @@
   `../../.venv/bin/ruff check --select F821,F822,F823
   scripts/verify_nanofold_benchmark_artifacts.py
   tests/test_verify_nanofold_benchmark_artifacts.py`.
+- 2026-05-15T12:34Z Added an exact E145 launch-recipe regression test:
+  `test_e145_outer_residual_context_recipe_matches_documented_gate`. The test
+  locks the documented run name, step target `9000`, effective batch size `8`,
+  crop `256`, MSA depth `64`, no extra MSA/templates, parameter cap
+  `3261974`, `--num-workers 4`, parameter-free residual outer-edge context
+  scale `0.25`, and the runtime ramp from `0.0` at step `8500` to `0.25` at
+  step `9000`. Focused validation passed:
+  `python -m pytest
+  tests/test_nanofold_public_benchmarks.py::test_e145_outer_residual_context_recipe_matches_documented_gate`
+  (`1 passed`), `python -m py_compile
+  tests/test_nanofold_public_benchmarks.py`, `../../.venv/bin/ruff check
+  --select F821,F822,F823 tests/test_nanofold_public_benchmarks.py`, and
+  `git diff --check`.

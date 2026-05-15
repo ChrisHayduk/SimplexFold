@@ -7104,3 +7104,7 @@ Validation status:
   explicit `--expected-num-workers` support and checks result/metadata/status
   consistency for expected effective batch size and worker count. Focused test:
   `python -m pytest tests/test_verify_nanofold_benchmark_artifacts.py`.
+- Launch-recipe guard: `test_e145_outer_residual_context_recipe_matches_documented_gate`
+  now locks the documented E145 run name, step target, effective batch size,
+  crop/MSA/template settings, `--num-workers 4`, parameter cap, static
+  residual scale, and `8500`-to-`9000` runtime ramp.
