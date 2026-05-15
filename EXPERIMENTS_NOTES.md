@@ -6418,3 +6418,43 @@
   `tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
   slice (`218 passed`), focused ruff checks via `../../.venv/bin/ruff`, and
   `git diff --check`.
+- 2026-05-15T02:14Z-02:36Z Runpod launch logistics for E130: three owned
+  pods were created but never became usable, then were stopped/deleted without
+  touching any unrelated Runpod instances. Failed owned pods:
+  `jhe7fevfkoxr4i` (`codex-simplexfold-e130-runpod-20260515`, H100 custom
+  image, SSH refused / uptime stayed 0), `n1vlthzsvpa5l1`
+  (`codex-simplexfold-e130b-runpod-20260515`, H100 custom image, pod never
+  ready / uptime stayed 0), and `us8gyfkar6u28s`
+  (`codex-simplexfold-e130-a100-runpod-20260515`, A100 custom image, pod
+  never ready / uptime stayed 0).
+- 2026-05-15T02:39Z E130 switched to owned pod `c67fbk189vnvfp`
+  (`codex-simplexfold-e130-template-runpod-20260515`) from the official
+  `runpod-torch-v280` template, image
+  `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404`, A100-SXM4-80GB. Remote
+  sanity check passed: Python `3.12.3`, torch `2.8.0+cu128`, CUDA available,
+  `/workspace` mounted, SimplexFold at branch
+  `codex/simplexfold-topology-e07-boundary-coordinate` commit `bd5ced6`, and
+  NanoFold at commit `96afc84`.
+- 2026-05-15T02:48Z-03:00Z Public data staging note: `/workspace` refused
+  ownership changes and was slow for many small files, so the public NanoFold
+  features and labels were copied onto the pod's local container disk under
+  `/root/nanofold_data/` and symlinked into
+  `/workspace/nanoFold-Competition/data/processed_features` and
+  `/workspace/nanoFold-Competition/data/processed_labels`. Coherence audit
+  passed with `11000` feature files, `11000` label files, manifest counts
+  `train=10000`, `val=1000`, `all=11000`, E128 checkpoint present, and no
+  hidden/private/salt/AppleDouble paths under the staged data or artifacts.
+- 2026-05-15T03:02Z E130 launched on owned pod `c67fbk189vnvfp` as
+  `e130_hodge_boundary_readout_from_e128_s9000_c256_m64`, PID `4224`, log
+  `/workspace/SimplexFold/logs/e130_hodge_boundary_readout.log`. It resumes
+  E128 from step `8500` with weights only, effective batch size `8`, crop
+  `256`, MSA depth `64`, sparse caps `24 / 48`, E128's selected-complex
+  recipe, E129's triangle-attention value residual disabled, and
+  `--simplex-boundary-hodge-readout-scale 0.25`.
+- E130 startup verification passed: runner saw `train=10000`, `val=1000`,
+  resumed from the E128 checkpoint at `step=8500` and `examples=68000`, loaded
+  `1332` matching model tensors, initialized `0` new/missing tensors, started
+  a fresh optimizer, and allocated about `17681 MiB` on the A100. Remote
+  parameter audit remained `3,240,738 <= 3,261,974`. Leave E130 running until
+  a coherent step-9000 result bundle appears, then pull, locally verify,
+  update `EXPERIMENT_RESULTS.md`, commit/push, and stop only this owned pod.
