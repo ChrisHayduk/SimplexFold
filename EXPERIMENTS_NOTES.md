@@ -6886,3 +6886,13 @@
   should it document E138 as runtime failed, terminate only the E138 process,
   and launch the already documented E139 no-Hodge oriented boundary-cochain
   fallback on the same healthy pod.
+- 2026-05-15T06:50Z E138 remained active and below cutoff on owned pod
+  `c67fbk189vnvfp`: PID `24980` had elapsed `00:48:01`, CPU time `10:01:16`,
+  `%CPU=1251`, RSS about `1.9 GiB`, and instantaneous GPU utilization again
+  sampled at `0%` while `38.2 GiB` remained allocated. Artifacts were still
+  only `run_metadata.json` plus inherited history ending at step `8500`; no
+  result, eval-detail, or checkpoint files existed. While leaving E138
+  running, I expanded the E139 documentation with a full same-pod launch
+  skeleton and validated the documented flags through the local
+  `parse_args` path: run name accepted, variant `full_msa_to_face`, oriented
+  cochain final runtime scale `0.25`, and effective batch size `8`.

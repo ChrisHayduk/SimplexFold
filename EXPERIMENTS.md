@@ -6205,6 +6205,72 @@ Candidate launch only after E138 returns and is documented:
 --simplex-boundary-oriented-cochain-runtime-scale-ramp-steps 500
 ```
 
+Full same-pod launch skeleton if E138 is documented as flat/runtime-failed
+and the owned pod remains healthy:
+
+```bash
+cd /workspace/SimplexFold_next
+mkdir -p logs
+python3 -m py_compile \
+  minalphafold/simplex.py \
+  minalphafold/evoformer.py \
+  minalphafold/model.py \
+  minalphafold/trainer.py \
+  scripts/run_nanofold_public_benchmarks.py
+nohup python -u scripts/run_nanofold_public_benchmarks.py \
+  --nanofold-root /workspace/nanoFold-Competition \
+  --model-config simplexfold_medium_param_matched \
+  --variants full_msa_to_face \
+  --run-name e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64 \
+  --output-dir artifacts/nanofold_public_benchmarks \
+  --resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+  --resume-model-weights-only \
+  --steps 9000 \
+  --batch-size 1 \
+  --grad-accum-steps 8 \
+  --crop-size 256 \
+  --msa-depth 64 \
+  --extra-msa-depth 0 \
+  --max-templates 0 \
+  --eval-every 500 \
+  --checkpoint-every 500 \
+  --final-max-val-batches 0 \
+  --eval-max-val-batches 0 \
+  --max-parameters 3261974 \
+  --n-cycles 4 \
+  --device cuda \
+  --simplex-face-coordinate-weight 1.0 \
+  --simplex-face-coordinate-distance-weight 0.5 \
+  --simplex-face-boundary-lddt-weight 0.05 \
+  --simplex-tetra-coordinate-weight 1.0 \
+  --simplex-tetra-coordinate-distance-weight 0.5 \
+  --simplex-tetra-boundary-lddt-weight 0.05 \
+  --simplex-geometry-distance-weight 0.025 \
+  --simplex-face-top-k 24 \
+  --simplex-tetra-top-k 48 \
+  --simplex-cell-score-degree-penalty 0.75 \
+  --simplex-cell-score-outer-edge-weight 0.25 \
+  --simplex-edge-frame-message-scale 0.025 \
+  --simplex-edge-frame-message-runtime-scale 0.0125 \
+  --simplex-boundary-edge-frame-gate-scale 0.05 \
+  --simplex-boundary-readout-directionality 0.25 \
+  --simplex-boundary-readout-directionality-runtime-scale 0.25 \
+  --simplex-boundary-incidence-normalization 1.0 \
+  --simplex-global-context-scale 0.1 \
+  --simplex-vertex-star-context-scale 1.0 \
+  --simplex-vertex-star-context-runtime-scale 1.0 \
+  --simplex-edge-star-context-scale 1.0 \
+  --simplex-edge-star-context-runtime-scale 0.5 \
+  --simplex-triangle-attention-bias-scale 0.0125 \
+  --simplex-boundary-oriented-cochain-scale 0.25 \
+  --simplex-boundary-oriented-cochain-runtime-scale 0.0 \
+  --simplex-boundary-oriented-cochain-runtime-scale-final 0.25 \
+  --simplex-boundary-oriented-cochain-runtime-scale-ramp-start-step 8500 \
+  --simplex-boundary-oriented-cochain-runtime-scale-ramp-steps 500 \
+  > logs/e139_no_hodge_oriented_boundary.log 2>&1 &
+echo $!
+```
+
 Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
 degree-penalized plus outer-edge-supported cell scoring, incidence
 normalization `1.0`, edge-frame message runtime scale `0.0125`, global context
@@ -6227,6 +6293,9 @@ operator with Hodge disabled. On the branch tip after documenting E139:
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
 - `python -m pytest tests/test_simplex.py::test_oriented_boundary_cochain_readout_subtracts_reverse_edges tests/test_simplex.py::test_simplicial_adapter_oriented_cochain_changes_boundary_pair_update tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_hodge_readout_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `python - <<'PY' ... parse_args(E139 full launch flags) ... PY`: accepted
+  the documented full command flags, with effective batch size `8` and
+  oriented-cochain runtime final scale `0.25`
 - `git diff --check`: passed
 
 Before launch, still run `git diff --check` on the exact branch tip used by
