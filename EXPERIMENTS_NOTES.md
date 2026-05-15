@@ -7557,3 +7557,14 @@
   tests/test_format_experiment_result_row.py`, `../../.venv/bin/ruff check
   --select F821,F822,F823 scripts/format_experiment_result_row.py
   tests/test_format_experiment_result_row.py`, and `git diff --check`.
+- 2026-05-15T12:47Z Improved the local active-run summarizer for long resumed
+  gates such as E140/E141. `scripts/summarize_nanofold_run_status.py` now
+  includes the last aggregate validation row from `history_<variant>.json` and
+  falls back to that `val_lddt_ca` when an active run has no returned
+  `results.json` yet. This is monitoring-only and does not read chain-level
+  eval details or affect training/scoring. Focused validation passed:
+  `python -m pytest tests/test_summarize_nanofold_run_status.py` (`5 passed`),
+  `python -m py_compile scripts/summarize_nanofold_run_status.py
+  tests/test_summarize_nanofold_run_status.py`, and `../../.venv/bin/ruff
+  check --select F821,F822,F823 scripts/summarize_nanofold_run_status.py
+  tests/test_summarize_nanofold_run_status.py`.

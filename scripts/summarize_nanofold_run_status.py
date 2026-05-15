@@ -21,6 +21,7 @@ STATUS_KEYS = (
     "elapsed_seconds_run",
     "last_history_step",
     "history_rows",
+    "last_lddt_ca",
     "last_train_loss",
     "total_examples",
     "stopped_early",
@@ -64,16 +65,27 @@ def _matching_result(path: Path, variant: str) -> dict[str, Any] | None:
     return None
 
 
-def _history_last_step(path: Path) -> int | None:
+def _history_last_row(path: Path) -> dict[str, Any] | None:
     if not path.exists():
         return None
     data = _load_json(path)
     if not isinstance(data, list) or not data:
         return None
     last = data[-1]
-    if not isinstance(last, dict) or "step" not in last:
+    if not isinstance(last, dict):
         return None
-    return int(last["step"])
+    return {
+        key: last[key]
+        for key in (
+            "step",
+            "val_lddt_ca",
+            "val_foldscore",
+            "val_ca_drmsd",
+            "val_ca_pred_rg",
+            "val_ca_true_rg",
+        )
+        if key in last
+    }
 
 
 def _csv_row_count(path: Path) -> int | None:
@@ -142,6 +154,7 @@ def summarize_run(run_dir: Path, *, variant: str = "full_msa_to_face") -> dict[s
 
     result = _matching_result(paths["results_json"], variant)
     eval_rows = _csv_row_count(paths["eval_details"])
+    history_last = _history_last_row(paths["history"])
     summary: dict[str, Any] = {
         "run_dir": str(run_dir),
         "variant": variant,
@@ -150,7 +163,8 @@ def summarize_run(run_dir: Path, *, variant: str = "full_msa_to_face") -> dict[s
         "status": status,
         "progress": _progress_summary(status, files),
         "result": result,
-        "history_last_step": _history_last_step(paths["history"]),
+        "history_last": history_last,
+        "history_last_step": None if history_last is None else history_last.get("step"),
         "eval_rows": eval_rows,
     }
     return summary
@@ -171,11 +185,17 @@ def _state(files: dict[str, dict[str, Any]]) -> str:
 def _format_line(summary: dict[str, Any]) -> str:
     status = summary.get("status") or {}
     result = summary.get("result") or {}
+    history_last = summary.get("history_last") or {}
     progress = summary.get("progress") or {}
     eta_seconds = progress.get("estimated_seconds_remaining")
     eta_hours = f"{eta_seconds / 3600.0:.1f}h" if isinstance(eta_seconds, (float, int)) else "-"
     steps_per_hour = progress.get("steps_per_hour")
     rate = f"{steps_per_hour:.1f}/h" if isinstance(steps_per_hour, (float, int)) else "-"
+    lddt_ca = result.get("val_lddt_ca")
+    if lddt_ca is None:
+        lddt_ca = status.get("last_lddt_ca")
+    if lddt_ca is None:
+        lddt_ca = history_last.get("val_lddt_ca", "-")
     parts = [
         f"{Path(summary['run_dir']).name}: {summary['state']}",
         f"completed={status.get('completed_step', result.get('completed_steps', '-'))}",
@@ -183,7 +203,7 @@ def _format_line(summary: dict[str, Any]) -> str:
         f"rate={rate}",
         f"eta={eta_hours}",
         f"last_history={status.get('last_history_step', summary.get('history_last_step', '-'))}",
-        f"lddt_ca={result.get('val_lddt_ca', '-')}",
+        f"lddt_ca={lddt_ca}",
         f"eval_rows={summary.get('eval_rows') if summary.get('eval_rows') is not None else '-'}",
         f"checkpoint={summary['files']['checkpoint']['exists']}",
     ]

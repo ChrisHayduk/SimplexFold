@@ -68,6 +68,7 @@ def test_summarize_run_reports_active_status_without_result_details(tmp_path):
     assert summary["state"] == "active"
     assert summary["status"]["completed_step"] == 8567
     assert summary["history_last_step"] == 8500
+    assert summary["history_last"]["val_lddt_ca"] == 0.4311
     assert summary["progress"]["completed_delta_steps"] == 67
     assert summary["progress"]["remaining_steps"] == 433
     assert summary["progress"]["elapsed_source"] == "status_elapsed_seconds_run"
@@ -109,6 +110,7 @@ def test_main_formats_active_rate_and_eta(tmp_path, capsys):
 
     assert "rate=67.0/h" in output
     assert "eta=6.5h" in output
+    assert "lddt_ca=0.4311" in output
 
 
 def test_summarize_run_falls_back_to_file_timing_for_old_status(tmp_path):
