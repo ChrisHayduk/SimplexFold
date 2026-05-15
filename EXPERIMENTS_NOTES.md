@@ -6831,3 +6831,22 @@
   inherited E128 step `8500` with `val_lddt_ca=0.4311057258844376`. No
   `results.json`, `results.csv`, eval-details file, or checkpoint exists yet,
   so there is nothing to pull or add to `EXPERIMENT_RESULTS.md`.
+- 2026-05-15T06:34Z E138 remained active on the same owned pod with PID
+  `24980`, elapsed `00:32:53`, process CPU time `06:51:43`, `%CPU=1251`,
+  RSS about `1.9 GiB`, and `194` threads. Remote artifacts were still limited
+  to `run_metadata.json` and inherited `history_full_msa_to_face.json`;
+  history length stayed `18`, ending at E128 step `8500` with
+  `val_lddt_ca=0.4311057258844376`, FoldScore `0.4025340421795845`,
+  `val_ca_drmsd=11.004606088757514`, and C-alpha Rg
+  `11.719762571811676 / 16.30911695623398`. No result bundle, eval details,
+  or checkpoint existed yet, so `EXPERIMENT_RESULTS.md` stays unchanged.
+- 2026-05-15T06:36Z Prepared E140 as a docs-only parked fallback; no Runpod
+  launch. E140 would use the existing selected face/tetra coordinate-expansion
+  terms at small weight as a selected-complex realization probe, not as a
+  generic radius/all-pairs/lDDT shortcut. Rationale: E128's selected
+  face/tetra boundary lDDT is already high (`0.7559` / `0.7385`), but global
+  C-alpha Rg is still collapsed (`11.7198 / 16.3091`). If E138/E139 return
+  coherent but remain flat, E140 can test whether the selected 2- and 3-cells
+  need a small anti-collapse constraint on their own boundary 1-skeleton
+  before the pair trunk can assemble a less compact backbone. Launch only
+  after E138 returns and E139 is either returned or explicitly skipped.

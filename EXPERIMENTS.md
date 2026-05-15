@@ -6231,3 +6231,53 @@ operator with Hodge disabled. On the branch tip after documenting E139:
 
 Before launch, still run `git diff --check` on the exact branch tip used by
 the Runpod checkout.
+
+### E140: Selected-Boundary Realization Anti-Collapse
+
+Status: planned launch recipe only; do not launch while E138 is active. Use
+only if E138/E139 return coherent but remain in the collapsed low-0.4 C-alpha
+lDDT band.
+
+Hypothesis: the current best E128 branch shows a useful but incomplete
+local-to-global split. The selected higher-order complex is learning local
+geometry: selected face/tetra boundary lDDT is `0.7559` / `0.7385`. The global
+fold is still too compact: predicted C-alpha Rg is `11.7198` versus true
+`16.3091`, with `val_lddt_ca=0.4311`. That suggests the selected face/tetra
+cells may be locally metric-aware but realized through boundary edges that are
+too contracted before the structure module assembles the backbone.
+
+Mechanism: use the existing selected simplex coordinate-expansion terms at a
+small weight. This is a topology-realization objective, not a generic
+score-chasing loss: it is computed only on the boundary edges of the
+model-selected `F_ijk` and `U_ijkl` cells. It does not supervise all residue
+pairs, C-alpha radius, validation lDDT, or a full distance matrix. In
+topological terms, it asks the learned sparse complex to realize its own
+selected 2- and 3-cells without collapsing their 1-skeleton.
+
+Candidate launch only after E138 returns and E139 is either returned or
+explicitly skipped:
+
+```bash
+--run-name e140_selected_boundary_expansion_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-face-coordinate-expansion-weight 0.05 \
+--simplex-tetra-coordinate-expansion-weight 0.05 \
+--simplex-coordinate-expansion-tolerance 0.05
+```
+
+Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, edge-frame message runtime scale `0.0125`, directed
+boundary readout `0.25`, global context `0.1`, vertex-star context `1.0`, and
+edge-star runtime `0.5`. Do not combine with E138/E139 orientation readouts
+unless one of those returned results specifically shows that orientation helps
+primary lDDT but worsens contraction.
+
+Decision rule: reject unless E140 beats E128 and any returned E138/E139 result
+on primary C-alpha lDDT while also improving the collapsed-global diagnostics:
+predicted C-alpha Rg should move toward true Rg without worsening dRMSD or
+FoldScore. It must still clear `0.45` before any 30k-step consideration.

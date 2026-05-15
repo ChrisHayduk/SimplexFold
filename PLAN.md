@@ -89,6 +89,20 @@ one-way directed boundary edges. This keeps the change in the explicit
 simplicial boundary pathway and still avoids the slow Hodge double-centering
 path. Launch only after E138 returns and is documented.
 
+Second parked fallback if E138/E139 are coherent but still too collapsed:
+E140 selected-boundary realization anti-collapse. This is the only loss-side
+candidate currently worth keeping in queue because it remains attached to the
+explicit selected complex: it supervises the realization of model-selected
+face/tetra boundary edges, not the full C-alpha radius, all-pairs distance
+matrix, or validation lDDT directly. The motivation is the current E128
+diagnostic split: selected face/tetra boundary lDDT is already high
+(`0.7559` / `0.7385`), but predicted C-alpha Rg is still much smaller than
+truth (`11.7198 / 16.3091`). A small selected-boundary expansion term could
+test whether local higher-rank cells are being realized too compactly before
+their geometry reaches the structure module. Launch only after E138 returns
+and E139 is either returned or deliberately skipped; keep it as a topology
+realization probe, not as a generic score-chasing loss.
+
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
 E118 residue vertex-star route with a half-strength boundary-edge-star
