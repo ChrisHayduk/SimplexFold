@@ -72,6 +72,36 @@
   `python scripts/audit_experiment_results.py EXPERIMENT_RESULTS.md`, and
   `git diff --check`.
 
+## 2026-05-15 Artifact Goal Audit Helper
+
+- Added `scripts/audit_goal_artifact.py`, a verifier-backed audit for one
+  returned NanoFold artifact directory. It composes the existing returned-run
+  verifier with the explicit goal criteria: validation C-alpha lDDT must exceed
+  `0.7`, completed steps must be at least `30,000`, the run must not be
+  stopped early, and the artifact must verify under the supplied parameter cap
+  such as `3261974`.
+- Dry-ran it on the existing E128 returned artifact. The verifier-backed
+  evidence passed for completed step `8500`, effective batch size `8`,
+  parameters `3,240,738 <= 3,261,974`, `1000` eval rows, checkpoint present,
+  and `stopped_early=false`; the goal audit correctly failed E128 because
+  `val_lddt_ca=0.4311` is below `0.7` and the run is not a 30,000-step
+  confirmation.
+- Updated heartbeat automation `check-simplexfold-e57-runpod` in place so a
+  coherent returned E140/E141 handoff now runs this artifact goal audit after
+  verifier success and before eval-detail analysis / result recording. The
+  owned-pod scope, E145 gating rule, and 30-minute schedule are unchanged.
+- Focused validation passed:
+  `python -m pytest tests/test_audit_goal_artifact.py
+  tests/test_verify_nanofold_benchmark_artifacts.py`,
+  `python -m py_compile scripts/audit_goal_artifact.py
+  tests/test_audit_goal_artifact.py scripts/verify_nanofold_benchmark_artifacts.py
+  tests/test_verify_nanofold_benchmark_artifacts.py`,
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/audit_goal_artifact.py tests/test_audit_goal_artifact.py
+  scripts/verify_nanofold_benchmark_artifacts.py
+  tests/test_verify_nanofold_benchmark_artifacts.py`,
+  the E128 artifact-audit dry run, and `git diff --check`.
+
 ## 2026-05-15 Owned Runpod Heartbeat
 
 - 2026-05-15T13:26Z Rechecked only the two owned active Runpod pods. E140 on
