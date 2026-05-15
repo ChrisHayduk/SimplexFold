@@ -563,6 +563,7 @@ def apply_model_config_cli_overrides(model_config: ModelConfig, args: argparse.N
         "simplex_boundary_signed_face_cyclic_readout_scale",
         "simplex_signed_tetra_coboundary_scale",
         "simplex_signed_tetra_to_face_scale",
+        "simplex_outer_edge_residual_context_scale",
     ):
         value = getattr(args, field_name, None)
         if value is not None:
@@ -2931,6 +2932,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Interpolate selected global-complex context toward boundary-edge star incidence context.",
+    )
+    parser.add_argument(
+        "--simplex-outer-edge-residual-context-scale",
+        type=float,
+        default=None,
+        help="Blend selected cell cochains with parameter-free directed outer-edge neighborhood context.",
     )
     parser.add_argument(
         "--simplex-pre-triangle-update-scale",

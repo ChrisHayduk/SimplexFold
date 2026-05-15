@@ -7315,3 +7315,19 @@
   parameter cap when added to the full E128 recipe unless another
   parameterized path is removed or a lower-rank/parameter-neutral variant is
   implemented.
+- 2026-05-15T10:58Z Staged the parameter-neutral E145 outer-neighborhood
+  transport hook locally. New model config/CLI field:
+  `simplex_outer_edge_residual_context_scale`. The path pools directed
+  external pair edges for each selected face/tetra cell, separates symmetric
+  and oriented outer-edge context, folds that context into the active
+  face/tetra cochain width without parameters, RMS-matches it to the current
+  cell state, and gates it with the existing cell gate. This directly follows
+  the Topotein outer-edge-neighborhood idea while avoiding the parameter cost
+  of the trainable `simplex_outer_edge_context_scale` MLPs. Focused
+  verification passed: `python -m py_compile minalphafold/simplex.py
+  minalphafold/model_config.py minalphafold/trainer.py
+  scripts/run_nanofold_public_benchmarks.py`; targeted pytest for the new
+  outer-edge delta, adapter behavior, parameter audit, trainer CLI, and
+  NanoFold runner config override (`5 passed`). Parameter audit for the full
+  E128-style recipe plus E145 scale `0.25` remains `3,240,738`, with `21,236`
+  parameters of headroom under the AF2-medium+5% cap.

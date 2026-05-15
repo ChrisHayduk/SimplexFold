@@ -28,15 +28,15 @@ mechanisms can be counterproductive.
 Near-term implication: E140/E141 should finish first because they are already
 running and directly probe selected-complex realization and signed oriented
 boundary incidence. The next parked idea, if both fail to clear the short-gate
-threshold, should be a Topotein-style outer-neighborhood transport probe. The
-clean version is not a generic metric loss; it is a topological architecture
-question: selected face/tetra cochains should update through directed
-residue-to-external-edge neighborhoods before their boundary signal reaches
-the pair trunk. The existing trainable `simplex_outer_edge_context_scale` hook
-does this, but adding it on top of the full E128 recipe exceeds the
-AF2-medium+5% cap unless another parameterized simplex path is removed or a
-lower-rank/parameter-neutral version is implemented. Therefore keep it as an
-E145 design candidate, not an automatic launch, until E140/E141 return.
+threshold, is now staged as E145: a Topotein-style outer-neighborhood
+transport probe. The clean version is not a generic metric loss; it is a
+topological architecture question: selected face/tetra cochains should update
+through directed residue-to-external-edge neighborhoods before their boundary
+signal reaches the pair trunk. The trainable `simplex_outer_edge_context_scale`
+hook was too expensive on top of the full E128 recipe, so E145 uses a new
+parameter-free `simplex_outer_edge_residual_context_scale` path that folds
+directed external pair-edge context into face/tetra cochain channels. Parameter
+audit: E128-style recipe with E145 scale `0.25` remains `3,240,738 <= 3,261,974`.
 
 Next actions:
 
@@ -45,8 +45,8 @@ Next actions:
 2. When either returns, verify and pull artifacts, update
    `EXPERIMENT_RESULTS.md`, commit/push, then decide whether the returned
    score justifies a continuation or pivot.
-3. If E140/E141 remain below `0.45`, design E145 around outer-neighborhood
-   selected-cell transport while preserving the parameter cap; avoid spending
+3. If E140/E141 remain below `0.45`, launch only a short E145 gate around the
+   parameter-free outer-neighborhood selected-cell transport; avoid spending
    30,000 steps unless a short gate clears `0.45` with coherent FoldScore,
    dRMSD, and C-alpha Rg.
 

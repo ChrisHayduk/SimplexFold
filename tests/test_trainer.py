@@ -606,6 +606,8 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.75",
             "--simplex-edge-star-context-scale",
             "0.5",
+            "--simplex-outer-edge-residual-context-scale",
+            "0.25",
             "--simplex-pre-triangle-update-scale",
             "0.25",
             "--simplex-pre-triangle-single-update-scale",
@@ -728,6 +730,7 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_global_context_scale == 0.125
     assert cfg.simplex_vertex_star_context_scale == 0.75
     assert cfg.simplex_edge_star_context_scale == 0.5
+    assert cfg.simplex_outer_edge_residual_context_scale == 0.25
     assert cfg.simplex_pre_triangle_update_scale == 0.25
     assert cfg.simplex_pre_triangle_single_update_scale == 0.0
     assert cfg.simplex_triangle_attention_bias_scale == 0.05
@@ -995,6 +998,23 @@ def test_simplicial_outer_edge_context_stays_within_medium_budget():
     assert simplex_params == 3_106_690
     assert outer_edge_context_params > simplex_params
     assert outer_edge_context_params <= int(af2_params * 1.05)
+
+
+def test_simplicial_parameter_free_outer_edge_context_adds_no_parameters():
+    simplex_medium = load_model_config("simplexfold_medium_param_matched")
+    outer_edge_residual_medium = replace(
+        simplex_medium,
+        simplex_use_msa_to_face=True,
+        simplex_outer_edge_residual_context_scale=0.25,
+    )
+
+    simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())
+    outer_edge_residual_params = sum(
+        parameter.numel() for parameter in AlphaFold2(outer_edge_residual_medium).parameters()
+    )
+
+    assert simplex_params == 3_106_690
+    assert outer_edge_residual_params == simplex_params
 
 
 def test_simplicial_msa_feedback_stays_within_medium_budget():

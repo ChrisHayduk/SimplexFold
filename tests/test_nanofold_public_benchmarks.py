@@ -1522,6 +1522,8 @@ def test_model_config_overrides_preserve_resume_compatible_variant_name():
             "full_msa_to_face",
             "--simplex-outer-edge-context-scale",
             "0.25",
+            "--simplex-outer-edge-residual-context-scale",
+            "0.125",
             "--simplex-segment-radius",
             "5",
         ]
@@ -1536,6 +1538,7 @@ def test_model_config_overrides_preserve_resume_compatible_variant_name():
     assert cfg.simplex_use_tetra is True
     assert cfg.simplex_use_msa_to_face is True
     assert cfg.simplex_outer_edge_context_scale == 0.25
+    assert cfg.simplex_outer_edge_residual_context_scale == 0.125
     assert cfg.simplex_segment_radius == 5
 
 

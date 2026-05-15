@@ -27,6 +27,7 @@ from minalphafold.simplex import (
     face_geometry_features,
     hodge_center_boundary_readout,
     oriented_boundary_cochain_readout,
+    parameter_free_outer_edge_context_delta,
     scatter_directed_edges_to_residue,
     segment_cell_indices,
     segment_geometry_features,
@@ -99,6 +100,7 @@ class SimplexConfig:
     simplex_boundary_metric_recycling_scale = 0.0
     simplex_outer_edge_update_scale = 0.0
     simplex_outer_edge_context_scale = 0.0
+    simplex_outer_edge_residual_context_scale = 0.0
     simplex_hodge_face_update_scale = 0.0
     simplex_edge_frame_message_scale = 0.0
     simplex_boundary_edge_frame_gate_scale = 0.0
@@ -597,6 +599,40 @@ def test_cell_outer_edge_context_excludes_edges_inside_cell():
     assert torch.allclose(empty_context, torch.zeros_like(empty_context))
 
 
+def test_parameter_free_outer_edge_context_delta_uses_external_directed_edges():
+    pair = torch.zeros(1, 4, 4, 4)
+    pair[0, 0, 3] = torch.tensor([1.0, 2.0, 3.0, 4.0])
+    pair[0, 1, 3] = torch.tensor([2.0, 3.0, 4.0, 5.0])
+    pair[0, 2, 3] = torch.tensor([3.0, 4.0, 5.0, 6.0])
+    pair[0, 3, 0] = torch.tensor([0.5, 1.0, 1.5, 2.0])
+    pair[0, 3, 1] = torch.tensor([1.0, 1.5, 2.0, 2.5])
+    pair[0, 3, 2] = torch.tensor([1.5, 2.0, 2.5, 3.0])
+    cell_indices = torch.tensor([[[[0, 1, 2]]]], dtype=torch.long)
+    cell_mask = torch.ones(1, 1, 1)
+    nbr_idx = torch.tensor([[[1, 2, 3], [0, 2, 3], [0, 1, 3], [0, 1, 2]]], dtype=torch.long)
+
+    delta = parameter_free_outer_edge_context_delta(
+        pair,
+        cell_indices,
+        cell_mask,
+        nbr_idx,
+        channels=3,
+    )
+
+    assert delta.shape == (1, 1, 1, 3)
+    assert torch.any(delta != 0)
+
+    inner_only = torch.tensor([[[1, 2], [0, 2], [0, 1], [0, 1]]], dtype=torch.long)
+    no_outer = parameter_free_outer_edge_context_delta(
+        pair,
+        cell_indices,
+        cell_mask,
+        inner_only,
+        channels=3,
+    )
+    assert torch.allclose(no_outer, torch.zeros_like(no_outer))
+
+
 def test_outer_edge_adapter_scale_changes_outputs_without_new_parameters():
     class OuterEdgeConfig(SimplexConfig):
         simplex_neighbor_k = 3
@@ -654,6 +690,35 @@ def test_outer_edge_context_adapter_scale_changes_outputs_with_budgeted_paramete
 
     assert on_params > off_params
     assert on_params - off_params < 10_000
+    assert not torch.allclose(on_pair, off_pair)
+    assert not torch.allclose(on_single, off_single)
+
+
+def test_parameter_free_outer_edge_context_adapter_scale_changes_outputs_without_new_parameters():
+    class OuterResidualContextConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class OuterResidualContextEnabledConfig(OuterResidualContextConfig):
+        simplex_outer_edge_residual_context_scale = 0.25
+
+    torch.manual_seed(17)
+    off_adapter = SimplicialAdapter(OuterResidualContextConfig())
+    torch.manual_seed(17)
+    on_adapter = SimplicialAdapter(OuterResidualContextEnabledConfig())
+    pair = torch.randn(1, 5, 5, OuterResidualContextConfig.c_z)
+    single = torch.randn(1, 5, OuterResidualContextConfig.c_s)
+
+    off_params = sum(p.numel() for p in off_adapter.parameters())
+    on_params = sum(p.numel() for p in on_adapter.parameters())
+    off_pair, off_single, _ = off_adapter(pair, single)
+    on_pair, on_single, _ = on_adapter(pair, single)
+
+    assert on_params == off_params
     assert not torch.allclose(on_pair, off_pair)
     assert not torch.allclose(on_single, off_single)
 

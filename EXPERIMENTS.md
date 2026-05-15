@@ -7009,9 +7009,9 @@ Validation status:
 
 ### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
 
-Status: design candidate only; do not launch until E140/E141 return. The two
-Runpod pods already running should finish before we spend capacity on a third
-branch.
+Status: code staged and locally validated; do not launch until E140/E141
+return. The two Runpod pods already running should finish before we spend
+capacity on a third branch.
 
 Source motivation: the saved Topotein PDF (`references/papers/2509.03885v1.pdf`)
 argues that protein topological networks need persistent multi-rank states and
@@ -7029,20 +7029,42 @@ through external incidence neighborhoods into the selected 2- and 3-cells. It
 is not an lDDT/radius loss and does not use hidden labels or external
 structure information.
 
-Implementation constraint: the existing `simplex_outer_edge_context_scale`
-module is the closest code path, but adding its trainable face/tetra context
-MLPs on top of the full E128 recipe raises the architecture to `3,317,330`
-parameters, above the cap `3,261,974`. Dropping both the E128 edge-frame
-message and boundary-edge-frame gate brings the outer-context recipe back
-under cap at `3,232,226`, but that also removes two successful oriented
-boundary-realization paths. Therefore E145 should either:
+Implementation: E145 adds `simplex_outer_edge_residual_context_scale`, a
+parameter-free outer-neighborhood path. For each selected face/tetra cell it
+pools directed external pair edges with `cell_outer_edge_context`, splits them
+into symmetric and oriented context, folds that context into the active
+face/tetra cochain width without learned weights, RMS-matches it to the cell
+state, and gates it with the existing face/tetra gate. This preserves the full
+E128 boundary-realization stack instead of removing edge-frame or
+boundary-edge-frame paths.
 
-- implement a parameter-neutral or lower-rank outer-neighborhood transport
-  path, or
-- explicitly replace a parameterized path only if E140/E141 show that the
-  current boundary-realization paths are no longer the limiting factor.
+Parameter constraint: the existing trainable `simplex_outer_edge_context_scale`
+module is semantically similar but too expensive on top of the full E128
+recipe (`3,317,330 > 3,261,974`). The new E145 path adds zero parameters: the
+full E128-style recipe plus `simplex_outer_edge_residual_context_scale=0.25`
+remains `3,240,738`, with `21,236` parameters of headroom.
+
+Candidate flag, only after E140/E141 return below threshold:
+
+```bash
+--run-name e145_outer_residual_context_from_e128_s9000_c256_m64 \
+--simplex-outer-edge-residual-context-scale 0.25
+```
+
+Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, edge-frame message runtime scale `0.0125`, directed
+boundary readout `0.25`, global context `0.1`, vertex-star context `1.0`,
+edge-star context runtime `0.5`, damped triangle-attention bias `0.0125`, and
+no Hodge readout.
 
 Decision rule: E145 should not receive a 30k spend unless a short gate clears
 `0.45` primary C-alpha lDDT and preserves coherent FoldScore, dRMSD, and
 C-alpha Rg. If E140 or E141 already clears the threshold, prioritize continuing
 that returned branch instead.
+
+Validation status:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed.
+- `python -m pytest tests/test_simplex.py::test_parameter_free_outer_edge_context_delta_uses_external_directed_edges tests/test_simplex.py::test_parameter_free_outer_edge_context_adapter_scale_changes_outputs_without_new_parameters tests/test_trainer.py::test_simplicial_parameter_free_outer_edge_context_adds_no_parameters tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_nanofold_public_benchmarks.py::test_model_config_overrides_preserve_resume_compatible_variant_name`: `5 passed`.
+- Parameter audit: E128 recipe plus E145 scale `0.25` is `3,240,738 <= 3,261,974`.

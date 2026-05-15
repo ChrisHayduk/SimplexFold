@@ -150,6 +150,7 @@ class ModelConfig:
     simplex_boundary_cochain_recycling_metric_gate_scale: float = 0.0
     simplex_outer_edge_update_scale: float = 0.0
     simplex_outer_edge_context_scale: float = 0.0
+    simplex_outer_edge_residual_context_scale: float = 0.0
     simplex_hodge_face_update_scale: float = 0.0
     simplex_signed_tetra_coboundary_scale: float = 0.0
     simplex_signed_tetra_to_face_scale: float = 0.0

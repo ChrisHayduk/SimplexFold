@@ -1417,6 +1417,55 @@ def cell_outer_edge_context(
     return edge_context.sum(dim=(-3, -2)) / count[..., None]
 
 
+def _fold_feature_channels(source: torch.Tensor, channels: int) -> torch.Tensor:
+    """Fold arbitrary feature width into a fixed channel count without parameters."""
+
+    width = int(source.shape[-1])
+    target = int(channels)
+    if target <= 0:
+        return source.new_empty(*source.shape[:-1], 0)
+    if width == target:
+        return source
+    parts: list[torch.Tensor] = []
+    for offset in range(target):
+        folded = source[..., offset::target]
+        if folded.shape[-1] == 0:
+            parts.append(source.new_zeros(*source.shape[:-1], 1))
+        else:
+            parts.append(folded.mean(dim=-1, keepdim=True))
+    return torch.cat(parts, dim=-1)
+
+
+def _rms_match_update(update: torch.Tensor, reference: torch.Tensor) -> torch.Tensor:
+    update_rms = torch.sqrt(update.float().pow(2).mean(dim=-1, keepdim=True).clamp_min(1e-6)).to(update.dtype)
+    reference_rms = torch.sqrt(
+        reference.detach().float().pow(2).mean(dim=-1, keepdim=True).clamp_min(1e-6)
+    ).to(update.dtype)
+    return update / update_rms * reference_rms
+
+
+def parameter_free_outer_edge_context_delta(
+    pair: torch.Tensor,
+    cell_indices: torch.Tensor,
+    cell_mask: torch.Tensor,
+    nbr_idx: torch.Tensor,
+    *,
+    channels: int,
+) -> torch.Tensor:
+    """Project directed external edge neighborhoods into cell cochains without parameters."""
+
+    if cell_indices.numel() == 0:
+        return pair.new_empty(*cell_indices.shape[:-1], int(channels))
+    context = cell_outer_edge_context(pair, cell_indices, cell_mask, nbr_idx)
+    if context.shape[-1] == 0:
+        return pair.new_zeros(*cell_indices.shape[:-1], int(channels))
+    outgoing, incoming = context.split(pair.shape[-1], dim=-1)
+    symmetric = 0.5 * (outgoing + incoming)
+    oriented = outgoing - incoming
+    folded = _fold_feature_channels(torch.cat([symmetric, oriented], dim=-1), int(channels))
+    return folded * cell_mask[..., None].to(folded.dtype)
+
+
 def masked_cell_mean(state: torch.Tensor, mask: torch.Tensor, channels: int) -> torch.Tensor:
     """Pool selected cell cochains into one protein-level cochain per batch item."""
 
@@ -1888,6 +1937,10 @@ class SimplicialAdapter(torch.nn.Module):
         )
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
         self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
+        self.outer_edge_residual_context_scale = min(
+            max(float(getattr(config, "simplex_outer_edge_residual_context_scale", 0.0)), 0.0),
+            1.0,
+        )
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
         self.signed_tetra_coboundary_scale = float(
             getattr(config, "simplex_signed_tetra_coboundary_scale", 0.0)
@@ -2482,6 +2535,22 @@ class SimplicialAdapter(torch.nn.Module):
             outer_msg = self.face_outer_edge_context(torch.cat([face_state, outer_context], dim=-1))
             face_state = face_state + self.dropout(
                 outer_edge_context_scale
+                * torch.sigmoid(self.face_gate(face_state))
+                * outer_msg
+                * topology.face_mask[..., None]
+            )
+            face_state = face_state * topology.face_mask[..., None]
+        if self.outer_edge_residual_context_scale > 0.0:
+            outer_msg = parameter_free_outer_edge_context_delta(
+                pair,
+                face_indices,
+                topology.face_mask,
+                topology.nbr_idx,
+                channels=self.c_face,
+            )
+            outer_msg = _rms_match_update(outer_msg, face_state)
+            face_state = face_state + self.dropout(
+                self.outer_edge_residual_context_scale
                 * torch.sigmoid(self.face_gate(face_state))
                 * outer_msg
                 * topology.face_mask[..., None]
@@ -3326,6 +3395,22 @@ class SimplicialAdapter(torch.nn.Module):
             outer_msg = self.tetra_outer_edge_context(torch.cat([tetra_state, outer_context], dim=-1))
             tetra_state = tetra_state + self.dropout(
                 outer_edge_context_scale
+                * torch.sigmoid(self.tetra_gate(tetra_state))
+                * outer_msg
+                * topology.tetra_mask[..., None]
+            )
+            tetra_state = tetra_state * topology.tetra_mask[..., None]
+        if self.outer_edge_residual_context_scale > 0.0:
+            outer_msg = parameter_free_outer_edge_context_delta(
+                pair,
+                topology.tetra_indices,
+                topology.tetra_mask,
+                topology.nbr_idx,
+                channels=self.c_tetra,
+            )
+            outer_msg = _rms_match_update(outer_msg, tetra_state)
+            tetra_state = tetra_state + self.dropout(
+                self.outer_edge_residual_context_scale
                 * torch.sigmoid(self.tetra_gate(tetra_state))
                 * outer_msg
                 * topology.tetra_mask[..., None]
