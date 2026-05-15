@@ -7219,3 +7219,18 @@
   pod and an RTX 5090 pod both failed with no deployable capacity/resources.
   No new pod was created. Keep only owned pod `c67fbk189vnvfp` running E140 and
   retry parallel capacity later only if useful.
+- 2026-05-15T10:09Z E140 remained active on owned pod `c67fbk189vnvfp`: PID
+  `55949` had elapsed `00:17:58`, process CPU time was `03:44:16`, and the
+  status heartbeat reported active step `8509`, microbatch `4`,
+  `stopped_early=false`, and effective batch size `8`. History still ends at
+  inherited E128 step `8500` and no result/eval-detail files exist yet, as
+  expected before the step-9000 evaluation. GPU memory was about `24.2 GiB`.
+  A same-image H100 NVL secure pod request for parallel E141 also failed with
+  no available requested capacity. No new pod was created; leave E140 running.
+- 2026-05-15T10:12Z E140 still active on the owned pod: PID `55949` had elapsed
+  `00:20:53`, process CPU time was `04:20:29`, and the status heartbeat
+  reported active step `8511`, microbatch `1`, `stopped_early=false`, and
+  effective batch size `8`. History still correctly ends at inherited E128 step
+  `8500`, so the current scored best remains E128 (`val_lddt_ca=0.4311057258844376`).
+  No `results.json` or eval-detail CSV exists yet; wait for the step-9000
+  evaluation before judging E140.
