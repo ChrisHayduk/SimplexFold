@@ -6624,3 +6624,15 @@
   `tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
   slice (`223 passed`); focused ruff undefined-name/syntax-risk checks; and
   `git diff --check`.
+- 2026-05-15T04:35Z-04:36Z Bounded E130 health sample on owned pod
+  `c67fbk189vnvfp`: PID `4224` remained active, elapsed time advanced from
+  `01:35:35` to `01:36:35`, process CPU time advanced from `19:51:12` to
+  `20:03:59`, `%CPU` stayed at `1246`, thread count stayed at `194`, RSS
+  stayed near `1.9 GiB`, and `/proc/4224/io` read counters advanced
+  (`rchar` `139719710` -> `140114623`, `syscr` `15864` -> `15959`). A100
+  memory remained allocated at `43091 MiB` though the instantaneous GPU
+  utilization sample was `0%`. The artifact directory still had only
+  `history_full_msa_to_face.json` and `run_metadata.json`; no result bundle,
+  eval-details file, or checkpoint existed. Interpretation: active but not
+  returned; leave the run undisturbed and keep `EXPERIMENT_RESULTS.md`
+  unchanged.
