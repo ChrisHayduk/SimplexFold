@@ -1,3 +1,55 @@
+## 2026-05-15 Operating Plan Update: E140/E141 Active, PDF-Informed Queue
+
+Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,
+well below the `0.7` goal and below the `0.45` short-gate threshold for a
+credible 30k-step spend. E140 and E141 are both active on owned Runpod pods
+and remain pre-eval: their histories still correctly end at inherited E128
+step `8500`, with no result or eval-detail bundle yet. Do not update
+`EXPERIMENT_RESULTS.md` for them until a scored result or explicit stopped-run
+outcome returns.
+
+The two user-provided PDFs are saved for later reference:
+
+- `references/papers/hands_on_geometric_deep_learning_nodes_to_complexes.pdf`
+- `references/papers/2509.03885v1.pdf`
+
+Full-text extraction/read-through on 2026-05-15 supports the current
+topology-native direction. The general topological-deep-learning guide
+emphasizes cochains, incidence maps, inter-neighborhood aggregation across
+topological domains, filtrations, and pooling/unspooling. `Topotein:
+Topological Deep Learning for Protein Representation Learning` is more
+directly actionable: it argues that effective protein TDL needs persistent
+multi-rank states, incident/adjacent neighborhood operators, and especially
+outer-edge neighborhoods that let higher-rank cells communicate through
+external directed edges without echoing messages only inside the same cell.
+It also warns that superficial higher-rank features without dedicated update
+mechanisms can be counterproductive.
+
+Near-term implication: E140/E141 should finish first because they are already
+running and directly probe selected-complex realization and signed oriented
+boundary incidence. The next parked idea, if both fail to clear the short-gate
+threshold, should be a Topotein-style outer-neighborhood transport probe. The
+clean version is not a generic metric loss; it is a topological architecture
+question: selected face/tetra cochains should update through directed
+residue-to-external-edge neighborhoods before their boundary signal reaches
+the pair trunk. The existing trainable `simplex_outer_edge_context_scale` hook
+does this, but adding it on top of the full E128 recipe exceeds the
+AF2-medium+5% cap unless another parameterized simplex path is removed or a
+lower-rank/parameter-neutral version is implemented. Therefore keep it as an
+E145 design candidate, not an automatic launch, until E140/E141 return.
+
+Next actions:
+
+1. Keep monitoring only the owned E140 pod `c67fbk189vnvfp` and E141 pod
+   `5ox436mhzej7j4` through their `status_full_msa_to_face.json` heartbeats.
+2. When either returns, verify and pull artifacts, update
+   `EXPERIMENT_RESULTS.md`, commit/push, then decide whether the returned
+   score justifies a continuation or pivot.
+3. If E140/E141 remain below `0.45`, design E145 around outer-neighborhood
+   selected-cell transport while preserving the parameter cap; avoid spending
+   30,000 steps unless a short gate clears `0.45` with coherent FoldScore,
+   dRMSD, and C-alpha Rg.
+
 ## 2026-05-15 Operating Plan Update: E140 Active With Heartbeat
 
 Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,

@@ -7286,3 +7286,32 @@
   `8502`, microbatch `1`, effective batch size `8`, and
   `stopped_early=false`; history also still ends at E128 step `8500` with no
   result/eval-detail files. Leave both running.
+- 2026-05-15T10:49Z Rechecked only the two owned active Runpod pods. E140 on
+  `c67fbk189vnvfp` remains active at PID `55949`, elapsed `00:53:10`, process
+  CPU time `11:03:43`, status active step `8528`, completed step `8527`,
+  microbatch `1`, effective batch size `8`, and `stopped_early=false`. E141 on
+  `5ox436mhzej7j4` remains active at PID `576`, elapsed `00:11:16`, process
+  CPU time `01:53:23`, status active step `8504`, completed step `8503`,
+  microbatch `1`, effective batch size `8`, and `stopped_early=false`. Both
+  runs still have only inherited history through E128 step `8500`; neither has
+  `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`, or a new
+  checkpoint yet.
+- 2026-05-15T10:49Z Confirmed the user-provided PDFs are saved in the repo at
+  `references/papers/hands_on_geometric_deep_learning_nodes_to_complexes.pdf`
+  and `references/papers/2509.03885v1.pdf`. Extracted and read full text from
+  both PDFs. The general TDL guide reinforces the framing around cochains,
+  incidence matrices, filtrations, and inter-neighborhood aggregation. The
+  Topotein paper is the more experiment-actionable source: its Protein
+  Combinatorial Complex and TCPNet design argue for persistent multi-rank
+  protein states, directed incidence/adjacency operators, edge-centric
+  scalarization, and outer-edge neighborhoods that let higher-rank cells
+  communicate through external directed edges. It also explicitly cautions
+  that shallow higher-rank feature addition without dedicated update
+  mechanisms can hurt, which matches our negative readout-only and weak
+  feedback branches. The immediate experiment consequence is to keep E140/E141
+  running, then consider an E145 outer-neighborhood transport candidate only if
+  they return below threshold; the existing trainable
+  `simplex_outer_edge_context_scale` hook matches this idea but exceeds the
+  parameter cap when added to the full E128 recipe unless another
+  parameterized path is removed or a lower-rank/parameter-neutral variant is
+  implemented.

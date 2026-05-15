@@ -7006,3 +7006,43 @@ Validation status:
   size `8`, max-parameter cap `3261974`, static residual scale `0.25`, and
   runtime final scale `0.25`. The full E128-style architecture audit counted
   `3,240,738` parameters, still under the cap.
+
+### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
+
+Status: design candidate only; do not launch until E140/E141 return. The two
+Runpod pods already running should finish before we spend capacity on a third
+branch.
+
+Source motivation: the saved Topotein PDF (`references/papers/2509.03885v1.pdf`)
+argues that protein topological networks need persistent multi-rank states and
+outer-edge neighborhoods, not just higher-rank features read out once at the
+end. Its PCC construction lets higher-rank protein cells update through
+directed external edges so cell-to-cell communication is not trapped inside a
+single secondary-structure element. This aligns with our current SimplexFold
+diagnosis: selected face/tetra boundary lDDT is high, but the global C-alpha
+trace remains compact and low-tail chains fail.
+
+Hypothesis: selected face/tetra cochains should receive a weak update from
+directed outer pair edges before boundary scatter/readout. In topological
+terms, this is an inter-neighborhood transport step from the pair 1-skeleton
+through external incidence neighborhoods into the selected 2- and 3-cells. It
+is not an lDDT/radius loss and does not use hidden labels or external
+structure information.
+
+Implementation constraint: the existing `simplex_outer_edge_context_scale`
+module is the closest code path, but adding its trainable face/tetra context
+MLPs on top of the full E128 recipe raises the architecture to `3,317,330`
+parameters, above the cap `3,261,974`. Dropping both the E128 edge-frame
+message and boundary-edge-frame gate brings the outer-context recipe back
+under cap at `3,232,226`, but that also removes two successful oriented
+boundary-realization paths. Therefore E145 should either:
+
+- implement a parameter-neutral or lower-rank outer-neighborhood transport
+  path, or
+- explicitly replace a parameterized path only if E140/E141 show that the
+  current boundary-realization paths are no longer the limiting factor.
+
+Decision rule: E145 should not receive a 30k spend unless a short gate clears
+`0.45` primary C-alpha lDDT and preserves coherent FoldScore, dRMSD, and
+C-alpha Rg. If E140 or E141 already clears the threshold, prioritize continuing
+that returned branch instead.
