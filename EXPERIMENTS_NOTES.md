@@ -7085,3 +7085,13 @@
   startup `run_metadata.json` plus inherited `history_full_msa_to_face.json`
   ending at E128 step `8500`; no result bundle, eval-details file, or
   checkpoint existed yet. Leave E139 running under the updated heartbeat.
+- 2026-05-15T09:13Z-09:15Z E139 remained active and still below cutoff on the
+  same owned pod. Python PID `42517` had elapsed `00:09:58`, process CPU time
+  `02:04:00`, and the artifact/log files were unchanged from startup. A
+  six-sample utilization check showed `19.2 GiB` GPU memory allocated but GPU
+  utilization mostly `0%` (`3%` in one sample), while the Python process used
+  roughly `12.4` CPU cores and had `194` threads. This matches the quiet
+  CPU-heavy/no-write pattern seen in E130/E138, but E139 is far below the
+  documented no-write cutoff, so leave it running. `py-spy` is installed on
+  the pod, but attaching to PID `42517` failed with container ptrace
+  `Permission denied`; no process state was changed.
