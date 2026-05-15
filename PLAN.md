@@ -2255,3 +2255,54 @@ and no dense coordinate objective. To stay within the AF2-medium +5% cap, the
 gate is intentionally face-boundary-only for now; the audited E120-style
 medium config with the new gate has `3,239,522` parameters, below the
 `3,261,974` cap.
+
+## 2026-05-15 E132 Runtime Boundary-Readout Ramp Prepared
+
+E130 is still the active Runpod run and E131 remains the first parked
+fallback. I prepared one additional no-parameter fallback for the same
+boundary-cochain family: runtime schedules for
+`simplex_boundary_hodge_readout_scale` and
+`simplex_boundary_edge_star_readout_scale`.
+
+Rationale: E130/E131 change the selected boundary 1-cochain readout, not the
+output loss. If E130 or E131 regresses, the failure may be an abrupt
+resume-time perturbation rather than a negative result for Hodge centering or
+edge-star smoothing themselves. The new runtime scales let a resumed checkpoint
+receive the same topological operation gradually over the short gate.
+
+This stays within the SimplexFold view: selected faces and tetras still write
+through their boundary 1-skeleton into `Z_ij`; the only change is a training
+schedule for how strongly the selected boundary cochain is Hodge-centered or
+edge-star-smoothed before pair update. It adds no parameters and no generic
+C-alpha, radius, all-pairs distance, or coordinate objective.
+
+Do not launch this while E130 is active. If E130/E131 look promising but
+unstable, the next clean gate is a ramped E132 variant from the E128
+checkpoint with the E128 recipe fixed and either:
+
+```bash
+--simplex-boundary-hodge-readout-scale 0.25 \
+--simplex-boundary-hodge-readout-runtime-scale 0.0 \
+--simplex-boundary-hodge-readout-runtime-scale-final 0.25 \
+--simplex-boundary-hodge-readout-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-hodge-readout-runtime-scale-ramp-steps 500
+```
+
+or the E131 combination:
+
+```bash
+--simplex-boundary-hodge-readout-scale 0.25 \
+--simplex-boundary-edge-star-readout-scale 0.5 \
+--simplex-boundary-hodge-readout-runtime-scale 0.0 \
+--simplex-boundary-hodge-readout-runtime-scale-final 0.25 \
+--simplex-boundary-edge-star-readout-runtime-scale 0.0 \
+--simplex-boundary-edge-star-readout-runtime-scale-final 0.5 \
+--simplex-boundary-hodge-readout-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-edge-star-readout-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-hodge-readout-runtime-scale-ramp-steps 500 \
+--simplex-boundary-edge-star-readout-runtime-scale-ramp-steps 500
+```
+
+Decision rule is unchanged: a short gate must beat E128/E130/E131 on primary
+C-alpha lDDT, keep FoldScore/dRMSD/Rg coherent, and clear `0.45` before any
+30k-step spend.

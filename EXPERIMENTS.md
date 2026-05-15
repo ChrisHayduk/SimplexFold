@@ -5726,3 +5726,63 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `220 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/model_config.py minalphafold/simplex.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - `git diff --check`: passed
+
+### E132: Ramped Boundary-Cochain Readout
+
+Status: implemented locally as a parked scheduling fallback while E130 runs;
+not launched on Runpod.
+
+Hypothesis: E130 and E131 may fail not because Hodge-centered or edge-star
+selected-boundary readout is wrong, but because injecting a new boundary
+1-cochain operation at full scale into an E128 checkpoint is too abrupt. A
+runtime ramp tests the same topological mechanism while preserving checkpoint
+stability.
+
+Mechanism: add runtime overrides for
+`simplex_boundary_hodge_readout_scale` and
+`simplex_boundary_edge_star_readout_scale`. These schedules are applied inside
+the existing simplex adapter after selected face/tetra states scatter to the
+selected boundary 1-skeleton and before the pair update. This keeps the
+operation in the simplicial pathway: higher-rank cells communicate through
+their boundary edges, and the schedule controls only how strongly the
+boundary-edge cochain is Hodge-centered or edge-star-smoothed during a resumed
+short gate. No parameters or output-side losses are added.
+
+Candidate launch only after E130 returns, and only if the boundary-cochain
+route remains plausible but unstable. For a ramped E130 retry from E128:
+
+```bash
+--run-name e132_ramped_hodge_readout_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-boundary-hodge-readout-scale 0.25 \
+--simplex-boundary-hodge-readout-runtime-scale 0.0 \
+--simplex-boundary-hodge-readout-runtime-scale-final 0.25 \
+--simplex-boundary-hodge-readout-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-hodge-readout-runtime-scale-ramp-steps 500
+```
+
+For a ramped E131-style gate, add:
+
+```bash
+--simplex-boundary-edge-star-readout-scale 0.5 \
+--simplex-boundary-edge-star-readout-runtime-scale 0.0 \
+--simplex-boundary-edge-star-readout-runtime-scale-final 0.5 \
+--simplex-boundary-edge-star-readout-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-edge-star-readout-runtime-scale-ramp-steps 500
+```
+
+Decision rule: reject unless the ramped readout beats the relevant static
+branch and E128 on primary C-alpha lDDT while keeping FoldScore, dRMSD, and
+C-alpha Rg coherent. It still must clear `0.45` before any 30k-step spend.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py::test_simplicial_adapter_hodge_centers_boundary_pair_update tests/test_simplex.py::test_simplicial_adapter_edge_star_smooths_boundary_pair_update tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `6 passed`
+- `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `220 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `git diff --check`: passed

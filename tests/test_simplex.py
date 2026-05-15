@@ -1949,8 +1949,14 @@ def test_simplicial_adapter_hodge_centers_boundary_pair_update():
     with torch.no_grad():
         pair_base, _, _ = base(pair, single)
         pair_hodge, _, _ = hodge(pair, single)
+        pair_override, _, _ = base(
+            pair,
+            single,
+            simplex_boundary_hodge_readout_scale_override=pair.new_tensor(0.5),
+        )
 
     assert not torch.allclose(pair_hodge, pair_base)
+    assert torch.allclose(pair_override, pair_hodge)
     assert pair_hodge.shape == pair_base.shape
 
 
@@ -1975,8 +1981,14 @@ def test_simplicial_adapter_edge_star_smooths_boundary_pair_update():
     with torch.no_grad():
         pair_base, _, _ = base(pair, single)
         pair_edge_star, _, _ = edge_star(pair, single)
+        pair_override, _, _ = base(
+            pair,
+            single,
+            simplex_boundary_edge_star_readout_scale_override=pair.new_tensor(0.5),
+        )
 
     assert not torch.allclose(pair_edge_star, pair_base)
+    assert torch.allclose(pair_override, pair_edge_star)
     assert pair_edge_star.shape == pair_base.shape
 
 

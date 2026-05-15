@@ -6530,3 +6530,27 @@
   step `8500`. Interpretation: the process remains active but has not reached
   a coherent step-9000 writeout, so leave E130 running under the heartbeat and
   do not launch the parked E131 fallback yet.
+- 2026-05-15T03:42Z E130 remained active on the owned pod with no returned
+  bundle: history still ended at E128 step `8500`, no `results.json`,
+  `results.csv`, eval-details file, or checkpoint existed, and PID `4224`
+  showed elapsed `42:16`, CPU time `08:45:14`, `%CPU=1242`, and RSS about
+  `1.9 GiB`. The pod should remain running under the heartbeat.
+- 2026-05-15T03:45Z Prepared E132 locally; no Runpod launch. E132 adds runtime
+  schedules for `simplex_boundary_hodge_readout_scale` and
+  `simplex_boundary_edge_star_readout_scale`. This is not a new loss or metric
+  hack: it lets a resumed checkpoint receive the same selected-boundary
+  1-cochain operations from E130/E131 gradually, after face/tetra boundary
+  messages scatter to selected edges and before `Z_ij` is updated. Use only if
+  E130/E131 make the boundary-cochain route plausible but look unstable. Local
+  focused validation passed: py_compile for `simplex.py`, `evoformer.py`,
+  `model.py`, `trainer.py`, and `run_nanofold_public_benchmarks.py`, plus six
+  targeted pytest checks covering adapter overrides, trainer schedule inputs,
+  runner parser support, runner validation-time overrides, and model-input
+  plumbing.
+- 2026-05-15T03:53Z E132 broader local validation passed:
+  `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  reported `220 passed`; focused ruff checks for undefined-name/syntax-risk
+  rules passed; `git diff --check` passed. A final owned-pod check at the
+  same time showed E130 still active with no `results.json`, `results.csv`,
+  eval-details file, or checkpoint and history still ending at step `8500`,
+  so E132 remains parked and `EXPERIMENT_RESULTS.md` remains unchanged.

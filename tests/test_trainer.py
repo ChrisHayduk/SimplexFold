@@ -54,6 +54,8 @@ from minalphafold.trainer import (
     simplex_boundary_metric_recycling_runtime_scale_at_step,
     simplex_boundary_pair_feedback_runtime_scale_at_step,
     simplex_boundary_pair_gate_runtime_scale_at_step,
+    simplex_boundary_edge_star_readout_runtime_scale_at_step,
+    simplex_boundary_hodge_readout_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
     simplex_cell_score_outer_edge_weight_at_step,
     simplex_edge_star_context_runtime_scale_at_step,
@@ -199,6 +201,14 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_boundary_readout_directionality_runtime_scale_final=0.5,
         simplex_boundary_readout_directionality_runtime_scale_ramp_start_step=10,
         simplex_boundary_readout_directionality_runtime_scale_ramp_steps=10,
+        simplex_boundary_hodge_readout_runtime_scale=0.0,
+        simplex_boundary_hodge_readout_runtime_scale_final=0.25,
+        simplex_boundary_hodge_readout_runtime_scale_ramp_start_step=10,
+        simplex_boundary_hodge_readout_runtime_scale_ramp_steps=10,
+        simplex_boundary_edge_star_readout_runtime_scale=0.0,
+        simplex_boundary_edge_star_readout_runtime_scale_final=0.5,
+        simplex_boundary_edge_star_readout_runtime_scale_ramp_start_step=10,
+        simplex_boundary_edge_star_readout_runtime_scale_ramp_steps=10,
         simplex_vertex_star_context_runtime_scale=0.0,
         simplex_vertex_star_context_runtime_scale_final=1.0,
         simplex_vertex_star_context_runtime_scale_ramp_start_step=10,
@@ -259,6 +269,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_single_update_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_hodge_face_runtime_scale_at_step(training_config, 15) == 0.05
     assert simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, 15) == 0.25
+    assert simplex_boundary_hodge_readout_runtime_scale_at_step(training_config, 15) == 0.125
+    assert simplex_boundary_edge_star_readout_runtime_scale_at_step(training_config, 15) == 0.25
     assert simplex_vertex_star_context_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_edge_star_context_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_pre_triangle_update_runtime_scale_at_step(training_config, 15) == 0.125
@@ -278,6 +290,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert "simplex_pair_update_scale_override" not in eval_inputs
     assert "simplex_hodge_face_update_scale_override" not in eval_inputs
     assert "simplex_boundary_readout_directionality_override" not in eval_inputs
+    assert "simplex_boundary_hodge_readout_scale_override" not in eval_inputs
+    assert "simplex_boundary_edge_star_readout_scale_override" not in eval_inputs
     assert "simplex_vertex_star_context_scale_override" not in eval_inputs
     assert "simplex_edge_star_context_scale_override" not in eval_inputs
     assert "simplex_pre_triangle_update_scale_override" not in eval_inputs
@@ -299,6 +313,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
         use_simplex_update_scale=True,
         use_simplex_hodge_face_runtime_scale=True,
         use_simplex_boundary_readout_directionality_runtime_scale=True,
+        use_simplex_boundary_hodge_readout_runtime_scale=True,
+        use_simplex_boundary_edge_star_readout_runtime_scale=True,
         use_simplex_vertex_star_context_runtime_scale=True,
         use_simplex_edge_star_context_runtime_scale=True,
         use_simplex_pre_triangle_runtime_scale=True,
@@ -320,6 +336,8 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_single_update_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.05))
     assert torch.allclose(train_inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
+    assert torch.allclose(train_inputs["simplex_boundary_hodge_readout_scale_override"], torch.tensor(0.125))
+    assert torch.allclose(train_inputs["simplex_boundary_edge_star_readout_scale_override"], torch.tensor(0.25))
     assert torch.allclose(train_inputs["simplex_vertex_star_context_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_edge_star_context_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_pre_triangle_update_scale_override"], torch.tensor(0.125))

@@ -1971,6 +1971,8 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_edge_frame_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
+        simplex_boundary_hodge_readout_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_edge_star_readout_scale_override: Optional[torch.Tensor] = None,
         simplex_vertex_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
@@ -2022,6 +2024,18 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_boundary_readout_directionality_override is not None:
             boundary_readout_directionality = min(
                 max(float(simplex_boundary_readout_directionality_override.detach().float().cpu().item()), 0.0),
+                1.0,
+            )
+        boundary_hodge_readout_scale = self.boundary_hodge_readout_scale
+        if simplex_boundary_hodge_readout_scale_override is not None:
+            boundary_hodge_readout_scale = min(
+                max(float(simplex_boundary_hodge_readout_scale_override.detach().float().cpu().item()), 0.0),
+                1.0,
+            )
+        boundary_edge_star_readout_scale = self.boundary_edge_star_readout_scale
+        if simplex_boundary_edge_star_readout_scale_override is not None:
+            boundary_edge_star_readout_scale = min(
+                max(float(simplex_boundary_edge_star_readout_scale_override.detach().float().cpu().item()), 0.0),
                 1.0,
             )
         vertex_star_context_scale = self.vertex_star_context_scale
@@ -2559,13 +2573,13 @@ class SimplicialAdapter(torch.nn.Module):
             pair_readout,
             pair_counts,
             pair_mask=pair_mask,
-            scale=self.boundary_hodge_readout_scale,
+            scale=boundary_hodge_readout_scale,
         )
         pair_readout = edge_star_smooth_boundary_readout(
             pair_readout,
             pair_counts,
             pair_mask=pair_mask,
-            scale=self.boundary_edge_star_readout_scale,
+            scale=boundary_edge_star_readout_scale,
         )
         pair_readout = coface_degree_attenuate_pair_readout(
             pair_readout,
