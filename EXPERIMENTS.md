@@ -6100,11 +6100,12 @@ Validation so far:
 
 ### E138: No-Hodge Face-Cyclic Boundary Readout
 
-Status: running on owned Runpod pod `c67fbk189vnvfp` from
+Status: runtime failed. E138 ran on owned Runpod pod `c67fbk189vnvfp` from
 `/workspace/SimplexFold_next` as
-`e138_no_hodge_face_cyclic_boundary_from_e128_s9000_c256_m64`, PID `24980`.
+`e138_no_hodge_face_cyclic_boundary_from_e128_s9000_c256_m64`, PID `24980`,
+then was stopped at the documented no-write cutoff after `03:00:56` elapsed.
 No code change beyond the already implemented E137 face-cyclic boundary
-operator; E138 is the no-Hodge launch recipe selected after E130 hit the
+operator; E138 was the no-Hodge launch recipe selected after E130 hit the
 runtime cutoff.
 
 Hypothesis: E130's static Hodge-centered boundary readout may be stressing an
@@ -6153,9 +6154,23 @@ Parameter audit: no new trainable modules beyond the already-tested E137
 operator; the E128-family architecture remains under the AF2-medium +5% cap
 at the existing audited `3,240,738 <= 3,261,974`.
 
-Decision rule: reject unless E138 beats E128 and any returned E130-family
-result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
-coherent. It still needs to clear `0.45` before any 30k-step consideration.
+Runpod terminal status: startup verification passed and E138 resumed the E128
+checkpoint at step `8500` / examples `68000`, loading `1332` matching tensors
+and initializing `0` new/missing tensors. At `2026-05-15T09:02:39Z`, the
+process had elapsed `03:00:56`, but the artifact directory still contained
+only startup `run_metadata.json` plus inherited `history_full_msa_to_face.json`
+ending at E128 step `8500`; no `results.json`, `results.csv`,
+`eval_details_full_msa_to_face.csv`, or checkpoint existed. The log had not
+changed since startup. The startup trace was preserved locally under
+`artifacts/nanofold_public_benchmarks/e138_no_hodge_face_cyclic_boundary_from_e128_s9000_c256_m64/`
+and `logs/e138_no_hodge_face_cyclic_boundary.log`, then only E138 PID `24980`
+was terminated.
+
+Decision: record E138 as a runtime-failed branch. The face-cyclic
+2-simplex boundary readout remains a topology-native idea, but this runtime
+path does not produce a usable short-gate score. Use the no-Hodge E139
+oriented boundary-cochain fallback rather than spending more time on E138
+without a runtime fix.
 
 Validation status: E138 is a launch-recipe subset of the already-tested E137
 operator with Hodge disabled. On the branch tip after documenting E138:
@@ -6169,8 +6184,10 @@ the Runpod checkout.
 
 ### E139: No-Hodge Oriented Boundary-Cochain Readout
 
-Status: launch recipe staged on the owned Runpod pod; do not launch while E138
-is active. This reuses the already implemented E136 oriented boundary-cochain
+Status: running on owned Runpod pod `c67fbk189vnvfp` from
+`/workspace/SimplexFold_e139` as
+`e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64`, Python PID
+`42517`. This reuses the already implemented E136 oriented boundary-cochain
 operator but removes E130's Hodge double-centering from the launch recipe.
 
 Hypothesis: E138 tests orientation at the level of each selected triangular
@@ -6188,7 +6205,7 @@ pair update. It is a simplicial/topological architecture change on the
 selected boundary 1-cochain, not an output-side C-alpha lDDT, radius,
 distance-matrix, or coordinate loss.
 
-Candidate launch only after E138 returns and is documented:
+Launch recipe used after E138 was documented as a runtime-failed branch:
 
 ```bash
 --run-name e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64 \
@@ -6207,7 +6224,7 @@ Candidate launch only after E138 returns and is documented:
 
 Full same-pod launch skeleton if E138 is documented as flat/runtime-failed
 and the owned pod remains healthy. Use the separate staged checkout so the
-active E138 tree is not disturbed:
+previous E138 tree is not disturbed:
 
 ```bash
 cd /workspace/SimplexFold_e139
@@ -6284,6 +6301,14 @@ Parameter audit: no new trainable modules beyond the already-tested E136
 operator; the E128-family architecture remains under the AF2-medium +5% cap
 at the existing audited `3,240,738 <= 3,261,974`.
 
+Runpod startup status: remote `python3 -m py_compile` passed in
+`/workspace/SimplexFold_e139`, the run wrote `run_metadata.json` and inherited
+history at `2026-05-15T09:03Z`, and the log confirms `train=10000`,
+`val=1000`, crop `256`, MSA depth `64`, resume from the E128 checkpoint at
+step `8500` / examples `68000`, `1332` matching tensors loaded, and `0`
+new/missing tensors initialized. The actual Python process is PID `42517`,
+with GPU memory allocated.
+
 Decision rule: reject unless E139 beats E128 and any returned E138 result on
 primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg coherent.
 It still needs to clear `0.45` before any 30k-step consideration.
@@ -6302,18 +6327,16 @@ operator with Hodge disabled. On the branch tip after documenting E139:
   model/trainer/runner files; parser validation accepted the documented E139
   command with effective batch size `8`, max-parameter cap `3261974`, oriented
   static scale `0.25`, and oriented runtime final scale `0.25`; the NanoFold
-  checkout and E128 checkpoint were verified present. No Runpod experiment was
-  launched from this checkout.
+  checkout and E128 checkpoint were verified present. The Runpod experiment
+  launched from this checkout after E138 was documented as runtime failed.
 - `git diff --check`: passed
-
-Before launch, still run `git diff --check` on the exact branch tip used by
-the Runpod checkout.
 
 ### E140: Selected-Boundary Realization Anti-Collapse
 
-Status: planned launch recipe only; do not launch while E138 is active. Use
-only if E138/E139 return coherent but remain in the collapsed low-0.4 C-alpha
-lDDT band.
+Status: planned launch recipe only; do not launch while E139 is active. Use
+only if E139 returns coherent but remains in the collapsed low-0.4 C-alpha
+lDDT band, or if E139 is deliberately skipped after a documented terminal
+state.
 
 Hypothesis: the current best E128 branch shows a useful but incomplete
 local-to-global split. The selected higher-order complex is learning local
@@ -6331,8 +6354,7 @@ pairs, C-alpha radius, validation lDDT, or a full distance matrix. In
 topological terms, it asks the learned sparse complex to realize its own
 selected 2- and 3-cells without collapsing their 1-skeleton.
 
-Candidate launch only after E138 returns and E139 is either returned or
-explicitly skipped:
+Candidate launch only after E139 is either returned or explicitly skipped:
 
 ```bash
 --run-name e140_selected_boundary_expansion_from_e128_s9000_c256_m64 \
@@ -6367,10 +6389,9 @@ model parameters. Local checks after documenting the parked recipe:
 
 ### E141: Signed Face-Cyclic Boundary Readout
 
-Status: locally implemented and validated while E138 is active; do not launch
-until E138 has returned or been documented as a terminal failure. If the
-current heartbeat has already launched the earlier E139 fallback, do not
-interrupt it just to run E141 first.
+Status: locally implemented, validated, and staged; do not launch while E139
+is active. E138 has already been documented as a terminal failure, and E139 is
+now the active fallback.
 
 Hypothesis: E138 tests whether selected face cochains should write back into
 pair state through each triangular boundary cycle `(i->j, j->k, k->i)`.
@@ -6388,7 +6409,7 @@ edges as `(ij, jk, -ik -> ki)`. This is parameter-neutral and changes only
 the selected face-to-pair cochain readout. It adds no C-alpha lDDT, radius,
 all-pairs distance, or coordinate loss.
 
-Candidate launch after E138 is documented:
+Candidate launch after E139 is documented:
 
 ```bash
 --run-name e141_signed_face_cyclic_boundary_from_e128_s9000_c256_m64 \
@@ -6406,7 +6427,7 @@ Candidate launch after E138 is documented:
 ```
 
 Full same-pod launch skeleton, using the staged checkout that does not disturb
-the active E138 tree:
+the active E139 tree:
 
 ```bash
 cd /workspace/SimplexFold_e141
@@ -6476,8 +6497,8 @@ degree-penalized plus outer-edge-supported cell scoring, incidence
 normalization `1.0`, edge-frame message runtime scale `0.0125`, global context
 `0.1`, vertex-star context `1.0`, and edge-star runtime `0.5`. Do not combine
 with E130's Hodge readout. Only combine with E138's unsigned face-cyclic path
-if E138 returns a coherent primary-lDDT improvement but seems under-signed by
-diagnostics.
+if a future fixed E138-style branch returns a coherent primary-lDDT
+improvement but seems under-signed by diagnostics.
 
 Parameter audit: no new trainable modules; the E128-family architecture
 remains under the AF2-medium +5% cap at the existing audited
@@ -6487,7 +6508,7 @@ Decision rule: reject unless E141 beats E128 and any returned E138/E139 result
 on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
 coherent. It still needs to clear `0.45` before any 30k-step consideration.
 
-Validation status on the local branch while E138 runs:
+Validation status on the local branch from the E138/E139 staging window:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
 - `python -m pytest tests/test_simplex.py::test_cyclic_face_boundary_helpers_return_oriented_face_cycle tests/test_simplex.py::test_simplicial_adapter_signed_face_cyclic_readout_changes_directed_pair_update tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_hodge_readout_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`
@@ -6504,10 +6525,9 @@ Validation status on the local branch while E138 runs:
 
 ### E142: Signed Tetra Coboundary Face Update
 
-Status: locally implemented and validated while E138 is active; do not launch
-while the active E138 process is still running. Treat this as a parked
-topology-native fallback after E138/E141/E139 are documented or deliberately
-skipped.
+Status: locally implemented, validated, and staged; do not launch while the
+active E139 process is still running. Treat this as a parked topology-native
+fallback after E139/E141 are documented or deliberately skipped.
 
 Hypothesis: the selected tetra cofaces should update face cochains through the
 oriented tetra boundary operator, not through an unsigned sibling-face mean.
@@ -6544,7 +6564,7 @@ Candidate launch only after the active Runpod branch is documented:
 ```
 
 Full same-pod launch skeleton, using the staged checkout that does not disturb
-the active E138 tree:
+the active E139 tree:
 
 ```bash
 cd /workspace/SimplexFold_e142
@@ -6622,7 +6642,7 @@ Decision rule: reject unless E142 beats E128 and any returned E138/E141/E139
 result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
 coherent. It still needs to clear `0.45` before any 30k-step consideration.
 
-Validation status on the local branch while E138 runs:
+Validation status on the local branch from the E138/E139 staging window:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
 - `python -m pytest tests/test_simplex.py::test_signed_face_tetra_coboundary_delta_uses_oriented_tetra_boundary_signs tests/test_simplex.py::test_signed_tetra_coboundary_adapter_scale_changes_outputs_without_new_parameters tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_hodge_face_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`
@@ -6639,7 +6659,7 @@ Validation status on the local branch while E138 runs:
 ### E143: Signed Tetra-to-Face Boundary Readout
 
 Status: locally implemented, validated, and staged on the owned Runpod pod
-while E138 is active; do not launch while the active E138 process is still
+while E139 is active; do not launch while the active E139 process is still
 running.
 
 Hypothesis: E142 signs the tetra coface-to-face residual, but the learned
@@ -6673,7 +6693,7 @@ Candidate launch only after the active Runpod branch is documented:
 ```
 
 Full same-pod launch skeleton, using the staged checkout that does not disturb
-the active E138 tree:
+the active E139 tree:
 
 ```bash
 cd /workspace/SimplexFold_e143
@@ -6750,7 +6770,7 @@ Decision rule: reject unless E143 beats E128 and any returned E138/E141/E139
 result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
 coherent. It still needs to clear `0.45` before any 30k-step consideration.
 
-Validation status on the local branch while E138 runs:
+Validation status on the local branch from the E138/E139 staging window:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
 - `python -m pytest tests/test_simplex.py::test_signed_tetra_face_boundary_updates_blends_oriented_boundary_signs tests/test_simplex.py::test_signed_tetra_to_face_adapter_scale_changes_outputs_without_new_parameters tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_hodge_face_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`

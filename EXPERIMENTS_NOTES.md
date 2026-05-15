@@ -7047,3 +7047,41 @@
   the target is not purely impossible for this parameter budget on favorable
   chains, but the branch still needs topology-to-global-assembly improvements
   that raise the low tail and expansion, not a generic output-side lDDT hack.
+- 2026-05-15T08:44Z E138 was still active but below the documented no-write
+  cutoff on owned pod `c67fbk189vnvfp`: PID `24980` had elapsed `02:42:51`,
+  artifact files were still only `run_metadata.json` and inherited
+  `history_full_msa_to_face.json`, history length remained `18` ending at
+  E128 step `8500`, and no result bundle, eval details, or checkpoint existed.
+  Left E138 running until the cutoff instead of stopping early.
+- 2026-05-15T09:02Z E138 reached the documented runtime-failure cutoff on the
+  same owned pod. PID `24980` had elapsed `03:00:56`, process CPU time was
+  `1-13:54:06`, the log had not changed since startup, artifact mtimes were
+  still `2026-05-15T06:01Z` / `06:02Z`, history remained at inherited E128
+  step `8500`, and no `results.json`, `results.csv`,
+  `eval_details_full_msa_to_face.csv`, or checkpoint existed. Preserved the
+  E138 trace locally under
+  `artifacts/nanofold_public_benchmarks/e138_no_hodge_face_cyclic_boundary_from_e128_s9000_c256_m64/`
+  plus `logs/e138_no_hodge_face_cyclic_boundary.log`, then terminated only
+  E138 PID `24980`.
+- 2026-05-15T09:03Z Launched E139 on owned pod `c67fbk189vnvfp` from the
+  separate staged checkout `/workspace/SimplexFold_e139` as
+  `e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64`. Remote
+  `python3 -m py_compile` passed before launch. The run resumes the E128
+  checkpoint from step `8500` with weights only, effective batch size `8`,
+  crop `256`, MSA depth `64`, sparse caps `24 / 48`, E128's
+  selected-complex recipe, no Hodge readout, no E138 face-cyclic readout, and
+  oriented boundary-cochain readout ramped from `0.0` to `0.25` over
+  steps `8500`-`9000`.
+- 2026-05-15T09:04Z E139 startup verification passed. The runner wrote
+  `run_metadata.json` and inherited `history_full_msa_to_face.json`, saw
+  `train=10000`, `val=1000`, resumed from the E128 checkpoint at
+  `step=8500` / `examples=68000`, loaded `1332` matching model tensors, and
+  initialized `0` new/missing tensors. The actual remote Python process is
+  PID `42517`; it had GPU memory allocated and was active. The printed launch
+  PID `42514` was the wrapper shell, not the training process.
+- 2026-05-15T09:09Z E139 remained active on owned pod `c67fbk189vnvfp`:
+  Python PID `42517` had elapsed `00:05:52`, process CPU time `01:12:17`,
+  and the expected E139 command line. The artifact directory contained
+  startup `run_metadata.json` plus inherited `history_full_msa_to_face.json`
+  ending at E128 step `8500`; no result bundle, eval-details file, or
+  checkpoint existed yet. Leave E139 running under the updated heartbeat.
