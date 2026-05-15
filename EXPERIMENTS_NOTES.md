@@ -7386,3 +7386,11 @@
   GPU once while E140 did not spike in that window. Treat the slow heartbeat as
   expected for these gates and continue waiting for the step-9000 evaluation
   unless the process exits or status stops advancing for a much longer window.
+- 2026-05-15T11:23Z Runtime triage for future gates: E140/E141 were launched
+  without `--num-workers`, so they inherited the benchmark runner default
+  `0`. Both owned A100 pods report `128` CPU cores, while the active jobs are
+  CPU-heavy and only burst the GPU intermittently. Do not mutate E140/E141
+  mid-flight, but for the next short gate use a cautious startup smoke with a
+  small DataLoader worker count, e.g. `--num-workers 4`, and verify the usual
+  run metadata/status before letting it continue. This is a throughput knob,
+  not an architecture/loss/data change.

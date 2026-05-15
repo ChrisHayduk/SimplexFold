@@ -49,6 +49,11 @@ Next actions:
    parameter-free outer-neighborhood selected-cell transport; avoid spending
    30,000 steps unless a short gate clears `0.45` with coherent FoldScore,
    dRMSD, and C-alpha Rg.
+4. For the next launched short gate, run a startup smoke with a small
+   DataLoader worker count such as `--num-workers 4`. E140/E141 inherited the
+   runner default `0`, and both owned A100 pods have 128 CPU cores while the
+   jobs are CPU-heavy. Treat this as a runtime-throughput knob only; do not
+   change active runs mid-flight.
 
 ## 2026-05-15 Operating Plan Update: E140 Active With Heartbeat
 

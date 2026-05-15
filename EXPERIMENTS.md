@@ -7069,7 +7069,10 @@ degree-penalized plus outer-edge-supported cell scoring, incidence
 normalization `1.0`, edge-frame message runtime scale `0.0125`, directed
 boundary readout `0.25`, global context `0.1`, vertex-star context `1.0`,
 edge-star context runtime `0.5`, damped triangle-attention bias `0.0125`, and
-no Hodge readout.
+no Hodge readout. Include a small DataLoader worker count such as
+`--num-workers 4` for future launches after a startup smoke; this should only
+change host-side throughput, not the model, loss, data split, or parameter
+budget.
 
 Decision rule: E145 should not receive a 30k spend unless a short gate clears
 `0.45` primary C-alpha lDDT and preserves coherent FoldScore, dRMSD, and
