@@ -15,6 +15,8 @@ def _write_active_run(run_dir):
                 "active_microbatches": 8,
                 "completed_step": 8567,
                 "target_steps": 9000,
+                "start_step": 8500,
+                "elapsed_seconds_total": 3600.0,
                 "last_history_step": 8500,
                 "history_rows": 18,
                 "effective_batch_size": 8,
@@ -61,6 +63,8 @@ def test_summarize_run_reports_active_status_without_result_details(tmp_path):
     assert summary["state"] == "active"
     assert summary["status"]["completed_step"] == 8567
     assert summary["history_last_step"] == 8500
+    assert summary["progress"]["completed_delta_steps"] == 67
+    assert summary["progress"]["remaining_steps"] == 433
     assert summary["result"] is None
     assert summary["eval_rows"] is None
 
@@ -87,3 +91,15 @@ def test_main_emits_json_summaries(tmp_path, capsys):
 
     assert summaries[0]["state"] == "active"
     assert json.loads(output)[0]["state"] == "active"
+    assert json.loads(output)[0]["progress"]["remaining_steps"] == 433
+
+
+def test_main_formats_active_rate_and_eta(tmp_path, capsys):
+    run_dir = tmp_path / "active"
+    _write_active_run(run_dir)
+
+    main([str(run_dir)])
+    output = capsys.readouterr().out
+
+    assert "rate=67.0/h" in output
+    assert "eta=6.5h" in output

@@ -16,6 +16,8 @@ STATUS_KEYS = (
     "active_microbatches",
     "completed_step",
     "target_steps",
+    "start_step",
+    "elapsed_seconds_total",
     "last_history_step",
     "history_rows",
     "last_train_loss",
@@ -77,6 +79,31 @@ def _csv_row_count(path: Path) -> int | None:
         return sum(1 for _ in csv.DictReader(handle))
 
 
+def _progress_summary(status: dict[str, Any] | None) -> dict[str, float | int] | None:
+    if not status:
+        return None
+    completed_step = status.get("completed_step")
+    start_step = status.get("start_step")
+    target_steps = status.get("target_steps")
+    elapsed_seconds = status.get("elapsed_seconds_total")
+    if completed_step is None or start_step is None or elapsed_seconds is None:
+        return None
+    completed_delta = max(0, int(completed_step) - int(start_step))
+    if completed_delta <= 0 or float(elapsed_seconds) <= 0.0:
+        return None
+    seconds_per_step = float(elapsed_seconds) / completed_delta
+    progress: dict[str, float | int] = {
+        "completed_delta_steps": completed_delta,
+        "seconds_per_step": seconds_per_step,
+        "steps_per_hour": 3600.0 / seconds_per_step,
+    }
+    if target_steps is not None:
+        remaining_steps = max(0, int(target_steps) - int(completed_step))
+        progress["remaining_steps"] = remaining_steps
+        progress["estimated_seconds_remaining"] = remaining_steps * seconds_per_step
+    return progress
+
+
 def summarize_run(run_dir: Path, *, variant: str = "full_msa_to_face") -> dict[str, Any]:
     run_dir = run_dir.resolve()
     paths = {
@@ -103,6 +130,7 @@ def summarize_run(run_dir: Path, *, variant: str = "full_msa_to_face") -> dict[s
         "state": _state(files),
         "files": files,
         "status": status,
+        "progress": _progress_summary(status),
         "result": result,
         "history_last_step": _history_last_step(paths["history"]),
         "eval_rows": eval_rows,
@@ -125,10 +153,17 @@ def _state(files: dict[str, dict[str, Any]]) -> str:
 def _format_line(summary: dict[str, Any]) -> str:
     status = summary.get("status") or {}
     result = summary.get("result") or {}
+    progress = summary.get("progress") or {}
+    eta_seconds = progress.get("estimated_seconds_remaining")
+    eta_hours = f"{eta_seconds / 3600.0:.1f}h" if isinstance(eta_seconds, (float, int)) else "-"
+    steps_per_hour = progress.get("steps_per_hour")
+    rate = f"{steps_per_hour:.1f}/h" if isinstance(steps_per_hour, (float, int)) else "-"
     parts = [
         f"{Path(summary['run_dir']).name}: {summary['state']}",
         f"completed={status.get('completed_step', result.get('completed_steps', '-'))}",
         f"target={status.get('target_steps', '-')}",
+        f"rate={rate}",
+        f"eta={eta_hours}",
         f"last_history={status.get('last_history_step', summary.get('history_last_step', '-'))}",
         f"lddt_ca={result.get('val_lddt_ca', '-')}",
         f"eval_rows={summary.get('eval_rows') if summary.get('eval_rows') is not None else '-'}",

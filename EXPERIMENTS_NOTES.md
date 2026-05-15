@@ -7476,3 +7476,15 @@
   `python -m py_compile scripts/summarize_nanofold_run_status.py
   tests/test_summarize_nanofold_run_status.py`, and
   `ruff check --select F821,F822,F823` on the new script/test.
+- 2026-05-15T12:15Z Extended the local run-status summarizer with live
+  throughput and ETA fields derived from the runner's existing
+  `start_step`, `completed_step`, `target_steps`, and
+  `elapsed_seconds_total` heartbeat fields. This is monitoring-only: it does
+  not change training behavior, result scoring, data access, or Runpod
+  launches. Focused validation passed: `python -m pytest
+  tests/test_summarize_nanofold_run_status.py` (`4 passed`),
+  `python -m py_compile scripts/summarize_nanofold_run_status.py
+  tests/test_summarize_nanofold_run_status.py`, and
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/summarize_nanofold_run_status.py
+  tests/test_summarize_nanofold_run_status.py`.
