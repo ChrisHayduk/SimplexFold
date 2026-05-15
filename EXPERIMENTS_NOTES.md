@@ -6737,3 +6737,14 @@
   and pivot to a ramped/sparser boundary-cochain candidate rather than
   spending another identical long gate. No result was pulled and
   `EXPERIMENT_RESULTS.md` remains unchanged.
+- 2026-05-15T05:27Z Prepared E138 as a launch-recipe-only fallback while E130
+  continues; no Runpod launch. E138 reuses the already-implemented E137
+  face-cyclic boundary readout but removes E130's static Hodge double-centering
+  from the recipe. Rationale: if E130's terminal state is a runtime failure,
+  the next short gate should still test the topology-native boundary
+  orientation hypothesis without repeating the slow vertex-star Hodge path.
+  The candidate keeps E128's oriented face gate and damped simplex
+  triangle-attention bias, then ramps only
+  `simplex_boundary_face_cyclic_readout_scale` from `0.0` to `0.5` over
+  steps `8500`-`9000`. It adds no parameters and no output-side loss. Launch
+  only after E130 either returns or is explicitly stopped and documented.

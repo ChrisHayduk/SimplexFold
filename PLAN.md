@@ -104,6 +104,16 @@ update. This keeps the change inside the selected 2-simplex boundary operator
 and adds no parameters or output-side loss. Keep it parked until E130 returns;
 use it only if the boundary-orientation family remains plausible.
 
+Runtime-failure fallback: if E130 crosses roughly three hours without a
+history/result writeout, do not launch another static Hodge-centered gate.
+Prefer E138, a no-Hodge face-cyclic boundary readout that keeps E128's
+oriented face gate and damped triangle-attention bias but removes
+`simplex_boundary_hodge_readout_scale`. This still tests the simplex/topology
+hypothesis by changing how learned 2-simplex cochains write through their
+oriented boundary cycle into `Z_ij`, while avoiding the slow vertex-star
+double-centering path that E130 appears to stress. Launch E138 only after E130
+is stopped or returns, and document the E130 terminal state first.
+
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
 E118 residue vertex-star route with a half-strength boundary-edge-star

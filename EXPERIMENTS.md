@@ -6093,3 +6093,66 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `227 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - `git diff --check`: passed
+
+### E138: No-Hodge Face-Cyclic Boundary Readout
+
+Status: planned launch recipe only; no code change beyond the already
+implemented E137 face-cyclic boundary operator. Use this only if E130 remains
+active past the runtime cutoff with no history/result writeout, or if E130
+returns with evidence that static Hodge-centering is too expensive or
+unhelpful.
+
+Hypothesis: E130's static Hodge-centered boundary readout may be stressing an
+expensive vertex-star double-centering path before it ever writes the
+step-9000 result. If that is the failure mode, the next useful short gate
+should preserve the topology-native orientation hypothesis without carrying
+the slow Hodge operation. E138 therefore tests the E137 idea directly:
+learned 2-simplex cochains should write to the pair trunk through their
+oriented boundary cycle `(i->j, j->k, k->i)`.
+
+Mechanism: reuse `simplex_boundary_face_cyclic_readout_scale` and its runtime
+schedule, but leave `simplex_boundary_hodge_readout_scale` at zero. The
+adapter changes only the directed face-to-pair boundary readout used by
+`simplex_boundary_readout_directionality`; symmetric face/tetra scatter,
+tetra scatter, losses, and trainable modules stay unchanged. This is still a
+simplicial/topological architecture test, not an output-side C-alpha lDDT,
+radius, distance-matrix, or coordinate loss.
+
+Candidate launch only after E130 is stopped or returns and its terminal state
+is documented:
+
+```bash
+--run-name e138_no_hodge_face_cyclic_boundary_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-boundary-readout-directionality 0.25 \
+--simplex-boundary-face-cyclic-readout-scale 0.5 \
+--simplex-boundary-face-cyclic-readout-runtime-scale 0.0 \
+--simplex-boundary-face-cyclic-readout-runtime-scale-final 0.5 \
+--simplex-boundary-face-cyclic-readout-runtime-scale-ramp-start-step 8500 \
+--simplex-boundary-face-cyclic-readout-runtime-scale-ramp-steps 500
+```
+
+Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, edge-frame message runtime scale `0.0125`, global context
+`0.1`, vertex-star context `1.0`, and edge-star runtime `0.5`. Do not include
+E129's triangle-attention value residual and do not include E130's Hodge
+readout unless E130 actually returns a coherent result that justifies the
+runtime cost.
+
+Parameter audit: no new trainable modules beyond the already-tested E137
+operator; the E128-family architecture remains under the AF2-medium +5% cap
+at the existing audited `3,240,738 <= 3,261,974`.
+
+Decision rule: reject unless E138 beats E128 and any returned E130-family
+result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
+coherent. It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation status: covered by the E137 implementation tests because E138 is a
+launch-recipe subset of E137 with Hodge disabled. Before launch, rerun
+`py_compile`, the focused E137 parser/runtime tests, and `git diff --check` on
+the exact branch tip used by the Runpod checkout.
