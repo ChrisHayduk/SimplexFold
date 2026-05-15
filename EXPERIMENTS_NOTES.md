@@ -6379,3 +6379,22 @@
   `history_full_msa_to_face.json`; history still ended at inherited step 8500,
   with no `results.csv` and no checkpoint. Interpretation: still active,
   still no coherent step-9000 bundle; let the heartbeat continue monitoring.
+- 2026-05-15T01:53Z E129 returned coherently on the owned pod
+  `o1dy17ouv8w5mz`. Remote verification passed with required files
+  (`results.json`, `results.csv`, history, eval details, run metadata, and
+  checkpoint), one result row, 1000 eval-detail rows, history ending at step
+  9000, `completed_steps=9000`, `effective_batch_size=8`,
+  `stopped_early=False`, and `parameters=3,252,898 <= 3,261,974`. Local
+  artifacts and the log were pulled into
+  `artifacts/nanofold_public_benchmarks/e129_triangle_value_from_e128_s9000_c256_m64/`
+  and `logs/e129_triangle_value_from_e128.log`; local
+  `scripts/verify_nanofold_benchmark_artifacts.py` passed with the same step,
+  batch, row-count, parameter-cap, stopped-early, checkpoint, and metadata
+  checks. Result: `val_lddt_ca=0.4302854641973972`, FoldScore
+  `0.39839958867430686`, `val_ca_drmsd=11.225015842318534`, C-alpha Rg
+  `11.272140373706817 / 16.30911695623398`, selected face/tetra boundary
+  lDDT `0.7584963102340698` / `0.7400881498157978`, and selected face/tetra
+  contraction `0.5353929928243161` / `0.5351497863531113`. Decision: reject
+  E129 as a 30k candidate and do not continue this exact value-residual path;
+  it improves local selected-boundary diagnostics but regresses primary
+  C-alpha lDDT, FoldScore, dRMSD, and expansion versus E128.

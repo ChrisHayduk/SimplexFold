@@ -5535,7 +5535,7 @@ than simply spending 30k steps or increasing triangle-attention bias.
 
 ### E129: Sparse Triangle-Attention Value Residual on E128
 
-Status: prepared as the next short Runpod gate.
+Status: returned and locally verified.
 
 Hypothesis: E128 finally made the selected-complex-to-triangle-attention route
 positive by combining a weak logit bias with E124's oriented face
@@ -5587,3 +5587,19 @@ longer-run consideration.
 Validation so far:
 
 - `python -m pytest tests/test_simplex.py::test_simplex_adapter_emits_sparse_triangle_attention_value tests/test_simplex.py::test_triangle_attention_uses_sparse_simplex_value tests/test_trainer.py::test_simplicial_triangle_attention_value_stays_inside_medium_budget tests/test_trainer.py::test_triangle_attention_value_runs_evoformer_block_eagerly tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `5 passed`
+
+Result: reject. E129 returned coherently at step 9000 with
+`val_lddt_ca=0.4303`, FoldScore `0.3984`, `val_ca_drmsd=11.2250`, and C-alpha
+Rg `11.2721 / 16.3091`. Remote and local coherence passed:
+`completed_steps=9000`, `effective_batch_size=8`, one result row, 1000
+eval-detail rows, history ending at step 9000, checkpoint present,
+`stopped_early=False`, and `parameters=3,252,898 <= 3,261,974`.
+
+Interpretation: the value residual did improve selected face/tetra boundary
+lDDT (`0.7585` / `0.7401`) and selected-boundary contraction (`0.5354` /
+`0.5351`) versus E128, but it reduced the primary C-alpha lDDT, FoldScore,
+dRMSD, and global C-alpha expansion. This is strong evidence that local
+selected-complex geometry is not the limiting signal by itself; the bottleneck
+is still global backbone assembly. Do not continue E129 or scale the
+triangle-attention value path for 30k steps without a new topology-native
+stabilization or assembly mechanism.

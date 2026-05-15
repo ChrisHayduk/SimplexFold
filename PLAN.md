@@ -1,22 +1,12 @@
-## Current Plan: After E128 Damped Triangle-Attention Bias
+## Current Plan: After E129 Triangle-Attention Value Residual
 
-Current status after E128: the best returned validation C-alpha lDDT is E128
-at `0.4311` at step 8500. E128 combined E124's oriented face
-boundary-edge-frame gate with a damped sparse simplex triangle-attention logit
-bias and improved C-alpha lDDT, FoldScore, dRMSD, and expansion versus the
-preceding E124/E126 gates. It is still not a 30,000-step candidate because it
-remains below the `0.45` short-gate threshold and far below the `0.7` target.
+Current status after E129: the best returned validation C-alpha lDDT remains
+E128 at `0.4311` at step 8500. E129 resumed the verified E128 checkpoint and
+added a tiny sparse triangle-attention value residual, but returned lower at
+step 9000 with `val_lddt_ca=0.4303`, FoldScore `0.3984`, and
+`val_ca_drmsd=11.2250`. It is not a 30,000-step candidate.
 
-Interpretation: weak selected-complex-to-triangle-attention routing is now
-useful when it is paired with E124's oriented boundary-edge realization path.
-The missing piece remains local-to-global assembly: selected face/tetra
-cochains learn strong local boundary geometry, but the trunk only receives a
-small global improvement. The next short gate should therefore change what
-AF2 triangle attention propagates from represented face/tetra triples, not
-just increase the attention-bias scale or spend more steps.
-
-E129 is the next Runpod gate. It resumes the verified E128 checkpoint and adds
-a tiny sparse triangle-attention value residual:
+E129 tested this topology-native route:
 
 ```text
 selected F_ijk / boundary faces of U_ijkl
@@ -26,12 +16,22 @@ selected F_ijk / boundary faces of U_ijkl
         -> structure module reads globally updated pair geometry
 ```
 
-This remains an architecture change inside the README motivation, not a loss
-hack. Persistent 2- and 3-simplex states write content through the represented
-triangles and their boundary pair orientations. The audited E129 module set
-has `3,252,898` parameters, below the `3,261,974` AF2-medium +5% cap. Reject
-unless E129 beats E128's `0.4311` primary C-alpha lDDT and keeps FoldScore and
-dRMSD coherent. It must still clear `0.45` before any longer-run consideration.
+The result is useful evidence but a negative branch decision. The value
+residual improved selected face/tetra boundary lDDT (`0.7585` / `0.7401`) and
+reduced selected-boundary contraction relative to E128, so the explicit
+higher-rank cells are still learning local boundary geometry. However, global
+assembly got worse: primary C-alpha lDDT, FoldScore, dRMSD, and C-alpha
+expansion all regressed. This reinforces the current diagnosis: simply
+injecting more selected-complex content into AF2 triangle attention is not yet
+enough to turn good local simplex geometry into an accurate global backbone.
+
+Next branch criteria: do not spend 30,000 steps on E129 or on a plain
+triangle-attention value/bias scale-up. The next topology-native short gate
+should change how local selected-complex geometry is reconciled before global
+readout, not merely add more value content. Prefer a mechanism that preserves
+E128's successful oriented boundary-edge realization while adding a
+stability/normalization path for global assembly, and require a clear break
+above the `0.45` short-gate threshold before any longer-run consideration.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
