@@ -7446,3 +7446,11 @@
   for the crop-256 full gate that has been allocating about `38 GiB`. Do not
   launch E145 on undersized hardware; wait for E140/E141 or 80GB-class
   capacity.
+- 2026-05-15T11:47Z Updated the active heartbeat automation
+  `check-simplexfold-e57-runpod` so it continues monitoring only the owned
+  E140/E141 pods, verifies and pulls any coherent returned result before
+  documenting `EXPERIMENT_RESULTS.md`, and treats E145 as a parked candidate
+  only after E140/E141 return below the `0.45` short-gate threshold or fail
+  coherently. The heartbeat now explicitly forbids launching E145 on
+  undersized 24GB/32GB hardware and requires suitable 80GB-class capacity plus
+  the audited `--num-workers 4` runtime knob for any future E145 short gate.
