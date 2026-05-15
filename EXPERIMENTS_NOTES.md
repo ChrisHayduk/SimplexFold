@@ -6823,3 +6823,11 @@
   parameter audit, benchmark parser, and benchmark validation-time override
   path (`9 passed`); focused ruff undefined-name/syntax-risk checks; and
   `git diff --check`. No Runpod launch and no `EXPERIMENT_RESULTS.md` update.
+- 2026-05-15T06:29Z E138 remained active on owned pod `c67fbk189vnvfp`:
+  PID `24980` had elapsed `00:28:02`-`00:28:03`, process CPU time was about
+  `05:51`, `%CPU=1251`, RSS about `1.9 GiB`, and `194` threads. Remote
+  artifacts still contained only `run_metadata.json` and
+  `history_full_msa_to_face.json`; history length remained `18`, ending at
+  inherited E128 step `8500` with `val_lddt_ca=0.4311057258844376`. No
+  `results.json`, `results.csv`, eval-details file, or checkpoint exists yet,
+  so there is nothing to pull or add to `EXPERIMENT_RESULTS.md`.
