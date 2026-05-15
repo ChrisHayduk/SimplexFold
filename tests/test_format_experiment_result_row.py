@@ -1,6 +1,6 @@
 import json
 
-from scripts.format_experiment_result_row import format_result_row, main
+from scripts.format_experiment_result_row import format_result_row, load_history, load_result, main
 
 
 def test_format_result_row_ignores_inherited_resume_history():
@@ -119,6 +119,24 @@ def test_main_selects_requested_variant_from_multirow_results(tmp_path, capsys):
         capsys.readouterr().out.strip()
         == "| E-test | completed | 9000 | 0.4600 | 0.4600 | 0.4100 | 10.5000 | - | pending |"
     )
+
+
+def test_public_load_helpers_select_variant_and_history(tmp_path):
+    result_path = tmp_path / "results.json"
+    history_path = tmp_path / "history.json"
+    result_path.write_text(
+        json.dumps(
+            [
+                {"variant": "other_variant", "val_lddt_ca": 0.1},
+                {"variant": "full_msa_to_face", "val_lddt_ca": 0.46},
+            ]
+        ),
+        encoding="utf-8",
+    )
+    history_path.write_text(json.dumps([{"step": 9000, "val_lddt_ca": 0.46}]), encoding="utf-8")
+
+    assert load_result(result_path, variant="full_msa_to_face")["val_lddt_ca"] == 0.46
+    assert load_history(history_path) == [{"step": 9000, "val_lddt_ca": 0.46}]
 
 
 def test_format_result_row_accepts_canonical_ca_rg_keys():

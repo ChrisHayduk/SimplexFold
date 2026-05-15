@@ -1,5 +1,17 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 Result Recording Helper Cleanup
+
+- Promoted the result/history JSON loaders in
+  `scripts/format_experiment_result_row.py` from private helpers to public
+  `load_result` / `load_history` functions so
+  `scripts/record_experiment_result.py` can compose the formatter without
+  importing underscored internals.
+- Added a focused regression test that the public helpers select the requested
+  benchmark variant and preserve history rows. This keeps the E140/E141 return
+  workflow on the supported result-recording path: verify artifacts, format the
+  row, upsert `EXPERIMENT_RESULTS.md`, and refresh the summary.
+
 ## 2026-05-12 Sparse-Cell Branch
 
 - E82 completed on owned Runpod pod `o1dy17ouv8w5mz` as

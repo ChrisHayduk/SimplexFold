@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.format_experiment_result_row import _load_history, _load_result, format_result_row  # noqa: E402
+from scripts.format_experiment_result_row import format_result_row, load_history, load_result  # noqa: E402
 from scripts.refresh_experiment_results_summary import refresh_summary  # noqa: E402
 from scripts.upsert_experiment_result_row import upsert_result_row  # noqa: E402
 
@@ -32,11 +32,11 @@ def record_experiment_result(
     confirmation_steps: int = 30_000,
 ) -> str:
     row = format_result_row(
-        _load_result(run_dir / "results.json", variant=variant),
+        load_result(run_dir / "results.json", variant=variant),
         run_label=run_label,
         status=status,
         decision=decision,
-        history=_load_history(run_dir / f"history_{variant}.json"),
+        history=load_history(run_dir / f"history_{variant}.json"),
         start_after_step=start_after_step,
     )
     markdown = results_md.read_text(encoding="utf-8")

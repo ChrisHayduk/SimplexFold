@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 
-def _load_result(path: Path, *, variant: str | None = None) -> dict[str, Any]:
+def load_result(path: Path, *, variant: str | None = None) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
     if isinstance(data, list):
         if not data:
@@ -31,7 +31,7 @@ def _load_result(path: Path, *, variant: str | None = None) -> dict[str, Any]:
     return row
 
 
-def _load_history(path: Path | None) -> list[dict[str, Any]]:
+def load_history(path: Path | None) -> list[dict[str, Any]]:
     if path is None or not path.exists():
         return []
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -129,11 +129,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> str:
     args = parse_args(argv)
     row = format_result_row(
-        _load_result(args.results_json, variant=args.variant),
+        load_result(args.results_json, variant=args.variant),
         run_label=args.run_label,
         status=args.status,
         decision=args.decision,
-        history=_load_history(args.history_json),
+        history=load_history(args.history_json),
         start_after_step=args.start_after_step,
     )
     print(row)
