@@ -18,6 +18,7 @@ STATUS_KEYS = (
     "target_steps",
     "start_step",
     "elapsed_seconds_total",
+    "elapsed_seconds_run",
     "last_history_step",
     "history_rows",
     "last_train_loss",
@@ -91,19 +92,26 @@ def _progress_summary(
     completed_step = status.get("completed_step")
     start_step = status.get("start_step")
     target_steps = status.get("target_steps")
-    status_mtime = files["status"].get("mtime")
-    metadata_mtime = files["metadata"].get("mtime")
-    if completed_step is None or start_step is None or status_mtime is None or metadata_mtime is None:
+    elapsed_source = "status_elapsed_seconds_run"
+    run_elapsed_seconds = status.get("elapsed_seconds_run")
+    if run_elapsed_seconds is None:
+        status_mtime = files["status"].get("mtime")
+        metadata_mtime = files["metadata"].get("mtime")
+        if status_mtime is None or metadata_mtime is None:
+            return None
+        elapsed_source = "status_metadata_mtime_delta"
+        run_elapsed_seconds = max(0.0, float(status_mtime) - float(metadata_mtime))
+    if completed_step is None or start_step is None:
         return None
     completed_delta = max(0, int(completed_step) - int(start_step))
-    run_elapsed_seconds = max(0.0, float(status_mtime) - float(metadata_mtime))
+    run_elapsed_seconds = float(run_elapsed_seconds)
     if completed_delta <= 0 or run_elapsed_seconds <= 0.0:
         return None
     seconds_per_step = run_elapsed_seconds / completed_delta
     progress: dict[str, float | int | str] = {
         "completed_delta_steps": completed_delta,
         "run_elapsed_seconds": run_elapsed_seconds,
-        "elapsed_source": "status_metadata_mtime_delta",
+        "elapsed_source": elapsed_source,
         "seconds_per_step": seconds_per_step,
         "steps_per_hour": 3600.0 / seconds_per_step,
     }

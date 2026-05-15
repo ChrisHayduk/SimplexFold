@@ -7500,3 +7500,22 @@
   `../../.venv/bin/ruff check --select F821,F822,F823
   scripts/summarize_nanofold_run_status.py
   tests/test_summarize_nanofold_run_status.py`.
+- 2026-05-15T12:23Z Added a future-proof runner heartbeat field,
+  `elapsed_seconds_run`, so future launched gates report run-local wall time
+  directly instead of forcing the summarizer to infer it from file mtimes.
+  The summarizer now prefers `elapsed_seconds_run` and falls back to
+  status/metadata mtime deltas for older active runs such as E140/E141.
+  This remains monitoring-only and does not affect training, scoring, or the
+  sealed NanoFold data path. Focused validation passed:
+  `python -m pytest tests/test_summarize_nanofold_run_status.py
+  tests/test_nanofold_public_benchmarks.py::test_run_status_payload_tracks_live_progress`
+  (`6 passed`), `python -m py_compile
+  scripts/run_nanofold_public_benchmarks.py
+  scripts/summarize_nanofold_run_status.py
+  tests/test_summarize_nanofold_run_status.py
+  tests/test_nanofold_public_benchmarks.py`, and
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/run_nanofold_public_benchmarks.py
+  scripts/summarize_nanofold_run_status.py
+  tests/test_summarize_nanofold_run_status.py
+  tests/test_nanofold_public_benchmarks.py`.

@@ -113,6 +113,7 @@ def test_run_status_payload_tracks_live_progress(tmp_path):
         effective_batch_size=8,
         num_workers=4,
         elapsed_seconds_total=12.5,
+        elapsed_seconds_run=7.5,
         history=[{"step": 100}, {"step": 125}],
         train_losses=[3.2, 3.0],
         latest_checkpoint_path=tmp_path / "full_msa_to_face_latest.pt",
@@ -128,6 +129,7 @@ def test_run_status_payload_tracks_live_progress(tmp_path):
     assert payload["target_steps"] == 9000
     assert payload["effective_batch_size"] == 8
     assert payload["num_workers"] == 4
+    assert payload["elapsed_seconds_run"] == 7.5
     assert payload["last_history_step"] == 125
     assert payload["last_train_loss"] == 3.0
     assert payload["latest_checkpoint"].endswith("full_msa_to_face_latest.pt")

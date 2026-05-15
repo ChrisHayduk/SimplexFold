@@ -18,6 +18,7 @@ def _write_active_run(run_dir):
                 "target_steps": 9000,
                 "start_step": 8500,
                 "elapsed_seconds_total": 3600.0,
+                "elapsed_seconds_run": 3600.0,
                 "last_history_step": 8500,
                 "history_rows": 18,
                 "effective_batch_size": 8,
@@ -69,6 +70,7 @@ def test_summarize_run_reports_active_status_without_result_details(tmp_path):
     assert summary["history_last_step"] == 8500
     assert summary["progress"]["completed_delta_steps"] == 67
     assert summary["progress"]["remaining_steps"] == 433
+    assert summary["progress"]["elapsed_source"] == "status_elapsed_seconds_run"
     assert summary["result"] is None
     assert summary["eval_rows"] is None
 
@@ -107,3 +109,21 @@ def test_main_formats_active_rate_and_eta(tmp_path, capsys):
 
     assert "rate=67.0/h" in output
     assert "eta=6.5h" in output
+
+
+def test_summarize_run_falls_back_to_file_timing_for_old_status(tmp_path):
+    run_dir = tmp_path / "active"
+    _write_active_run(run_dir)
+    variant = "full_msa_to_face"
+    status_path = run_dir / f"status_{variant}.json"
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    status.pop("elapsed_seconds_run")
+    status["elapsed_seconds_total"] = 100_000.0
+    status_path.write_text(json.dumps(status), encoding="utf-8")
+    launch_time = 1_800_000_000.0
+    os.utime(status_path, (launch_time + 3600.0, launch_time + 3600.0))
+
+    summary = summarize_run(run_dir)
+
+    assert summary["progress"]["elapsed_source"] == "status_metadata_mtime_delta"
+    assert summary["progress"]["steps_per_hour"] == 67.0
