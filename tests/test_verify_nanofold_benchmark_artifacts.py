@@ -42,6 +42,7 @@ def _write_run(run_dir, *, eval_rows=3, metadata=None, result=None):
         "simplex_global_context_scale": 0.1,
         "simplex_face_top_k": 24,
         "simplex_tetra_top_k": 48,
+        "simplex_disabled_gate": None,
     }
     if metadata:
         meta.update(metadata)
@@ -150,3 +151,14 @@ def test_main_accepts_expected_num_workers_flag(tmp_path, capsys):
 
     assert summary["num_workers"] == 4
     assert json.loads(output)["num_workers"] == 4
+
+
+def test_main_accepts_null_metadata_expectation(tmp_path, capsys):
+    run_dir = tmp_path / "run"
+    _write_run(run_dir)
+
+    summary = main([str(run_dir), "--metadata", "simplex_disabled_gate=null"])
+    output = capsys.readouterr().out
+
+    assert summary["run_dir"] == str(run_dir.resolve())
+    assert json.loads(output)["run_dir"] == str(run_dir.resolve())

@@ -7577,3 +7577,11 @@
   Both snapshots correctly show inherited history ending at E128 step `8500`
   with aggregate `val_lddt_ca=0.4311057258844376`, so the best scored result
   remains E128 until a new eval row returns.
+- 2026-05-15T12:52Z Tightened returned-result handoff documentation before
+  E140/E141 finish. `scripts/verify_nanofold_benchmark_artifacts.py` now
+  parses `--metadata key=null` / `key=none` as JSON `null`, so recipe checks
+  can prove disabled topology knobs as well as enabled ones. `EXPERIMENTS.md`
+  now contains exact E140 and E141 verifier command templates with
+  run-name/model-config/recipe metadata expectations, and explicitly omits
+  `--expected-num-workers` for those two older launches because they predate
+  worker-count metadata.

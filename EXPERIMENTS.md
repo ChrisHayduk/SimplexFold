@@ -6478,6 +6478,31 @@ checks after documenting the parked recipe:
   new/missing tensors initialized. The status heartbeat showed active step
   `8501`, microbatch `1`, and effective batch size `8`.
 
+Returned-artifact verification template, after pulling the completed remote
+artifact directory locally:
+
+```bash
+python scripts/verify_nanofold_benchmark_artifacts.py \
+  artifacts/nanofold_public_benchmarks/e140_selected_boundary_expansion_from_e128_s9000_c256_m64 \
+  --expected-completed-steps 9000 \
+  --expected-effective-batch-size 8 \
+  --max-parameters 3261974 \
+  --expected-results-rows 1 \
+  --expected-eval-rows 1000 \
+  --expected-history-last-step 9000 \
+  --expect-stopped-early false \
+  --metadata run_name=e140_selected_boundary_expansion_from_e128_s9000_c256_m64 \
+  --metadata model_config=simplexfold_medium_param_matched \
+  --metadata simplex_face_coordinate_expansion_weight=0.05 \
+  --metadata simplex_tetra_coordinate_expansion_weight=0.05 \
+  --metadata simplex_coordinate_expansion_tolerance=0.05 \
+  --metadata simplex_boundary_signed_face_cyclic_readout_scale=null
+```
+
+Do not include `--expected-num-workers` for E140: this launch predates the
+runner metadata/status worker-count fields and inherited the default
+single-process DataLoader path.
+
 ### E141: Signed Face-Cyclic Boundary Readout
 
 Status: launched in parallel on a separate owned Runpod A100 pod while E140
@@ -6619,6 +6644,30 @@ Validation status on the local branch from the E138/E139 staging window:
   documented E141 command with effective batch size `8`, max-parameter cap
   `3261974`, signed static scale `0.25`, and signed runtime final scale
   `0.25`.
+
+Returned-artifact verification template, after pulling the completed remote
+artifact directory locally:
+
+```bash
+python scripts/verify_nanofold_benchmark_artifacts.py \
+  artifacts/nanofold_public_benchmarks/e141_signed_face_cyclic_boundary_from_e128_s9000_c256_m64 \
+  --expected-completed-steps 9000 \
+  --expected-effective-batch-size 8 \
+  --max-parameters 3261974 \
+  --expected-results-rows 1 \
+  --expected-eval-rows 1000 \
+  --expected-history-last-step 9000 \
+  --expect-stopped-early false \
+  --metadata run_name=e141_signed_face_cyclic_boundary_from_e128_s9000_c256_m64 \
+  --metadata model_config=simplexfold_medium_param_matched \
+  --metadata simplex_boundary_signed_face_cyclic_readout_scale=0.25 \
+  --metadata simplex_face_coordinate_expansion_weight=null \
+  --metadata simplex_tetra_coordinate_expansion_weight=null
+```
+
+Do not include `--expected-num-workers` for E141: this launch predates the
+runner metadata/status worker-count fields and inherited the default
+single-process DataLoader path.
 
 ### E142: Signed Tetra Coboundary Face Update
 

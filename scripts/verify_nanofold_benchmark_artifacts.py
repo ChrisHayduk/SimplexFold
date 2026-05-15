@@ -63,6 +63,8 @@ def _parse_expected_value(raw: str) -> Any:
         return True
     if lowered == "false":
         return False
+    if lowered in {"null", "none"}:
+        return None
     try:
         return int(raw)
     except ValueError:
