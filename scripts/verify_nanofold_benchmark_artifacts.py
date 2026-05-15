@@ -101,6 +101,7 @@ def verify_artifacts(
     variant: str = "full_msa_to_face",
     expected_completed_steps: int | None = None,
     expected_effective_batch_size: int | None = None,
+    expected_num_workers: int | None = None,
     max_parameters: int | None = None,
     expect_stopped_early: bool | None = None,
     expected_results_rows: int | None = None,
@@ -114,6 +115,13 @@ def verify_artifacts(
     metadata = _load_json(run_dir / "run_metadata.json")
     if not isinstance(metadata, dict):
         raise TypeError(f"run_metadata.json must contain an object in {run_dir}")
+    status_path = run_dir / f"status_{variant}.json"
+    status = None
+    if status_path.exists():
+        loaded_status = _load_json(status_path)
+        if not isinstance(loaded_status, dict):
+            raise TypeError(f"Status file must contain an object in {status_path}")
+        status = loaded_status
 
     results_csv_rows = _csv_rows(run_dir / "results.csv")
     result_csv_matches = [row for row in results_csv_rows if row.get("variant", variant) == variant]
@@ -133,6 +141,9 @@ def verify_artifacts(
 
     completed_steps = int(result.get("completed_steps", -1))
     effective_batch_size = int(result.get("effective_batch_size", -1))
+    num_workers = result.get("num_workers")
+    if num_workers is not None:
+        num_workers = int(num_workers)
     parameters = int(result.get("parameters", -1))
     stopped_early = bool(result.get("stopped_early"))
     last_history_step = int(history[-1].get("step", -1))
@@ -147,6 +158,29 @@ def verify_artifacts(
             effective_batch_size == expected_effective_batch_size,
             f"effective_batch_size={effective_batch_size}, expected {expected_effective_batch_size}",
         )
+        if "effective_batch_size" in metadata:
+            _require(
+                int(metadata["effective_batch_size"]) == expected_effective_batch_size,
+                f"metadata effective_batch_size={metadata['effective_batch_size']}, expected {expected_effective_batch_size}",
+            )
+        if status is not None and "effective_batch_size" in status:
+            _require(
+                int(status["effective_batch_size"]) == expected_effective_batch_size,
+                f"status effective_batch_size={status['effective_batch_size']}, expected {expected_effective_batch_size}",
+            )
+    if expected_num_workers is not None:
+        _require(num_workers is not None, "Missing result num_workers")
+        _require(num_workers == expected_num_workers, f"num_workers={num_workers}, expected {expected_num_workers}")
+        _require("num_workers" in metadata, "Missing metadata num_workers")
+        _require(
+            int(metadata["num_workers"]) == expected_num_workers,
+            f"metadata num_workers={metadata['num_workers']}, expected {expected_num_workers}",
+        )
+        if status is not None and "num_workers" in status:
+            _require(
+                int(status["num_workers"]) == expected_num_workers,
+                f"status num_workers={status['num_workers']}, expected {expected_num_workers}",
+            )
     if max_parameters is not None:
         _require(parameters <= max_parameters, f"parameters={parameters} exceeds max {max_parameters}")
     if expect_stopped_early is not None:
@@ -177,6 +211,7 @@ def verify_artifacts(
         "variant": variant,
         "completed_steps": completed_steps,
         "effective_batch_size": effective_batch_size,
+        "num_workers": num_workers,
         "parameters": parameters,
         "stopped_early": stopped_early,
         "results_rows": len(results_csv_rows),
@@ -195,6 +230,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--variant", default="full_msa_to_face")
     parser.add_argument("--expected-completed-steps", type=int)
     parser.add_argument("--expected-effective-batch-size", type=int)
+    parser.add_argument("--expected-num-workers", type=int)
     parser.add_argument("--max-parameters", type=int)
     parser.add_argument("--expected-results-rows", type=int)
     parser.add_argument("--expected-eval-rows", type=int)
@@ -215,6 +251,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         variant=args.variant,
         expected_completed_steps=args.expected_completed_steps,
         expected_effective_batch_size=args.expected_effective_batch_size,
+        expected_num_workers=args.expected_num_workers,
         max_parameters=args.max_parameters,
         expect_stopped_early=stopped_early,
         expected_results_rows=args.expected_results_rows,

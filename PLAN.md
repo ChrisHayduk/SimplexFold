@@ -47,7 +47,9 @@ Next actions:
    `5ox436mhzej7j4` through their `status_full_msa_to_face.json` heartbeats.
 2. When either returns, verify and pull artifacts, update
    `EXPERIMENT_RESULTS.md`, commit/push, then decide whether the returned
-   score justifies a continuation or pivot.
+   score justifies a continuation or pivot. For future `--num-workers 4`
+   launches, include `--expected-num-workers 4` in
+   `scripts/verify_nanofold_benchmark_artifacts.py` verification.
 3. If E140/E141 remain below `0.45`, launch only a short E145 gate around the
    ramped parameter-free outer-neighborhood selected-cell transport; avoid
    spending 30,000 steps unless a short gate clears `0.45` with coherent

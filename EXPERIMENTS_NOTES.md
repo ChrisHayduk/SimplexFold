@@ -7519,3 +7519,17 @@
   scripts/summarize_nanofold_run_status.py
   tests/test_summarize_nanofold_run_status.py
   tests/test_nanofold_public_benchmarks.py`.
+- 2026-05-15T12:29Z Tightened returned-artifact verification for future
+  `--num-workers 4` gates. `scripts/verify_nanofold_benchmark_artifacts.py`
+  now accepts `--expected-num-workers` and checks the result row,
+  `run_metadata.json`, and optional `status_<variant>.json` agree on expected
+  worker count; it also cross-checks expected effective batch size against
+  metadata/status when those fields are present. This is verification-only and
+  does not touch the live E140/E141 jobs. Focused validation passed:
+  `python -m pytest tests/test_verify_nanofold_benchmark_artifacts.py`
+  (`8 passed`), `python -m py_compile
+  scripts/verify_nanofold_benchmark_artifacts.py
+  tests/test_verify_nanofold_benchmark_artifacts.py`, and
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/verify_nanofold_benchmark_artifacts.py
+  tests/test_verify_nanofold_benchmark_artifacts.py`.

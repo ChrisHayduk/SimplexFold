@@ -7080,7 +7080,10 @@ no Hodge readout. Include a small DataLoader worker count such as
 `--num-workers 4` for future launches after a startup smoke; this should only
 change host-side throughput, not the model, loss, data split, or parameter
 budget. New runner metadata/result/status artifacts record `num_workers`, so
-returned runs can be audited for this runtime knob.
+returned runs can be audited for this runtime knob. Verify those returned
+artifacts with `--expected-num-workers 4` in addition to the usual
+completed-step, effective-batch, parameter-cap, history, eval-row, and
+stopped-early checks.
 
 Decision rule: E145 should not receive a 30k spend unless a short gate clears
 `0.45` primary C-alpha lDDT and preserves coherent FoldScore, dRMSD, and
@@ -7097,3 +7100,7 @@ Validation status:
   `test_fold_feature_channels_matches_offset_mean_reference`. A local CPU
   smoke on a representative `[1, 256, 48, 128] -> 32` fold matched the prior
   offset-mean reference exactly and ran about `0.95 ms` versus `10.54 ms`.
+- Verifier readiness: `scripts/verify_nanofold_benchmark_artifacts.py` now has
+  explicit `--expected-num-workers` support and checks result/metadata/status
+  consistency for expected effective batch size and worker count. Focused test:
+  `python -m pytest tests/test_verify_nanofold_benchmark_artifacts.py`.
