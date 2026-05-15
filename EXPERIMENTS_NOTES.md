@@ -6293,3 +6293,12 @@
   `1033`, elapsed `00:19`, process CPU `774%`, RSS about `2.0 GiB`, H100
   memory `18665 MiB`, two startup files, and history ending at inherited step
   8500.
+- 2026-05-14T23:56Z-2026-05-15T00:00Z E129 remained active across the initial
+  five-sample watch on the owned pod. PID `1033` stayed alive from about
+  `01:38` through `05:38` elapsed, process CPU stayed around `731%`-`784%`,
+  RSS stayed about `2.0 GiB`, and the process kept `178` threads. H100 memory
+  ramped from `29295 MiB` to `38823 MiB`, with sampled GPU utilization between
+  `42%` and `59%`. The artifact directory still had only the two startup
+  files, history still ended at inherited step 8500, and no `results.csv` or
+  checkpoint was present. Interpretation: normal early training before the
+  step-9000 writeout.
