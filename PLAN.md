@@ -64,8 +64,14 @@ Current Runpod status: startup and early health checks passed. The runner saw
 `train=10000`, `val=1000`, resumed the E128 checkpoint at `step=8500` and
 `examples=68000`, loaded `1332` matching model tensors, initialized `0`
 new/missing tensors, and started a fresh optimizer. The process is active and
-has not yet produced a returned result bundle, so `EXPERIMENT_RESULTS.md`
-must remain unchanged until remote coherence and local verification pass.
+has not yet produced a returned result bundle. A 2026-05-15T05:25Z sample had
+PID `4224` still alive after `02:25:34` elapsed with advancing CPU time but
+only the inherited step-8500 history row and no `results.json`. Keep
+`EXPERIMENT_RESULTS.md` unchanged until remote coherence and local
+verification pass. If E130 reaches roughly three hours with no history or
+result writeout, treat the static Hodge readout as a runtime-failed branch and
+pivot to a ramped/sparser boundary-cochain candidate rather than spending an
+identical long gate.
 
 Prepared fallback if E130 returns flat or regresses: E131 boundary edge-star
 readout diffusion. E130 removes vertex-star offsets from the selected

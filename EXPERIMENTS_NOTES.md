@@ -6720,3 +6720,20 @@
   E130 process untouched while preparing E136/E137-style parked candidates for
   later launch only after E130 returns and is documented. No result was pulled
   and `EXPERIMENT_RESULTS.md` remains unchanged.
+- 2026-05-15T05:25Z E130 is still active but now unusually slow relative to
+  recent 500-step gates. PID `4224` remained alive on owned pod
+  `c67fbk189vnvfp` with elapsed `02:25:34`, process CPU time
+  `1-06:15:26`, `%CPU=1247`, RSS about `1.9 GiB`, and `194` threads. Remote
+  introspection showed one Python process with many runnable CPU threads, an
+  open CUDA context, no child dataloader processes, and no available
+  `py-spy`/`gdb`/`strace`; this looks like an expensive active PyTorch path
+  rather than a missing-output post-processing failure. The remote artifact
+  directory still contained only `history_full_msa_to_face.json` and
+  `run_metadata.json`; history length stayed `18`, ending at inherited E128
+  step `8500` with `val_lddt_ca=0.4311057258844376`; `results.json` remained
+  missing. E128 and E129 each returned their comparable 500-step gates in just
+  under two hours, so if E130 crosses roughly three hours without a history or
+  result writeout, treat the static Hodge readout as a runtime-failed branch
+  and pivot to a ramped/sparser boundary-cochain candidate rather than
+  spending another identical long gate. No result was pulled and
+  `EXPERIMENT_RESULTS.md` remains unchanged.
