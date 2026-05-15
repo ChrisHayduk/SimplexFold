@@ -512,6 +512,8 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.05",
             "--simplex-boundary-hodge-readout-scale",
             "0.25",
+            "--simplex-boundary-edge-star-readout-scale",
+            "0.5",
             "--simplex-boundary-edge-frame-gate-runtime-scale",
             "0.0",
             "--simplex-boundary-edge-frame-gate-runtime-scale-final",
@@ -566,6 +568,7 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_triangle_attention_value_scale == 0.025
     assert cfg.simplex_boundary_edge_frame_gate_scale == 0.05
     assert cfg.simplex_boundary_hodge_readout_scale == 0.25
+    assert cfg.simplex_boundary_edge_star_readout_scale == 0.5
     assert args.simplex_boundary_edge_frame_gate_runtime_scale == 0.0
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_final == 0.05
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step == 6000
@@ -1289,7 +1292,11 @@ def test_simplicial_boundary_hodge_readout_adds_no_parameters():
         simplex_edge_star_context_scale=1.0,
         simplex_triangle_attention_bias_scale=0.0125,
     )
-    hodge_medium = replace(base_medium, simplex_boundary_hodge_readout_scale=0.25)
+    hodge_medium = replace(
+        base_medium,
+        simplex_boundary_hodge_readout_scale=0.25,
+        simplex_boundary_edge_star_readout_scale=0.5,
+    )
 
     base_params = sum(parameter.numel() for parameter in AlphaFold2(base_medium).parameters())
     hodge_params = sum(parameter.numel() for parameter in AlphaFold2(hodge_medium).parameters())

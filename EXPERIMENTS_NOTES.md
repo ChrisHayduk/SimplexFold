@@ -6469,3 +6469,23 @@
   have returned yet. Interpretation: active early compute, not a coherent
   result bundle. Keep monitoring and do not update `EXPERIMENT_RESULTS.md`
   until the step-9000 bundle exists and verifies.
+- 2026-05-15T03:08Z Prepared E131 locally while E130 runs; no Runpod launch.
+  E131 adds `simplex_boundary_edge_star_readout_scale`, a parameter-neutral
+  edge-star diffusion step on the selected boundary-edge 1-cochain after the
+  Hodge-centered E130 readout and before the pair update. This stays inside
+  the simplicial view: selected face/tetra cells write to their boundary
+  1-skeleton, and the boundary cochain is locally smoothed through residue
+  edge-stars rather than supervised with an output-side C-alpha or distance
+  metric. Candidate use only if E130 returns weakly but keeps the
+  boundary-cochain stabilization route plausible; do not launch before E130 is
+  remotely and locally verified. Local focused validation passed:
+  py_compile for modified modules plus targeted tests for the edge-star
+  readout helper, adapter effect, CLI override, parameter audit, and NanoFold
+  runner parser (`5 passed`).
+- 2026-05-15T03:13Z E131 broader local validation passed:
+  `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  reported `220 passed`; focused ruff checks for undefined-name/syntax-risk
+  rules passed; `git diff --check` passed. E130 remained active on owned pod
+  `c67fbk189vnvfp` at the same time with no `results.json`, `results.csv`,
+  eval-details file, or checkpoint yet, so E131 remains a parked fallback and
+  `EXPERIMENT_RESULTS.md` remains unchanged.

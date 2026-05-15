@@ -16,6 +16,7 @@ from minalphafold.simplex import (
     build_simplex_topology,
     cell_outer_edge_context,
     coface_degree_attenuate_pair_readout,
+    edge_star_smooth_boundary_readout,
     edge_star_cell_mean,
     face_edge_frame_features,
     face_outer_edge_delta,
@@ -98,6 +99,7 @@ class SimplexConfig:
     simplex_boundary_incidence_normalization = 0.0
     simplex_boundary_readout_directionality = 0.0
     simplex_boundary_hodge_readout_scale = 0.0
+    simplex_boundary_edge_star_readout_scale = 0.0
     simplex_global_context_scale = 0.0
     simplex_vertex_star_context_scale = 0.0
     simplex_edge_star_context_scale = 0.0
@@ -1911,6 +1913,21 @@ def test_hodge_center_boundary_readout_removes_vertex_star_offsets():
     assert torch.allclose(half_centered, 0.5 * pair_readout, atol=1e-6)
 
 
+def test_edge_star_smooth_boundary_readout_diffuses_selected_edges():
+    pair_readout = torch.zeros(1, 3, 3, 1)
+    pair_readout[0, 0, 1, 0] = 3.0
+    pair_readout[0, 0, 2, 0] = 9.0
+    pair_counts = torch.zeros(1, 3, 3, 1)
+    pair_counts[0, 0, 1, 0] = 1.0
+    pair_counts[0, 0, 2, 0] = 1.0
+
+    smoothed = edge_star_smooth_boundary_readout(pair_readout, pair_counts, scale=1.0)
+
+    assert torch.isclose(smoothed[0, 0, 1, 0], torch.tensor(4.5))
+    assert torch.isclose(smoothed[0, 0, 2, 0], torch.tensor(7.5))
+    assert torch.isclose(smoothed[0, 1, 0, 0], torch.tensor(0.0))
+
+
 def test_simplicial_adapter_hodge_centers_boundary_pair_update():
     class BaseHodgeConfig(SimplexConfig):
         simplex_neighbor_k = 4
@@ -1935,6 +1952,32 @@ def test_simplicial_adapter_hodge_centers_boundary_pair_update():
 
     assert not torch.allclose(pair_hodge, pair_base)
     assert pair_hodge.shape == pair_base.shape
+
+
+def test_simplicial_adapter_edge_star_smooths_boundary_pair_update():
+    class BaseEdgeStarConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class EdgeStarReadoutConfig(BaseEdgeStarConfig):
+        simplex_boundary_edge_star_readout_scale = 0.5
+
+    torch.manual_seed(84)
+    pair = torch.randn(1, 6, 6, EdgeStarReadoutConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 6, EdgeStarReadoutConfig.c_s)
+    base = SimplicialAdapter(BaseEdgeStarConfig()).eval()
+    edge_star = SimplicialAdapter(EdgeStarReadoutConfig()).eval()
+    edge_star.load_state_dict(base.state_dict())
+
+    with torch.no_grad():
+        pair_base, _, _ = base(pair, single)
+        pair_edge_star, _, _ = edge_star(pair, single)
+
+    assert not torch.allclose(pair_edge_star, pair_base)
+    assert pair_edge_star.shape == pair_base.shape
 
 
 def test_simplex_boundary_metric_recycling_bins_scatter_selected_boundary_edges():

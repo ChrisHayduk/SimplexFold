@@ -1034,6 +1034,31 @@ def hodge_center_boundary_readout(
     return pair_readout + pair_readout.new_tensor(scale) * (centered - pair_readout)
 
 
+def edge_star_smooth_boundary_readout(
+    pair_readout: torch.Tensor,
+    pair_counts: torch.Tensor,
+    *,
+    pair_mask: torch.Tensor | None = None,
+    scale: float,
+) -> torch.Tensor:
+    """Diffuse a selected boundary 1-cochain through residue edge-stars."""
+
+    scale = min(max(float(scale), 0.0), 1.0)
+    if scale <= 0.0:
+        return pair_readout
+    edge_mask = (pair_counts > 0).to(pair_readout.dtype)
+    if pair_mask is not None:
+        edge_mask = edge_mask * pair_mask[..., None].to(pair_readout.dtype)
+
+    source_count = edge_mask.sum(dim=2).clamp_min(1.0)
+    target_count = edge_mask.sum(dim=1).clamp_min(1.0)
+    source_mean = (pair_readout * edge_mask).sum(dim=2) / source_count
+    target_mean = (pair_readout * edge_mask).sum(dim=1) / target_count
+    smoothed = 0.5 * (source_mean[:, :, None, :] + target_mean[:, None, :, :])
+    edge_masked_delta = edge_mask * (smoothed - pair_readout)
+    return pair_readout + pair_readout.new_tensor(scale) * edge_masked_delta
+
+
 def boundary_incidence_weights(
     edge_indices: torch.Tensor,
     edge_mask: torch.Tensor,
@@ -1732,6 +1757,10 @@ class SimplicialAdapter(torch.nn.Module):
         )
         self.boundary_hodge_readout_scale = min(
             max(float(getattr(config, "simplex_boundary_hodge_readout_scale", 0.0)), 0.0),
+            1.0,
+        )
+        self.boundary_edge_star_readout_scale = min(
+            max(float(getattr(config, "simplex_boundary_edge_star_readout_scale", 0.0)), 0.0),
             1.0,
         )
         self.triangle_attention_bias_scale = float(
@@ -2531,6 +2560,12 @@ class SimplicialAdapter(torch.nn.Module):
             pair_counts,
             pair_mask=pair_mask,
             scale=self.boundary_hodge_readout_scale,
+        )
+        pair_readout = edge_star_smooth_boundary_readout(
+            pair_readout,
+            pair_counts,
+            pair_mask=pair_mask,
+            scale=self.boundary_edge_star_readout_scale,
         )
         pair_readout = coface_degree_attenuate_pair_readout(
             pair_readout,

@@ -67,6 +67,17 @@ new/missing tensors, and started a fresh optimizer. The process is active and
 has not yet produced a returned result bundle, so `EXPERIMENT_RESULTS.md`
 must remain unchanged until remote coherence and local verification pass.
 
+Prepared fallback if E130 returns flat or regresses: E131 boundary edge-star
+readout diffusion. E130 removes vertex-star offsets from the selected
+boundary 1-cochain. E131 keeps that Hodge-centered route available but adds a
+second parameter-neutral cochain operation: diffuse the selected boundary-edge
+readout through residue edge-stars before the pair update. In topological
+terms this is a lower-adjacency smoothing step on the selected 1-skeleton,
+not an output-side coordinate or lDDT loss. Do not launch E131 until E130
+returns and is documented; the candidate should only run if E130 confirms that
+boundary cochain stabilization is promising but still under-assembles the
+global backbone.
+
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
 E118 residue vertex-star route with a half-strength boundary-edge-star
