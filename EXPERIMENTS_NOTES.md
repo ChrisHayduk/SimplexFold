@@ -1,5 +1,19 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 Owned Runpod Heartbeat
+
+- 2026-05-15T13:26Z Rechecked only the two owned active Runpod pods. E140 on
+  pod `c67fbk189vnvfp` is alive with PID `55949`, active step `8611`,
+  completed step `8610`, active microbatch `1/8`, effective batch size `8`,
+  and no `results.json`, eval-details CSV, result CSV, or checkpoint yet.
+- E141 on pod `5ox436mhzej7j4` is alive with PID `576`, active step `8565`,
+  completed step `8564`, active microbatch `3/8`, effective batch size `8`,
+  and no `results.json`, eval-details CSV, result CSV, or checkpoint yet.
+- Both histories still end at inherited E128 step `8500` with
+  `val_lddt_ca=0.4311057258844376`, so `EXPERIMENT_RESULTS.md` correctly
+  remains unchanged. Do not launch E145 or stop any owned pod while E140/E141
+  are slow but still coherently progressing.
+
 ## 2026-05-15 Result Recording Helper Cleanup
 
 - Promoted the result/history JSON loaders in
