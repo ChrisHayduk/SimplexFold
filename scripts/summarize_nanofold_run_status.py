@@ -46,7 +46,10 @@ def _load_json(path: Path) -> Any:
 
 
 def _file_summary(path: Path) -> dict[str, Any]:
-    return {"exists": path.exists(), "size": path.stat().st_size if path.exists() else 0}
+    if not path.exists():
+        return {"exists": False, "size": 0}
+    stat = path.stat()
+    return {"exists": True, "size": stat.st_size, "mtime": stat.st_mtime}
 
 
 def _matching_result(path: Path, variant: str) -> dict[str, Any] | None:
@@ -79,21 +82,28 @@ def _csv_row_count(path: Path) -> int | None:
         return sum(1 for _ in csv.DictReader(handle))
 
 
-def _progress_summary(status: dict[str, Any] | None) -> dict[str, float | int] | None:
+def _progress_summary(
+    status: dict[str, Any] | None,
+    files: dict[str, dict[str, Any]],
+) -> dict[str, float | int | str] | None:
     if not status:
         return None
     completed_step = status.get("completed_step")
     start_step = status.get("start_step")
     target_steps = status.get("target_steps")
-    elapsed_seconds = status.get("elapsed_seconds_total")
-    if completed_step is None or start_step is None or elapsed_seconds is None:
+    status_mtime = files["status"].get("mtime")
+    metadata_mtime = files["metadata"].get("mtime")
+    if completed_step is None or start_step is None or status_mtime is None or metadata_mtime is None:
         return None
     completed_delta = max(0, int(completed_step) - int(start_step))
-    if completed_delta <= 0 or float(elapsed_seconds) <= 0.0:
+    run_elapsed_seconds = max(0.0, float(status_mtime) - float(metadata_mtime))
+    if completed_delta <= 0 or run_elapsed_seconds <= 0.0:
         return None
-    seconds_per_step = float(elapsed_seconds) / completed_delta
-    progress: dict[str, float | int] = {
+    seconds_per_step = run_elapsed_seconds / completed_delta
+    progress: dict[str, float | int | str] = {
         "completed_delta_steps": completed_delta,
+        "run_elapsed_seconds": run_elapsed_seconds,
+        "elapsed_source": "status_metadata_mtime_delta",
         "seconds_per_step": seconds_per_step,
         "steps_per_hour": 3600.0 / seconds_per_step,
     }
@@ -130,7 +140,7 @@ def summarize_run(run_dir: Path, *, variant: str = "full_msa_to_face") -> dict[s
         "state": _state(files),
         "files": files,
         "status": status,
-        "progress": _progress_summary(status),
+        "progress": _progress_summary(status, files),
         "result": result,
         "history_last_step": _history_last_step(paths["history"]),
         "eval_rows": eval_rows,

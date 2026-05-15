@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 
 from scripts.summarize_nanofold_run_status import main, summarize_run
 
@@ -30,6 +31,9 @@ def _write_active_run(run_dir):
         encoding="utf-8",
     )
     (run_dir / "run_metadata.json").write_text(json.dumps({"effective_batch_size": 8}), encoding="utf-8")
+    launch_time = 1_800_000_000.0
+    os.utime(run_dir / "run_metadata.json", (launch_time, launch_time))
+    os.utime(run_dir / f"status_{variant}.json", (launch_time + 3600.0, launch_time + 3600.0))
 
 
 def _write_returned_run(run_dir):

@@ -7488,3 +7488,15 @@
   `../../.venv/bin/ruff check --select F821,F822,F823
   scripts/summarize_nanofold_run_status.py
   tests/test_summarize_nanofold_run_status.py`.
+- 2026-05-15T12:19Z Corrected the local ETA helper before relying on it for
+  decisions. E140/E141 heartbeats showed `elapsed_seconds_total` is inherited
+  from the resumed checkpoint, so it is useful as total training time but not
+  as a run-local throughput denominator. The summarizer now estimates active
+  run rate from the status-file mtime minus `run_metadata.json` mtime and
+  labels that source explicitly. Focused validation passed again:
+  `python -m pytest tests/test_summarize_nanofold_run_status.py` (`4 passed`),
+  `python -m py_compile scripts/summarize_nanofold_run_status.py
+  tests/test_summarize_nanofold_run_status.py`, and
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/summarize_nanofold_run_status.py
+  tests/test_summarize_nanofold_run_status.py`.
