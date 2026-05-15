@@ -56,4 +56,5 @@ def test_audit_experiment_results_summarizes_target_state():
     assert "Best returned score: E200 `val_lddt_ca=0.7100` at step 30000." in summary
     assert "30k confirmation: 1 run(s) above `0.7` at >= 30,000 steps." in summary
     assert "Short gates >= `0.45` before 30,000 steps: 1." in summary
+    assert "Parameter-budget evidence: not present in EXPERIMENT_RESULTS.md" in summary
     assert "- E200: best `0.7100` at step 30000; final/stop `0.7050`; status `returned`" in summary

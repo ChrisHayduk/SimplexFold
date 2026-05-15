@@ -60,6 +60,17 @@
   verifier/analyzer/recording, before committing. The owned-pod scope,
   Runpod-management limits, E145 gating rule, and 30-minute schedule are
   unchanged.
+- Tightened the helper to state that parameter-budget evidence is not present
+  in `EXPERIMENT_RESULTS.md` itself. A future apparent `>0.7` row still needs
+  artifact metadata/verifier evidence for the `<=3261974` parameter cap before
+  it can count toward the goal. Focused validation passed:
+  `python -m pytest tests/test_audit_experiment_results.py`,
+  `python -m py_compile scripts/audit_experiment_results.py
+  tests/test_audit_experiment_results.py`,
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/audit_experiment_results.py tests/test_audit_experiment_results.py`,
+  `python scripts/audit_experiment_results.py EXPERIMENT_RESULTS.md`, and
+  `git diff --check`.
 
 ## 2026-05-15 Owned Runpod Heartbeat
 

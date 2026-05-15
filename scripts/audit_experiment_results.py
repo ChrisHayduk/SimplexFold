@@ -150,6 +150,10 @@ def audit_experiment_results(
             f"Short gates >= `{short_gate_threshold:.2f}` before {confirmation_steps:,} steps: "
             f"{len(short_gate)}."
         ),
+        (
+            "Parameter-budget evidence: not present in EXPERIMENT_RESULTS.md; "
+            "confirm any candidate with artifact metadata/verifier output."
+        ),
         f"Top {len(top)} numeric rows:",
     ]
     for row in top:
