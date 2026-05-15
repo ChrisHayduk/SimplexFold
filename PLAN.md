@@ -54,7 +54,9 @@ Next actions:
 3. If E140/E141 remain below `0.45`, launch only a short E145 gate around the
    ramped parameter-free outer-neighborhood selected-cell transport; avoid
    spending 30,000 steps unless a short gate clears `0.45` with coherent
-   FoldScore, dRMSD, and C-alpha Rg.
+   FoldScore, dRMSD, and C-alpha Rg. Use the full E145 launch and verifier
+   templates now recorded in `EXPERIMENTS.md`, including `--num-workers 4`
+   and returned-artifact `--expected-num-workers 4`.
 4. For the next launched short gate, run a startup smoke with a small
    DataLoader worker count such as `--num-workers 4`. E140/E141 inherited the
    runner default `0`, and both owned A100 pods have 128 CPU cores while the

@@ -7585,3 +7585,11 @@
   run-name/model-config/recipe metadata expectations, and explicitly omits
   `--expected-num-workers` for those two older launches because they predate
   worker-count metadata.
+- 2026-05-15T12:55Z Added the full parked E145 launch skeleton and returned
+  verifier template to `EXPERIMENTS.md`, and pointed `PLAN.md` at that exact
+  handoff path. The template keeps the full E128 selected-complex recipe,
+  adds only the parameter-free outer-edge residual context ramp from `0.0` to
+  `0.25` over steps `8500`-`9000`, and includes `--num-workers 4` plus
+  returned-artifact verification with `--expected-num-workers 4`. This is a
+  launch-safety/documentation update only; E145 remains parked until E140/E141
+  return below the short-gate threshold or fail coherently.
