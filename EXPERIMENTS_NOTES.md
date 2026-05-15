@@ -7376,3 +7376,13 @@
   the documented aggregate signal: `1000` rows, mean lDDT `0.4311`, length-bin
   lDDT from `0.5096` (`<80`) to `0.3919` (`>=220`), and 75
   high-boundary/low-global rows.
+- 2026-05-15T11:18Z Rechecked only the two owned active pods. E140 remains
+  pre-eval at active step `8544`, completed step `8543`, elapsed `01:25:36`,
+  with inherited history still ending at E128 step `8500` and no
+  `results.json`, eval-details CSV, or new checkpoint. E141 remains pre-eval
+  at active step `8515`, completed step `8514`, elapsed `00:43:42`, also with
+  no returned result artifacts. Both jobs are CPU-heavy with large A100 memory
+  allocations (`~38 GiB`); a short utilization sample saw E141 spike to `66%`
+  GPU once while E140 did not spike in that window. Treat the slow heartbeat as
+  expected for these gates and continue waiting for the step-9000 evaluation
+  unless the process exits or status stops advancing for a much longer window.
