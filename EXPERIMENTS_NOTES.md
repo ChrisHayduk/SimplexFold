@@ -1,5 +1,25 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 Result-Table Audit Helper
+
+- Added `scripts/audit_experiment_results.py`, a read-only audit helper for
+  `EXPERIMENT_RESULTS.md`. It parses the Markdown table, reports the best
+  numeric validation C-alpha lDDT row, counts any short gates above the
+  `0.45` threshold, and separately counts true 30,000-step confirmations above
+  the `0.7` target using the final/stop lDDT.
+- Current live-table audit output confirms the experiment state: best returned
+  score is E128 at `val_lddt_ca=0.4311` and step `8500`; there are `0` short
+  gates at or above `0.45` before `30,000` steps; and there are `0` confirmed
+  `30,000`-step runs above `0.7`.
+- Focused validation passed:
+  `python -m pytest tests/test_audit_experiment_results.py`,
+  `python -m py_compile scripts/audit_experiment_results.py
+  tests/test_audit_experiment_results.py`,
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  scripts/audit_experiment_results.py tests/test_audit_experiment_results.py`,
+  `python scripts/audit_experiment_results.py EXPERIMENT_RESULTS.md`, and
+  `git diff --check`.
+
 ## 2026-05-15 Owned Runpod Heartbeat
 
 - 2026-05-15T13:26Z Rechecked only the two owned active Runpod pods. E140 on
