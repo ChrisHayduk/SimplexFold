@@ -7194,5 +7194,14 @@
   `01:08:06`, `status_full_msa_to_face.json` reported active step `8503`,
   microbatch `4`, and effective batch size `8`, while history still correctly
   ended at inherited E128 step `8500` until the next evaluation/checkpoint.
-  GPU memory was about `18.8 GiB`. This confirms E140 is not showing the
-  immediate no-write pathology seen in E130/E138/E139.
+  GPU memory was about `18.8 GiB`. This confirms the new heartbeat is needed
+  to distinguish real step progress from an apparently quiet pre-eval run.
+- 2026-05-15T09:59Z Corrected the interpretation of E130/E138/E139. E140's
+  heartbeat shows that a resumed 500-step gate can make real step progress for
+  many minutes while history still ends at inherited step `8500`; the next
+  history/result write is not expected until the step-9000 evaluation. The old
+  no-history cutoff therefore overcalled earlier stopped branches as runtime
+  failures. Reclassify E130/E138/E139 as stopped pre-eval with no scored result,
+  not as evidence that Hodge, face-cyclic, or oriented boundary-cochain
+  readouts are architecturally bad. Future long-running gates should rely on
+  `status_full_msa_to_face.json` heartbeat progress before any stop decision.

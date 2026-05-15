@@ -5606,11 +5606,12 @@ stabilization or assembly mechanism.
 
 ### E130: Hodge-Centered Boundary Readout
 
-Status: runtime failed. E130 ran as a short gate on owned Runpod pod
+Status: stopped pre-eval. E130 ran as a short gate on owned Runpod pod
 `c67fbk189vnvfp` as
 `e130_hodge_boundary_readout_from_e128_s9000_c256_m64`, but was stopped after
 roughly three hours with no step-9000 history row, result bundle, eval-details
-file, or checkpoint.
+file, or checkpoint. Later E140 heartbeat evidence showed that absence of a
+new 500-step history row alone is not proof of runtime failure.
 
 Hypothesis: E128/E129 show that explicit face/tetra states can learn strong
 local selected-boundary geometry, but the pair trunk still under-assembles the
@@ -5664,8 +5665,10 @@ However, at the 2026-05-15T06:00Z cutoff the process was still active after
 `03:00:16` elapsed, history still ended at inherited E128 step `8500`, and no
 `results.json`, `results.csv`, eval-details file, or checkpoint existed. The
 timeout trace was preserved under ignored local log/artifact paths, PID `4224`
-was terminated, and E130 is recorded in `EXPERIMENT_RESULTS.md` as a runtime
-failure. Do not retry this exact static Hodge gate.
+was terminated. E130 is now recorded in `EXPERIMENT_RESULTS.md` as stopped
+pre-eval rather than as scored evidence against static Hodge readout. Do not
+retry this exact static Hodge gate unless the branch is relaunched with the
+live status heartbeat.
 
 Validation so far:
 
@@ -6100,13 +6103,13 @@ Validation so far:
 
 ### E138: No-Hodge Face-Cyclic Boundary Readout
 
-Status: runtime failed. E138 ran on owned Runpod pod `c67fbk189vnvfp` from
+Status: stopped pre-eval. E138 ran on owned Runpod pod `c67fbk189vnvfp` from
 `/workspace/SimplexFold_next` as
 `e138_no_hodge_face_cyclic_boundary_from_e128_s9000_c256_m64`, PID `24980`,
-then was stopped at the documented no-write cutoff after `03:00:56` elapsed.
+then was stopped at the earlier no-history cutoff after `03:00:56` elapsed.
 No code change beyond the already implemented E137 face-cyclic boundary
 operator; E138 was the no-Hodge launch recipe selected after E130 hit the
-runtime cutoff.
+pre-eval cutoff.
 
 Hypothesis: E130's static Hodge-centered boundary readout may be stressing an
 expensive vertex-star double-centering path before it ever writes the
@@ -6166,11 +6169,11 @@ changed since startup. The startup trace was preserved locally under
 and `logs/e138_no_hodge_face_cyclic_boundary.log`, then only E138 PID `24980`
 was terminated.
 
-Decision: record E138 as a runtime-failed branch. The face-cyclic
-2-simplex boundary readout remains a topology-native idea, but this runtime
-path does not produce a usable short-gate score. Use the no-Hodge E139
-oriented boundary-cochain fallback rather than spending more time on E138
-without a runtime fix.
+Decision: record E138 as stopped pre-eval with no scored result. The
+face-cyclic 2-simplex boundary readout remains a topology-native idea; the
+stop only shows that the old checkout lacked enough live progress visibility.
+Do not use this row as evidence against the architecture without relaunching
+with heartbeat instrumentation.
 
 Validation status: E138 is a launch-recipe subset of the already-tested E137
 operator with Hodge disabled. On the branch tip after documenting E138:
@@ -6184,13 +6187,14 @@ the Runpod checkout.
 
 ### E139: No-Hodge Oriented Boundary-Cochain Readout
 
-Status: runtime failed on owned Runpod pod `c67fbk189vnvfp`. E139 ran from
+Status: stopped pre-eval on owned Runpod pod `c67fbk189vnvfp`. E139 ran from
 `/workspace/SimplexFold_e139` as
 `e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64`, then was stopped
-after `00:45:26` elapsed because it remained in the same no-write first-step
-state as E130/E138 while burning `09:08:39` process CPU time. This reuses the
-already implemented E136 oriented boundary-cochain operator but removes E130's
-Hodge double-centering from the launch recipe.
+after `00:45:26` elapsed with only startup files and inherited E128 history.
+Later E140 heartbeat evidence showed that this was an over-aggressive pre-eval
+stop rather than proof of runtime failure. This reuses the already implemented
+E136 oriented boundary-cochain operator but removes E130's Hodge
+double-centering from the launch recipe.
 
 Hypothesis: E138 tests orientation at the level of each selected triangular
 face's boundary cycle `(i->j, j->k, k->i)`. If E138 is coherent but flat, the
@@ -6207,7 +6211,7 @@ pair update. It is a simplicial/topological architecture change on the
 selected boundary 1-cochain, not an output-side C-alpha lDDT, radius,
 distance-matrix, or coordinate loss.
 
-Launch recipe used after E138 was documented as a runtime-failed branch:
+Launch recipe used after E138 was documented as stopped pre-eval:
 
 ```bash
 --run-name e139_no_hodge_oriented_boundary_from_e128_s9000_c256_m64 \
@@ -6224,7 +6228,7 @@ Launch recipe used after E138 was documented as a runtime-failed branch:
 --simplex-boundary-oriented-cochain-runtime-scale-ramp-steps 500
 ```
 
-Full same-pod launch skeleton if E138 is documented as flat/runtime-failed
+Full same-pod launch skeleton if E138 is documented as flat or stopped pre-eval
 and the owned pod remains healthy. Use the separate staged checkout so the
 previous E138 tree is not disturbed:
 
@@ -6309,12 +6313,13 @@ history at `2026-05-15T09:03Z`, and the log confirms `train=10000`,
 `val=1000`, crop `256`, MSA depth `64`, resume from the E128 checkpoint at
 step `8500` / examples `68000`, `1332` matching tensors loaded, and `0`
 new/missing tensors initialized. It never wrote a new history row, result
-bundle, eval details, checkpoint, or status file. The remote trace was
-preserved locally, then only E139 PIDs `42517` and `42514` were stopped.
+bundle, eval details, checkpoint, or status file before we stopped it. The
+remote trace was preserved locally, then only E139 PIDs `42517` and `42514`
+were stopped.
 
-Decision: reject as a runtime-failed branch with no scored result. Use E140 as
-the next active gate because it tests selected-complex realization rather than
-another boundary-readout transform.
+Decision: record E139 as stopped pre-eval with no scored result. Use E140 as
+the next active gate because it tests selected-complex realization and, unlike
+the older E139 checkout, has live heartbeat instrumentation.
 
 Validation status: E139 is a launch-recipe subset of the already-tested E136
 operator with Hodge disabled. On the branch tip after documenting E139:
@@ -6331,13 +6336,13 @@ operator with Hodge disabled. On the branch tip after documenting E139:
   command with effective batch size `8`, max-parameter cap `3261974`, oriented
   static scale `0.25`, and oriented runtime final scale `0.25`; the NanoFold
   checkout and E128 checkpoint were verified present. The Runpod experiment
-  launched from this checkout after E138 was documented as runtime failed.
+  launched from this checkout after E138 was documented as stopped pre-eval.
 - `git diff --check`: passed
 
 ### E140: Selected-Boundary Realization Anti-Collapse
 
-Status: launched on the owned Runpod pod after E139 was documented as runtime
-failed. E140 is the active gate as
+Status: launched on the owned Runpod pod after E139 was documented as stopped
+pre-eval. E140 is the active gate as
 `e140_selected_boundary_expansion_from_e128_s9000_c256_m64` from the staged
 `/workspace/SimplexFold_e140` checkout.
 
@@ -6357,7 +6362,7 @@ pairs, C-alpha radius, validation lDDT, or a full distance matrix. In
 topological terms, it asks the learned sparse complex to realize its own
 selected 2- and 3-cells without collapsing their 1-skeleton.
 
-Candidate launch used after E139 was explicitly stopped as runtime failed:
+Candidate launch used after E139 was explicitly stopped pre-eval:
 
 ```bash
 --run-name e140_selected_boundary_expansion_from_e128_s9000_c256_m64 \
@@ -6472,7 +6477,7 @@ checks after documenting the parked recipe:
 ### E141: Signed Face-Cyclic Boundary Readout
 
 Status: locally implemented, validated, and staged; do not launch while E140
-is active. E138 and E139 have already been documented as runtime failures.
+is active. E138 and E139 have already been documented as stopped pre-eval.
 
 Hypothesis: E138 tests whether selected face cochains should write back into
 pair state through each triangular boundary cycle `(i->j, j->k, k->i)`.

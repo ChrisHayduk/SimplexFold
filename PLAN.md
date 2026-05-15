@@ -1,21 +1,19 @@
-## 2026-05-15 Operating Plan Update: E140 After E139 Runtime Failure
+## 2026-05-15 Operating Plan Update: E140 Active With Heartbeat
 
 Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,
 well below the `0.7` goal and below the `0.45` short-gate threshold for a
-credible 30k-step spend. E138 reached the documented no-write runtime cutoff
-on owned Runpod pod `c67fbk189vnvfp`: after `03:00:56` elapsed it still had
-only startup log output, inherited E128 history through step `8500`, and no
-step-9000 result bundle, eval details, or checkpoint. Its trace was preserved
-locally and only E138 PID `24980` was stopped. E138 is therefore a terminal
-runtime-failed branch, not a returned score.
+credible 30k-step spend. E130, E138, and E139 were all stopped before their
+first new evaluation/checkpoint row. With E140's new status heartbeat, we now
+know a 500-step continuation can run for many hours before writing the next
+history row, so those branches should be treated as pre-eval stopped runs, not
+as scored architectural failures.
 
-E139 then tested a no-Hodge oriented boundary-cochain readout from E128, but
-it reproduced the same no-write first-step failure pattern. It was stopped on
-the same owned pod after `00:45:26` elapsed because it had burned `09:08:39`
-process CPU time without writing a new history row, result bundle, eval
-details, checkpoint, or status file. Its trace was preserved locally and only
-E139 PIDs `42517` / `42514` were stopped. Treat the oriented boundary-cochain
-route as runtime failed in this implementation, not as a scored branch.
+E139 tested a no-Hodge oriented boundary-cochain readout from E128 and was
+stopped on the same owned pod after `00:45:26` elapsed with only startup files
+and inherited step-8500 history. Its trace was preserved locally and only E139
+PIDs `42517` / `42514` were stopped. Because that checkout did not have live
+step heartbeats, the lack of a new history row is not enough evidence to reject
+the oriented boundary-cochain architecture.
 
 Active gate: E140 is running from the separate `/workspace/SimplexFold_e140`
 checkout on the same owned pod as
@@ -56,19 +54,19 @@ than adding an output-side metric shortcut.
 ## Superseded Plan: E139 No-Hodge Oriented Boundary-Cochain Readout
 
 This section is retained for provenance. E139 has now been stopped as a
-runtime-failed branch, and E140 is the active gate described in the operating
-plan above.
+pre-eval branch, and E140 is the active gate described in the operating plan
+above.
 
 Current status after E138: the best returned validation C-alpha lDDT remains
 E128 at `0.4311` at step 8500. E129 resumed the verified E128 checkpoint and
 added a tiny sparse triangle-attention value residual, but returned lower at
 step 9000 with `val_lddt_ca=0.4303`, FoldScore `0.3984`, and
 `val_ca_drmsd=11.2250`. E130 then tested static Hodge-centered selected
-boundary readout from E128 but was stopped as a runtime-failed branch after
+boundary readout from E128 but was stopped before its first new eval after
 roughly three hours with no new history row, result bundle, eval details, or
 checkpoint. E138 then removed Hodge and tested face-cyclic boundary readout
-from E128, but it also reached the roughly three-hour no-write cutoff with no
-step-9000 bundle and was stopped as a runtime-failed branch.
+from E128, but it also reached the roughly three-hour cutoff with no step-9000
+bundle and was stopped pre-eval.
 
 The planned E139 short gate ran on the same owned Runpod pod
 `c67fbk189vnvfp` from the separate `/workspace/SimplexFold_e139` checkout as
@@ -81,8 +79,8 @@ Startup verification passed: the runner saw `train=10000`, `val=1000`, crop
 `256`, MSA depth `64`, resumed the E128 checkpoint at `step=8500` /
 `examples=68000`, loaded `1332` matching model tensors, initialized `0`
 new/missing tensors, and recorded `effective_batch_size=8` with
-`max_parameters=3261974`. It was later stopped as a terminal runtime failure
-after remaining in a no-write first-step state.
+`max_parameters=3261974`. It was later stopped before the first new eval row;
+E140's heartbeat evidence showed this stop was over-aggressive.
 
 E129 tested this topology-native route:
 
@@ -111,15 +109,17 @@ E128's successful oriented boundary-edge realization while adding a
 stability/normalization path for global assembly, and require a clear break
 above the `0.45` short-gate threshold before any longer-run consideration.
 
-E130 terminal diagnosis: Hodge-centered selected-boundary readout was the
-right topology-native question but the wrong runtime branch. It treated the
+E130 pre-eval diagnosis: Hodge-centered selected-boundary readout remains a
+topology-native question, but the branch was stopped before it produced a
+score. It treated the
 face/tetra boundary messages as a sparse boundary-edge 1-cochain on the
 selected complex, double-centered that cochain over source and target residue
 vertex stars, and blended the centered cochain back into the pair readout
 before `Z_ij` was updated. This did not add parameters or an output-side
-lDDT/radius/coordinate loss, but the static Hodge gate ran for roughly three
+lDDT/radius/coordinate loss. The static Hodge gate ran for roughly three
 hours without writing a step-9000 history row, result bundle, eval details, or
-checkpoint. E130 was therefore stopped as a runtime-failed branch.
+checkpoint, but without heartbeat evidence we cannot distinguish slow training
+from failure.
 
 ```text
 selected F_ijk / U_ijkl
@@ -130,15 +130,15 @@ selected F_ijk / U_ijkl
         -> Z_ij / structure module
 ```
 
-E138 terminal diagnosis: no-Hodge face-cyclic boundary readout was the right
-topology-native question but not a usable runtime branch. It kept E128's
+E138 pre-eval diagnosis: no-Hodge face-cyclic boundary readout remains a
+topology-native question, but the branch was stopped before it produced a
+score. It kept E128's
 oriented face gate and damped triangle-attention bias, removed
 `simplex_boundary_hodge_readout_scale`, and tested whether learned
 2-simplex cochains write through the oriented boundary cycle
-`(i->j, j->k, k->i)` before updating `Z_ij`. The run still crossed the
-three-hour no-write cutoff with only inherited E128 history, so treat the
-face-cyclic route as runtime-failed unless a later implementation fixes the
-runtime path.
+`(i->j, j->k, k->i)` before updating `Z_ij`. The run crossed the earlier
+three-hour cutoff with only inherited E128 history, but after E140 we should
+not use that absence of a 500-step history row as architectural evidence.
 
 E139 was the no-Hodge oriented boundary-cochain fallback. E138 tested
 orientation at the level of each selected face's 2-simplex boundary cycle;
@@ -146,7 +146,7 @@ E139 instead tests the induced selected boundary 1-cochain after face/tetra
 scatter by subtracting reverse selected-edge common mode,
 `cochain(i,j) - cochain(j,i)`, while preserving one-way directed boundary
 edges. This kept the change in the explicit simplicial boundary pathway and
-avoided the slow Hodge double-centering path, but the run failed before
+avoided the Hodge double-centering path, but the run was stopped before
 producing a scored step-9000 point.
 
 Second parked fallback if E138/E139 are coherent but still too collapsed:
@@ -175,7 +175,7 @@ The parked E141/E142/E143 Runpod checkouts have been fast-forwarded to
 heartbeat; their candidate-specific topology flags and effective batch size
 `8` were rechecked by the remote parser.
 E140 was staged as `/workspace/SimplexFold_e140`, then launched after E139 was
-documented as runtime failed. Remote py_compile passed, the full E128-style
+documented as stopped pre-eval. Remote py_compile passed, the full E128-style
 launch recipe parses with effective batch size `8`, and the architecture audit
 remains within cap at `3,240,738 <= 3,261,974`.
 E144 is also staged as `/workspace/SimplexFold_e144`: it is a no-Hodge
