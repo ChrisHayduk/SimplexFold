@@ -6850,3 +6850,11 @@
   need a small anti-collapse constraint on their own boundary 1-skeleton
   before the pair trunk can assemble a less compact backbone. Launch only
   after E138 returns and E139 is either returned or explicitly skipped.
+- 2026-05-15T06:39Z Validated the parked E140 plumbing locally; no Runpod
+  launch. A parameter audit of `simplexfold_medium_param_matched` counted
+  `3,106,690 <= 3,261,974`, and focused tests covering the expansion-hinge
+  no-parameter guarantee, AlphaFold loss coordinate-expansion overrides,
+  NanoFold benchmark loss builder, variant parser acceptance, and topology
+  preservation all passed (`5 passed in 1.31s`). This confirms E140 can be
+  launched later using existing selected-complex loss plumbing if the active
+  orientation/readout branches return flat.

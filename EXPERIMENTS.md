@@ -6281,3 +6281,9 @@ Decision rule: reject unless E140 beats E128 and any returned E138/E139 result
 on primary C-alpha lDDT while also improving the collapsed-global diagnostics:
 predicted C-alpha Rg should move toward true Rg without worsening dRMSD or
 FoldScore. It must still clear `0.45` before any 30k-step consideration.
+
+Validation status: E140 uses existing loss/parser plumbing and adds no
+model parameters. Local checks after documenting the parked recipe:
+
+- `python - <<'PY' ... AlphaFold2(load_model_config("simplexfold_medium_param_matched")) ... PY`: parameter count `3,106,690 <= 3,261,974`
+- `python -m pytest tests/test_trainer.py::test_simplicial_expansion_hinge_adds_no_parameters tests/test_trainer.py::test_alphafold_loss_overrides_simplex_coordinate_weights tests/test_nanofold_public_benchmarks.py::test_benchmark_loss_builder_applies_topology_margin_config tests/test_nanofold_public_benchmarks.py::test_full_msa_to_face_expansion_hinge_variant_is_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_full_msa_to_face_expansion_hinge_variant_keeps_base_topology`: `5 passed`
