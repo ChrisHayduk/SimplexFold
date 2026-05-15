@@ -34,6 +34,7 @@ from minalphafold.simplex import (
     simplex_boundary_metric_recycling_bins,
     signed_cyclic_face_boundary_updates,
     signed_face_tetra_coboundary_delta,
+    signed_tetra_face_boundary_updates,
     tetra_edge_frame_features,
     tetra_geometry_features,
     vertex_star_cell_mean,
@@ -1226,6 +1227,18 @@ def test_signed_face_tetra_coboundary_delta_uses_oriented_tetra_boundary_signs()
     )
 
 
+def test_signed_tetra_face_boundary_updates_blends_oriented_boundary_signs():
+    tetra_face_update = torch.tensor([[[[[2.0], [3.0], [5.0]]]]])
+
+    signed = signed_tetra_face_boundary_updates(tetra_face_update, scale=1.0)
+    half = signed_tetra_face_boundary_updates(tetra_face_update, scale=0.5)
+    off = signed_tetra_face_boundary_updates(tetra_face_update, scale=0.0)
+
+    assert torch.allclose(signed, torch.tensor([[[[[-2.0], [3.0], [-5.0]]]]]))
+    assert torch.allclose(half, torch.tensor([[[[[0.0], [3.0], [0.0]]]]]))
+    assert torch.allclose(off, tetra_face_update)
+
+
 def test_hodge_face_adapter_scale_changes_outputs_without_new_parameters():
     class HodgeConfig(SimplexConfig):
         simplex_neighbor_k = 3
@@ -1284,6 +1297,43 @@ def test_signed_tetra_coboundary_adapter_scale_changes_outputs_without_new_param
         pair,
         single,
         simplex_signed_tetra_coboundary_scale_override=pair.new_tensor(0.25),
+    )
+
+    assert on_params == off_params
+    assert not torch.allclose(on_pair, off_pair)
+    assert not torch.allclose(on_single, off_single)
+    assert torch.allclose(override_pair, on_pair)
+    assert torch.allclose(override_single, on_single)
+
+
+def test_signed_tetra_to_face_adapter_scale_changes_outputs_without_new_parameters():
+    class SignedTetraToFaceConfig(SimplexConfig):
+        simplex_neighbor_k = 3
+        simplex_use_tetra = True
+        simplex_use_recycled_geometry = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+
+    class SignedTetraToFaceEnabledConfig(SignedTetraToFaceConfig):
+        simplex_signed_tetra_to_face_scale = 1.0
+
+    torch.manual_seed(73)
+    off_adapter = SimplicialAdapter(SignedTetraToFaceConfig())
+    torch.manual_seed(73)
+    on_adapter = SimplicialAdapter(SignedTetraToFaceEnabledConfig())
+    pair = torch.randn(1, 5, 5, SignedTetraToFaceConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 5, SignedTetraToFaceConfig.c_s)
+
+    off_params = sum(p.numel() for p in off_adapter.parameters())
+    on_params = sum(p.numel() for p in on_adapter.parameters())
+    off_pair, off_single, _ = off_adapter(pair, single)
+    on_pair, on_single, _ = on_adapter(pair, single)
+    override_pair, override_single, _ = off_adapter(
+        pair,
+        single,
+        simplex_signed_tetra_to_face_scale_override=pair.new_tensor(1.0),
     )
 
     assert on_params == off_params

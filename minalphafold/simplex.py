@@ -1371,6 +1371,25 @@ def signed_face_tetra_coboundary_delta(
     return (delta / counts.clamp_min(1.0)) * face_mask[..., None]
 
 
+def signed_tetra_face_boundary_updates(
+    tetra_face_update: torch.Tensor,
+    *,
+    scale: float,
+) -> torch.Tensor:
+    """Blend learned tetra-to-face messages toward oriented boundary signs."""
+
+    blend = min(max(float(scale), 0.0), 1.0)
+    if tetra_face_update.numel() == 0 or blend == 0.0:
+        return tetra_face_update
+    signs = tetra_face_update.new_tensor([-1.0, 1.0, -1.0]).reshape(
+        *((1,) * (tetra_face_update.ndim - 2)),
+        3,
+        1,
+    )
+    signed_update = tetra_face_update * signs
+    return tetra_face_update + tetra_face_update.new_tensor(blend) * (signed_update - tetra_face_update)
+
+
 def cell_outer_edge_context(
     pair: torch.Tensor,
     cell_indices: torch.Tensor,
@@ -1873,6 +1892,10 @@ class SimplicialAdapter(torch.nn.Module):
         self.signed_tetra_coboundary_scale = float(
             getattr(config, "simplex_signed_tetra_coboundary_scale", 0.0)
         )
+        self.signed_tetra_to_face_scale = min(
+            max(float(getattr(config, "simplex_signed_tetra_to_face_scale", 0.0)), 0.0),
+            1.0,
+        )
         self.edge_frame_message_scale = float(getattr(config, "simplex_edge_frame_message_scale", 0.0))
         self.boundary_edge_frame_gate_scale = float(
             getattr(config, "simplex_boundary_edge_frame_gate_scale", 0.0)
@@ -2117,6 +2140,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
         simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
         simplex_signed_tetra_coboundary_scale_override: Optional[torch.Tensor] = None,
+        simplex_signed_tetra_to_face_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_edge_frame_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
@@ -2167,6 +2191,15 @@ class SimplicialAdapter(torch.nn.Module):
             signed_tetra_coboundary_scale = max(
                 float(simplex_signed_tetra_coboundary_scale_override.detach().float().cpu().item()),
                 0.0,
+            )
+        signed_tetra_to_face_scale = self.signed_tetra_to_face_scale
+        if simplex_signed_tetra_to_face_scale_override is not None:
+            signed_tetra_to_face_scale = min(
+                max(
+                    float(simplex_signed_tetra_to_face_scale_override.detach().float().cpu().item()),
+                    0.0,
+                ),
+                1.0,
             )
         edge_frame_message_scale = self.edge_frame_message_scale
         if simplex_edge_frame_message_scale_override is not None:
@@ -2523,6 +2556,11 @@ class SimplicialAdapter(torch.nn.Module):
             )
 
             face_delta = self.tetra_to_face(tetra_state).reshape(*tetra_state.shape[:-1], 3, self.c_face)
+            if signed_tetra_to_face_scale > 0.0:
+                face_delta = signed_tetra_face_boundary_updates(
+                    face_delta,
+                    scale=signed_tetra_to_face_scale,
+                )
             face_delta = face_delta * topology.tetra_mask[..., None, None]
             face_delta_scattered = torch.zeros_like(face_state)
             face_counts = torch.zeros(*face_state.shape[:-1], 1, device=face_state.device, dtype=face_state.dtype)

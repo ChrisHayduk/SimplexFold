@@ -265,6 +265,7 @@ class AlphaFold2(torch.nn.Module):
             simplex_outer_edge_context_scale_override: torch.Tensor | None = None,
             simplex_hodge_face_update_scale_override: torch.Tensor | None = None,
             simplex_signed_tetra_coboundary_scale_override: torch.Tensor | None = None,
+            simplex_signed_tetra_to_face_scale_override: torch.Tensor | None = None,
             simplex_edge_frame_message_scale_override: torch.Tensor | None = None,
             simplex_boundary_edge_frame_gate_scale_override: torch.Tensor | None = None,
             simplex_boundary_readout_directionality_override: torch.Tensor | None = None,
@@ -516,6 +517,9 @@ class AlphaFold2(torch.nn.Module):
                                         simplex_signed_tetra_coboundary_scale_override=(
                                             simplex_signed_tetra_coboundary_scale_override
                                         ),
+                                        simplex_signed_tetra_to_face_scale_override=(
+                                            simplex_signed_tetra_to_face_scale_override
+                                        ),
                                         simplex_edge_frame_message_scale_override=(
                                             simplex_edge_frame_message_scale_override
                                         ),
@@ -607,6 +611,9 @@ class AlphaFold2(torch.nn.Module):
                                     ),
                                     simplex_signed_tetra_coboundary_scale_override=(
                                         simplex_signed_tetra_coboundary_scale_override
+                                    ),
+                                    simplex_signed_tetra_to_face_scale_override=(
+                                        simplex_signed_tetra_to_face_scale_override
                                     ),
                                     simplex_edge_frame_message_scale_override=(
                                         simplex_edge_frame_message_scale_override

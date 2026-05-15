@@ -6978,3 +6978,28 @@
   signed static scale `0.25`, and signed runtime final scale `0.25`. The
   NanoFold checkout and E128 resume checkpoint were verified present. No
   Runpod experiment was launched from this checkout.
+- 2026-05-15T07:53Z E138 remained active and below cutoff on owned pod
+  `c67fbk189vnvfp`: PID `24980` had elapsed `01:51:56`, process CPU time
+  `23:26:38`, and the artifact directory still contained only
+  `run_metadata.json` plus inherited `history_full_msa_to_face.json`. No
+  result bundle, eval-details file, or checkpoint existed yet.
+- 2026-05-15T07:55Z Prepared E143 locally while E138 continues; no Runpod
+  launch. E143 adds a signed blend on the learned `tetra_to_face` readout
+  before selected tetra messages scatter back into the maintained anchored
+  faces. It uses the same oriented tetra boundary signs `[-, +, -]` as E142,
+  but acts on the learned tetra-to-face cochain readout rather than on the
+  parameter-neutral sibling-face coboundary residual. This is a
+  parameter-neutral simplicial incidence change, not an output-side
+  C-alpha lDDT/radius/distance loss. Local validation passed: `python -m
+  py_compile` for `simplex.py`, `evoformer.py`, `model.py`, `trainer.py`, and
+  the NanoFold runner; the nine focused signed tetra-to-face parser/runtime
+  tests (`9 passed`); and the broader `tests/test_simplex.py
+  tests/test_nanofold_public_benchmarks.py tests/test_trainer.py` slice
+  (`232 passed`). Focused ruff undefined-name/syntax-risk checks passed.
+  Parameter audit counted `3,106,690` parameters with or without
+  `simplex_signed_tetra_to_face_scale=0.25`, so the operator adds no
+  parameters and remains under the `3,261,974` cap. Local parser validation
+  accepted the full E143 launch command with effective batch size `8`,
+  max-parameter cap `3261974`, signed static scale `0.25`, and signed runtime
+  final scale `0.25`. E143 still needs a pushed commit and remote staging
+  before it can be launched later.

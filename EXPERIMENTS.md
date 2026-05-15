@@ -6627,3 +6627,63 @@ Validation status on the local branch while E138 runs:
   parser validation accepted the documented E142 command with effective batch
   size `8`, max-parameter cap `3261974`, signed static scale `0.25`, and
   signed runtime final scale `0.25`.
+
+### E143: Signed Tetra-to-Face Boundary Readout
+
+Status: locally implemented and validated while E138 is active; do not launch
+while the active E138 process is still running. Stage this on Runpod only after
+the local branch commit is pushed.
+
+Hypothesis: E142 signs the tetra coface-to-face residual, but the learned
+`tetra_to_face` readout still scatters one message to each anchored face with
+no oriented incidence sign. In the oriented tetra boundary, the maintained
+anchored faces `(i,j,k)`, `(i,j,l)`, and `(i,k,l)` carry signs `[-, +, -]`.
+E143 tests whether the learned tetra cochain should respect the same boundary
+operator when writing back into persistent face states.
+
+Mechanism: add `simplex_signed_tetra_to_face_scale` plus matching runtime
+ramp flags. The adapter computes the existing learned `tetra_to_face` messages
+and blends them toward the signed oriented boundary convention before
+scattering into face states. This is parameter-neutral and changes only the
+tetra-to-face cochain readout. It adds no C-alpha lDDT, radius, all-pairs
+distance, or coordinate loss.
+
+Candidate launch only after the active Runpod branch is documented:
+
+```bash
+--run-name e143_signed_tetra_to_face_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-signed-tetra-to-face-scale 0.25 \
+--simplex-signed-tetra-to-face-runtime-scale 0.0 \
+--simplex-signed-tetra-to-face-runtime-scale-final 0.25 \
+--simplex-signed-tetra-to-face-runtime-scale-ramp-start-step 8500 \
+--simplex-signed-tetra-to-face-runtime-scale-ramp-steps 500
+```
+
+Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, edge-frame message runtime scale `0.0125`, directed
+boundary readout `0.25`, global context `0.1`, vertex-star context `1.0`,
+edge-star runtime `0.5`, and no E130 Hodge readout. Do not combine E143 with
+E142 at first; E142 changes the parameter-neutral coface residual, while E143
+changes the learned tetra-to-face readout path.
+
+Decision rule: reject unless E143 beats E128 and any returned E138/E141/E139
+result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
+coherent. It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation status on the local branch while E138 runs:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py::test_signed_tetra_face_boundary_updates_blends_oriented_boundary_signs tests/test_simplex.py::test_signed_tetra_to_face_adapter_scale_changes_outputs_without_new_parameters tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_hodge_face_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `232 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- Parameter audit: `3,106,690` with or without `simplex_signed_tetra_to_face_scale=0.25`, so the change adds zero parameters and stays below `3,261,974`.
+- `python - <<'PY' ... parse_args(E143 full launch flags) ... PY`: accepted
+  the documented E143 flags, with effective batch size `8`, max-parameter cap
+  `3261974`, signed static scale `0.25`, and signed runtime final scale
+  `0.25`.

@@ -1,4 +1,4 @@
-## 2026-05-15 Operating Plan Update: E138 Active, E142 Prepared
+## 2026-05-15 Operating Plan Update: E138 Active, E143 Prepared
 
 Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,
 well below the `0.7` goal and below the `0.45` short-gate threshold for a
@@ -11,23 +11,25 @@ terminal failure.
 While E138 runs, keep preparing only topology-native, parameter-neutral
 fallbacks that can explain why selected face/tetra geometry has strong local
 diagnostics but has not yet translated into global C-alpha lDDT. E141 is
-already staged as a signed face-cyclic boundary-readout candidate. E142 is now
-prepared locally as the complementary upper-coboundary candidate: selected
-tetra cofaces update maintained face cochains using the oriented tetra
-boundary signs `[-, +, -]` for anchored faces `(i,j,k)`, `(i,j,l)`,
-`(i,k,l)`. This tests whether preserving tetra-to-face incidence orientation
-helps global assembly without adding parameters or a generic metric loss.
+already staged as a signed face-cyclic boundary-readout candidate. E142 is
+staged as the complementary upper-coboundary candidate: selected tetra cofaces
+update maintained face cochains using the oriented tetra boundary signs
+`[-, +, -]` for anchored faces `(i,j,k)`, `(i,j,l)`, `(i,k,l)`. E143 is now
+prepared locally for the same incidence problem on the learned
+tetra-to-face readout: it ramps a signed blend on `tetra_to_face` messages
+before they scatter back into face cochains. These are topology-native
+architecture changes and add no parameters or generic metric losses.
 
 Next actions:
 
 1. Leave E138 running until it either returns or reaches the no-write runtime
    failure cutoff.
 2. If E138 returns coherently, verify and pull artifacts, update
-   `EXPERIMENT_RESULTS.md`, commit/push, then decide whether E141 or E142 is
-   the better next short gate from the returned signal. E142 is staged in a
-   separate `/workspace/SimplexFold_e142` checkout if tetra coface
-   orientation becomes the preferred follow-up, but do not launch it while
-   E138 is active.
+   `EXPERIMENT_RESULTS.md`, commit/push, then decide whether E141, E142, or
+   E143 is the better next short gate from the returned signal. E142 is staged
+   in a separate `/workspace/SimplexFold_e142` checkout if tetra coface
+   orientation becomes the preferred follow-up; E143 still needs remote
+   staging after its branch commit. Do not launch either while E138 is active.
 3. If E138 fails without a coherent bundle, document the terminal failure and
    launch the already documented E139 fallback unless the pod is unhealthy.
 4. Do not spend 30,000 steps on any branch until a short gate clears `0.45`,

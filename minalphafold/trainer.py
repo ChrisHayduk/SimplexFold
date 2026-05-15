@@ -241,6 +241,10 @@ class TrainingConfig:
     simplex_signed_tetra_coboundary_runtime_scale_final: float | None = None
     simplex_signed_tetra_coboundary_runtime_scale_ramp_start_step: int | None = None
     simplex_signed_tetra_coboundary_runtime_scale_ramp_steps: int = 1
+    simplex_signed_tetra_to_face_runtime_scale: float | None = None
+    simplex_signed_tetra_to_face_runtime_scale_final: float | None = None
+    simplex_signed_tetra_to_face_runtime_scale_ramp_start_step: int | None = None
+    simplex_signed_tetra_to_face_runtime_scale_ramp_steps: int = 1
     simplex_edge_frame_message_runtime_scale: float | None = None
     simplex_edge_frame_message_runtime_scale_final: float | None = None
     simplex_edge_frame_message_runtime_scale_ramp_start_step: int | None = None
@@ -558,6 +562,7 @@ def apply_model_config_cli_overrides(model_config: ModelConfig, args: argparse.N
         "simplex_boundary_face_cyclic_readout_scale",
         "simplex_boundary_signed_face_cyclic_readout_scale",
         "simplex_signed_tetra_coboundary_scale",
+        "simplex_signed_tetra_to_face_scale",
     ):
         value = getattr(args, field_name, None)
         if value is not None:
@@ -1092,6 +1097,23 @@ def simplex_signed_tetra_coboundary_runtime_scale_at_step(
     )
 
 
+def simplex_signed_tetra_to_face_runtime_scale_at_step(
+    training_config: TrainingConfig,
+    step: int | None,
+) -> float | None:
+    if training_config.simplex_signed_tetra_to_face_runtime_scale is None:
+        return None
+    if step is None:
+        return float(training_config.simplex_signed_tetra_to_face_runtime_scale)
+    return _ramped_value(
+        training_config.simplex_signed_tetra_to_face_runtime_scale,
+        training_config.simplex_signed_tetra_to_face_runtime_scale_final,
+        step=step,
+        start_step=training_config.simplex_signed_tetra_to_face_runtime_scale_ramp_start_step,
+        ramp_steps=training_config.simplex_signed_tetra_to_face_runtime_scale_ramp_steps,
+    )
+
+
 def simplex_boundary_readout_directionality_runtime_scale_at_step(
     training_config: TrainingConfig,
     step: int | None,
@@ -1514,6 +1536,7 @@ def model_inputs_from_batch(
     use_simplex_outer_edge_context_runtime_scale: bool = False,
     use_simplex_hodge_face_runtime_scale: bool = False,
     use_simplex_signed_tetra_coboundary_runtime_scale: bool = False,
+    use_simplex_signed_tetra_to_face_runtime_scale: bool = False,
     use_simplex_edge_frame_message_runtime_scale: bool = False,
     use_simplex_boundary_edge_frame_gate_runtime_scale: bool = False,
     use_simplex_boundary_readout_directionality_runtime_scale: bool = False,
@@ -1600,6 +1623,14 @@ def model_inputs_from_batch(
     ):
         inputs["simplex_signed_tetra_coboundary_scale_override"] = batch["target_feat"].new_tensor(
             float(signed_tetra_coboundary_scale)
+        )
+    signed_tetra_to_face_scale = simplex_signed_tetra_to_face_runtime_scale_at_step(
+        training_config,
+        step,
+    )
+    if use_simplex_signed_tetra_to_face_runtime_scale and signed_tetra_to_face_scale is not None:
+        inputs["simplex_signed_tetra_to_face_scale_override"] = batch["target_feat"].new_tensor(
+            float(signed_tetra_to_face_scale)
         )
     edge_frame_message_scale = simplex_edge_frame_message_runtime_scale_at_step(training_config, step)
     if use_simplex_edge_frame_message_runtime_scale and edge_frame_message_scale is not None:
@@ -1894,6 +1925,7 @@ def train_step(
             use_simplex_outer_edge_context_runtime_scale=True,
             use_simplex_hodge_face_runtime_scale=True,
             use_simplex_signed_tetra_coboundary_runtime_scale=True,
+            use_simplex_signed_tetra_to_face_runtime_scale=True,
             use_simplex_edge_frame_message_runtime_scale=True,
             use_simplex_boundary_edge_frame_gate_runtime_scale=True,
             use_simplex_boundary_readout_directionality_runtime_scale=True,
@@ -2247,6 +2279,7 @@ def fit(
                     use_simplex_outer_edge_context_runtime_scale=True,
                     use_simplex_hodge_face_runtime_scale=True,
                     use_simplex_signed_tetra_coboundary_runtime_scale=True,
+                    use_simplex_signed_tetra_to_face_runtime_scale=True,
                     use_simplex_edge_frame_message_runtime_scale=True,
                     use_simplex_boundary_edge_frame_gate_runtime_scale=True,
                     use_simplex_boundary_readout_directionality_runtime_scale=True,
@@ -2659,6 +2692,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--simplex-signed-tetra-coboundary-runtime-scale-ramp-start-step", type=int, default=None)
     parser.add_argument("--simplex-signed-tetra-coboundary-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
+        "--simplex-signed-tetra-to-face-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for signed tetra-to-face boundary readout.",
+    )
+    parser.add_argument("--simplex-signed-tetra-to-face-runtime-scale-final", type=float, default=None)
+    parser.add_argument("--simplex-signed-tetra-to-face-runtime-scale-ramp-start-step", type=int, default=None)
+    parser.add_argument("--simplex-signed-tetra-to-face-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-edge-frame-message-runtime-scale",
         type=float,
         default=None,
@@ -2924,6 +2966,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Gate selected simplex boundary-edge messages with oriented edge-frame scalar features.",
     )
     parser.add_argument(
+        "--simplex-signed-tetra-to-face-scale",
+        type=float,
+        default=None,
+        help="Blend learned tetra-to-face messages toward oriented tetra boundary signs.",
+    )
+    parser.add_argument(
         "--simplex-boundary-hodge-readout-scale",
         type=float,
         default=None,
@@ -3124,6 +3172,12 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         simplex_signed_tetra_coboundary_runtime_scale_ramp_steps=(
             args.simplex_signed_tetra_coboundary_runtime_scale_ramp_steps
         ),
+        simplex_signed_tetra_to_face_runtime_scale=args.simplex_signed_tetra_to_face_runtime_scale,
+        simplex_signed_tetra_to_face_runtime_scale_final=args.simplex_signed_tetra_to_face_runtime_scale_final,
+        simplex_signed_tetra_to_face_runtime_scale_ramp_start_step=(
+            args.simplex_signed_tetra_to_face_runtime_scale_ramp_start_step
+        ),
+        simplex_signed_tetra_to_face_runtime_scale_ramp_steps=args.simplex_signed_tetra_to_face_runtime_scale_ramp_steps,
         simplex_edge_frame_message_runtime_scale=args.simplex_edge_frame_message_runtime_scale,
         simplex_edge_frame_message_runtime_scale_final=args.simplex_edge_frame_message_runtime_scale_final,
         simplex_edge_frame_message_runtime_scale_ramp_start_step=(
