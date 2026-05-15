@@ -24,7 +24,10 @@ Next actions:
    failure cutoff.
 2. If E138 returns coherently, verify and pull artifacts, update
    `EXPERIMENT_RESULTS.md`, commit/push, then decide whether E141 or E142 is
-   the better next short gate from the returned signal.
+   the better next short gate from the returned signal. E142 is staged in a
+   separate `/workspace/SimplexFold_e142` checkout if tetra coface
+   orientation becomes the preferred follow-up, but do not launch it while
+   E138 is active.
 3. If E138 fails without a coherent bundle, document the terminal failure and
    launch the already documented E139 fallback unless the pod is unhealthy.
 4. Do not spend 30,000 steps on any branch until a short gate clears `0.45`,

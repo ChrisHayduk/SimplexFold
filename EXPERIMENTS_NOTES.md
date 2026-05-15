@@ -6967,3 +6967,14 @@
   `simplex_signed_tetra_coboundary_scale=0.25`, so the operator adds no
   parameters and remains under the `3,261,974` cap. Keep E142 parked until
   the active E138 result or terminal failure is documented.
+- 2026-05-15T07:43Z Staged E142 on the owned Runpod pod without disturbing
+  the active E138 checkout. Cloned the pushed branch into
+  `/workspace/SimplexFold_e142`, reset it to commit `410589d`, confirmed a
+  clean checkout, and ran remote `python3 -m py_compile` for `simplex.py`,
+  `evoformer.py`, `model.py`, `trainer.py`, and the NanoFold runner. Remote
+  parser validation accepted the full E142 launch command with run name
+  `e142_signed_tetra_coboundary_from_e128_s9000_c256_m64`, variant
+  `full_msa_to_face`, effective batch size `8`, max-parameter cap `3261974`,
+  signed static scale `0.25`, and signed runtime final scale `0.25`. The
+  NanoFold checkout and E128 resume checkpoint were verified present. No
+  Runpod experiment was launched from this checkout.
