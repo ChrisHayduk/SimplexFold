@@ -6797,3 +6797,12 @@
   `results.json`, `results.csv`, eval-details file, or checkpoint existed
   yet, which is normal for the first few minutes of this 500-step resumed
   gate. Leave E138 running under the heartbeat.
+- 2026-05-15T06:18Z Bounded E138 watch on owned pod `c67fbk189vnvfp`:
+  PID `24980` remained active through samples at elapsed `00:07:03`,
+  `00:12:04`, and `00:17:04`. The final sample had process CPU time
+  `03:33:30`, `%CPU=1250`, RSS about `1.9 GiB`, and `194` threads. The
+  artifact directory still contained only `run_metadata.json` and
+  `history_full_msa_to_face.json`; history length remained `18`, ending at
+  inherited E128 step `8500` with `val_lddt_ca=0.4311057258844376`. No
+  `results.json`, `results.csv`, eval-details file, or checkpoint exists yet.
+  Interpretation: normal early active compute, not a returned result.
