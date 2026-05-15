@@ -1,5 +1,18 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 E141 Heartbeat After Goal-Audit Fix
+
+- Rechecked only the owned active E141 Runpod pod `5ox436mhzej7j4` after
+  pushing the goal-audit exit-code fix. The process is still alive as PID
+  `576`, elapsed `03:59:46`, with `completed_step=8589`, `active_step=8590`,
+  active microbatch `3/8`, effective batch size `8`, target step `9000`, and
+  `stopped_early=false`.
+- No returned bundle exists yet: `results.json`, `results.csv`,
+  `eval_details_full_msa_to_face.csv`, and
+  `checkpoints/full_msa_to_face_latest.pt` are still absent. The inherited
+  history remains at `18` rows with last history step `8500`, so
+  `EXPERIMENT_RESULTS.md` correctly remains unchanged.
+
 ## 2026-05-15 Artifact Goal Audit Exit-Code Fix
 
 - Fixed `scripts/audit_goal_artifact.py` so the script entry point exits
