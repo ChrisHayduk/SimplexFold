@@ -7013,3 +7013,9 @@
   signed static scale `0.25`, and signed runtime final scale `0.25`. The
   NanoFold checkout and E128 resume checkpoint were verified present. No
   Runpod experiment was launched from this checkout.
+- 2026-05-15T08:00Z E138 remained active and below cutoff on owned pod
+  `c67fbk189vnvfp`: PID `24980` had elapsed `01:58:42`, process CPU time
+  `1-00:51:31`, and `43.1 GiB` of A100 memory allocated. The artifact
+  directory still contained only `run_metadata.json` plus inherited
+  `history_full_msa_to_face.json`; no result bundle, eval-details file, or
+  checkpoint existed yet. Leave E138 running.
