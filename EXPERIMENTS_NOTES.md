@@ -7104,3 +7104,14 @@
   model parameters, losses, training data, evaluation, or any active Runpod
   process. The current E139 run is unaffected because it is running an older
   staged checkout.
+- 2026-05-15T09:31Z Refreshed the parked fallback Runpod checkouts without
+  touching active E139. `/workspace/SimplexFold_e141`,
+  `/workspace/SimplexFold_e142`, and `/workspace/SimplexFold_e143` all
+  fast-forwarded cleanly to heartbeat commit `fd65f74`, and remote
+  `python3 -m py_compile` passed for `simplex.py`, `evoformer.py`, `model.py`,
+  `trainer.py`, and `scripts/run_nanofold_public_benchmarks.py` in each tree.
+  Remote parser validation still accepted the documented E141, E142, and E143
+  launch recipes with effective batch size `8`, max-parameter cap `3261974`,
+  static scale `0.25`, and runtime final scale `0.25` for the candidate-specific
+  signed face-cyclic, signed tetra-coboundary, or signed tetra-to-face flag.
+  E139 remained active during this refresh and no new experiment was launched.

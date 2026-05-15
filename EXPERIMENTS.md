@@ -6522,6 +6522,12 @@ Validation status on the local branch from the E138/E139 staging window:
   skeleton, reran the same parser check: run name, variant, effective batch
   size `8`, max-parameter cap `3261974`, signed static scale `0.25`, and
   signed runtime final scale `0.25` all matched the documented command.
+- Remote staging refresh: `/workspace/SimplexFold_e141` was fast-forwarded to
+  heartbeat commit `fd65f74`; remote `python3 -m py_compile` passed for the
+  model/trainer/runner files, and parser validation still accepted the
+  documented E141 command with effective batch size `8`, max-parameter cap
+  `3261974`, signed static scale `0.25`, and signed runtime final scale
+  `0.25`.
 
 ### E142: Signed Tetra Coboundary Face Update
 
@@ -6649,12 +6655,13 @@ Validation status on the local branch from the E138/E139 staging window:
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `230 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - Parameter audit: `3,106,690` with or without `simplex_signed_tetra_coboundary_scale=0.25`, so the change adds zero parameters and stays below `3,261,974`.
-- Remote readiness: `/workspace/SimplexFold_e142` is clean at commit
-  `410589d`; remote `python3 -m py_compile` passed for the model/trainer/runner
-  files; `/workspace/nanoFold-Competition` and the E128 checkpoint both exist;
-  parser validation accepted the documented E142 command with effective batch
-  size `8`, max-parameter cap `3261974`, signed static scale `0.25`, and
-  signed runtime final scale `0.25`.
+- Remote readiness: `/workspace/SimplexFold_e142` was initially staged clean
+  at commit `410589d`, then fast-forwarded to heartbeat commit `fd65f74`;
+  remote `python3 -m py_compile` passed for the model/trainer/runner files;
+  `/workspace/nanoFold-Competition` and the E128 checkpoint both exist; parser
+  validation accepted the documented E142 command with effective batch size
+  `8`, max-parameter cap `3261974`, signed static scale `0.25`, and signed
+  runtime final scale `0.25`.
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 
@@ -6781,9 +6788,10 @@ Validation status on the local branch from the E138/E139 staging window:
   the documented E143 flags, with effective batch size `8`, max-parameter cap
   `3261974`, signed static scale `0.25`, and signed runtime final scale
   `0.25`.
-- Remote readiness: `/workspace/SimplexFold_e143` is clean at commit
-  `f931bed`; remote `python3 -m py_compile` passed for the model/trainer/runner
-  files; `/workspace/nanoFold-Competition` and the E128 checkpoint both exist;
-  parser validation accepted the documented E143 command with effective batch
-  size `8`, max-parameter cap `3261974`, signed static scale `0.25`, and
-  signed runtime final scale `0.25`.
+- Remote readiness: `/workspace/SimplexFold_e143` was initially staged clean
+  at commit `f931bed`, then fast-forwarded to heartbeat commit `fd65f74`;
+  remote `python3 -m py_compile` passed for the model/trainer/runner files;
+  `/workspace/nanoFold-Competition` and the E128 checkpoint both exist; parser
+  validation accepted the documented E143 command with effective batch size
+  `8`, max-parameter cap `3261974`, signed static scale `0.25`, and signed
+  runtime final scale `0.25`.

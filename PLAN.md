@@ -172,6 +172,10 @@ enter the reverse `(k,i)` edge with a negative incidence coefficient. E141
 adds a parameter-neutral signed version of the face-cyclic readout with the
 same runtime-ramp pattern. It is the more faithful topology test of the
 E138 idea, not a metric-side loss. Do not launch it while E139 is active.
+The parked E141/E142/E143 Runpod checkouts have been fast-forwarded to
+`fd65f74` so future launches inherit the live `status_<variant>.json`
+heartbeat; their candidate-specific topology flags and effective batch size
+`8` were rechecked by the remote parser.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
