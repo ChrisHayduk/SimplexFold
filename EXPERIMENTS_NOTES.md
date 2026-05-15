@@ -6922,3 +6922,10 @@
   returns or is terminally documented; if the current heartbeat has already
   launched E139 by then, do not interrupt that fallback solely to run E141
   first.
+- 2026-05-15T07:10Z Staged E141 on the owned Runpod pod without disturbing
+  the active E138 checkout. Cloned the pushed branch tip into
+  `/workspace/SimplexFold_e141` at commit `d5cb9d9` and ran remote
+  `python3 -m py_compile` for `simplex.py`, `evoformer.py`, `model.py`,
+  `trainer.py`, and the NanoFold runner successfully. No Runpod experiment
+  was launched from this checkout; E138 PID `24980` continues to own the
+  active GPU run from `/workspace/SimplexFold_next`.
