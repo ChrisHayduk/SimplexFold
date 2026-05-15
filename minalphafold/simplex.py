@@ -1331,6 +1331,46 @@ def face_tetra_coboundary_delta(
     return (delta / counts.clamp_min(1.0)) * face_mask[..., None]
 
 
+def signed_face_tetra_coboundary_delta(
+    face_state: torch.Tensor,
+    face_mask: torch.Tensor,
+    tetra_face_slots: torch.Tensor,
+    tetra_mask: torch.Tensor,
+) -> torch.Tensor:
+    """Average sibling face states using oriented tetra boundary signs."""
+
+    if face_state.numel() == 0 or tetra_face_slots.numel() == 0 or tetra_mask.numel() == 0:
+        return torch.zeros_like(face_state)
+
+    b, l, _, c_face = face_state.shape
+    num_tetra = tetra_face_slots.shape[0]
+    face_slot_ids = tetra_face_slots.reshape(1, 1, num_tetra, 3).expand(b, l, -1, -1)
+    flat_face_slots = face_slot_ids.reshape(b, l, -1)
+    gathered_face = face_state.gather(
+        2,
+        flat_face_slots[..., None].expand(-1, -1, -1, c_face),
+    ).reshape(b, l, num_tetra, 3, c_face)
+    gathered_face_mask = face_mask.gather(2, flat_face_slots).reshape(b, l, num_tetra, 3)
+    incident_mask = gathered_face_mask.to(face_state.dtype) * tetra_mask[..., None].to(face_state.dtype)
+
+    signs = face_state.new_tensor([-1.0, 1.0, -1.0]).reshape(1, 1, 1, 3)
+    signed_face = gathered_face * signs[..., None]
+    signed_tetra_sum = (signed_face * incident_mask[..., None]).sum(dim=-2, keepdim=True)
+    signed_sibling_sum = signed_tetra_sum - signed_face * incident_mask[..., None]
+    sibling_count = (incident_mask.sum(dim=-1, keepdim=True) - incident_mask).clamp_min(0.0)
+    aligned_sibling_mean = signs[..., None] * signed_sibling_sum / sibling_count[..., None].clamp_min(1.0)
+    has_sibling = (sibling_count > 0).to(face_state.dtype) * incident_mask
+    sibling_update = (aligned_sibling_mean - gathered_face) * has_sibling[..., None]
+
+    flat_updates = sibling_update.reshape(b, l, -1, c_face)
+    flat_counts = has_sibling.reshape(b, l, -1, 1)
+    delta = torch.zeros_like(face_state)
+    counts = face_state.new_zeros(*face_state.shape[:-1], 1)
+    delta.scatter_add_(2, flat_face_slots[..., None].expand(-1, -1, -1, c_face), flat_updates)
+    counts.scatter_add_(2, flat_face_slots[..., None], flat_counts)
+    return (delta / counts.clamp_min(1.0)) * face_mask[..., None]
+
+
 def cell_outer_edge_context(
     pair: torch.Tensor,
     cell_indices: torch.Tensor,
@@ -1830,6 +1870,9 @@ class SimplicialAdapter(torch.nn.Module):
         self.outer_edge_update_scale = float(getattr(config, "simplex_outer_edge_update_scale", 0.0))
         self.outer_edge_context_scale = float(getattr(config, "simplex_outer_edge_context_scale", 0.0))
         self.hodge_face_update_scale = float(getattr(config, "simplex_hodge_face_update_scale", 0.0))
+        self.signed_tetra_coboundary_scale = float(
+            getattr(config, "simplex_signed_tetra_coboundary_scale", 0.0)
+        )
         self.edge_frame_message_scale = float(getattr(config, "simplex_edge_frame_message_scale", 0.0))
         self.boundary_edge_frame_gate_scale = float(
             getattr(config, "simplex_boundary_edge_frame_gate_scale", 0.0)
@@ -2073,6 +2116,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_single_update_scale_override: Optional[torch.Tensor] = None,
         simplex_outer_edge_context_scale_override: Optional[torch.Tensor] = None,
         simplex_hodge_face_update_scale_override: Optional[torch.Tensor] = None,
+        simplex_signed_tetra_coboundary_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_frame_message_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_edge_frame_gate_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_readout_directionality_override: Optional[torch.Tensor] = None,
@@ -2116,6 +2160,12 @@ class SimplicialAdapter(torch.nn.Module):
         if simplex_hodge_face_update_scale_override is not None:
             hodge_face_update_scale = max(
                 float(simplex_hodge_face_update_scale_override.detach().float().cpu().item()),
+                0.0,
+            )
+        signed_tetra_coboundary_scale = self.signed_tetra_coboundary_scale
+        if simplex_signed_tetra_coboundary_scale_override is not None:
+            signed_tetra_coboundary_scale = max(
+                float(simplex_signed_tetra_coboundary_scale_override.detach().float().cpu().item()),
                 0.0,
             )
         edge_frame_message_scale = self.edge_frame_message_scale
@@ -2438,6 +2488,24 @@ class SimplicialAdapter(torch.nn.Module):
                 hodge_face_update_scale
                 * torch.sigmoid(self.face_gate(face_state))
                 * hodge_msg
+                * topology.face_mask[..., None]
+            )
+            face_state = face_state * topology.face_mask[..., None]
+        if (
+            signed_tetra_coboundary_scale > 0.0
+            and self.use_tetra
+            and topology.tetra_indices.shape[2] > 0
+        ):
+            signed_coboundary_msg = signed_face_tetra_coboundary_delta(
+                face_state,
+                topology.face_mask,
+                topology.tetra_face_slots,
+                topology.tetra_mask,
+            )
+            face_state = face_state + self.dropout(
+                signed_tetra_coboundary_scale
+                * torch.sigmoid(self.face_gate(face_state))
+                * signed_coboundary_msg
                 * topology.face_mask[..., None]
             )
             face_state = face_state * topology.face_mask[..., None]

@@ -71,6 +71,7 @@ from minalphafold.trainer import (
     simplex_pre_triangle_single_update_runtime_scale_at_step,
     simplex_pre_triangle_update_runtime_scale_at_step,
     simplex_segment_cell_runtime_scale_at_step,
+    simplex_signed_tetra_coboundary_runtime_scale_at_step,
     simplex_single_update_runtime_scale_at_step,
     simplex_triangle_attention_bias_runtime_scale_at_step,
     simplex_triangle_attention_value_runtime_scale_at_step,
@@ -108,6 +109,7 @@ def test_simplicial_runtime_overrides_reach_model_path():
         "simplex_boundary_oriented_cochain_scale_override",
         "simplex_boundary_face_cyclic_readout_scale_override",
         "simplex_boundary_signed_face_cyclic_readout_scale_override",
+        "simplex_signed_tetra_coboundary_scale_override",
     ):
         assert parameter in inspect.signature(AlphaFold2.forward).parameters
         assert parameter in inspect.signature(SimplicialEvoformer.forward).parameters
@@ -206,6 +208,10 @@ def test_model_inputs_add_training_only_simplex_curricula():
         simplex_hodge_face_runtime_scale_final=0.1,
         simplex_hodge_face_runtime_scale_ramp_start_step=10,
         simplex_hodge_face_runtime_scale_ramp_steps=10,
+        simplex_signed_tetra_coboundary_runtime_scale=0.0,
+        simplex_signed_tetra_coboundary_runtime_scale_final=0.2,
+        simplex_signed_tetra_coboundary_runtime_scale_ramp_start_step=10,
+        simplex_signed_tetra_coboundary_runtime_scale_ramp_steps=10,
         simplex_boundary_readout_directionality_runtime_scale=0.0,
         simplex_boundary_readout_directionality_runtime_scale_final=0.5,
         simplex_boundary_readout_directionality_runtime_scale_ramp_start_step=10,
@@ -301,6 +307,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert simplex_pair_update_runtime_scale_at_step(training_config, 15) == 0.75
     assert simplex_single_update_runtime_scale_at_step(training_config, 15) == 0.5
     assert simplex_hodge_face_runtime_scale_at_step(training_config, 15) == 0.05
+    assert simplex_signed_tetra_coboundary_runtime_scale_at_step(training_config, 15) == 0.1
     assert simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, 15) == 0.25
     assert simplex_boundary_hodge_readout_runtime_scale_at_step(training_config, 15) == 0.125
     assert simplex_boundary_edge_star_readout_runtime_scale_at_step(training_config, 15) == 0.25
@@ -328,6 +335,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert "simplex_teacher_ca_coords" not in eval_inputs
     assert "simplex_pair_update_scale_override" not in eval_inputs
     assert "simplex_hodge_face_update_scale_override" not in eval_inputs
+    assert "simplex_signed_tetra_coboundary_scale_override" not in eval_inputs
     assert "simplex_boundary_readout_directionality_override" not in eval_inputs
     assert "simplex_boundary_hodge_readout_scale_override" not in eval_inputs
     assert "simplex_boundary_edge_star_readout_scale_override" not in eval_inputs
@@ -357,6 +365,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
         use_simplex_teacher_forcing=True,
         use_simplex_update_scale=True,
         use_simplex_hodge_face_runtime_scale=True,
+        use_simplex_signed_tetra_coboundary_runtime_scale=True,
         use_simplex_boundary_readout_directionality_runtime_scale=True,
         use_simplex_boundary_hodge_readout_runtime_scale=True,
         use_simplex_boundary_edge_star_readout_runtime_scale=True,
@@ -385,6 +394,7 @@ def test_model_inputs_add_training_only_simplex_curricula():
     assert torch.allclose(train_inputs["simplex_pair_update_scale_override"], torch.tensor(0.75))
     assert torch.allclose(train_inputs["simplex_single_update_scale_override"], torch.tensor(0.5))
     assert torch.allclose(train_inputs["simplex_hodge_face_update_scale_override"], torch.tensor(0.05))
+    assert torch.allclose(train_inputs["simplex_signed_tetra_coboundary_scale_override"], torch.tensor(0.1))
     assert torch.allclose(train_inputs["simplex_boundary_readout_directionality_override"], torch.tensor(0.25))
     assert torch.allclose(train_inputs["simplex_boundary_hodge_readout_scale_override"], torch.tensor(0.125))
     assert torch.allclose(train_inputs["simplex_boundary_edge_star_readout_scale_override"], torch.tensor(0.25))
@@ -608,6 +618,16 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.5",
             "--simplex-boundary-signed-face-cyclic-readout-scale",
             "0.25",
+            "--simplex-signed-tetra-coboundary-scale",
+            "0.125",
+            "--simplex-signed-tetra-coboundary-runtime-scale",
+            "0.0",
+            "--simplex-signed-tetra-coboundary-runtime-scale-final",
+            "0.125",
+            "--simplex-signed-tetra-coboundary-runtime-scale-ramp-start-step",
+            "6000",
+            "--simplex-signed-tetra-coboundary-runtime-scale-ramp-steps",
+            "500",
             "--simplex-boundary-edge-star-residual-runtime-scale",
             "0.0",
             "--simplex-boundary-edge-star-residual-runtime-scale-final",
@@ -699,6 +719,11 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_boundary_oriented_cochain_scale == 0.25
     assert cfg.simplex_boundary_face_cyclic_readout_scale == 0.5
     assert cfg.simplex_boundary_signed_face_cyclic_readout_scale == 0.25
+    assert cfg.simplex_signed_tetra_coboundary_scale == 0.125
+    assert args.simplex_signed_tetra_coboundary_runtime_scale == 0.0
+    assert args.simplex_signed_tetra_coboundary_runtime_scale_final == 0.125
+    assert args.simplex_signed_tetra_coboundary_runtime_scale_ramp_start_step == 6000
+    assert args.simplex_signed_tetra_coboundary_runtime_scale_ramp_steps == 500
     assert args.simplex_boundary_edge_star_residual_runtime_scale == 0.0
     assert args.simplex_boundary_edge_star_residual_runtime_scale_final == 0.25
     assert args.simplex_boundary_edge_star_residual_runtime_scale_ramp_start_step == 6000
@@ -1038,6 +1063,7 @@ def test_simplicial_hodge_face_update_adds_no_parameters():
         simplex_medium,
         simplex_use_msa_to_face=True,
         simplex_hodge_face_update_scale=0.25,
+        simplex_signed_tetra_coboundary_scale=0.25,
     )
 
     simplex_params = sum(parameter.numel() for parameter in AlphaFold2(simplex_medium).parameters())

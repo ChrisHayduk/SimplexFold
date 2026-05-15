@@ -1,3 +1,35 @@
+## 2026-05-15 Operating Plan Update: E138 Active, E142 Prepared
+
+Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,
+well below the `0.7` goal and below the `0.45` short-gate threshold for a
+credible 30k-step spend. E138 is still the active Runpod gate on owned pod
+`c67fbk189vnvfp`, testing no-Hodge face-cyclic boundary readout from the E128
+checkpoint. Do not update `EXPERIMENT_RESULTS.md` for E138 until a coherent
+step-9000 bundle is verified, or until the run is explicitly stopped as a
+terminal failure.
+
+While E138 runs, keep preparing only topology-native, parameter-neutral
+fallbacks that can explain why selected face/tetra geometry has strong local
+diagnostics but has not yet translated into global C-alpha lDDT. E141 is
+already staged as a signed face-cyclic boundary-readout candidate. E142 is now
+prepared locally as the complementary upper-coboundary candidate: selected
+tetra cofaces update maintained face cochains using the oriented tetra
+boundary signs `[-, +, -]` for anchored faces `(i,j,k)`, `(i,j,l)`,
+`(i,k,l)`. This tests whether preserving tetra-to-face incidence orientation
+helps global assembly without adding parameters or a generic metric loss.
+
+Next actions:
+
+1. Leave E138 running until it either returns or reaches the no-write runtime
+   failure cutoff.
+2. If E138 returns coherently, verify and pull artifacts, update
+   `EXPERIMENT_RESULTS.md`, commit/push, then decide whether E141 or E142 is
+   the better next short gate from the returned signal.
+3. If E138 fails without a coherent bundle, document the terminal failure and
+   launch the already documented E139 fallback unless the pod is unhealthy.
+4. Do not spend 30,000 steps on any branch until a short gate clears `0.45`,
+   with FoldScore, dRMSD, and C-alpha Rg remaining coherent.
+
 ## Current Plan: E138 No-Hodge Face-Cyclic Boundary Readout
 
 Current status after E130: the best returned validation C-alpha lDDT remains

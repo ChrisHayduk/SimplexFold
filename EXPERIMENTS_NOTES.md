@@ -6944,3 +6944,26 @@
   The staged E141 parser path still reports effective batch size `8`,
   max-parameter cap `3261974`, and signed runtime final scale `0.25`. No
   experiment was launched.
+- 2026-05-15T07:38Z E138 remained active and below cutoff on owned pod
+  `c67fbk189vnvfp`: PID `24980` had elapsed `01:36:37`, process CPU time
+  `20:13:14`, `%CPU=1255`, and `38.2 GiB` of A100 memory allocated. The
+  artifact directory still contained only `run_metadata.json` plus inherited
+  `history_full_msa_to_face.json`; no result bundle, eval-details file, or
+  checkpoint existed yet. Leave E138 running under the heartbeat.
+- 2026-05-15T07:39Z Prepared E142 locally while E138 continues; no Runpod
+  launch. E142 adds a signed upper-coboundary face update through selected
+  tetra cofaces: anchored tetra faces `(i,j,k)`, `(i,j,l)`, and `(i,k,l)` use
+  oriented boundary signs `[-, +, -]`, so sibling face messages are aligned by
+  `sign(current) * sign(sibling)` before scattering a coboundary delta back to
+  the face cochain. This is a parameter-neutral simplicial cochain update, not
+  an output-side C-alpha lDDT/radius/distance loss. Local validation passed:
+  `python -m py_compile` for `simplex.py`, `evoformer.py`, `model.py`,
+  `trainer.py`, and the NanoFold runner; the nine focused signed tetra
+  coboundary parser/runtime tests (`9 passed`); and the broader
+  `tests/test_simplex.py tests/test_nanofold_public_benchmarks.py
+  tests/test_trainer.py` slice (`230 passed`). Focused ruff
+  undefined-name/syntax-risk checks passed. Parameter audit counted
+  `3,106,690` parameters with or without
+  `simplex_signed_tetra_coboundary_scale=0.25`, so the operator adds no
+  parameters and remains under the `3,261,974` cap. Keep E142 parked until
+  the active E138 result or terminal failure is documented.

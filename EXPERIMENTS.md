@@ -6493,3 +6493,65 @@ Validation status on the local branch while E138 runs:
   skeleton, reran the same parser check: run name, variant, effective batch
   size `8`, max-parameter cap `3261974`, signed static scale `0.25`, and
   signed runtime final scale `0.25` all matched the documented command.
+
+### E142: Signed Tetra Coboundary Face Update
+
+Status: locally implemented and validated while E138 is active; do not launch
+while the active E138 process is still running. Treat this as a parked
+topology-native fallback after E138/E141/E139 are documented or deliberately
+skipped.
+
+Hypothesis: the selected tetra cofaces should update face cochains through the
+oriented tetra boundary operator, not through an unsigned sibling-face mean.
+For an anchored selected tetra `[i,j,k,l]`, SimplexFold maintains the anchored
+faces `(i,j,k)`, `(i,j,l)`, and `(i,k,l)`. In the oriented boundary
+`partial[i,j,k,l] = [j,k,l] - [i,k,l] + [i,j,l] - [i,j,k]`, those maintained
+faces carry signs `[-, +, -]` after dropping the unmaintained opposite face
+`[j,k,l]`. E142 tests whether aligning sibling face messages by those
+incidence signs helps the face cochain represent coherent tetrahedral packing
+before it writes back into pair/structure pathways.
+
+Mechanism: add `simplex_signed_tetra_coboundary_scale` plus matching
+training-time runtime-ramp flags. The adapter gathers the selected
+tetra-face slots, averages sibling face states after multiplying by
+`sign(current) * sign(sibling)`, subtracts the current face state, and
+scatters that signed upper-coboundary delta back into the selected face
+state. The change adds no parameters and no C-alpha lDDT, radius,
+all-pairs-distance, or coordinate loss.
+
+Candidate launch only after the active Runpod branch is documented:
+
+```bash
+--run-name e142_signed_tetra_coboundary_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-signed-tetra-coboundary-scale 0.25 \
+--simplex-signed-tetra-coboundary-runtime-scale 0.0 \
+--simplex-signed-tetra-coboundary-runtime-scale-final 0.25 \
+--simplex-signed-tetra-coboundary-runtime-scale-ramp-start-step 8500 \
+--simplex-signed-tetra-coboundary-runtime-scale-ramp-steps 500
+```
+
+Keep the rest of the E128 selected-complex recipe fixed: sparse caps `24 / 48`,
+degree-penalized plus outer-edge-supported cell scoring, incidence
+normalization `1.0`, edge-frame message runtime scale `0.0125`, directed
+boundary readout `0.25`, global context `0.1`, vertex-star context `1.0`,
+edge-star runtime `0.5`, and no E130 Hodge readout. Do not combine E142 with
+E138/E141 boundary-cycle readouts unless a returned result specifically shows
+that face-cycle orientation improves primary lDDT while leaving tetra coface
+orientation as the likely missing link.
+
+Decision rule: reject unless E142 beats E128 and any returned E138/E141/E139
+result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
+coherent. It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation status on the local branch while E138 runs:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py::test_signed_face_tetra_coboundary_delta_uses_oriented_tetra_boundary_signs tests/test_simplex.py::test_signed_tetra_coboundary_adapter_scale_changes_outputs_without_new_parameters tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_hodge_face_update_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `230 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- Parameter audit: `3,106,690` with or without `simplex_signed_tetra_coboundary_scale=0.25`, so the change adds zero parameters and stays below `3,261,974`.
