@@ -5857,3 +5857,59 @@ Validation so far:
 - `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `221 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - `git diff --check`: passed
+
+### E134: Edge-Star Residual Boundary Readout
+
+Status: implemented locally as a parked boundary-cochain fallback while E130
+runs; not launched on Runpod.
+
+Hypothesis: E130 Hodge-centers the selected boundary 1-cochain, and E131
+smooths it through residue edge-stars. If those routes stabilize the local
+boundary signal but blunt the global fold, the missing component may be the
+high-frequency/coexact part of the selected edge cochain: the deviation of a
+boundary edge from its lower-star neighborhood. E134 tests that residual
+without changing the loss surface or parameter count.
+
+Mechanism: add `simplex_boundary_edge_star_residual_scale`, a parameter-neutral
+readout transform after the selected face/tetra boundary scatter. For selected
+boundary edges, compute the source-star and target-star means of the current
+boundary-edge readout, average them as a lower-star baseline, and blend the
+edge readout toward `edge - lower_star_mean`. Non-selected edges are unchanged.
+This keeps the operation in the explicit simplex pathway: higher-order cell
+cochains communicate through their boundary 1-skeleton before writing to
+`Z_ij`.
+
+Candidate launch only after E130 returns and is verified. A conservative gate
+from the E128/E130-family checkpoint keeps the E128 selected-complex recipe
+fixed and adds:
+
+```bash
+--run-name e134_edge_star_residual_from_e128_s9000_c256_m64 \
+--resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-model-weights-only \
+--steps 9000 \
+--simplex-boundary-edge-frame-gate-scale 0.05 \
+--simplex-triangle-attention-bias-scale 0.0125 \
+--simplex-boundary-hodge-readout-scale 0.25 \
+--simplex-boundary-edge-star-residual-scale 0.25
+```
+
+If the direct residual helps but is noisy, retest at `0.125`; if E131's
+smoothing looks useful but under-expressive, combine the E131 smoothing scale
+with this residual scale as a low/high edge-star decomposition.
+
+Parameter audit: no new trainable modules. The E128-family architecture remains
+under the AF2-medium +5% cap; the local parameter regression should remain
+equal to the E130/E131 Hodge/readout budget.
+
+Decision rule: reject unless E134 beats E128 and any returned E130/E131/E132
+result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
+coherent. It still needs to clear `0.45` before any 30k-step consideration.
+
+Validation so far:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py::test_edge_star_residual_boundary_readout_keeps_deviation_from_star_mean tests/test_simplex.py::test_simplicial_adapter_edge_star_residual_changes_boundary_pair_update tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_hodge_readout_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser`: `5 passed`
+- `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: `223 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+- `git diff --check`: passed

@@ -1005,6 +1005,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_boundary_readout_directionality", args.simplex_boundary_readout_directionality),
         ("simplex_boundary_hodge_readout_scale", args.simplex_boundary_hodge_readout_scale),
         ("simplex_boundary_edge_star_readout_scale", args.simplex_boundary_edge_star_readout_scale),
+        ("simplex_boundary_edge_star_residual_scale", args.simplex_boundary_edge_star_residual_scale),
         ("simplex_global_context_scale", args.simplex_global_context_scale),
         ("simplex_vertex_star_context_scale", args.simplex_vertex_star_context_scale),
         ("simplex_edge_star_context_scale", args.simplex_edge_star_context_scale),
@@ -2127,6 +2128,11 @@ def _train_variant(
             if use_simplicial
             else 0.0
         ),
+        "simplex_boundary_edge_star_residual_scale": (
+            float(getattr(model_config, "simplex_boundary_edge_star_residual_scale", 0.0))
+            if use_simplicial
+            else 0.0
+        ),
         "simplex_triangle_attention_bias_scale": (
             float(getattr(model_config, "simplex_triangle_attention_bias_scale", 0.0))
             if use_simplicial
@@ -2379,6 +2385,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_boundary_readout_directionality",
         "simplex_boundary_hodge_readout_scale",
         "simplex_boundary_edge_star_readout_scale",
+        "simplex_boundary_edge_star_residual_scale",
         "simplex_segment_cell_scale",
         "simplex_segment_radius",
         "simplex_c_segment",
@@ -2940,6 +2947,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Diffuse selected boundary-edge readout through residue edge-stars before pair update.",
+    )
+    parser.add_argument(
+        "--simplex-boundary-edge-star-residual-scale",
+        type=float,
+        default=None,
+        help="Blend selected boundary-edge readout toward its edge-star residual before pair update.",
     )
     parser.add_argument(
         "--simplex-global-context-scale",
@@ -3732,6 +3745,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_boundary_readout_directionality": args.simplex_boundary_readout_directionality,
         "simplex_boundary_hodge_readout_scale": args.simplex_boundary_hodge_readout_scale,
         "simplex_boundary_edge_star_readout_scale": args.simplex_boundary_edge_star_readout_scale,
+        "simplex_boundary_edge_star_residual_scale": args.simplex_boundary_edge_star_residual_scale,
         "simplex_global_context_scale": args.simplex_global_context_scale,
         "simplex_vertex_star_context_scale": args.simplex_vertex_star_context_scale,
         "simplex_edge_star_context_scale": args.simplex_edge_star_context_scale,

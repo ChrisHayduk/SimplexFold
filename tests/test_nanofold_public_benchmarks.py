@@ -476,6 +476,8 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
             "0.25",
             "--simplex-boundary-edge-star-readout-scale",
             "0.5",
+            "--simplex-boundary-edge-star-residual-scale",
+            "0.25",
             "--simplex-boundary-edge-frame-gate-scale",
             "0.05",
             "--simplex-boundary-edge-frame-gate-runtime-scale",
@@ -686,6 +688,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert args.simplex_boundary_readout_directionality == 0.5
     assert args.simplex_boundary_hodge_readout_scale == 0.25
     assert args.simplex_boundary_edge_star_readout_scale == 0.5
+    assert args.simplex_boundary_edge_star_residual_scale == 0.25
     assert args.simplex_boundary_edge_frame_gate_scale == 0.05
     assert args.simplex_boundary_edge_frame_gate_runtime_scale == 0.0
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_final == 0.05
@@ -750,6 +753,7 @@ def test_model_config_override_flags_are_accepted_by_cli_parser():
     assert cfg.simplex_boundary_readout_directionality == 0.5
     assert cfg.simplex_boundary_hodge_readout_scale == 0.25
     assert cfg.simplex_boundary_edge_star_readout_scale == 0.5
+    assert cfg.simplex_boundary_edge_star_residual_scale == 0.25
     assert cfg.simplex_global_context_scale == 0.125
     assert cfg.simplex_vertex_star_context_scale == 0.75
     assert cfg.simplex_edge_star_context_scale == 0.5

@@ -2351,3 +2351,41 @@ or, only if retesting the E129 value route deliberately:
 Decision rule is still strict: the branch must beat E128/E130/E129 on primary
 C-alpha lDDT and keep FoldScore, dRMSD, and C-alpha Rg coherent. It must clear
 `0.45` in the short gate before any 30k-step spend.
+
+## 2026-05-15 E134 Edge-Star Residual Boundary Readout Prepared
+
+E130 is still active on the owned Runpod pod, so E134 is only a parked local
+candidate. It adds a parameter-neutral high-pass transform on the selected
+boundary-edge 1-cochain: after selected face/tetra states scatter to boundary
+edges and after any Hodge centering or edge-star smoothing, the readout can be
+blended toward its deviation from the lower edge-star mean before it updates
+`Z_ij`.
+
+This is a simplicial/topological change, not a new loss. E131's edge-star
+readout tests diffusion across residue stars; E134 tests the complementary
+coexact-style residual signal, asking whether the pair trunk needs the
+non-smooth circulation/local contrast component of the selected boundary
+cochain rather than another smoothed average. It adds no parameters and no
+generic C-alpha, radius, all-pairs distance, or coordinate objective.
+
+Do not launch E134 while E130 is active. If E130/E131/E132 show that
+boundary-edge readout is plausible but smoothing suppresses useful local
+orientation/contrast, a short E134 gate from the E128-family checkpoint should
+keep the E128 selected-complex recipe fixed and add:
+
+```bash
+--simplex-boundary-hodge-readout-scale 0.25 \
+--simplex-boundary-edge-star-residual-scale 0.25
+```
+
+If testing it specifically against E131, use the same static E131 edge-star
+smoothing scale and add only the residual scale:
+
+```bash
+--simplex-boundary-edge-star-readout-scale 0.5 \
+--simplex-boundary-edge-star-residual-scale 0.25
+```
+
+Decision rule is unchanged: reject unless it beats E128 and any returned
+E130/E131/E132 result on primary C-alpha lDDT while keeping FoldScore, dRMSD,
+and C-alpha Rg coherent. It still must clear `0.45` before any 30k-step spend.

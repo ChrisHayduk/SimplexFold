@@ -549,6 +549,8 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
             "0.25",
             "--simplex-boundary-edge-star-readout-scale",
             "0.5",
+            "--simplex-boundary-edge-star-residual-scale",
+            "0.25",
             "--simplex-boundary-edge-frame-gate-runtime-scale",
             "0.0",
             "--simplex-boundary-edge-frame-gate-runtime-scale-final",
@@ -604,6 +606,7 @@ def test_trainer_cli_accepts_simplex_star_context_overrides():
     assert cfg.simplex_boundary_edge_frame_gate_scale == 0.05
     assert cfg.simplex_boundary_hodge_readout_scale == 0.25
     assert cfg.simplex_boundary_edge_star_readout_scale == 0.5
+    assert cfg.simplex_boundary_edge_star_residual_scale == 0.25
     assert args.simplex_boundary_edge_frame_gate_runtime_scale == 0.0
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_final == 0.05
     assert args.simplex_boundary_edge_frame_gate_runtime_scale_ramp_start_step == 6000
@@ -1331,6 +1334,7 @@ def test_simplicial_boundary_hodge_readout_adds_no_parameters():
         base_medium,
         simplex_boundary_hodge_readout_scale=0.25,
         simplex_boundary_edge_star_readout_scale=0.5,
+        simplex_boundary_edge_star_residual_scale=0.5,
     )
 
     base_params = sum(parameter.numel() for parameter in AlphaFold2(base_medium).parameters())

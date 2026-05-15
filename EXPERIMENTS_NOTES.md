@@ -6587,3 +6587,24 @@
   `val_lddt_ca=0.4311057258844376`. No `results.json`, `results.csv`,
   eval-details file, or step-9000 checkpoint existed, so leave the pod running
   and do not update `EXPERIMENT_RESULTS.md` yet.
+- 2026-05-15T04:20Z E130 continued active on the same owned pod: PID `4224`
+  had elapsed `01:19:53`, `%CPU=1247`, RSS about `1.8 GiB`, and the remote
+  artifact directory still had only `history_full_msa_to_face.json` and
+  `run_metadata.json`. No `results.json`, `results.csv`, eval-details file, or
+  checkpoint existed, so no result was pulled and `EXPERIMENT_RESULTS.md`
+  remains unchanged.
+- 2026-05-15T04:20Z Began E134 local candidate while E130 runs; no Runpod
+  launch. E134 adds `simplex_boundary_edge_star_residual_scale`, a
+  parameter-neutral high-pass transform of the selected boundary-edge
+  1-cochain. It computes each selected edge's deviation from the average of
+  its source and target edge-star means before the pair update. This is a
+  topological/cochain-route change, not a new C-alpha or lDDT loss: it tests
+  whether the explicit face/tetra boundary signal needs its local contrast
+  component preserved rather than only Hodge-centering or edge-star smoothing.
+- 2026-05-15T04:24Z E134 local validation passed: py_compile for the modified
+  SimplexFold modules and NanoFold runner, five focused pytest checks covering
+  the residual helper, adapter effect, trainer parser, zero-parameter audit,
+  and benchmark-runner parser, the broader
+  `tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  slice (`223 passed`), focused ruff undefined-name/syntax-risk checks, and
+  `git diff --check`.
