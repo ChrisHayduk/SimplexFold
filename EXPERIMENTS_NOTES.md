@@ -6358,3 +6358,14 @@
   with no `results.csv` and no checkpoint. Interpretation: the run is still
   active but has not reached a coherent step-9000 writeout; continue waiting
   and keep the heartbeat responsible for the next probe.
+- 2026-05-15T01:40Z-01:41Z E129 deeper health check on the owned pod:
+  PID `1033` stayed alive from `01:44:59` to `01:45:59` elapsed, process CPU
+  rose from `14:03:01` to `14:13:52`, process CPU utilization was about
+  `802%`-`805%`, RSS stayed around `2.0 GiB`, and `178` threads remained open.
+  `/proc/1033/io` read counters advanced (`rchar` `716310923` -> `719790080`,
+  `syscr` `128260` -> `128817`) while write counters stayed unchanged. CUDA
+  file descriptors remained open and H100 memory stayed at `43687 MiB`. The
+  only artifact mtimes were the launch-time `run_metadata.json` and
+  `history_full_msa_to_face.json`. Interpretation: the long quiet period is
+  active compute/read-side work before writeout, not an idle completed bundle;
+  keep waiting and do not intervene.
