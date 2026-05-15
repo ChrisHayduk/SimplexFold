@@ -6936,3 +6936,11 @@
   `e141_signed_face_cyclic_boundary_from_e128_s9000_c256_m64`, variant
   `full_msa_to_face`, effective batch size `8`, max-parameter cap `3261974`,
   signed static scale `0.25`, and signed runtime final scale `0.25`.
+- 2026-05-15T07:17Z Rechecked E141 remote readiness while leaving E138
+  untouched. `/workspace/SimplexFold_e141` is clean on commit `d5cb9d9`, the
+  NanoFold checkout exists at `/workspace/nanoFold-Competition`, and the E128
+  resume checkpoint exists at
+  `/workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt`.
+  The staged E141 parser path still reports effective batch size `8`,
+  max-parameter cap `3261974`, and signed runtime final scale `0.25`. No
+  experiment was launched.
