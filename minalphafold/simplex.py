@@ -1424,16 +1424,19 @@ def _fold_feature_channels(source: torch.Tensor, channels: int) -> torch.Tensor:
     target = int(channels)
     if target <= 0:
         return source.new_empty(*source.shape[:-1], 0)
+    if width <= 0:
+        return source.new_zeros(*source.shape[:-1], target)
     if width == target:
         return source
-    parts: list[torch.Tensor] = []
-    for offset in range(target):
-        folded = source[..., offset::target]
-        if folded.shape[-1] == 0:
-            parts.append(source.new_zeros(*source.shape[:-1], 1))
-        else:
-            parts.append(folded.mean(dim=-1, keepdim=True))
-    return torch.cat(parts, dim=-1)
+    chunks = (width + target - 1) // target
+    padded_width = chunks * target
+    if padded_width != width:
+        source = torch.cat([source, source.new_zeros(*source.shape[:-1], padded_width - width)], dim=-1)
+    folded = source.reshape(*source.shape[:-1], chunks, target).sum(dim=-2)
+    offsets = torch.arange(target, device=source.device)
+    counts = ((width - 1 - offsets).div(target, rounding_mode="floor") + 1).clamp_min(0)
+    counts = counts.to(dtype=source.dtype).reshape(*([1] * (source.ndim - 1)), target)
+    return folded / counts.clamp_min(1.0)
 
 
 def _rms_match_update(update: torch.Tensor, reference: torch.Tensor) -> torch.Tensor:

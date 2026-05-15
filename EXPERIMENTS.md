@@ -7084,3 +7084,8 @@ Validation status:
 - `python -m py_compile minalphafold/simplex.py minalphafold/model_config.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed.
 - `python -m pytest tests/test_simplex.py::test_parameter_free_outer_edge_context_delta_uses_external_directed_edges tests/test_simplex.py::test_parameter_free_outer_edge_context_adapter_scale_changes_outputs_without_new_parameters tests/test_trainer.py::test_simplicial_parameter_free_outer_edge_context_adds_no_parameters tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_nanofold_public_benchmarks.py::test_model_config_overrides_preserve_resume_compatible_variant_name`: `5 passed`.
 - Parameter audit: E128 recipe plus E145 scale `0.25` is `3,240,738 <= 3,261,974`.
+- Readiness cleanup: `_fold_feature_channels`, used by the parameter-free
+  outer-neighborhood projection, is now vectorized and covered by
+  `test_fold_feature_channels_matches_offset_mean_reference`. A local CPU
+  smoke on a representative `[1, 256, 48, 128] -> 32` fold matched the prior
+  offset-mean reference exactly and ran about `0.95 ms` versus `10.54 ms`.

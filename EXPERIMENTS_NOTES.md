@@ -7404,3 +7404,16 @@
   still flags pre-existing import-order/unused-import/zip-style cleanup in
   `tests/test_trainer.py`, so this change keeps the verification scoped to the
   new guard and syntax/name errors.
+- 2026-05-15T11:31Z Optimized the staged E145 parameter-free
+  outer-neighborhood path before launch. `_fold_feature_channels` no longer
+  loops once per target channel; it pads, reshapes, sums, and divides by the
+  exact per-offset counts, preserving the old offset-mean behavior including
+  zero-filled tail channels. Added
+  `test_fold_feature_channels_matches_offset_mean_reference` and reran the
+  E145-focused simplex tests (`3 passed`), `tests/test_simplex.py` (`95
+  passed`), `python -m py_compile minalphafold/simplex.py tests/test_simplex.py`,
+  `ruff check --select F821,F822,F823 minalphafold/simplex.py
+  tests/test_simplex.py`, `ruff check --select I001 tests/test_simplex.py`, and
+  `git diff --check`. A local CPU smoke for a representative
+  `[1, 256, 48, 128] -> 32` fold matched the reference exactly and measured
+  about `0.95 ms` vectorized versus `10.54 ms` for the prior loop.

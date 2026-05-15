@@ -1,15 +1,15 @@
 import torch
-
 from minalphafold.embedders import TriangleAttentionEndingNode, TriangleAttentionStartingNode
 from minalphafold.evoformer import SimplicialEvoformer
 from minalphafold.simplex import (
     SimplexGeometryLoss,
     SimplexTopology,
     SimplicialAdapter,
-    apply_boundary_metric_gate,
     _boundary_degree_weights,
     _cell_outer_edge_support,
     _cell_segment_support,
+    _fold_feature_channels,
+    apply_boundary_metric_gate,
     boundary_edge_star_context,
     boundary_incidence_weights,
     boundary_metric_confidence,
@@ -18,24 +18,24 @@ from minalphafold.simplex import (
     coface_degree_attenuate_pair_readout,
     cyclic_face_boundary_edges,
     cyclic_face_boundary_updates,
+    edge_star_cell_mean,
     edge_star_residual_boundary_readout,
     edge_star_smooth_boundary_readout,
-    edge_star_cell_mean,
     face_edge_frame_features,
+    face_geometry_features,
     face_outer_edge_delta,
     face_tetra_coboundary_delta,
-    face_geometry_features,
     hodge_center_boundary_readout,
     oriented_boundary_cochain_readout,
     parameter_free_outer_edge_context_delta,
     scatter_directed_edges_to_residue,
     segment_cell_indices,
     segment_geometry_features,
-    simplex_boundary_metric_confidence_map,
-    simplex_boundary_metric_recycling_bins,
     signed_cyclic_face_boundary_updates,
     signed_face_tetra_coboundary_delta,
     signed_tetra_face_boundary_updates,
+    simplex_boundary_metric_confidence_map,
+    simplex_boundary_metric_recycling_bins,
     tetra_edge_frame_features,
     tetra_geometry_features,
     vertex_star_cell_mean,
@@ -721,6 +721,21 @@ def test_parameter_free_outer_edge_context_adapter_scale_changes_outputs_without
     assert on_params == off_params
     assert not torch.allclose(on_pair, off_pair)
     assert not torch.allclose(on_single, off_single)
+
+
+def test_fold_feature_channels_matches_offset_mean_reference():
+    source = torch.arange(2 * 3 * 10, dtype=torch.float32).reshape(2, 3, 10)
+    for channels in (1, 3, 4, 12):
+        folded = _fold_feature_channels(source, channels)
+        expected_parts = []
+        for offset in range(channels):
+            part = source[..., offset::channels]
+            if part.shape[-1] == 0:
+                expected_parts.append(source.new_zeros(*source.shape[:-1], 1))
+            else:
+                expected_parts.append(part.mean(dim=-1, keepdim=True))
+        expected = torch.cat(expected_parts, dim=-1)
+        assert torch.equal(folded, expected)
 
 
 def test_global_context_adapter_routes_selected_complex_summary_back_to_cells():
