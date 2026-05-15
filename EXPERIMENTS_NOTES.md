@@ -6675,3 +6675,24 @@
   The artifact directory still had only `history_full_msa_to_face.json` and
   `run_metadata.json`; no result bundle, eval-details file, or checkpoint
   existed. Interpretation: active compute, not returned or idle.
+- 2026-05-15T04:56Z E130 refresh on owned pod `c67fbk189vnvfp`: PID `4224`
+  remained active with elapsed `01:56:35`, process CPU time `1-00:13:45`,
+  `%CPU=1246`, RSS about `1.9 GiB`, and still only
+  `history_full_msa_to_face.json` plus `run_metadata.json` in the remote
+  artifact directory. No result bundle existed, so no pull or results update
+  was possible.
+- 2026-05-15T04:57Z Began E137 local candidate while E130 runs; no Runpod
+  launch. E137 adds `simplex_boundary_face_cyclic_readout_scale` plus runtime
+  scheduling. It changes the directed face-to-pair boundary readout from the
+  face slot convention `(i,j)`, `(i,k)`, `(j,k)` toward the actual oriented
+  2-simplex boundary cycle `(i->j, j->k, k->i)`. This is a topology-native
+  boundary-operator change on selected face cochains, not an output-side
+  lDDT/radius/distance/coordinate loss. Focused validation so far:
+  py_compile for modified runtime modules and runner, `git diff --check`, and
+  nine targeted pytest checks covering cyclic boundary helpers, adapter
+  override behavior, runtime signatures, trainer parser/input plumbing,
+  parameter audit, benchmark parser, and benchmark validation-time override
+  path. Broader validation also passed:
+  `python -m pytest tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`
+  reported `227 passed`, focused ruff undefined-name/syntax-risk checks
+  passed, and `git diff --check` remained clean.

@@ -89,6 +89,15 @@ boundary/cochain operation, not a metric loss or output-side lDDT hack. Use it
 only after E130 returns and is documented; require an improvement over E128
 and any returned E130-family result before considering further continuation.
 
+Second parked orientation candidate: E137 face-cyclic boundary readout. The
+current directed face readout still uses the edge slot convention `(i,j)`,
+`(i,k)`, `(j,k)` for a selected face `(i,j,k)`. E137 tests the actual oriented
+boundary cycle of a 2-simplex, `(i->j, j->k, k->i)`, by blending only the
+directed face-to-pair readout toward that cyclic boundary before the pair
+update. This keeps the change inside the selected 2-simplex boundary operator
+and adds no parameters or output-side loss. Keep it parked until E130 returns;
+use it only if the boundary-orientation family remains plausible.
+
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best
 E118 residue vertex-star route with a half-strength boundary-edge-star

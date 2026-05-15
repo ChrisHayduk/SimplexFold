@@ -1108,6 +1108,33 @@ def oriented_boundary_cochain_readout(
     return pair_readout + pair_readout.new_tensor(scale) * edge_masked_delta
 
 
+def cyclic_face_boundary_edges(face_indices: torch.Tensor) -> torch.Tensor:
+    """Return the oriented boundary cycle edges of selected triangular faces."""
+
+    i, j, k = face_indices.unbind(dim=-1)
+    return torch.stack(
+        [
+            torch.stack([i, j], dim=-1),
+            torch.stack([j, k], dim=-1),
+            torch.stack([k, i], dim=-1),
+        ],
+        dim=-2,
+    )
+
+
+def cyclic_face_boundary_updates(face_edge_update: torch.Tensor) -> torch.Tensor:
+    """Reorder face-edge updates from `(ij, ik, jk)` slots to `(ij, jk, ki)`."""
+
+    return torch.stack(
+        [
+            face_edge_update[..., 0, :],
+            face_edge_update[..., 2, :],
+            face_edge_update[..., 1, :],
+        ],
+        dim=-2,
+    )
+
+
 def boundary_incidence_weights(
     edge_indices: torch.Tensor,
     edge_mask: torch.Tensor,
@@ -1820,6 +1847,10 @@ class SimplicialAdapter(torch.nn.Module):
             max(float(getattr(config, "simplex_boundary_oriented_cochain_scale", 0.0)), 0.0),
             1.0,
         )
+        self.boundary_face_cyclic_readout_scale = min(
+            max(float(getattr(config, "simplex_boundary_face_cyclic_readout_scale", 0.0)), 0.0),
+            1.0,
+        )
         self.triangle_attention_bias_scale = float(
             getattr(config, "simplex_triangle_attention_bias_scale", 0.0)
         )
@@ -2032,6 +2063,7 @@ class SimplicialAdapter(torch.nn.Module):
         simplex_boundary_edge_star_readout_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_edge_star_residual_scale_override: Optional[torch.Tensor] = None,
         simplex_boundary_oriented_cochain_scale_override: Optional[torch.Tensor] = None,
+        simplex_boundary_face_cyclic_readout_scale_override: Optional[torch.Tensor] = None,
         simplex_vertex_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_edge_star_context_scale_override: Optional[torch.Tensor] = None,
         simplex_segment_cell_scale_override: Optional[torch.Tensor] = None,
@@ -2112,6 +2144,15 @@ class SimplicialAdapter(torch.nn.Module):
             boundary_oriented_cochain_scale = min(
                 max(
                     float(simplex_boundary_oriented_cochain_scale_override.detach().float().cpu().item()),
+                    0.0,
+                ),
+                1.0,
+            )
+        boundary_face_cyclic_readout_scale = self.boundary_face_cyclic_readout_scale
+        if simplex_boundary_face_cyclic_readout_scale_override is not None:
+            boundary_face_cyclic_readout_scale = min(
+                max(
+                    float(simplex_boundary_face_cyclic_readout_scale_override.detach().float().cpu().item()),
                     0.0,
                 ),
                 1.0,
@@ -2529,6 +2570,23 @@ class SimplicialAdapter(torch.nn.Module):
                 edge_mask=face_edge_mask,
                 include_reverse=False,
             )
+            if boundary_face_cyclic_readout_scale > 0.0:
+                cyclic_face_pair_delta, cyclic_face_pair_counts = scatter_to_pair(
+                    cyclic_face_boundary_updates(face_edge_update),
+                    cyclic_face_boundary_edges(topology.face_indices),
+                    pair_shape=tuple(pair.shape),  # type: ignore[arg-type]
+                    edge_mask=face_edge_mask,
+                    include_reverse=False,
+                )
+                cyclic_scale = pair.new_tensor(boundary_face_cyclic_readout_scale)
+                directed_pair_delta = (
+                    (1.0 - cyclic_scale) * directed_pair_delta
+                    + cyclic_scale * cyclic_face_pair_delta
+                )
+                directed_pair_counts = (
+                    (1.0 - cyclic_scale) * directed_pair_counts
+                    + cyclic_scale * cyclic_face_pair_counts
+                )
 
         if self.use_tetra and tetra_state.numel() > 0:
             tet_i, tet_j, tet_k, tet_l = topology.tetra_indices.unbind(dim=-1)

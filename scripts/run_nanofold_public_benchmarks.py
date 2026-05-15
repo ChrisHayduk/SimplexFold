@@ -72,6 +72,7 @@ from minalphafold.trainer import (  # noqa: E402
     simplex_boundary_pair_gate_runtime_scale_at_step,
     simplex_boundary_edge_star_residual_runtime_scale_at_step,
     simplex_boundary_edge_star_readout_runtime_scale_at_step,
+    simplex_boundary_face_cyclic_readout_runtime_scale_at_step,
     simplex_boundary_hodge_readout_runtime_scale_at_step,
     simplex_boundary_oriented_cochain_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
@@ -659,6 +660,7 @@ def _evaluate(
                         use_simplex_boundary_edge_star_readout_runtime_scale=True,
                         use_simplex_boundary_edge_star_residual_runtime_scale=True,
                         use_simplex_boundary_oriented_cochain_runtime_scale=True,
+                        use_simplex_boundary_face_cyclic_readout_runtime_scale=True,
                         use_simplex_vertex_star_context_runtime_scale=True,
                         use_simplex_edge_star_context_runtime_scale=True,
                         use_simplex_pre_triangle_runtime_scale=True,
@@ -1011,6 +1013,7 @@ def _apply_model_config_overrides(config: Any, args: argparse.Namespace) -> Any:
         ("simplex_boundary_edge_star_readout_scale", args.simplex_boundary_edge_star_readout_scale),
         ("simplex_boundary_edge_star_residual_scale", args.simplex_boundary_edge_star_residual_scale),
         ("simplex_boundary_oriented_cochain_scale", args.simplex_boundary_oriented_cochain_scale),
+        ("simplex_boundary_face_cyclic_readout_scale", args.simplex_boundary_face_cyclic_readout_scale),
         ("simplex_global_context_scale", args.simplex_global_context_scale),
         ("simplex_vertex_star_context_scale", args.simplex_vertex_star_context_scale),
         ("simplex_edge_star_context_scale", args.simplex_edge_star_context_scale),
@@ -1251,6 +1254,9 @@ def _train_variant(
         simplex_boundary_oriented_cochain_runtime_scale = (
             simplex_boundary_oriented_cochain_runtime_scale_at_step(training_config, step)
         )
+        simplex_boundary_face_cyclic_readout_runtime_scale = (
+            simplex_boundary_face_cyclic_readout_runtime_scale_at_step(training_config, step)
+        )
         simplex_vertex_star_context_runtime_scale = simplex_vertex_star_context_runtime_scale_at_step(
             training_config,
             step,
@@ -1330,6 +1336,7 @@ def _train_variant(
                         use_simplex_boundary_edge_star_readout_runtime_scale=True,
                         use_simplex_boundary_edge_star_residual_runtime_scale=True,
                         use_simplex_boundary_oriented_cochain_runtime_scale=True,
+                        use_simplex_boundary_face_cyclic_readout_runtime_scale=True,
                         use_simplex_vertex_star_context_runtime_scale=True,
                         use_simplex_edge_star_context_runtime_scale=True,
                         use_simplex_pre_triangle_runtime_scale=True,
@@ -1492,6 +1499,11 @@ def _train_variant(
                     float("nan")
                     if simplex_boundary_oriented_cochain_runtime_scale is None
                     else simplex_boundary_oriented_cochain_runtime_scale
+                ),
+                "simplex_boundary_face_cyclic_readout_runtime_scale": (
+                    float("nan")
+                    if simplex_boundary_face_cyclic_readout_runtime_scale is None
+                    else simplex_boundary_face_cyclic_readout_runtime_scale
                 ),
                 "simplex_vertex_star_context_runtime_scale": (
                     float("nan")
@@ -1856,6 +1868,18 @@ def _train_variant(
         "simplex_boundary_oriented_cochain_runtime_scale_ramp_steps": (
             training_config.simplex_boundary_oriented_cochain_runtime_scale_ramp_steps
         ),
+        "simplex_boundary_face_cyclic_readout_runtime_scale": (
+            training_config.simplex_boundary_face_cyclic_readout_runtime_scale
+        ),
+        "simplex_boundary_face_cyclic_readout_runtime_scale_final": (
+            training_config.simplex_boundary_face_cyclic_readout_runtime_scale_final
+        ),
+        "simplex_boundary_face_cyclic_readout_runtime_scale_ramp_start_step": (
+            training_config.simplex_boundary_face_cyclic_readout_runtime_scale_ramp_start_step
+        ),
+        "simplex_boundary_face_cyclic_readout_runtime_scale_ramp_steps": (
+            training_config.simplex_boundary_face_cyclic_readout_runtime_scale_ramp_steps
+        ),
         "simplex_hodge_face_runtime_scale": training_config.simplex_hodge_face_runtime_scale,
         "simplex_hodge_face_runtime_scale_final": training_config.simplex_hodge_face_runtime_scale_final,
         "simplex_hodge_face_runtime_scale_ramp_start_step": (
@@ -2185,6 +2209,11 @@ def _train_variant(
             if use_simplicial
             else 0.0
         ),
+        "simplex_boundary_face_cyclic_readout_scale": (
+            float(getattr(model_config, "simplex_boundary_face_cyclic_readout_scale", 0.0))
+            if use_simplicial
+            else 0.0
+        ),
         "simplex_triangle_attention_bias_scale": (
             float(getattr(model_config, "simplex_triangle_attention_bias_scale", 0.0))
             if use_simplicial
@@ -2303,6 +2332,10 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_boundary_oriented_cochain_runtime_scale_final",
         "simplex_boundary_oriented_cochain_runtime_scale_ramp_start_step",
         "simplex_boundary_oriented_cochain_runtime_scale_ramp_steps",
+        "simplex_boundary_face_cyclic_readout_runtime_scale",
+        "simplex_boundary_face_cyclic_readout_runtime_scale_final",
+        "simplex_boundary_face_cyclic_readout_runtime_scale_ramp_start_step",
+        "simplex_boundary_face_cyclic_readout_runtime_scale_ramp_steps",
         "simplex_vertex_star_context_runtime_scale",
         "simplex_vertex_star_context_runtime_scale_final",
         "simplex_vertex_star_context_runtime_scale_ramp_start_step",
@@ -2447,6 +2480,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_boundary_edge_star_readout_scale",
         "simplex_boundary_edge_star_residual_scale",
         "simplex_boundary_oriented_cochain_scale",
+        "simplex_boundary_face_cyclic_readout_scale",
         "simplex_segment_cell_scale",
         "simplex_segment_radius",
         "simplex_c_segment",
@@ -2957,6 +2991,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--simplex-boundary-oriented-cochain-runtime-scale-ramp-steps", type=int, default=1)
     parser.add_argument(
+        "--simplex-boundary-face-cyclic-readout-runtime-scale",
+        type=float,
+        default=None,
+        help="Training-time override for cyclic oriented face-boundary readout.",
+    )
+    parser.add_argument("--simplex-boundary-face-cyclic-readout-runtime-scale-final", type=float, default=None)
+    parser.add_argument(
+        "--simplex-boundary-face-cyclic-readout-runtime-scale-ramp-start-step",
+        type=int,
+        default=None,
+    )
+    parser.add_argument("--simplex-boundary-face-cyclic-readout-runtime-scale-ramp-steps", type=int, default=1)
+    parser.add_argument(
         "--simplex-hodge-face-runtime-scale",
         type=float,
         default=None,
@@ -3046,6 +3093,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Blend selected boundary-edge readout toward an oriented 1-cochain difference.",
+    )
+    parser.add_argument(
+        "--simplex-boundary-face-cyclic-readout-scale",
+        type=float,
+        default=None,
+        help="Blend directed face boundary readout toward oriented cyclic 2-simplex edges.",
     )
     parser.add_argument(
         "--simplex-global-context-scale",
@@ -3430,6 +3483,18 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         ),
         simplex_boundary_oriented_cochain_runtime_scale_ramp_steps=(
             args.simplex_boundary_oriented_cochain_runtime_scale_ramp_steps
+        ),
+        simplex_boundary_face_cyclic_readout_runtime_scale=(
+            args.simplex_boundary_face_cyclic_readout_runtime_scale
+        ),
+        simplex_boundary_face_cyclic_readout_runtime_scale_final=(
+            args.simplex_boundary_face_cyclic_readout_runtime_scale_final
+        ),
+        simplex_boundary_face_cyclic_readout_runtime_scale_ramp_start_step=(
+            args.simplex_boundary_face_cyclic_readout_runtime_scale_ramp_start_step
+        ),
+        simplex_boundary_face_cyclic_readout_runtime_scale_ramp_steps=(
+            args.simplex_boundary_face_cyclic_readout_runtime_scale_ramp_steps
         ),
         simplex_vertex_star_context_runtime_scale=args.simplex_vertex_star_context_runtime_scale,
         simplex_vertex_star_context_runtime_scale_final=args.simplex_vertex_star_context_runtime_scale_final,
@@ -3860,6 +3925,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_boundary_edge_star_readout_scale": args.simplex_boundary_edge_star_readout_scale,
         "simplex_boundary_edge_star_residual_scale": args.simplex_boundary_edge_star_residual_scale,
         "simplex_boundary_oriented_cochain_scale": args.simplex_boundary_oriented_cochain_scale,
+        "simplex_boundary_face_cyclic_readout_scale": args.simplex_boundary_face_cyclic_readout_scale,
         "simplex_global_context_scale": args.simplex_global_context_scale,
         "simplex_vertex_star_context_scale": args.simplex_vertex_star_context_scale,
         "simplex_edge_star_context_scale": args.simplex_edge_star_context_scale,

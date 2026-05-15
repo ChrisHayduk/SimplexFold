@@ -16,6 +16,8 @@ from minalphafold.simplex import (
     build_simplex_topology,
     cell_outer_edge_context,
     coface_degree_attenuate_pair_readout,
+    cyclic_face_boundary_edges,
+    cyclic_face_boundary_updates,
     edge_star_residual_boundary_readout,
     edge_star_smooth_boundary_readout,
     edge_star_cell_mean,
@@ -104,6 +106,7 @@ class SimplexConfig:
     simplex_boundary_edge_star_readout_scale = 0.0
     simplex_boundary_edge_star_residual_scale = 0.0
     simplex_boundary_oriented_cochain_scale = 0.0
+    simplex_boundary_face_cyclic_readout_scale = 0.0
     simplex_global_context_scale = 0.0
     simplex_vertex_star_context_scale = 0.0
     simplex_edge_star_context_scale = 0.0
@@ -2006,6 +2009,17 @@ def test_oriented_boundary_cochain_readout_subtracts_reverse_edges():
     assert torch.isclose(half_oriented[0, 0, 2, 0], torch.tensor(7.0))
 
 
+def test_cyclic_face_boundary_helpers_return_oriented_face_cycle():
+    face_indices = torch.tensor([[[[2, 5, 7]]]], dtype=torch.long)
+    updates = torch.tensor([[[[[1.0], [2.0], [3.0]]]]])
+
+    edges = cyclic_face_boundary_edges(face_indices)
+    cyclic_updates = cyclic_face_boundary_updates(updates)
+
+    assert edges.tolist() == [[[[[2, 5], [5, 7], [7, 2]]]]]
+    assert cyclic_updates.flatten().tolist() == [1.0, 3.0, 2.0]
+
+
 def test_simplicial_adapter_hodge_centers_boundary_pair_update():
     class BaseHodgeConfig(SimplexConfig):
         simplex_neighbor_k = 4
@@ -2135,6 +2149,42 @@ def test_simplicial_adapter_oriented_cochain_changes_boundary_pair_update():
     assert torch.allclose(single_override, single_oriented)
     assert pair_oriented.shape == pair_base.shape
     assert single_oriented.shape == single_base.shape
+
+
+def test_simplicial_adapter_face_cyclic_readout_changes_directed_pair_update():
+    class BaseCyclicConfig(SimplexConfig):
+        simplex_neighbor_k = 4
+        simplex_use_tetra = False
+        simplex_local_radius = -1
+        simplex_local_bias = 0.0
+        simplex_long_min_sep = -1
+        simplex_boundary_readout_directionality = 1.0
+
+    class CyclicConfig(BaseCyclicConfig):
+        simplex_boundary_face_cyclic_readout_scale = 1.0
+
+    torch.manual_seed(89)
+    pair = torch.randn(1, 6, 6, CyclicConfig.c_z)
+    pair = 0.5 * (pair + pair.transpose(1, 2))
+    single = torch.randn(1, 6, CyclicConfig.c_s)
+    base = SimplicialAdapter(BaseCyclicConfig()).eval()
+    cyclic = SimplicialAdapter(CyclicConfig()).eval()
+    cyclic.load_state_dict(base.state_dict())
+
+    with torch.no_grad():
+        pair_base, single_base, _ = base(pair, single)
+        pair_cyclic, single_cyclic, _ = cyclic(pair, single)
+        pair_override, single_override, _ = base(
+            pair,
+            single,
+            simplex_boundary_face_cyclic_readout_scale_override=pair.new_tensor(1.0),
+        )
+
+    assert not torch.allclose(pair_cyclic, pair_base)
+    assert torch.allclose(pair_override, pair_cyclic)
+    assert torch.allclose(single_override, single_cyclic)
+    assert pair_cyclic.shape == pair_base.shape
+    assert single_cyclic.shape == single_base.shape
 
 
 def test_simplex_boundary_metric_recycling_bins_scatter_selected_boundary_edges():
