@@ -78,3 +78,44 @@ def test_main_formats_row_from_json_files(tmp_path, capsys):
         capsys.readouterr().out.strip()
         == "| E-test | stopped early | 600 | 0.2500 | 0.2500 | 0.3000 | - | - | rejected |"
     )
+
+
+def test_main_selects_requested_variant_from_multirow_results(tmp_path, capsys):
+    result_path = tmp_path / "results.json"
+    result_path.write_text(
+        json.dumps(
+            [
+                {
+                    "variant": "other_variant",
+                    "completed_steps": 9000,
+                    "val_lddt_ca": 0.1,
+                    "val_foldscore": 0.2,
+                },
+                {
+                    "variant": "full_msa_to_face",
+                    "completed_steps": 9000,
+                    "val_lddt_ca": 0.46,
+                    "val_foldscore": 0.41,
+                    "val_ca_drmsd": 10.5,
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    main(
+        [
+            str(result_path),
+            "--variant",
+            "full_msa_to_face",
+            "--run-label",
+            "E-test",
+            "--decision",
+            "pending",
+        ]
+    )
+
+    assert (
+        capsys.readouterr().out.strip()
+        == "| E-test | completed | 9000 | 0.4600 | 0.4600 | 0.4100 | 10.5000 | - | pending |"
+    )

@@ -7546,3 +7546,14 @@
   tests/test_nanofold_public_benchmarks.py`, `../../.venv/bin/ruff check
   --select F821,F822,F823 tests/test_nanofold_public_benchmarks.py`, and
   `git diff --check`.
+- 2026-05-15T12:40Z Tightened the `EXPERIMENT_RESULTS.md` row formatter for
+  returned multi-variant `results.json` files. `scripts/format_experiment_result_row.py`
+  now accepts `--variant` and selects exactly one matching result row instead
+  of blindly formatting the first row. This keeps the final-results handoff
+  aligned with the verifier/summarizer behavior and reduces manual row-editing
+  risk once E140/E141/E145 return. Focused validation passed:
+  `python -m pytest tests/test_format_experiment_result_row.py` (`3 passed`),
+  `python -m py_compile scripts/format_experiment_result_row.py
+  tests/test_format_experiment_result_row.py`, `../../.venv/bin/ruff check
+  --select F821,F822,F823 scripts/format_experiment_result_row.py
+  tests/test_format_experiment_result_row.py`, and `git diff --check`.

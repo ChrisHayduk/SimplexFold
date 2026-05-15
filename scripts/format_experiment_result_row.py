@@ -10,12 +10,18 @@ from pathlib import Path
 from typing import Any
 
 
-def _load_result(path: Path) -> dict[str, Any]:
+def _load_result(path: Path, *, variant: str | None = None) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
     if isinstance(data, list):
         if not data:
             raise ValueError(f"No result rows in {path}")
-        row = data[0]
+        if variant is None:
+            row = data[0]
+        else:
+            matches = [row for row in data if isinstance(row, dict) and row.get("variant", variant) == variant]
+            if len(matches) != 1:
+                raise ValueError(f"Expected exactly one result row for variant {variant!r} in {path}, found {len(matches)}")
+            row = matches[0]
     elif isinstance(data, dict):
         row = data
     else:
@@ -107,6 +113,7 @@ def format_result_row(
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("results_json", type=Path)
+    parser.add_argument("--variant", default="full_msa_to_face")
     parser.add_argument("--history-json", type=Path)
     parser.add_argument("--run-label", required=True)
     parser.add_argument("--status", default="completed")
@@ -122,7 +129,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> str:
     args = parse_args(argv)
     row = format_result_row(
-        _load_result(args.results_json),
+        _load_result(args.results_json, variant=args.variant),
         run_label=args.run_label,
         status=args.status,
         decision=args.decision,
