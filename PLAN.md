@@ -1,10 +1,27 @@
-## Current Plan: E130 Boundary Hodge Readout
+## Current Plan: E138 No-Hodge Face-Cyclic Boundary Readout
 
-Current status after E129: the best returned validation C-alpha lDDT remains
+Current status after E130: the best returned validation C-alpha lDDT remains
 E128 at `0.4311` at step 8500. E129 resumed the verified E128 checkpoint and
 added a tiny sparse triangle-attention value residual, but returned lower at
 step 9000 with `val_lddt_ca=0.4303`, FoldScore `0.3984`, and
-`val_ca_drmsd=11.2250`. It is not a 30,000-step candidate.
+`val_ca_drmsd=11.2250`. E130 then tested static Hodge-centered selected
+boundary readout from E128 but was stopped as a runtime-failed branch after
+roughly three hours with no new history row, result bundle, eval details, or
+checkpoint.
+
+Active short gate: E138 is running on the same owned Runpod pod
+`c67fbk189vnvfp` from the separate `/workspace/SimplexFold_next` checkout as
+`e138_no_hodge_face_cyclic_boundary_from_e128_s9000_c256_m64`, PID `24980`.
+It resumes E128 at step `8500`, keeps E128's oriented face gate and damped
+simplex triangle-attention bias, removes E130's
+`simplex_boundary_hodge_readout_scale`, and ramps only the face-cyclic
+2-simplex boundary readout from `0.0` to `0.5` over steps `8500`-`9000`.
+Startup verification passed: the runner saw `train=10000`, `val=1000`, crop
+`256`, MSA depth `64`, resumed the E128 checkpoint at `step=8500` /
+`examples=68000`, loaded `1332` matching model tensors, initialized `0`
+new/missing tensors, and recorded `effective_batch_size=8` with
+`max_parameters=3261974`. Keep `EXPERIMENT_RESULTS.md` unchanged for E138
+until a coherent step-9000 result bundle is verified.
 
 E129 tested this topology-native route:
 
@@ -33,19 +50,15 @@ E128's successful oriented boundary-edge realization while adding a
 stability/normalization path for global assembly, and require a clear break
 above the `0.45` short-gate threshold before any longer-run consideration.
 
-E130 implements the next local candidate: Hodge-centered selected-boundary
-readout. Treat the face/tetra boundary messages as a sparse boundary-edge
-1-cochain on the selected complex, double-center that cochain over source and
-target residue vertex stars, and blend the centered cochain back into the pair
-readout before `Z_ij` is updated. This is a topology-native global-assembly
-change, not a generic C-alpha lDDT loss: it removes vertex-star offset
-components from the selected boundary 1-skeleton so the structure trunk sees a
-more globally reconciled edge cochain. It adds no parameters.
-
-Active short gate: E130 is running on owned Runpod pod `c67fbk189vnvfp` as
-`e130_hodge_boundary_readout_from_e128_s9000_c256_m64`. It resumes E128,
-keeps the E128 recipe fixed, disables E129's value residual, and adds
-`--simplex-boundary-hodge-readout-scale 0.25`:
+E130 terminal diagnosis: Hodge-centered selected-boundary readout was the
+right topology-native question but the wrong runtime branch. It treated the
+face/tetra boundary messages as a sparse boundary-edge 1-cochain on the
+selected complex, double-centered that cochain over source and target residue
+vertex stars, and blended the centered cochain back into the pair readout
+before `Z_ij` was updated. This did not add parameters or an output-side
+lDDT/radius/coordinate loss, but the static Hodge gate ran for roughly three
+hours without writing a step-9000 history row, result bundle, eval details, or
+checkpoint. E130 was therefore stopped as a runtime-failed branch.
 
 ```text
 selected F_ijk / U_ijkl
@@ -56,63 +69,16 @@ selected F_ijk / U_ijkl
         -> Z_ij / structure module
 ```
 
-Gate rule: reject unless E130 beats E128's `0.4311` primary C-alpha lDDT and
-keeps FoldScore/dRMSD/Rg coherent. Do not consider a 30,000-step spend until
-the branch clearly breaks above `0.45` in a short gate.
-
-Current Runpod status: startup and early health checks passed. The runner saw
-`train=10000`, `val=1000`, resumed the E128 checkpoint at `step=8500` and
-`examples=68000`, loaded `1332` matching model tensors, initialized `0`
-new/missing tensors, and started a fresh optimizer. The process is active and
-has not yet produced a returned result bundle. A 2026-05-15T05:25Z sample had
-PID `4224` still alive after `02:25:34` elapsed with advancing CPU time but
-only the inherited step-8500 history row and no `results.json`. Keep
-`EXPERIMENT_RESULTS.md` unchanged until remote coherence and local
-verification pass. If E130 reaches roughly three hours with no history or
-result writeout, treat the static Hodge readout as a runtime-failed branch and
-pivot to a ramped/sparser boundary-cochain candidate rather than spending an
-identical long gate.
-
-Prepared fallback if E130 returns flat or regresses: E131 boundary edge-star
-readout diffusion. E130 removes vertex-star offsets from the selected
-boundary 1-cochain. E131 keeps that Hodge-centered route available but adds a
-second parameter-neutral cochain operation: diffuse the selected boundary-edge
-readout through residue edge-stars before the pair update. In topological
-terms this is a lower-adjacency smoothing step on the selected 1-skeleton,
-not an output-side coordinate or lDDT loss. Do not launch E131 until E130
-returns and is documented; the candidate should only run if E130 confirms that
-boundary cochain stabilization is promising but still under-assembles the
-global backbone.
-
-Additional parked candidate while E130 runs: E136 oriented boundary-cochain
-readout. E124/E128 already suggest that preserving boundary-edge orientation
-matters, but the selected face/tetra readout still mixes common-mode reverse
-edge content before updating `Z_ij`. E136 treats the selected boundary message
-as an oriented 1-cochain: for selected edges that also have a selected reverse
-edge, it blends the readout toward `cochain(i,j) - cochain(j,i)`, while
-leaving one-way selected directed edges intact. This is a topology-native
-boundary/cochain operation, not a metric loss or output-side lDDT hack. Use it
-only after E130 returns and is documented; require an improvement over E128
-and any returned E130-family result before considering further continuation.
-
-Second parked orientation candidate: E137 face-cyclic boundary readout. The
-current directed face readout still uses the edge slot convention `(i,j)`,
-`(i,k)`, `(j,k)` for a selected face `(i,j,k)`. E137 tests the actual oriented
-boundary cycle of a 2-simplex, `(i->j, j->k, k->i)`, by blending only the
-directed face-to-pair readout toward that cyclic boundary before the pair
-update. This keeps the change inside the selected 2-simplex boundary operator
-and adds no parameters or output-side loss. Keep it parked until E130 returns;
-use it only if the boundary-orientation family remains plausible.
-
-Runtime-failure fallback: if E130 crosses roughly three hours without a
-history/result writeout, do not launch another static Hodge-centered gate.
-Prefer E138, a no-Hodge face-cyclic boundary readout that keeps E128's
-oriented face gate and damped triangle-attention bias but removes
-`simplex_boundary_hodge_readout_scale`. This still tests the simplex/topology
-hypothesis by changing how learned 2-simplex cochains write through their
-oriented boundary cycle into `Z_ij`, while avoiding the slow vertex-star
-double-centering path that E130 appears to stress. Launch E138 only after E130
-is stopped or returns, and document the E130 terminal state first.
+E138 is the runtime-safe fallback: no-Hodge face-cyclic boundary readout. It
+keeps E128's oriented face gate and damped triangle-attention bias, removes
+`simplex_boundary_hodge_readout_scale`, and tests whether learned 2-simplex
+cochains write more cleanly through the actual oriented boundary cycle
+`(i->j, j->k, k->i)` before updating `Z_ij`. This remains a
+simplicial/topological architecture test, not a metric-loss shortcut. Gate
+rule: reject unless E138 beats E128 and any returned E130-family result on
+primary C-alpha lDDT while keeping FoldScore/dRMSD/Rg coherent; do not
+consider a 30,000-step spend until the branch clearly breaks above `0.45` in
+the short gate.
 
 Earlier, E120 became the primary-lDDT leader at `val_lddt_ca=0.4248` at step 7500.
 It continued the selected-complex global-context family by combining the best

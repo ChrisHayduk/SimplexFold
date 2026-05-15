@@ -5606,8 +5606,11 @@ stabilization or assembly mechanism.
 
 ### E130: Hodge-Centered Boundary Readout
 
-Status: running as a short gate on owned Runpod pod `c67fbk189vnvfp` as
-`e130_hodge_boundary_readout_from_e128_s9000_c256_m64`.
+Status: runtime failed. E130 ran as a short gate on owned Runpod pod
+`c67fbk189vnvfp` as
+`e130_hodge_boundary_readout_from_e128_s9000_c256_m64`, but was stopped after
+roughly three hours with no step-9000 history row, result bundle, eval-details
+file, or checkpoint.
 
 Hypothesis: E128/E129 show that explicit face/tetra states can learn strong
 local selected-boundary geometry, but the pair trunk still under-assembles the
@@ -5654,14 +5657,15 @@ Decision rule: reject unless E130 beats E128's `0.4311` primary C-alpha lDDT
 and keeps FoldScore, dRMSD, and C-alpha Rg coherent. It still needs to clear
 `0.45` before any longer-run consideration.
 
-Runpod launch status: startup verification passed. E130 resumed the E128
+Runpod terminal status: startup verification passed and E130 resumed the E128
 checkpoint at `step=8500` / `examples=68000`, loaded `1332` matching model
 tensors, initialized `0` new/missing tensors, and started a fresh optimizer.
-An early health check showed the process active with advancing CPU and read
-counters plus A100 memory allocation around `18`-`19` GiB. No `results.json`,
-`results.csv`, eval-details file, or step-9000 checkpoint has returned yet;
-keep this experiment out of `EXPERIMENT_RESULTS.md` until remote coherence and
-local verification pass.
+However, at the 2026-05-15T06:00Z cutoff the process was still active after
+`03:00:16` elapsed, history still ended at inherited E128 step `8500`, and no
+`results.json`, `results.csv`, eval-details file, or checkpoint existed. The
+timeout trace was preserved under ignored local log/artifact paths, PID `4224`
+was terminated, and E130 is recorded in `EXPERIMENT_RESULTS.md` as a runtime
+failure. Do not retry this exact static Hodge gate.
 
 Validation so far:
 
@@ -6096,11 +6100,12 @@ Validation so far:
 
 ### E138: No-Hodge Face-Cyclic Boundary Readout
 
-Status: planned launch recipe only; no code change beyond the already
-implemented E137 face-cyclic boundary operator. Use this only if E130 remains
-active past the runtime cutoff with no history/result writeout, or if E130
-returns with evidence that static Hodge-centering is too expensive or
-unhelpful.
+Status: running on owned Runpod pod `c67fbk189vnvfp` from
+`/workspace/SimplexFold_next` as
+`e138_no_hodge_face_cyclic_boundary_from_e128_s9000_c256_m64`, PID `24980`.
+No code change beyond the already implemented E137 face-cyclic boundary
+operator; E138 is the no-Hodge launch recipe selected after E130 hit the
+runtime cutoff.
 
 Hypothesis: E130's static Hodge-centered boundary readout may be stressing an
 expensive vertex-star double-centering path before it ever writes the

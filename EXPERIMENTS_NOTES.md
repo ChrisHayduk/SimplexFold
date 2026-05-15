@@ -6766,3 +6766,25 @@
   unusably. The E128 checkpoint and NanoFold checkout were present. At the
   same sample, E130 remained active with elapsed `02:34:57`, process CPU time
   `1-08:13:37`, `%CPU=1247`, and no result writeout yet.
+- 2026-05-15T06:00Z E130 reached the documented runtime-failure cutoff on the
+  same owned pod: elapsed `03:00:16`, process CPU time `1-13:27:46`,
+  `%CPU=1246`, history still length `18` ending at inherited E128 step
+  `8500`, and no `results.json`, `results.csv`, eval-details file, or
+  checkpoint. I pulled the timeout trace locally under ignored paths
+  (`logs/e130_hodge_boundary_readout.log` plus E130 `run_metadata.json` and
+  `history_full_msa_to_face.json`), then terminated only E130 PID `4224`.
+  Because the pod/data/checkpoint were already staged and owned by this
+  thread, I reused pod `c67fbk189vnvfp` for the next Runpod experiment rather
+  than touching any other instance.
+- 2026-05-15T06:01Z Launched E138 on owned pod `c67fbk189vnvfp` from the
+  separate `/workspace/SimplexFold_next` checkout, PID `24980`, log
+  `/workspace/SimplexFold_next/logs/e138_no_hodge_face_cyclic_boundary.log`,
+  artifacts
+  `/workspace/SimplexFold_next/artifacts/nanofold_public_benchmarks/e138_no_hodge_face_cyclic_boundary_from_e128_s9000_c256_m64`.
+  The launch fast-forwarded the checkout to `56aa623`, reran remote
+  `python3 -m py_compile`, resumed the E128 checkpoint at step `8500` /
+  examples `68000`, loaded `1332` matching tensors, initialized `0`
+  new/missing tensors, and started a fresh optimizer. Startup metadata records
+  effective batch size `8`, max parameters `3261974`, Hodge readout disabled,
+  face-cyclic readout scale `0.5`, and damped simplex triangle-attention bias
+  `0.0125`. No E138 result has returned yet.
