@@ -6520,3 +6520,13 @@
   passes and the current design rule: prefer selected-complex construction,
   incidence, Hodge/co-boundary, outer-edge, and cochain-communication changes
   over generic output-side lDDT or coordinate losses.
+- 2026-05-15T03:33Z E130 health sample on owned pod `c67fbk189vnvfp`:
+  PID `4224` remained active with elapsed time `33:27`, process CPU time
+  `06:55:16`, `%CPU=1240`, RSS about `1.9 GiB`, and `194` threads. IO
+  counters had advanced to `rchar=102062187`, `syscr=8964`, and `wchar=189351`;
+  the A100 still had `38227 MiB` allocated. The artifact check immediately
+  before this health sample still showed no `results.json`, `results.csv`,
+  eval-details file, or checkpoint, and history still ended at inherited E128
+  step `8500`. Interpretation: the process remains active but has not reached
+  a coherent step-9000 writeout, so leave E130 running under the heartbeat and
+  do not launch the parked E131 fallback yet.
