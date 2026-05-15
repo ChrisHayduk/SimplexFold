@@ -6152,7 +6152,12 @@ Decision rule: reject unless E138 beats E128 and any returned E130-family
 result on primary C-alpha lDDT while keeping FoldScore, dRMSD, and C-alpha Rg
 coherent. It still needs to clear `0.45` before any 30k-step consideration.
 
-Validation status: covered by the E137 implementation tests because E138 is a
-launch-recipe subset of E137 with Hodge disabled. Before launch, rerun
-`py_compile`, the focused E137 parser/runtime tests, and `git diff --check` on
-the exact branch tip used by the Runpod checkout.
+Validation status: E138 is a launch-recipe subset of the already-tested E137
+operator with Hodge disabled. On the branch tip after documenting E138:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py::test_cyclic_face_boundary_helpers_return_oriented_face_cycle tests/test_simplex.py::test_simplicial_adapter_face_cyclic_readout_changes_directed_pair_update tests/test_trainer.py::test_simplicial_runtime_overrides_reach_model_path tests/test_trainer.py::test_model_inputs_add_training_only_simplex_curricula tests/test_trainer.py::test_trainer_cli_accepts_simplex_star_context_overrides tests/test_trainer.py::test_simplicial_boundary_hodge_readout_adds_no_parameters tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_runtime_simplex_message_scales_ramp_and_enter_model_inputs tests/test_nanofold_public_benchmarks.py::test_evaluate_uses_runtime_simplex_overrides_for_validation`: `9 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
+
+Before launch, still run `git diff --check` on the exact branch tip used by
+the Runpod checkout.

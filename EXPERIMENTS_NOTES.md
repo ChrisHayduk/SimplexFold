@@ -6748,3 +6748,12 @@
   `simplex_boundary_face_cyclic_readout_scale` from `0.0` to `0.5` over
   steps `8500`-`9000`. It adds no parameters and no output-side loss. Launch
   only after E130 either returns or is explicitly stopped and documented.
+- 2026-05-15T05:31Z E138 fallback validation on the local branch tip passed
+  while E130 continued running. Checks: `python -m py_compile` for
+  `simplex.py`, `evoformer.py`, `model.py`, `trainer.py`, and the NanoFold
+  runner; the nine focused E137/E138 parser/runtime tests covering cyclic
+  boundary helpers, adapter effect, runtime signatures, trainer parser/input
+  plumbing, parameter audit, benchmark parser, and benchmark validation-time
+  override path (`9 passed`); and focused ruff undefined-name/syntax-risk
+  checks. This does not change `EXPERIMENT_RESULTS.md` because no Runpod
+  result has returned.
