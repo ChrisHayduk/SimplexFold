@@ -6347,3 +6347,14 @@
   Interpretation: long but active compute/evaluation before the step-9000
   writeout; do not intervene, pull, stop, or launch a follow-up until a
   coherent result bundle appears or the process exits with a clear failure.
+- 2026-05-15T01:22Z-01:36Z E129 remained active through a 15-sample bounded
+  watch on the owned pod. PID `1033` stayed alive from about `01:27:13`
+  through `01:41:15` elapsed, process CPU rose from about `758%` to `794%`,
+  RSS stayed around `2.0 GiB` with brief samples up to about `2.52 GiB`, and
+  the process kept `178` threads. H100 memory stayed allocated at `43687 MiB`,
+  with sampled GPU utilization ranging from `0%` to `65%`. The artifact
+  directory still contained only `run_metadata.json` and
+  `history_full_msa_to_face.json`; history still ended at inherited step 8500,
+  with no `results.csv` and no checkpoint. Interpretation: the run is still
+  active but has not reached a coherent step-9000 writeout; continue waiting
+  and keep the heartbeat responsible for the next probe.
