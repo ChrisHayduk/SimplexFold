@@ -7436,3 +7436,13 @@
   no returned result artifacts. Both status files still show effective batch
   size `8` and `stopped_early=false`; continue waiting rather than treating
   either as scored evidence.
+- 2026-05-15T11:45Z Rechecked only the owned E140/E141 endpoints plus Runpod
+  GPU capacity. E140 advanced to active step `8558`, completed step `8557`,
+  elapsed `01:52:40`; E141 advanced to active step `8526`, completed step
+  `8525`, elapsed `01:10:45`. Neither has a result bundle, eval-details CSV,
+  or checkpoint yet. `runpodctl gpu list --include-unavailable` showed no
+  currently available 80GB-class secure GPU (`A100`, `H100`, `H200`, `B200`,
+  `B300` all unavailable), while the available 24GB-class GPUs are too small
+  for the crop-256 full gate that has been allocating about `38 GiB`. Do not
+  launch E145 on undersized hardware; wait for E140/E141 or 80GB-class
+  capacity.
