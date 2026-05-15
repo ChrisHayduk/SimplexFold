@@ -7651,3 +7651,9 @@
   Focused validation passed: `python -m pytest
   tests/test_record_experiment_result.py` (`2 passed`), `py_compile` on the
   helper/test, ruff `F821/F822/F823` on the helper/test, and `git diff --check`.
+- 2026-05-15T13:16Z Updated heartbeat automation
+  `check-simplexfold-e57-runpod` in place after the verified-result recording
+  wrapper landed. The returned-result handoff now says to verify artifacts
+  with the exact E140/E141 templates, run the eval-detail analyzer, then call
+  `scripts/record_experiment_result.py` to update `EXPERIMENT_RESULTS.md`.
+  Owned-pod scope and the 30-minute schedule are unchanged.
