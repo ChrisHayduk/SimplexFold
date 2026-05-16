@@ -8494,3 +8494,12 @@
   `6336` remained alive and CPU-active, with GPU utilization sampled at `61%`
   and `23191 / 81920` MiB allocated. Continue monitoring only E146 and keep
   `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-16T19:26Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8669`, active step `8670`, active
+  microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`,
+  `stopped_early=false`, and finite last train loss `4.637627840042114`.
+  Artifact inventory remained pre-return with only `history_full_msa_to_face.json`,
+  `run_metadata.json`, and `status_full_msa_to_face.json`; no `results.json`,
+  result CSV, eval-detail CSV, or E146 checkpoint exists yet. Trainer PID
+  `6336` remained alive and CPU-active, with GPU utilization sampled at `60%`
+  and `23191 / 81920` MiB allocated. Continue monitoring only E146.
