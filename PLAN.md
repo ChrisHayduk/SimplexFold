@@ -2723,3 +2723,10 @@ queue is deliberately topology-native: E142/E143 test oriented 3-simplex
 boundary incidence, and E144 tests the residual component of a selected
 boundary 1-cochain. Do not spend a 30k run unless a returned short gate clears
 `0.45` with coherent FoldScore, dRMSD, and C-alpha Rg.
+
+Current-pod E142 readiness: `/workspace/SimplexFold_e142` now exists on owned
+pod `723hbew2jrvxjx` as a clone of the active E146 checkout at commit
+`f610b81`. Remote `py_compile` passed for the model/trainer/runner files, and
+the E128 checkpoint to resume from is the current-pod path under
+`/workspace/SimplexFold_e145/artifacts/.../full_msa_to_face_latest.pt`, not
+the older `/workspace/SimplexFold/...` path used by earlier pod notes.

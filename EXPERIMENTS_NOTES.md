@@ -8556,3 +8556,13 @@
   simplicial/topological motivation: E142/E143 test oriented tetra boundary
   incidence, and E144 tests a residual selected boundary 1-cochain. None adds
   a generic metric-side loss.
+- 2026-05-16T19:39Z Current-pod E142 readiness was refreshed without touching
+  the active E146 trainer. Initial checks showed `/workspace/SimplexFold_e142`
+  and the older `/workspace/SimplexFold/.../e128.../full_msa_to_face_latest.pt`
+  path were absent on owned pod `723hbew2jrvxjx`. The E128 checkpoint does
+  exist at
+  `/workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt`.
+  Staged `/workspace/SimplexFold_e142` by cloning `/workspace/SimplexFold_e146`
+  at commit `f610b81`; remote `py_compile` passed for the model, trainer, and
+  benchmark runner files. Updated the E142 launch recipe docs to use the
+  current-pod checkpoint path.

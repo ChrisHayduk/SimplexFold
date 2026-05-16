@@ -6769,7 +6769,7 @@ Candidate launch only after the active Runpod branch is documented:
 
 ```bash
 --run-name e142_signed_tetra_coboundary_from_e128_s9000_c256_m64 \
---resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-from-checkpoint /workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
 --resume-model-weights-only \
 --steps 9000 \
 --simplex-boundary-edge-frame-gate-scale 0.05 \
@@ -6799,7 +6799,7 @@ nohup python -u scripts/run_nanofold_public_benchmarks.py \
   --variants full_msa_to_face \
   --run-name e142_signed_tetra_coboundary_from_e128_s9000_c256_m64 \
   --output-dir artifacts/nanofold_public_benchmarks \
-  --resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+  --resume-from-checkpoint /workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
   --resume-model-weights-only \
   --steps 9000 \
   --batch-size 1 \
@@ -6867,13 +6867,13 @@ Validation status on the local branch from the E138/E139 staging window:
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py tests/test_trainer.py`: `230 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823,E305 minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed
 - Parameter audit: `3,106,690` with or without `simplex_signed_tetra_coboundary_scale=0.25`, so the change adds zero parameters and stays below `3,261,974`.
-- Remote readiness: `/workspace/SimplexFold_e142` was initially staged clean
-  at commit `410589d`, then fast-forwarded to heartbeat commit `fd65f74`;
-  remote `python3 -m py_compile` passed for the model/trainer/runner files;
-  `/workspace/nanoFold-Competition` and the E128 checkpoint both exist; parser
-  validation accepted the documented E142 command with effective batch size
-  `8`, max-parameter cap `3261974`, signed static scale `0.25`, and signed
-  runtime final scale `0.25`.
+- Remote readiness: `/workspace/SimplexFold_e142` was staged on the current
+  owned pod by cloning the active E146 checkout at commit `f610b81`; remote
+  `python3 -m py_compile` passed for the model/trainer/runner files; the
+  current-pod E128 checkpoint exists under `/workspace/SimplexFold_e145`.
+  Parser validation previously accepted the documented E142 command with
+  effective batch size `8`, max-parameter cap `3261974`, signed static scale
+  `0.25`, and signed runtime final scale `0.25`.
 - Launch-recipe guard:
   `test_e142_signed_tetra_coboundary_recipe_matches_documented_gate` locks
   the documented run name, step target, effective batch size,
