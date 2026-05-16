@@ -9162,3 +9162,15 @@
   final-validation/eval-watch, not as a scored result or terminal no-score
   outcome yet; continue monitoring only E142 and keep `EXPERIMENT_RESULTS.md`
   unchanged.
+- 2026-05-16T23:44Z E142 remained in final validation watch on owned pod
+  `723hbew2jrvxjx`. Status stayed at `completed_step=9000`, active step
+  `9000`, phase `evaluating`, with status mtime still
+  `2026-05-16T23:09:53Z`; artifact inventory was unchanged and still lacked
+  `results.json`, result CSV, eval-detail CSV, and checkpoint files. Trainer
+  PID `13262` remained alive and strongly CPU-active, with elapsed time
+  `02:39:29` and accumulated process CPU time `1-10:06:22`; GPU utilization
+  sampled at `0%` with `43101 / 81920` MiB allocated. `py-spy`, `gdb`,
+  `pstack`, and `strace` were not available on the pod for low-risk stack
+  inspection. Continue treating this as CPU-active eval-watch rather than a
+  scored result or terminal no-score outcome; keep `EXPERIMENT_RESULTS.md`
+  unchanged.
