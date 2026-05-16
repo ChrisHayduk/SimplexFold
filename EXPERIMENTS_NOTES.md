@@ -8158,3 +8158,13 @@
   inherited `history_full_msa_to_face.json`, and
   `status_full_msa_to_face.json`; no `results.json`, result CSV,
   eval-detail CSV, or new checkpoint exists yet.
+- 2026-05-16T15:58Z E145 remains live and pre-eval on owned pod
+  `723hbew2jrvxjx`. The status heartbeat advanced to `completed_step=8659`,
+  active step `8660`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, and `stopped_early=false`; the latest status now reports
+  `last_train_loss=NaN`, so monitor the next heartbeat for recurrence before
+  treating it as a terminal training failure. The E145 launch wrapper, trainer
+  parent, and DataLoader workers are still alive. Artifact inventory remains
+  pre-return with only `run_metadata.json`, inherited
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  `results.json`, result CSV, eval-detail CSV, or new checkpoint exists yet.
