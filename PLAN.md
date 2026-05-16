@@ -1,3 +1,21 @@
+## 2026-05-16 Operating Plan Update: E145 Final-Step Watch
+
+E145 has reached the final short-gate step region on owned Runpod pod
+`723hbew2jrvxjx`, but it has not returned a scored result. The latest status
+file still reports `completed_step=8999`, active step `9000`, active
+microbatch `1 / 8`, effective batch size `8`, and `num_workers=4`; the status
+mtime has stopped at `2026-05-16T17:03Z`. The artifact directory still
+contains only `run_metadata.json`, inherited `history_full_msa_to_face.json`,
+and `status_full_msa_to_face.json`, with no `results.json`, result CSV,
+eval-detail CSV, or E145 checkpoint.
+
+This is a watch condition, not a terminal result. The trainer process remains
+alive and CPU-active, but GPU utilization sampled at `0%` with memory still
+allocated. Continue monitoring only this owned E145 pod. Do not update
+`EXPERIMENT_RESULTS.md`, do not stop the pod, and do not launch a successor
+unless the run either returns a verified scored bundle or accumulates stronger
+terminal no-score evidence comparable to E141.
+
 ## 2026-05-16 Operating Plan Update: E145 Active
 
 Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,

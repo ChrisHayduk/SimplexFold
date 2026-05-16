@@ -8266,3 +8266,45 @@
   pre-return with only `run_metadata.json`, inherited
   `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
   `results.json`, result CSV, eval-detail CSV, or new checkpoint exists yet.
+- 2026-05-16T16:26Z E145 remained live and pre-eval on owned pod
+  `723hbew2jrvxjx`. The status heartbeat advanced to `completed_step=8810`,
+  active step `8811`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, `stopped_early=false`, and finite last train loss
+  `4.816759765148163`. The process tree remained alive, and artifact inventory
+  still contained only `run_metadata.json`, inherited
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+- 2026-05-16T16:31Z E145 remained live and pre-eval on owned pod
+  `723hbew2jrvxjx`. The status heartbeat advanced to `completed_step=8837`,
+  active step `8838`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, `stopped_early=false`, and finite last train loss
+  `4.865641355514526`. The artifact directory still had no result bundle,
+  eval-detail CSV, result CSV, or E145 checkpoint.
+- 2026-05-16T16:42Z E145 remained live and pre-eval on owned pod
+  `723hbew2jrvxjx`. The status heartbeat advanced to `completed_step=8890`,
+  active step `8891`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, `stopped_early=false`, and finite last train loss
+  `4.470302224159241`. The process tree remained alive and the artifact
+  inventory remained pre-return.
+- 2026-05-16T16:52Z E145 remained live and pre-eval on owned pod
+  `723hbew2jrvxjx`. The status heartbeat advanced to `completed_step=8944`,
+  active step `8945`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, `stopped_early=false`, and finite last train loss
+  `4.386955678462982`. The artifact directory still contained only
+  `run_metadata.json`, inherited `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`.
+- 2026-05-16T17:07Z E145 reached the final-step watch region on owned pod
+  `723hbew2jrvxjx`: status reported `completed_step=8999`, active step
+  `9000`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, `stopped_early=false`, and last train loss
+  `4.847704619169235`. Status mtime was `2026-05-16T17:03:26Z`, artifact
+  inventory still had no `results.json`, result CSV, eval-detail CSV, or E145
+  checkpoint, and the process tree remained alive.
+- 2026-05-16T17:15Z-17:18Z E145 remained in final-step watch state rather
+  than returning a result. Status stayed at `completed_step=8999`, active step
+  `9000`, active microbatch `1 / 8`, with status mtime still
+  `2026-05-16T17:03:26Z`; artifact inventory was unchanged. The trainer PID
+  `347` remained alive and CPU-active, increasing from about `348%` to
+  `402%` CPU across samples, while `nvidia-smi` sampled `0%` GPU utilization
+  with `29137 / 81920` MiB allocated. Treat this as a watch condition, not a
+  terminal no-score outcome yet; leave the owned pod running and do not update
+  `EXPERIMENT_RESULTS.md`.
