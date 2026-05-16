@@ -8051,3 +8051,15 @@
   eval-detail CSV, or new checkpoint yet. Leave E145 running and update
   `EXPERIMENT_RESULTS.md` only after a scored result or documented terminal
   no-score outcome.
+- 2026-05-16T15:37Z E145 remains live and coherent on owned pod
+  `723hbew2jrvxjx`. The status heartbeat showed `completed_step=8545`,
+  active step `8546`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, `stopped_early=false`, and last train loss
+  `4.621459543704987`. The process list still shows the launch wrapper PID
+  `345`, trainer parent PID `347`, and DataLoader worker children under the
+  same benchmark command. Artifact listing still contains only
+  `run_metadata.json`, inherited `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no `results.json`, result CSV,
+  eval-detail CSV, or new checkpoint exists yet. Do not update
+  `EXPERIMENT_RESULTS.md` until E145 returns a scored bundle or terminal
+  no-score outcome.
