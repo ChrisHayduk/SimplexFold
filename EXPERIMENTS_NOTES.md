@@ -8787,3 +8787,16 @@
   `results.json`, result CSV, eval-detail CSV, or E142 checkpoint exists yet.
   Trainer PID `13262` remained alive and CPU-active. Continue monitoring only
   E142 and keep `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-16T21:32Z E142 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8604`, active step `8605`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, and
+  finite last train loss `4.8286319971084595`. Artifact inventory remained
+  pre-return with only `history_full_msa_to_face.json`,
+  `run_metadata.json`, and `status_full_msa_to_face.json`; no
+  `results.json`, result CSV, eval-detail CSV, or E142 checkpoint exists yet.
+  Trainer PID `13262` remained alive and CPU-active. GPU memory remained
+  allocated at `43101 / 81920` MiB; the instantaneous utilization sample was
+  `0%`, but status advancement confirms this is still in-flight training
+  rather than a stall. Continue monitoring only E142 and keep
+  `EXPERIMENT_RESULTS.md` unchanged.
