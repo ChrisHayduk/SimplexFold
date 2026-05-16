@@ -8325,3 +8325,24 @@
   used. Continue treating this as a final-step watch condition rather than a
   scored or terminal result; leave the owned pod running for another sample
   window and keep `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-16T17:52Z E145 remained in the same final-step watch state on
+  owned pod `723hbew2jrvxjx`. `runpodctl pod get` still reported the owned pod
+  as `RUNNING`. The status file stayed at `completed_step=8999`, active step
+  `9000`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, `stopped_early=false`, and last train loss
+  `4.847704619169235`, with status mtime still `2026-05-16T17:03Z`.
+  Artifact inventory remained only `history_full_msa_to_face.json`,
+  `run_metadata.json`, and `status_full_msa_to_face.json`; no `results.json`,
+  result CSV, eval-detail CSV, or E145 checkpoint exists yet. The launcher
+  PID `345` and trainer PID `347` were still alive, with trainer CPU-active
+  at roughly `839%` and `nvidia-smi` sampling `0%` GPU utilization with
+  `29137 / 81920` MiB allocated. Leave the owned pod running; this is still
+  not a scored result and does not warrant an `EXPERIMENT_RESULTS.md` update.
+- 2026-05-16T17:57Z E145 was sampled again before committing the local
+  tracker/runtime-prep update. Artifact inventory and status were unchanged:
+  still no result bundle, result CSV, eval-detail CSV, or E145 checkpoint;
+  status remained at `completed_step=8999`, active step `9000`, active
+  microbatch `1 / 8`. The trainer PID `347` remained alive and CPU-active at
+  roughly `886%`, with GPU utilization again sampled at `0%` and
+  `29137 / 81920` MiB allocated. Continue the watch; do not classify this as
+  terminal no-score yet without stronger evidence.

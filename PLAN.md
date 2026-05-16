@@ -4,10 +4,13 @@ E145 has reached the final short-gate step region on owned Runpod pod
 `723hbew2jrvxjx`, but it has not returned a scored result. The latest status
 file still reports `completed_step=8999`, active step `9000`, active
 microbatch `1 / 8`, effective batch size `8`, and `num_workers=4`; the status
-mtime has stopped at `2026-05-16T17:03Z`. The artifact directory still
-contains only `run_metadata.json`, inherited `history_full_msa_to_face.json`,
-and `status_full_msa_to_face.json`, with no `results.json`, result CSV,
-eval-detail CSV, or E145 checkpoint.
+mtime has stopped at `2026-05-16T17:03Z`. Later `2026-05-16T17:52Z` and
+`2026-05-16T17:57Z` heartbeats still showed the launcher and trainer PIDs
+alive, trainer CPU-active from roughly `839%` to `886%`, and GPU utilization
+sampled at `0%` with memory still allocated. The artifact directory still
+contains only `run_metadata.json`,
+inherited `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`,
+with no `results.json`, result CSV, eval-detail CSV, or E145 checkpoint.
 
 This is a watch condition, not a terminal result. The trainer process remains
 alive and CPU-active, but GPU utilization sampled at `0%` with memory still
@@ -15,6 +18,14 @@ allocated. Continue monitoring only this owned E145 pod. Do not update
 `EXPERIMENT_RESULTS.md`, do not stop the pod, and do not launch a successor
 unless the run either returns a verified scored bundle or accumulates stronger
 terminal no-score evidence comparable to E141.
+
+A local exact-memory reduction for `cell_outer_edge_context` is now prepared
+for the same outer-neighborhood cochain path. It does not change the
+topological operator or parameter count: outgoing and incoming external-edge
+means are reduced before concatenation rather than after materializing the
+doubled directed-edge tensor. If E145 becomes a terminal no-score run, the
+next parked gate is E146: rerun the same E145 architecture from E128 with this
+returnability fix before drawing an architectural conclusion.
 
 ## 2026-05-16 Operating Plan Update: E145 Active
 

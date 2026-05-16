@@ -15,7 +15,7 @@ from typing import Optional
 
 import torch
 
-from .initialization import init_gate_linear, init_linear, zero_linear
+from .initialization import init_gate_linear, init_linear
 
 
 @dataclass
@@ -1410,11 +1410,14 @@ def cell_outer_edge_context(
     is_inner = (outer_nbrs[..., None] == vertices[..., None, None, :]).any(dim=-1)
     outer_mask = cell_mask[..., None, None].to(pair.dtype) * (~is_inner).to(pair.dtype)
 
-    outgoing = gather_pair(pair, src, outer_nbrs)
-    incoming = gather_pair(pair, outer_nbrs, src)
-    edge_context = torch.cat([outgoing, incoming], dim=-1) * outer_mask[..., None]
     count = outer_mask.sum(dim=(-2, -1)).clamp_min(1.0)
-    return edge_context.sum(dim=(-3, -2)) / count[..., None]
+    outgoing = (
+        (gather_pair(pair, src, outer_nbrs) * outer_mask[..., None]).sum(dim=(-3, -2)) / count[..., None]
+    )
+    incoming = (
+        (gather_pair(pair, outer_nbrs, src) * outer_mask[..., None]).sum(dim=(-3, -2)) / count[..., None]
+    )
+    return torch.cat([outgoing, incoming], dim=-1)
 
 
 def _fold_feature_channels(source: torch.Tensor, channels: int) -> torch.Tensor:

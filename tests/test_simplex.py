@@ -5,6 +5,7 @@ from minalphafold.simplex import (
     SimplexGeometryLoss,
     SimplexTopology,
     SimplicialAdapter,
+    _batch_arange_like,
     _boundary_degree_weights,
     _cell_outer_edge_support,
     _cell_segment_support,
@@ -597,6 +598,48 @@ def test_cell_outer_edge_context_excludes_edges_inside_cell():
     inner_only = torch.tensor([[[1], [0], [3], [2]]], dtype=torch.long)
     empty_context = cell_outer_edge_context(pair, cell_indices, cell_mask, inner_only)
     assert torch.allclose(empty_context, torch.zeros_like(empty_context))
+
+
+def test_cell_outer_edge_context_matches_dense_reference_with_masks():
+    torch.manual_seed(21)
+    pair = torch.randn(2, 5, 5, 3)
+    cell_indices = torch.tensor(
+        [
+            [[[0, 1, 2], [1, 3, 4]], [[2, 3, 4], [0, 2, 4]]],
+            [[[1, 2, 3], [0, 3, 4]], [[0, 1, 4], [0, 2, 3]]],
+        ],
+        dtype=torch.long,
+    )
+    cell_mask = torch.tensor(
+        [
+            [[1.0, 0.0], [1.0, 1.0]],
+            [[0.0, 1.0], [1.0, 1.0]],
+        ]
+    )
+    nbr_idx = torch.tensor(
+        [
+            [[1, 2, 4], [0, 2, 3], [0, 1, 4], [1, 2, 4], [0, 2, 3]],
+            [[2, 3, 4], [0, 2, 4], [0, 1, 3], [0, 2, 4], [0, 1, 3]],
+        ],
+        dtype=torch.long,
+    )
+
+    vertices = cell_indices
+    outer_nbrs = nbr_idx[_batch_arange_like(vertices), vertices]
+    src = vertices[..., None].expand_as(outer_nbrs)
+    is_inner = (outer_nbrs[..., None] == vertices[..., None, None, :]).any(dim=-1)
+    outer_mask = cell_mask[..., None, None].to(pair.dtype) * (~is_inner).to(pair.dtype)
+    outgoing = pair[_batch_arange_like(src), src, outer_nbrs]
+    incoming = pair[_batch_arange_like(src), outer_nbrs, src]
+    dense_context = torch.cat([outgoing, incoming], dim=-1) * outer_mask[..., None]
+    count = outer_mask.sum(dim=(-2, -1)).clamp_min(1.0)
+    expected = dense_context.sum(dim=(-3, -2)) / count[..., None]
+
+    actual = cell_outer_edge_context(pair, cell_indices, cell_mask, nbr_idx)
+
+    assert torch.allclose(actual, expected)
+    inactive_actual = actual[cell_mask == 0]
+    assert torch.allclose(inactive_actual, torch.zeros_like(inactive_actual))
 
 
 def test_parameter_free_outer_edge_context_delta_uses_external_directed_edges():

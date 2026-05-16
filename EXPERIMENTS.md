@@ -7376,3 +7376,37 @@ Validation status:
   now locks the documented E145 run name, step target, effective batch size,
   crop/MSA/template settings, `--num-workers 4`, parameter cap, static
   residual scale, and `8500`-to-`9000` runtime ramp.
+
+### E146 Parked Idea: Exact Outer-Neighborhood Context Memory Reduction
+
+Status: parked; do not launch while E145 is still alive unless E145 returns a
+verified scored bundle or becomes a documented terminal no-score run.
+
+Hypothesis: E145 may be stressing the final-step path because the
+parameter-free outer-neighborhood cochain update computes over many candidate
+cells before top-k masks are applied, especially the tetra slots. The
+topological operation itself is still the right object to test: selected
+face/tetra cochains should receive directed external pair-edge context before
+their boundary signal returns to the pair trunk. The first corrective move
+should therefore preserve the same cochain operator exactly, not replace it
+with a generic metric loss or a weaker architecture.
+
+Mechanism: `cell_outer_edge_context` now reduces outgoing and incoming
+directed external-edge neighborhoods separately before concatenating the two
+pooled cell contexts. This avoids materializing the doubled
+`[outgoing, incoming]` edge-context tensor for every candidate cell while
+leaving the selected-cell outer-neighborhood mean unchanged. It adds no
+parameters and keeps the same pair-to-cell directed incidence semantics.
+
+Gate: if E145 does not return a scored result, relaunch the same short E145
+recipe as an E146 runtime-repeat from the E128 checkpoint using this exact
+context-reduction code. Treat E146 primarily as a returnability/stability gate
+for the same topology-native architecture. If it returns, compare the score
+under the normal short-gate rule: no 30k spend unless primary C-alpha lDDT
+clears `0.45` with coherent FoldScore, dRMSD, and C-alpha Rg.
+
+Validation so far:
+
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m py_compile minalphafold/simplex.py tests/test_simplex.py`: passed.
+- `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_simplex.py -k "outer_edge_context or outer_edge_residual"`: `7 passed, 90 deselected`; pytest emitted a cache-write warning for the parent repo `.pytest_cache`, but the tests passed.
+- `RUFF_CACHE_DIR=/private/tmp/simplexfold_ruff_cache /Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check minalphafold/simplex.py tests/test_simplex.py --ignore E741`: passed. The `E741` ignore isolates the pre-existing ambiguous-name style pattern already present throughout `simplex.py`.
