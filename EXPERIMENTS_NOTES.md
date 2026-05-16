@@ -8401,3 +8401,12 @@
   ends at inherited E128 step `8500`, and no `results.json`, result CSV,
   eval-detail CSV, or E146 checkpoint exists yet. This is coherent training
   progress, not a returned result.
+- 2026-05-16T19:04Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8553`, active step `8554`, active
+  microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`, and finite
+  last train loss `4.587962657213211`. The artifact directory still contained
+  only `history_full_msa_to_face.json`, `run_metadata.json`, and
+  `status_full_msa_to_face.json`; no `results.json`, result CSV,
+  eval-detail CSV, or E146 checkpoint exists yet. Trainer PID `6336` remained
+  alive with GPU utilization sampled at `100%` and `23191 / 81920` MiB
+  allocated. Continue monitoring E146 only.
