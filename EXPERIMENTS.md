@@ -6546,9 +6546,15 @@ single-process DataLoader path.
 
 ### E141: Signed Face-Cyclic Boundary Readout
 
-Status: launched in parallel on a separate owned Runpod A100 pod while E140
-continues on its original pod. E138 and E139 have already been documented as
-stopped pre-eval.
+Status: failed as a final-step stall on owned Runpod A100 pod
+`5ox436mhzej7j4` with no scored result. E141 reached
+`completed_step=8999`, active step `9000`, and active microbatch `7/8`, but
+produced no `results.json`, result CSV, eval-detail CSV, checkpoint, or new
+history row beyond inherited E128 step `8500`. The status heartbeat stopped
+updating at `2026-05-16T09:00:40Z`; later diagnostics showed CPU time still
+advancing with unchanged artifacts and idle GPU. Trace was pulled locally, and
+the owned pod was stopped. Treat this as a runtime stall, not scored evidence
+against the signed face-cyclic boundary architecture.
 
 Hypothesis: E138 tests whether selected face cochains should write back into
 pair state through each triangular boundary cycle `(i->j, j->k, k->i)`.

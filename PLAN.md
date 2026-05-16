@@ -1,3 +1,43 @@
+## 2026-05-16 Operating Plan Update: E141 Stalled, E145 Next
+
+Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,
+well below the `0.7` goal and below the `0.45` short-gate threshold for a
+credible 30k-step spend. E141 has now failed as a stalled final-step/no-score
+run on owned Runpod pod `5ox436mhzej7j4`. It reached
+`completed_step=8999`, active step `9000`, and active microbatch `7/8`, but
+never produced `results.json`, result CSV, eval-detail CSV, checkpoint, or a
+new history row beyond inherited E128 step `8500`. The status heartbeat
+stopped updating at `2026-05-16T09:00:40Z`; a later one-minute interval
+confirmed CPU time was still advancing while status and artifacts stayed
+unchanged and the GPU was idle. The trace was pulled locally under ignored
+`artifacts/runpod_traces/e141_stalled_20260516T1508Z/`, and only the owned
+E141 pod was stopped.
+
+Interpret E141 as runtime/infrastructure failure, not scored evidence against
+signed face-cyclic boundary readout. The next eligible short gate is E145, the
+Topotein/PDF-informed outer-neighborhood selected-cell transport probe. E145
+is still topology-native: selected face/tetra cochains update through directed
+external pair-edge neighborhoods before their boundary signal returns to the
+pair trunk. It adds zero parameters on top of the E128-style recipe
+(`3,240,738 <= 3,261,974`) and should use the documented runtime ramp from
+`0.0` to `0.25` over steps `8500`-`9000`.
+
+Next actions:
+
+1. Launch E145 only on a fresh owned 80GB-class Runpod pod, using the latest
+   pushed branch tip, crop `256`, MSA depth `64`, no extra MSA/templates,
+   effective batch size `8`, `--num-workers 4`, and max-parameter cap
+   `3261974`.
+2. Record the new E145 pod id, SSH endpoint, checkout path, PID, log path, and
+   artifact path in `EXPERIMENTS_NOTES.md`. Manage only this newly launched
+   pod.
+3. When E145 returns, verify remote coherence, pull artifacts/log locally,
+   run the exact E145 verifier and goal-audit templates in `EXPERIMENTS.md`
+   including `--expected-num-workers 4`, analyze eval details, update
+   `EXPERIMENT_RESULTS.md`, and commit/push.
+4. Do not spend 30,000 steps unless an actual short gate clears `0.45` primary
+   C-alpha lDDT while preserving coherent FoldScore, dRMSD, and C-alpha Rg.
+
 ## 2026-05-15 Operating Plan Update: E140 Failed, E141 Active
 
 Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,

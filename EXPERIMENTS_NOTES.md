@@ -1,5 +1,33 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-16 E141 Final-Step Stall; Pod Stopped
+
+- Rechecked only the owned E141 Runpod pod `5ox436mhzej7j4`. E141 reached the
+  final training step but did not return a scored bundle: status stayed at
+  `phase=microbatch_done`, `completed_step=8999`, active step `9000`, active
+  microbatch `7/8`, effective batch size `8`, and `stopped_early=false`.
+  `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`, and
+  `checkpoints/full_msa_to_face_latest.pt` were absent; history still ended at
+  inherited E128 step `8500`.
+- Stall evidence: `status_full_msa_to_face.json` mtime was
+  `2026-05-16T09:00:40Z`, while checks around `2026-05-16T15:06Z` still saw
+  the same status and no artifacts. GPU utilization was `0%` with about
+  `43055 MiB` allocated. A one-minute interval from `15:07:34Z` to
+  `15:08:34Z` showed process CPU time advancing from `utime=131967578,
+  stime=961396` to `utime=132047167, stime=961856`, but the status mtime,
+  artifact set, and history stayed unchanged. The log still only contained
+  startup/resume lines.
+- Pulled the available trace locally under ignored
+  `artifacts/runpod_traces/e141_stalled_20260516T1508Z/`: the run directory
+  contains `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; the log was also preserved. Added
+  `/artifacts/runpod_traces` to `.gitignore` so these local traces cannot be
+  staged accidentally.
+- Stopped only the owned E141 pod `5ox436mhzej7j4` after trace preservation.
+  Record E141 as a failed final-step stall/no-score outcome, not as evidence
+  that signed face-cyclic boundary readout helps or hurts. E145 is now the
+  next eligible short gate.
+
 ## 2026-05-15 Parked Signed-Boundary Recipe Guards
 
 - Added local launch-recipe guards for the documented parked E142, E143, and

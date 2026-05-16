@@ -1,6 +1,6 @@
 # SimplexFold Experiment Results
 
-Last updated: 2026-05-15.
+Last updated: 2026-05-16.
 
 Best validation C-alpha lDDT so far: **E128**, `val_lddt_ca=0.4311` at step
 8500. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
@@ -149,3 +149,4 @@ recorded in the running notes for that run.
 | E138 no-Hodge face-cyclic boundary readout | stopped pre-eval | - | - | - | - | - | - | Stopped after `03:00:56` elapsed on owned Runpod pod `c67fbk189vnvfp` with only startup `run_metadata.json`, inherited E128 step-8500 history, and no result bundle, eval details, checkpoint, or status file. Trace was preserved locally and only E138 PID `24980` was stopped; because this checkout lacked heartbeat instrumentation, do not treat the absence of a step-9000 history row as proof of architectural failure. |
 | E139 no-Hodge oriented boundary cochain | stopped pre-eval | - | - | - | - | - | - | Stopped after `00:45:26` elapsed on owned Runpod pod `c67fbk189vnvfp` with only startup `run_metadata.json`, inherited E128 step-8500 history, and no result bundle, eval details, checkpoint, or status file. Trace was preserved locally and only E139 PIDs `42517` / `42514` were stopped. Later E140 heartbeat progress showed that this was an over-aggressive pre-eval stop, not a scored result; pivot remains E140 selected-boundary realization anti-collapse. |
 | E140 selected-boundary realization anti-collapse | failed pre-eval | - | - | - | - | - | - | Failed on owned Runpod pod `c67fbk189vnvfp` after resuming E128 with no new scored result: no result bundle, eval details, checkpoint, or new history row; the preserved log ends with `OSError: [Errno 5] Input/output error` while writing `status_full_msa_to_face.json`. The pod was stopped after trace pull; treat this as infrastructure failure, not evidence against selected-boundary expansion. |
+| E141 signed face-cyclic boundary readout | failed final-step stall | - | - | - | - | - | - | Stalled on owned Runpod pod `5ox436mhzej7j4` after reaching `completed_step=8999`, active step `9000`, and microbatch `7/8`, with no `results.json`, result CSV, eval-detail CSV, checkpoint, or new history row beyond inherited E128 step `8500`. The status file stopped updating at `2026-05-16T09:00:40Z`; a `2026-05-16T15:07:34Z` to `15:08:34Z` interval showed CPU time advancing but status/artifacts unchanged and GPU idle. Trace was pulled locally, and the owned pod was stopped. Treat this as a runtime stall with no scored evidence against the signed face-cyclic boundary architecture. |

@@ -1,6 +1,7 @@
 *.pyc
 /artifacts/nanofold_public_benchmarks_smoke
 /artifacts/nanofold_public_benchmarks
+/artifacts/runpod_traces
 /artifacts/modal_nanofold_public_benchmarks
 /artifacts/debug_smoke
 /logs
