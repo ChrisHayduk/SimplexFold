@@ -21,10 +21,10 @@ Launch wrapper PID is `13260`, trainer PID is `13262`, log is
 `/workspace/SimplexFold_e142/logs/e142_signed_tetra_coboundary.log`, and
 artifact directory is
 `/workspace/SimplexFold_e142/artifacts/nanofold_public_benchmarks/e142_signed_tetra_coboundary_from_e128_s9000_c256_m64`.
-Latest heartbeat at `2026-05-16T21:20:46Z` showed coherent progress at
-`completed_step=8558`, active step `8559`, active microbatch `1 / 8`,
+Latest heartbeat at `2026-05-16T21:23:00Z` showed coherent progress at
+`completed_step=8566`, active step `8567`, active microbatch `1 / 8`,
 effective batch size `8`, `num_workers=0`, finite last train loss
-`4.533531099557877`, live trainer PID `13262`, and GPU memory remained
+`4.844849765300751`, live trainer PID `13262`, and GPU memory remained
 allocated at `43101 / 81920` MiB. The artifact directory still has
 no `results.json`, result CSV, eval-detail CSV, or E142 checkpoint, so this is
 in-flight training rather than a result.
