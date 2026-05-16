@@ -22,19 +22,22 @@ artifact directory is
 `/workspace/SimplexFold_e146/artifacts/nanofold_public_benchmarks/e146_outer_residual_context_exact_from_e128_s9000_c256_m64`.
 Startup at `2026-05-16T18:57Z` reached `completed_step=8512`, active step
 `8513`, active microbatch `1 / 8`, with GPU utilization sampled at `52%`.
-Latest heartbeat at `2026-05-16T19:51Z` showed coherent progress at
-`completed_step=8798`, active step `8799`, active microbatch `1 / 8`,
+Latest heartbeat at `2026-05-16T19:54Z` showed coherent progress at
+`completed_step=8811`, active step `8812`, active microbatch `1 / 8`,
 effective batch size `8`, `num_workers=4`, finite last train loss
-`4.607700049877167`, live trainer PID `6336`, and GPU utilization sampled at
-`99%` with `23191 / 81920` MiB allocated. The artifact directory still has no
+`4.893148183822632`, live trainer PID `6336`, and GPU utilization sampled at
+`71%` with `23191 / 81920` MiB allocated. The artifact directory still has no
 `results.json`, result CSV, eval-detail CSV, or E146 checkpoint, so this
 remains in-flight training rather than a result.
 
 Runner-observability follow-up: the local branch now has final-step-only status
 phases around batch fetch, forward, loss/backward, eval, checkpointing, and
 final history writes. This does not affect active E146, but any successor such
-as E142 should pull the branch tip before launch so final-step stalls can be
-classified by operation rather than only by coarse microbatch position.
+as E142 should use this branch tip so final-step stalls can be classified by
+operation rather than only by coarse microbatch position. The parked
+`/workspace/SimplexFold_e142` checkout on owned pod `723hbew2jrvxjx` was
+fast-forwarded from GitHub to commit `62fda26`; remote `py_compile` passed for
+the runner and its benchmark tests.
 
 Next actions:
 

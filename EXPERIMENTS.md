@@ -7333,6 +7333,12 @@ change training math, architecture, losses, data, or parameter count. The goal
 is to make a repeated final-step stall actionable instead of another ambiguous
 `microbatch_start` / `microbatch_done` snapshot.
 
+Current-pod readiness: `/workspace/SimplexFold_e142` on owned pod
+`723hbew2jrvxjx` was fast-forwarded from the GitHub branch to commit
+`62fda26` after adding the final-step status phases. The checkout's `origin`
+still points to the local E146 clone, so its branch status may report it as
+ahead of `origin`; use the `github` remote for future branch-tip refreshes.
+
 Goal-level artifact audit template, after the verifier passes:
 
 ```bash

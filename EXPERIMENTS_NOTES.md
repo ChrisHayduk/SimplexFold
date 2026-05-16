@@ -8593,3 +8593,20 @@
   Pull this branch tip into `/workspace/SimplexFold_e142` before launching a
   successor so any repeated final-step stall is attributable to a specific
   operation.
+- 2026-05-16T19:54Z The parked `/workspace/SimplexFold_e142` checkout on
+  owned pod `723hbew2jrvxjx` was fast-forwarded from GitHub to commit
+  `62fda26`, which includes the final-step status instrumentation. Its
+  `origin` still points at the local E146 checkout, so `git status` reports
+  the branch as ahead of `origin`; the added `github` remote is the source
+  used for the fast-forward. Remote `py_compile` passed for
+  `scripts/run_nanofold_public_benchmarks.py` and
+  `tests/test_nanofold_public_benchmarks.py`.
+- 2026-05-16T19:54Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8811`, active step `8812`, active
+  microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`,
+  `stopped_early=false`, and finite last train loss `4.893148183822632`.
+  Artifact inventory remained pre-return with only `history_full_msa_to_face.json`,
+  `run_metadata.json`, and `status_full_msa_to_face.json`; no `results.json`,
+  result CSV, eval-detail CSV, or E146 checkpoint exists yet. Trainer PID
+  `6336` remained alive and CPU-active, with GPU utilization sampled at `71%`
+  and `23191 / 81920` MiB allocated. Continue monitoring only E146.
