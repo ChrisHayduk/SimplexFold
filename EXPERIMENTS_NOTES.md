@@ -8094,3 +8094,12 @@
   checkpoint has been written. Continue monitoring; do not record a final
   result until the step-9000 artifact bundle exists or the run reaches a
   documented terminal no-score state.
+- 2026-05-16T15:44Z E145 remains live and pre-eval on owned pod
+  `723hbew2jrvxjx`. The status heartbeat advanced to `completed_step=8585`,
+  active step `8586`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, `stopped_early=false`, and last train loss
+  `4.467980057001114`. The run is still before the step-9000 evaluation
+  boundary: the artifact directory contains only `run_metadata.json`,
+  inherited `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  No `results.json`, result CSV, eval-detail CSV, or new checkpoint exists yet,
+  so `EXPERIMENT_RESULTS.md` remains unchanged.
