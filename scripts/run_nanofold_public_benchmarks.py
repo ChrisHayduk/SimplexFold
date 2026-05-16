@@ -36,7 +36,7 @@ import time
 from contextlib import nullcontext
 from dataclasses import replace
 from pathlib import Path
-from typing import Any, ContextManager
+from typing import Any, Callable, ContextManager
 
 import numpy as np
 import torch
@@ -132,6 +132,9 @@ def _run_status_payload(
     active_step: int | None = None,
     active_microbatch: int | None = None,
     active_microbatches: int | None = None,
+    active_eval_batch: int | None = None,
+    active_eval_batches: int | None = None,
+    active_eval_examples: int | None = None,
 ) -> dict[str, Any]:
     """Build a lightweight live status payload for long NanoFold runs."""
 
@@ -159,6 +162,12 @@ def _run_status_payload(
         payload["active_microbatch"] = int(active_microbatch)
     if active_microbatches is not None:
         payload["active_microbatches"] = int(active_microbatches)
+    if active_eval_batch is not None:
+        payload["active_eval_batch"] = int(active_eval_batch)
+    if active_eval_batches is not None:
+        payload["active_eval_batches"] = int(active_eval_batches)
+    if active_eval_examples is not None:
+        payload["active_eval_examples"] = int(active_eval_examples)
     return payload
 
 
@@ -712,6 +721,7 @@ def _evaluate(
     mixed_precision: str,
     step: int | None = None,
     detail_path: Path | None = None,
+    progress_callback: Callable[[int, int | None, int], None] | None = None,
 ) -> dict[str, float]:
     model.eval()
     losses: list[float] = []
@@ -719,11 +729,17 @@ def _evaluate(
     term_values: dict[str, list[float]] = {}
     detail_rows: list[dict[str, Any]] = []
     total_examples = 0
+    try:
+        total_batches = len(dataloader)
+    except TypeError:
+        total_batches = None
 
     with torch.no_grad():
         for batch_index, batch in enumerate(dataloader):
             if max_batches is not None and batch_index >= max_batches:
                 break
+            if progress_callback is not None:
+                progress_callback(batch_index, total_batches, total_examples)
             batch = move_to_device(batch, device)
             with _autocast_context(device, mixed_precision):
                 outputs = model(
@@ -799,6 +815,8 @@ def _evaluate(
                             row[key] = values[example_index]
                     detail_rows.append(row)
             total_examples += int(batch["aatype"].shape[0])
+            if progress_callback is not None:
+                progress_callback(batch_index + 1, total_batches, total_examples)
             for key, value in terms.items():
                 mean_value = _tensor_mean(value)
                 if mean_value is not None:
@@ -1291,6 +1309,9 @@ def _train_variant(
         active_step: int | None = None,
         active_microbatch: int | None = None,
         active_microbatches: int | None = None,
+        active_eval_batch: int | None = None,
+        active_eval_batches: int | None = None,
+        active_eval_examples: int | None = None,
     ) -> None:
         nonlocal next_status_write_at
         now = time.perf_counter()
@@ -1314,6 +1335,9 @@ def _train_variant(
             active_step=active_step,
             active_microbatch=active_microbatch,
             active_microbatches=active_microbatches,
+            active_eval_batch=active_eval_batch,
+            active_eval_batches=active_eval_batches,
+            active_eval_examples=active_eval_examples,
         )
         _write_run_status_file(
             status_path,
@@ -1829,6 +1853,9 @@ def _train_variant(
             if should_eval:
                 val_batch_limit = final_max_val_batches if is_final_step else eval_max_val_batches
                 write_run_status("evaluating", force=True, active_step=step)
+                eval_batch_total = len(val_loader)
+                if val_batch_limit is not None:
+                    eval_batch_total = min(eval_batch_total, val_batch_limit)
                 last_eval = _evaluate(
                     model,
                     loss_fn,
@@ -1842,6 +1869,13 @@ def _train_variant(
                     detail_path=output_dir / f"eval_details_{variant}.csv"
                     if is_final_step
                     else None,
+                    progress_callback=lambda batch_index, total_batches, examples: write_run_status(
+                        "evaluating",
+                        active_step=step,
+                        active_eval_batch=batch_index,
+                        active_eval_batches=eval_batch_total if total_batches is not None else None,
+                        active_eval_examples=examples,
+                    ),
                 )
                 write_run_status("evaluated", force=True, active_step=step)
                 row.update(last_eval)
@@ -1858,6 +1892,13 @@ def _train_variant(
                         mixed_precision=mixed_precision,
                         step=step,
                         detail_path=output_dir / f"eval_details_ema_{variant}.csv",
+                        progress_callback=lambda batch_index, total_batches, examples: write_run_status(
+                            "evaluating_ema",
+                            active_step=step,
+                            active_eval_batch=batch_index,
+                            active_eval_batches=eval_batch_total if total_batches is not None else None,
+                            active_eval_examples=examples,
+                        ),
                     )
                     prefixed_ema_eval = _prefix_metrics(ema_eval, "ema_")
                     row.update(prefixed_ema_eval)
@@ -1918,6 +1959,19 @@ def _train_variant(
             mixed_precision=mixed_precision,
             step=completed_step,
             detail_path=output_dir / f"eval_details_{variant}.csv",
+            progress_callback=lambda batch_index, total_batches, examples: write_run_status(
+                "evaluating_final_fallback",
+                active_step=completed_step,
+                active_eval_batch=batch_index,
+                active_eval_batches=(
+                    min(len(val_loader), final_max_val_batches)
+                    if final_max_val_batches is not None
+                    else len(val_loader)
+                )
+                if total_batches is not None
+                else None,
+                active_eval_examples=examples,
+            ),
         )
         write_run_status("evaluated_final_fallback", force=True, active_step=completed_step)
         if ema_model is not None:
@@ -1933,6 +1987,19 @@ def _train_variant(
                 mixed_precision=mixed_precision,
                 step=completed_step,
                 detail_path=output_dir / f"eval_details_ema_{variant}.csv",
+                progress_callback=lambda batch_index, total_batches, examples: write_run_status(
+                    "evaluating_final_fallback_ema",
+                    active_step=completed_step,
+                    active_eval_batch=batch_index,
+                    active_eval_batches=(
+                        min(len(val_loader), final_max_val_batches)
+                        if final_max_val_batches is not None
+                        else len(val_loader)
+                    )
+                    if total_batches is not None
+                    else None,
+                    active_eval_examples=examples,
+                ),
             )
             final_eval.update(_prefix_metrics(ema_eval, "ema_"))
             write_run_status("evaluated_final_fallback_ema", force=True, active_step=completed_step)

@@ -125,6 +125,9 @@ def test_run_status_payload_tracks_live_progress(tmp_path):
         active_step=126,
         active_microbatch=3,
         active_microbatches=8,
+        active_eval_batch=17,
+        active_eval_batches=1000,
+        active_eval_examples=16,
     )
 
     assert payload["variant"] == "full_msa_to_face"
@@ -141,6 +144,9 @@ def test_run_status_payload_tracks_live_progress(tmp_path):
     assert payload["active_step"] == 126
     assert payload["active_microbatch"] == 3
     assert payload["active_microbatches"] == 8
+    assert payload["active_eval_batch"] == 17
+    assert payload["active_eval_batches"] == 1000
+    assert payload["active_eval_examples"] == 16
 
 
 def test_write_run_status_file_is_best_effort_and_preserves_prior_status(tmp_path, monkeypatch, capsys):
@@ -1433,6 +1439,7 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
         "extra_msa_mask": torch.ones(1, 0, 4),
     }
     model = CaptureModel()
+    progress_events = []
 
     monkeypatch.setattr(
         "scripts.run_nanofold_public_benchmarks._loss_with_terms",
@@ -1458,9 +1465,13 @@ def test_evaluate_uses_runtime_simplex_overrides_for_validation(monkeypatch):
         foldscore_components_fn=None,
         mixed_precision="off",
         step=3250,
+        progress_callback=lambda batch_index, total_batches, examples: progress_events.append(
+            (batch_index, total_batches, examples)
+        ),
     )
 
     assert result["val_lddt_ca"] == 0.1
+    assert progress_events == [(0, 1, 0), (1, 1, 1)]
     assert torch.isclose(model.kwargs["simplex_pair_update_scale_override"], torch.tensor(0.75))
     assert torch.isclose(model.kwargs["simplex_single_update_scale_override"], torch.tensor(0.625))
     assert torch.isclose(model.kwargs["simplex_outer_edge_residual_context_scale_override"], torch.tensor(0.125))

@@ -6890,18 +6890,18 @@ Validation status on the local branch from the E138/E139 staging window:
   The launch uses effective batch size `8`, crop `256`, MSA depth `64`,
   `num_workers=0`, max parameter cap `3,261,974`, and no external templates,
   pretrained weights, external MSA retrieval, or metric-side C-alpha loss.
-  Latest heartbeat at `2026-05-16T23:44:45Z` showed final-validation watch:
+  Latest heartbeat at `2026-05-16T23:55:14Z` showed final-validation watch:
   `completed_step=9000`, active step `9000`, phase `evaluating`, finite last
   train loss `4.721518278121948`, trainer PID `13262` still CPU-active,
   status mtime `2026-05-16T23:09:53Z`, GPU utilization sampled at `0%`, GPU
-  memory allocated at `43101 / 81920` MiB, process CPU time at `1-10:06:22`,
+  memory allocated at `43101 / 81920` MiB, process CPU time at `1-14:12:37`,
   and no returned result bundle yet. Keep treating E142 as eval-watch rather
   than a scored or terminal outcome.
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 
 Status: locally implemented, validated, and staged on the owned Runpod pod;
-do not launch while E141 is active.
+do not launch while E142 is active.
 
 Hypothesis: E142 signs the tetra coface-to-face residual, but the learned
 `tetra_to_face` readout still scatters one message to each anchored face with
@@ -7037,9 +7037,9 @@ Validation status on the local branch from the E138/E139 staging window:
 
 ### E144: No-Hodge Edge-Star Residual Boundary Readout
 
-Status: launch recipe staged and remotely validated; do not launch while E140
-is active. Treat this as a parked fallback after E140 and the signed-boundary
-queue are documented or deliberately skipped.
+Status: launch recipe staged and remotely validated; do not launch while E142
+is active. Treat this as a parked fallback after the signed-boundary queue is
+documented or deliberately skipped.
 
 Hypothesis: E139 tests an oriented antisymmetric selected boundary 1-cochain,
 but the selected boundary readout may also carry residue-star common modes

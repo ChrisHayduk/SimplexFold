@@ -1,5 +1,30 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-16 E142 Final-Validation Watch; Eval Progress Instrumentation
+
+- Rechecked only the owned Runpod pod `723hbew2jrvxjx` at
+  `2026-05-16T23:55:14Z`. E142 is still in final validation watch with
+  `phase=evaluating`, `completed_step=9000`, active step `9000`, effective
+  batch size `8`, `num_workers=0`, finite last train loss
+  `4.721518278121948`, and status mtime `2026-05-16T23:09:53Z`.
+- No scored return exists yet. The artifact directory still contains only
+  `status_full_msa_to_face.json`, `history_full_msa_to_face.json`, and
+  `run_metadata.json`; there is no `results.json`, result CSV,
+  `eval_details_full_msa_to_face.csv`, or E142 checkpoint. History still ends
+  at inherited E128 step `8500`.
+- Stall classification: not terminal yet. Trainer PID `13262` remains alive
+  and CPU-active with process time `1-14:12:37`, state `Rl`, and `194`
+  threads; GPU utilization sampled at `0%` with `43101 / 81920` MiB allocated.
+  The log still contains only startup/resume lines, and `/proc/13262/wchan`
+  returned `0`. Continue monitoring rather than stopping the run while CPU
+  progress continues in the final validation path.
+- Added local runner observability for future short gates: validation now
+  reports `active_eval_batch`, `active_eval_batches`, and
+  `active_eval_examples` through the live status file, and
+  `scripts/summarize_nanofold_run_status.py` includes those counters. This is
+  instrumentation only; it does not change architecture, losses, training
+  data, validation scoring, or the already-running E142 checkout.
+
 ## 2026-05-16 E141 Final-Step Stall; Pod Stopped
 
 - Rechecked only the owned E141 Runpod pod `5ox436mhzej7j4`. E141 reached the

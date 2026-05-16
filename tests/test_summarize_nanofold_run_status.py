@@ -14,6 +14,9 @@ def _write_active_run(run_dir):
                 "active_step": 8568,
                 "active_microbatch": 1,
                 "active_microbatches": 8,
+                "active_eval_batch": 17,
+                "active_eval_batches": 1000,
+                "active_eval_examples": 16,
                 "completed_step": 8567,
                 "target_steps": 9000,
                 "start_step": 8500,
@@ -67,6 +70,9 @@ def test_summarize_run_reports_active_status_without_result_details(tmp_path):
 
     assert summary["state"] == "active"
     assert summary["status"]["completed_step"] == 8567
+    assert summary["status"]["active_eval_batch"] == 17
+    assert summary["status"]["active_eval_batches"] == 1000
+    assert summary["status"]["active_eval_examples"] == 16
     assert summary["history_last_step"] == 8500
     assert summary["history_last"]["val_lddt_ca"] == 0.4311
     assert summary["progress"]["completed_delta_steps"] == 67
