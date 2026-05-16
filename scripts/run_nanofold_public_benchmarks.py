@@ -183,6 +183,12 @@ def _write_run_status_file(status_path: Path, payload: dict[str, Any]) -> bool:
     return True
 
 
+def _should_force_microbatch_status(*, microbatch_index: int, is_final_step: bool) -> bool:
+    """Write every final-step microbatch phase so stalls are diagnosable."""
+
+    return is_final_step or microbatch_index == 0
+
+
 def _autocast_context(device: torch.device, mixed_precision: str) -> ContextManager[Any]:
     if mixed_precision == "off" or device.type not in {"cuda", "cpu"}:
         return nullcontext()
@@ -1316,6 +1322,7 @@ def _train_variant(
         next_status_write_at = now + status_write_interval_seconds
 
     def save_latest_checkpoint(*, stopped: bool) -> None:
+        write_run_status("checkpointing", force=True)
         _save_training_checkpoint(
             latest_checkpoint_path,
             model=model,
@@ -1451,17 +1458,23 @@ def _train_variant(
         simplex_face_top_k = simplex_face_top_k_at_step(training_config, step)
         simplex_tetra_top_k = simplex_tetra_top_k_at_step(training_config, step)
         simplex_cell_score_outer_edge_weight = simplex_cell_score_outer_edge_weight_at_step(training_config, step)
+        is_final_step = step == training_config.epochs
         optimizer.zero_grad(set_to_none=True)
         loss_accum = 0.0
         term_accum: dict[str, list[float]] = {}
         micro_examples = 0
         terms: dict[str, torch.Tensor] = {}
         for microbatch_index in range(grad_accum_steps):
+            active_microbatch = microbatch_index + 1
+            force_micro_status = _should_force_microbatch_status(
+                microbatch_index=microbatch_index,
+                is_final_step=is_final_step,
+            )
             write_run_status(
                 "microbatch_start",
-                force=microbatch_index == 0,
+                force=force_micro_status,
                 active_step=step,
-                active_microbatch=microbatch_index + 1,
+                active_microbatch=active_microbatch,
                 active_microbatches=grad_accum_steps,
             )
             try:
@@ -1471,6 +1484,20 @@ def _train_variant(
                 batch = next(train_iter)
 
             batch = move_to_device(batch, device)
+            write_run_status(
+                "microbatch_batch_ready",
+                force=force_micro_status,
+                active_step=step,
+                active_microbatch=active_microbatch,
+                active_microbatches=grad_accum_steps,
+            )
+            write_run_status(
+                "microbatch_forward_start",
+                force=force_micro_status,
+                active_step=step,
+                active_microbatch=active_microbatch,
+                active_microbatches=grad_accum_steps,
+            )
             with _autocast_context(device, mixed_precision):
                 outputs = model(
                     **model_inputs_from_batch(
@@ -1509,9 +1536,30 @@ def _train_variant(
                         step=step,
                     )
                 )
+            write_run_status(
+                "microbatch_forward_done",
+                force=force_micro_status,
+                active_step=step,
+                active_microbatch=active_microbatch,
+                active_microbatches=grad_accum_steps,
+            )
             per_example_loss, terms = _loss_with_terms(loss_fn, batch, outputs)
             micro_loss = per_example_loss.float().mean()
+            write_run_status(
+                "microbatch_backward_start",
+                force=force_micro_status,
+                active_step=step,
+                active_microbatch=active_microbatch,
+                active_microbatches=grad_accum_steps,
+            )
             (micro_loss / grad_accum_steps).backward()
+            write_run_status(
+                "microbatch_backward_done",
+                force=force_micro_status,
+                active_step=step,
+                active_microbatch=active_microbatch,
+                active_microbatches=grad_accum_steps,
+            )
             batch_examples = int(batch["aatype"].shape[0])
             micro_examples += batch_examples
             loss_accum += float(micro_loss.detach().cpu().item()) * batch_examples
@@ -1521,8 +1569,9 @@ def _train_variant(
                     term_accum.setdefault(key, []).append(mean_value)
             write_run_status(
                 "microbatch_done",
+                force=force_micro_status,
                 active_step=step,
-                active_microbatch=microbatch_index + 1,
+                active_microbatch=active_microbatch,
                 active_microbatches=grad_accum_steps,
             )
 
@@ -1554,7 +1603,6 @@ def _train_variant(
         completed_step = step
         write_run_status("training")
 
-        is_final_step = step == training_config.epochs
         should_eval = is_final_step or (eval_every > 0 and step % eval_every == 0)
         should_log = step == 1 or should_eval or (log_every > 0 and step % log_every == 0)
         if should_log:
@@ -1780,6 +1828,7 @@ def _train_variant(
                 row[f"train_{key}"] = _mean(values)
             if should_eval:
                 val_batch_limit = final_max_val_batches if is_final_step else eval_max_val_batches
+                write_run_status("evaluating", force=True, active_step=step)
                 last_eval = _evaluate(
                     model,
                     loss_fn,
@@ -1794,8 +1843,10 @@ def _train_variant(
                     if is_final_step
                     else None,
                 )
+                write_run_status("evaluated", force=True, active_step=step)
                 row.update(last_eval)
                 if ema_model is not None and is_final_step:
+                    write_run_status("evaluating_ema", force=True, active_step=step)
                     ema_eval = _evaluate(
                         ema_model,
                         loss_fn,
@@ -1811,7 +1862,9 @@ def _train_variant(
                     prefixed_ema_eval = _prefix_metrics(ema_eval, "ema_")
                     row.update(prefixed_ema_eval)
                     last_eval.update(prefixed_ema_eval)
+                    write_run_status("evaluated_ema", force=True, active_step=step)
             history.append(row)
+            write_run_status("writing_history", force=True, active_step=step)
             history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
             write_run_status("logged", force=True)
             val_parts = []
@@ -1853,6 +1906,7 @@ def _train_variant(
 
     elapsed = elapsed_total()
     if completed_step >= training_config.epochs and last_eval is None:
+        write_run_status("evaluating_final_fallback", force=True, active_step=completed_step)
         final_eval = _evaluate(
             model,
             loss_fn,
@@ -1865,7 +1919,9 @@ def _train_variant(
             step=completed_step,
             detail_path=output_dir / f"eval_details_{variant}.csv",
         )
+        write_run_status("evaluated_final_fallback", force=True, active_step=completed_step)
         if ema_model is not None:
+            write_run_status("evaluating_final_fallback_ema", force=True, active_step=completed_step)
             ema_eval = _evaluate(
                 ema_model,
                 loss_fn,
@@ -1879,6 +1935,7 @@ def _train_variant(
                 detail_path=output_dir / f"eval_details_ema_{variant}.csv",
             )
             final_eval.update(_prefix_metrics(ema_eval, "ema_"))
+            write_run_status("evaluated_final_fallback_ema", force=True, active_step=completed_step)
     elif last_eval is None:
         final_eval = {}
     else:
@@ -2490,6 +2547,7 @@ def _train_variant(
         "checkpoint_every": checkpoint_every,
         **final_eval,
     }
+    write_run_status("writing_final_history", force=True)
     history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
     write_run_status("finished", force=True)
     return result

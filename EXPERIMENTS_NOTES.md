@@ -8576,3 +8576,20 @@
   `6336` remained alive and CPU-active, with GPU utilization sampled at `44%`
   and `23191 / 81920` MiB allocated. Continue monitoring only E146 and keep
   `EXPERIMENT_RESULTS.md` unchanged until a scored or terminal outcome exists.
+- 2026-05-16T19:51Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8798`, active step `8799`, active
+  microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`,
+  `stopped_early=false`, and finite last train loss `4.607700049877167`.
+  Artifact inventory remained pre-return with only `history_full_msa_to_face.json`,
+  `run_metadata.json`, and `status_full_msa_to_face.json`; no `results.json`,
+  result CSV, eval-detail CSV, or E146 checkpoint exists yet. Trainer PID
+  `6336` remained alive and CPU-active, with GPU utilization sampled at `99%`
+  and `23191 / 81920` MiB allocated. Continue monitoring only E146.
+- 2026-05-16T19:52Z Added local final-step status instrumentation for
+  subsequent runs. The runner now forces status phases through final-step
+  batch readiness, forward start/done, backward start/done, evaluation,
+  checkpointing, and final history writes. This changes observability only; it
+  does not change the model, losses, data, parameter count, or active E146.
+  Pull this branch tip into `/workspace/SimplexFold_e142` before launching a
+  successor so any repeated final-step stall is attributable to a specific
+  operation.

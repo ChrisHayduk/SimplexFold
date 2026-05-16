@@ -47,6 +47,7 @@ from scripts.run_nanofold_public_benchmarks import (
     _enforce_parameter_budget,
     _evaluate,
     _run_status_payload,
+    _should_force_microbatch_status,
     _write_run_status_file,
     _simplex_boundary_geometry_metrics,
     _simplex_topology_metrics,
@@ -157,6 +158,12 @@ def test_write_run_status_file_is_best_effort_and_preserves_prior_status(tmp_pat
     assert _write_run_status_file(status_path, {"phase": "new"}) is False
     assert status_path.read_text(encoding="utf-8") == '{"phase":"old"}'
     assert "warning: could not write run status" in capsys.readouterr().err
+
+
+def test_final_step_forces_every_microbatch_status_phase():
+    assert _should_force_microbatch_status(microbatch_index=0, is_final_step=False) is True
+    assert _should_force_microbatch_status(microbatch_index=4, is_final_step=False) is False
+    assert _should_force_microbatch_status(microbatch_index=4, is_final_step=True) is True
 
 
 def test_full_msa_to_face_aux_closure_variant_keeps_message_masks_unchanged():

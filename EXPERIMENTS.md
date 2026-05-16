@@ -7325,6 +7325,14 @@ E144 projects selected boundary-edge 1-cochains away from residue edge-star
 common modes. None of these changes adds parameters, external data, pretrained
 weights, or generic C-alpha/coordinate/radius losses.
 
+Operational note: before launching any post-E146 successor, update the remote
+checkout to a branch tip that includes the final-step status instrumentation.
+That runner patch only adds forced heartbeat phases around final-step batch
+fetch, forward/backward, eval, checkpointing, and final writes; it does not
+change training math, architecture, losses, data, or parameter count. The goal
+is to make a repeated final-step stall actionable instead of another ambiguous
+`microbatch_start` / `microbatch_done` snapshot.
+
 Goal-level artifact audit template, after the verifier passes:
 
 ```bash
