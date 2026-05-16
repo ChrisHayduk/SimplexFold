@@ -8120,3 +8120,11 @@
   `run_metadata.json`, inherited `history_full_msa_to_face.json`, and
   `status_full_msa_to_face.json`; no result bundle, eval-detail CSV, or new
   checkpoint exists yet.
+- 2026-05-16T15:50Z E145 remains live and pre-eval on owned pod
+  `723hbew2jrvxjx`. The status heartbeat advanced to `completed_step=8614`,
+  active step `8615`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, `stopped_early=false`, and last train loss
+  `4.382141292095184`. Artifact inventory remains pre-return with only
+  `run_metadata.json`, inherited `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no result bundle, eval-detail CSV, or new
+  checkpoint exists yet.
