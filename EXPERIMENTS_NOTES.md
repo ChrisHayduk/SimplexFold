@@ -8308,3 +8308,20 @@
   with `29137 / 81920` MiB allocated. Treat this as a watch condition, not a
   terminal no-score outcome yet; leave the owned pod running and do not update
   `EXPERIMENT_RESULTS.md`.
+- 2026-05-16T17:21Z-17:35Z E145 still had no scored return and no new
+  artifact movement. Status remained fixed at `completed_step=8999`, active
+  step `9000`, active microbatch `1 / 8`, with status mtime
+  `2026-05-16T17:03:26Z`; artifact inventory still contained only
+  `run_metadata.json`, inherited `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. The trainer PID `347` stayed alive and
+  increasingly CPU-active (`452%` at 17:21Z, `646%` at 17:35Z), while GPU
+  utilization stayed sampled at `0%` with `29137 / 81920` MiB allocated. Local
+  code inspection showed the status file is written at `microbatch_start` and
+  then again only after batch load, device transfer, model forward, loss, and
+  backward complete for that microbatch, so the unchanged `1 / 8` status means
+  the run is still inside the first final-step microbatch path, not in final
+  eval/checkpoint writing. `py-spy`, `strace`, and `gdb` were not installed on
+  the pod, so only low-risk `ps`, `/proc`, and `nvidia-smi` diagnostics were
+  used. Continue treating this as a final-step watch condition rather than a
+  scored or terminal result; leave the owned pod running for another sample
+  window and keep `EXPERIMENT_RESULTS.md` unchanged.
