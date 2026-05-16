@@ -9148,3 +9148,17 @@
   remained alive and CPU-active, with GPU utilization sampled at `47%` and
   `43101 / 81920` MiB allocated. Continue monitoring only E142 and keep
   `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-16T23:24Z E142 reached the final validation watch state on owned
+  pod `723hbew2jrvxjx`. Status advanced through the final microbatches to
+  `completed_step=9000`, active step `9000`, phase `evaluating`, effective
+  batch size `8`, `num_workers=0`, `stopped_early=false`, and finite last
+  train loss `4.721518278121948`. The latest status mtime was
+  `2026-05-16T23:09:53Z`; artifact inventory remained pre-return with only
+  `history_full_msa_to_face.json`, `run_metadata.json`, and
+  `status_full_msa_to_face.json`. There is still no `results.json`, result
+  CSV, eval-detail CSV, or E142 checkpoint. Trainer PID `13262` remained
+  alive and strongly CPU-active, GPU utilization sampled at `0%`, and GPU
+  memory remained allocated at `43101 / 81920` MiB. Treat this as
+  final-validation/eval-watch, not as a scored result or terminal no-score
+  outcome yet; continue monitoring only E142 and keep `EXPERIMENT_RESULTS.md`
+  unchanged.
