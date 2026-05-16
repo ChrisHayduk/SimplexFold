@@ -1,4 +1,4 @@
-## 2026-05-16 Operating Plan Update: E141 Stalled, E145 Next
+## 2026-05-16 Operating Plan Update: E145 Active
 
 Current returned best remains E128 at `val_lddt_ca=0.4311` at step `8500`,
 well below the `0.7` goal and below the `0.45` short-gate threshold for a
@@ -14,23 +14,23 @@ unchanged and the GPU was idle. The trace was pulled locally under ignored
 E141 pod was stopped.
 
 Interpret E141 as runtime/infrastructure failure, not scored evidence against
-signed face-cyclic boundary readout. The next eligible short gate is E145, the
-Topotein/PDF-informed outer-neighborhood selected-cell transport probe. E145
-is still topology-native: selected face/tetra cochains update through directed
-external pair-edge neighborhoods before their boundary signal returns to the
-pair trunk. It adds zero parameters on top of the E128-style recipe
-(`3,240,738 <= 3,261,974`) and should use the documented runtime ramp from
-`0.0` to `0.25` over steps `8500`-`9000`.
+signed face-cyclic boundary readout. E145 is now the active short gate on
+owned Runpod pod `723hbew2jrvxjx`. It is the Topotein/PDF-informed
+outer-neighborhood selected-cell transport probe: selected face/tetra cochains
+update through directed external pair-edge neighborhoods before their boundary
+signal returns to the pair trunk. It adds zero parameters on top of the
+E128-style recipe (`3,240,738 <= 3,261,974`) and uses the documented runtime
+ramp from `0.0` to `0.25` over steps `8500`-`9000`.
 
 Next actions:
 
-1. Launch E145 only on a fresh owned 80GB-class Runpod pod, using the latest
-   pushed branch tip, crop `256`, MSA depth `64`, no extra MSA/templates,
-   effective batch size `8`, `--num-workers 4`, and max-parameter cap
-   `3261974`.
-2. Record the new E145 pod id, SSH endpoint, checkout path, PID, log path, and
-   artifact path in `EXPERIMENTS_NOTES.md`. Manage only this newly launched
-   pod.
+1. Monitor only owned E145 pod `723hbew2jrvxjx` at
+   `root@195.26.233.76 -p 31813`, checkout `/workspace/SimplexFold_e145`.
+   Leave it running while `status_full_msa_to_face.json`, process state, and
+   artifact mtimes show coherent progress.
+2. Do not update `EXPERIMENT_RESULTS.md` until E145 returns a scored result or
+   reaches a documented terminal no-score outcome. Live notes stay in
+   `EXPERIMENTS_NOTES.md`.
 3. When E145 returns, verify remote coherence, pull artifacts/log locally,
    run the exact E145 verifier and goal-audit templates in `EXPERIMENTS.md`
    including `--expected-num-workers 4`, analyze eval details, update

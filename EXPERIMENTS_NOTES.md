@@ -8022,3 +8022,32 @@
   `scripts/record_experiment_result.py` dry-run on a temporary copy of
   `EXPERIMENT_RESULTS.md` preserved the E128 best-summary header and generated
   the expected table row with C-alpha Rg intact.
+- 2026-05-16T15:33Z E145 is now active on owned Runpod pod `723hbew2jrvxjx`
+  (`root@195.26.233.76 -p 31813`, A100 SXM 80GB, image
+  `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404`). The remote checkout is
+  `/workspace/SimplexFold_e145` at commit
+  `780017258110abc95640d9d4b6c0cdf723b71dc8`; NanoFold is staged at
+  `/workspace/nanoFold-Competition` commit
+  `96afc8467a108aa8bee3b51cdf4a030cd656a960`. Public data staging was
+  verified before launch with `11000` feature NPZs, `11000` label NPZs,
+  train/val manifest counts `10000 / 1000`, `preprocess_meta.json` present,
+  and no macOS `._*` sidecars. The E128 checkpoint was present at
+  `/workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt`
+  with size `35M`.
+- 2026-05-16T15:33Z E145 launch/runtime coherence check passed. Run name:
+  `e145_outer_residual_context_from_e128_s9000_c256_m64`; log:
+  `/workspace/SimplexFold_e145/logs/e145_outer_residual_context.log`;
+  artifact directory:
+  `/workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e145_outer_residual_context_from_e128_s9000_c256_m64`.
+  The launch wrapper PID is `345`; the active trainer parent is PID `347`,
+  with DataLoader worker children observed under the same command. Remote
+  metadata confirms `steps=9000`, `effective_batch_size=8`, `num_workers=4`,
+  `max_parameters=3261974`, crop `256`, MSA depth `64`,
+  `simplex_outer_edge_residual_context_scale=0.25`, runtime scale `0.0`,
+  runtime final `0.25`, ramp start `8500`, and ramp length `500`. The status
+  heartbeat at `2026-05-16T15:33:11Z` showed `completed_step=8525`, active
+  step `8526`, active microbatch `1 / 8`, `stopped_early=false`, inherited
+  history ending at E128 step `8500`, and no `results.json`, result CSV,
+  eval-detail CSV, or new checkpoint yet. Leave E145 running and update
+  `EXPERIMENT_RESULTS.md` only after a scored result or documented terminal
+  no-score outcome.

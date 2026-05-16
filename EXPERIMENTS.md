@@ -7149,10 +7149,10 @@ Validation status:
 
 ### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
 
-Status: code staged and locally validated; do not launch until E141 returns
-or fails coherently. E140 failed pre-eval with no scored result, and E141 is
-still using the active Runpod capacity that should finish before we spend on
-a third branch.
+Status: running on owned Runpod pod `723hbew2jrvxjx` as
+`e145_outer_residual_context_from_e128_s9000_c256_m64`. E140 failed pre-eval
+with no scored result, and E141 later stalled at the final step with no scored
+result, so E145 is the active follow-up short gate.
 
 Source motivation: the saved Topotein PDF (`references/papers/2509.03885v1.pdf`)
 argues that protein topological networks need persistent multi-rank states and
@@ -7197,7 +7197,7 @@ recipe (`3,317,330 > 3,261,974`). The new E145 path adds zero parameters: the
 full E128-style recipe plus `simplex_outer_edge_residual_context_scale=0.25`
 remains `3,240,738`, with `21,236` parameters of headroom.
 
-Candidate flag, only after E141 returns below threshold or fails coherently:
+Candidate flag:
 
 ```bash
 --run-name e145_outer_residual_context_from_e128_s9000_c256_m64 \
@@ -7208,9 +7208,8 @@ Candidate flag, only after E141 returns below threshold or fails coherently:
 --simplex-outer-edge-residual-context-runtime-scale-ramp-steps 500
 ```
 
-Full launch skeleton, only after E141 returns below threshold or fails
-coherently and suitable 80GB-class Runpod capacity is available. Use a fresh
-checkout at the latest pushed branch tip; do not reuse an active E141 tree.
+Full launch skeleton. Use a fresh checkout at the latest pushed branch tip;
+do not reuse a failed or active prior experiment tree.
 
 ```bash
 cd /workspace/SimplexFold_e145
@@ -7337,8 +7336,27 @@ python scripts/audit_goal_artifact.py \
 
 Decision rule: E145 should not receive a 30k spend unless a short gate clears
 `0.45` primary C-alpha lDDT and preserves coherent FoldScore, dRMSD, and
-C-alpha Rg. If E141 clears the threshold, prioritize continuing that returned
-branch instead.
+C-alpha Rg.
+
+Launch: E145 was launched on 2026-05-16 on owned Runpod pod
+`723hbew2jrvxjx` (`root@195.26.233.76 -p 31813`, A100 SXM 80GB, image
+`runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404`). The remote checkout is
+`/workspace/SimplexFold_e145` at commit
+`780017258110abc95640d9d4b6c0cdf723b71dc8`; NanoFold is staged at
+`/workspace/nanoFold-Competition` commit
+`96afc8467a108aa8bee3b51cdf4a030cd656a960`; public data counts were verified
+as `11000` feature NPZs, `11000` label NPZs, and train/val manifests
+`10000 / 1000`. The run resumed the E128 checkpoint at step `8500` with
+`1332` matching tensors and `0` new/missing tensors. The launch wrapper PID is
+`345`; the active trainer parent is PID `347`, with DataLoader worker children
+observed under the same command. The log is
+`/workspace/SimplexFold_e145/logs/e145_outer_residual_context.log`, and the
+artifact directory is
+`/workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e145_outer_residual_context_from_e128_s9000_c256_m64`.
+First live status on 2026-05-16T15:33Z showed `completed_step=8525`, active
+step `8526`, active microbatch `1 / 8`, `effective_batch_size=8`,
+`num_workers=4`, `stopped_early=false`, inherited history ending at E128 step
+`8500`, and no returned result bundle yet.
 
 Validation status:
 
