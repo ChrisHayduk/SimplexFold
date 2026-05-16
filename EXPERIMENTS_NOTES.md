@@ -8386,3 +8386,18 @@
   `32%` with `22361 / 81920` MiB allocated. No returned result bundle yet;
   keep `EXPERIMENT_RESULTS.md` unchanged for E146 until a scored or terminal
   outcome exists.
+- 2026-05-16T19:01Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8534`, active step `8535`, active
+  microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`, and finite
+  last train loss `5.0033299922943115`. The status file mtime updated at
+  `19:01Z`; artifact inventory still contained only startup metadata,
+  inherited history, and live status. Trainer PID `6336` remained alive with
+  GPU utilization sampled at `43%` and `22363 / 81920` MiB allocated. Continue
+  monitoring only E146; no scored result exists yet.
+- 2026-05-16T19:01Z-19:02Z E146 continued to advance on owned pod
+  `723hbew2jrvxjx`. A one-minute interval moved from `completed_step=8539`,
+  active step `8540`, GPU `83%`, to `completed_step=8544`, active step
+  `8545`, GPU `57%`, with memory steady at `22363 / 81920` MiB. History still
+  ends at inherited E128 step `8500`, and no `results.json`, result CSV,
+  eval-detail CSV, or E146 checkpoint exists yet. This is coherent training
+  progress, not a returned result.
