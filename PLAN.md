@@ -2705,3 +2705,21 @@ E130 returns, prefer the ramped version first:
 Decision rule is the same as E134: beat E128 and any returned E130/E131/E132
 result on primary C-alpha lDDT, keep FoldScore/dRMSD/Rg coherent, and clear
 `0.45` before any 30k-step spend.
+
+## 2026-05-16 Operating Plan Update: E146 Active
+
+E146 is still active on the owned Runpod pod and has not returned a scored
+9000-step bundle yet. Keep monitoring only E146 while it advances; do not
+update `EXPERIMENT_RESULTS.md` or launch a successor until E146 either returns
+a verified scored artifact set or becomes a documented terminal no-score run.
+
+If E146 returns below the `0.45` short gate or fails without a score, the next
+launch should be the already prepared E142 signed tetra-coboundary short gate.
+That keeps the E128 selected-complex recipe fixed and tests whether selected
+tetra cofaces should update face cochains through the oriented tetra boundary
+operator. If E142 is weak or fails, the fallback queue is E143 signed
+tetra-to-face readout, then E144 no-Hodge boundary edge-star residual. This
+queue is deliberately topology-native: E142/E143 test oriented 3-simplex
+boundary incidence, and E144 tests the residual component of a selected
+boundary 1-cochain. Do not spend a 30k run unless a returned short gate clears
+`0.45` with coherent FoldScore, dRMSD, and C-alpha Rg.

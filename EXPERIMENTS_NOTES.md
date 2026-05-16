@@ -8539,3 +8539,20 @@
   result CSV, eval-detail CSV, or E146 checkpoint exists yet. Trainer PID
   `6336` remained alive and CPU-active, with GPU utilization sampled at `39%`
   and `23191 / 81920` MiB allocated. Continue monitoring only E146.
+- 2026-05-16T19:35Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8716`, active step `8717`, active
+  microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`,
+  `stopped_early=false`, and finite last train loss `4.781200468540192`.
+  Artifact inventory remained pre-return with only `history_full_msa_to_face.json`,
+  `run_metadata.json`, and `status_full_msa_to_face.json`; no `results.json`,
+  result CSV, eval-detail CSV, or E146 checkpoint exists yet. Trainer PID
+  `6336` remained alive and CPU-active, with GPU utilization sampled at `67%`
+  and `23191 / 81920` MiB allocated.
+- 2026-05-16T19:36Z Post-E146 queue check: do not launch a successor while
+  E146 is still coherent. If E146 returns below the `0.45` short gate or
+  becomes terminal no-score, the next prepared topology-native short gate is
+  E142 signed tetra coboundary, followed by E143 signed tetra-to-face readout
+  and then E144 no-Hodge edge-star residual. This queue remains within the
+  simplicial/topological motivation: E142/E143 test oriented tetra boundary
+  incidence, and E144 tests a residual selected boundary 1-cochain. None adds
+  a generic metric-side loss.

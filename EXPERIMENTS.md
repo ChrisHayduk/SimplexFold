@@ -7312,6 +7312,19 @@ python scripts/verify_nanofold_benchmark_artifacts.py \
   --metadata simplex_outer_edge_residual_context_runtime_scale_ramp_steps=500
 ```
 
+Post-E146 queue: while E146 is coherent, do not launch a successor. If E146
+returns below the `0.45` short-gate threshold or becomes a terminal no-score
+run, launch E142 next rather than inventing a new metric-side objective. E142
+is the signed tetra-coboundary face update: it keeps the E128 selected-complex
+recipe fixed and tests the oriented upper-boundary operator from selected
+3-simplices into face cochains. If E142 does not improve the returned best,
+the next two prepared topology-native probes are E143 signed tetra-to-face
+readout and E144 no-Hodge edge-star residual boundary readout. E143 applies
+the same oriented tetra boundary signs to the learned tetra-to-face readout;
+E144 projects selected boundary-edge 1-cochains away from residue edge-star
+common modes. None of these changes adds parameters, external data, pretrained
+weights, or generic C-alpha/coordinate/radius losses.
+
 Goal-level artifact audit template, after the verifier passes:
 
 ```bash
