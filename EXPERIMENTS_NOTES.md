@@ -8697,3 +8697,15 @@
   `38235 / 81920` MiB allocated. No returned result bundle exists yet, so
   keep `EXPERIMENT_RESULTS.md` unchanged for E142 until it returns or reaches
   a documented terminal state.
+- 2026-05-16T21:14Z E142 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced from the earlier `8524` sample to `completed_step=8533`,
+  active step `8534`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, and finite last train loss
+  `4.655693680047989`. Artifact inventory remained pre-return with only
+  `history_full_msa_to_face.json`, `run_metadata.json`, and
+  `status_full_msa_to_face.json`; no `results.json`, result CSV,
+  eval-detail CSV, or E142 checkpoint exists yet. Trainer PID `13262`
+  remained alive and CPU-active, with GPU memory allocated at
+  `38237 / 81920` MiB. The instantaneous GPU-utilization sample was `0%`,
+  but step advancement confirms coherent training rather than a stall.
+  Continue monitoring only E142 and keep `EXPERIMENT_RESULTS.md` unchanged.
