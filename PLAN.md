@@ -1,3 +1,45 @@
+## 2026-05-16 Operating Plan Update: E146 Stalled, E142 Active
+
+E146 is now a terminal no-score outcome. On owned Runpod pod
+`723hbew2jrvxjx`, it advanced coherently to `completed_step=8999`, active
+step `9000`, and active microbatch `1 / 8`, then stopped updating
+`status_full_msa_to_face.json` at `2026-05-16T20:32Z`. Repeated samples
+through `2026-05-16T20:38:21Z` showed status and artifact inventory unchanged,
+no `results.json`, result CSV, eval-detail CSV, checkpoint, or new step-9000
+history row, trainer CPU time still advancing, and GPU utilization sampled at
+`0%`. The trace was pulled locally under ignored
+`artifacts/runpod_traces/e146_stalled_20260516T2038Z/`, and only the E146
+process tree was stopped. Record E146 as a failed final-step stall with no
+scored architectural evidence.
+
+E142 is now the active owned Runpod gate on the same pod from staged checkout
+`/workspace/SimplexFold_e142` at commit `62fda26`. It keeps the E128 selected
+complex recipe fixed and tests the parameter-free signed tetra coboundary face
+update: selected tetra cofaces update face cochains through the oriented
+3-simplex boundary signs rather than through an unsigned sibling-face mean.
+Launch wrapper PID is `13260`, trainer PID is `13262`, log is
+`/workspace/SimplexFold_e142/logs/e142_signed_tetra_coboundary.log`, and
+artifact directory is
+`/workspace/SimplexFold_e142/artifacts/nanofold_public_benchmarks/e142_signed_tetra_coboundary_from_e128_s9000_c256_m64`.
+Latest heartbeat at `2026-05-16T21:09:44Z` showed coherent progress at
+`completed_step=8515`, active step `8516`, active microbatch `1 / 8`,
+effective batch size `8`, `num_workers=0`, finite last train loss
+`4.59290337562561`, live trainer PID `13262`, and GPU utilization sampled
+at `40%` with `38235 / 81920` MiB allocated. The artifact directory still has
+no `results.json`, result CSV, eval-detail CSV, or E142 checkpoint, so this is
+in-flight training rather than a result.
+
+Next actions:
+
+1. Monitor only the owned E142 pod/run for status movement and returned
+   artifacts.
+2. Do not update `EXPERIMENT_RESULTS.md` for E142 until it returns a scored
+   bundle or reaches a documented terminal no-score state.
+3. If E142 returns, run the normal verifier, goal audit, and eval-detail
+   analyzer before recording the result.
+4. Still do not spend 30,000 steps unless a short gate clears `0.45` primary
+   C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
+
 ## 2026-05-16 Operating Plan Update: E145 Stalled, E146 Active
 
 E145 is now a terminal no-score outcome, not an in-flight result. On owned

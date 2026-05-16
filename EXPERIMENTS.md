@@ -6743,9 +6743,9 @@ single-process DataLoader path.
 
 ### E142: Signed Tetra Coboundary Face Update
 
-Status: locally implemented, validated, and staged; do not launch while E141
-is active. Treat this as a parked topology-native fallback after E141 is
-documented or deliberately skipped.
+Status: active on owned Runpod pod `723hbew2jrvxjx` after E146 reached a
+terminal no-score final-step stall. Treat this as the current topology-native
+short gate.
 
 Hypothesis: the selected tetra cofaces should update face cochains through the
 oriented tetra boundary operator, not through an unsigned sibling-face mean.
@@ -6879,6 +6879,21 @@ Validation status on the local branch from the E138/E139 staging window:
   the documented run name, step target, effective batch size,
   crop/MSA/template settings, parameter cap, default `num_workers=0`, signed
   tetra-coboundary static scale, and the `8500`-to-`9000` runtime ramp.
+- Launch: E142 was launched on 2026-05-16 from `/workspace/SimplexFold_e142`
+  at commit `62fda26`, after E146 trace preservation and targeted E146 PID
+  shutdown. The run name is
+  `e142_signed_tetra_coboundary_from_e128_s9000_c256_m64`, launch wrapper PID
+  is `13260`, trainer PID is `13262`, and the artifact directory is
+  `/workspace/SimplexFold_e142/artifacts/nanofold_public_benchmarks/e142_signed_tetra_coboundary_from_e128_s9000_c256_m64`.
+  It resumed the E128 checkpoint at step `8500`, loaded `1332` matching model
+  tensors, initialized `0` new/missing tensors, and started a fresh optimizer.
+  The launch uses effective batch size `8`, crop `256`, MSA depth `64`,
+  `num_workers=0`, max parameter cap `3,261,974`, and no external templates,
+  pretrained weights, external MSA retrieval, or metric-side C-alpha loss.
+  Latest heartbeat at `2026-05-16T21:09:44Z` showed `completed_step=8515`,
+  active step `8516`, active microbatch `1 / 8`, finite last train loss
+  `4.59290337562561`, GPU utilization sampled at `40%`, and no returned
+  result bundle yet.
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 
@@ -7416,7 +7431,8 @@ Validation status:
 
 ### E146: Exact Outer-Neighborhood Context Memory Reduction
 
-Status: active on owned Runpod pod `723hbew2jrvxjx`.
+Status: failed final-step stall/no-score. E146 reached final-step watch on
+owned Runpod pod `723hbew2jrvxjx`, but did not return a scored result.
 
 Hypothesis: E145 may be stressing the final-step path because the
 parameter-free outer-neighborhood cochain update computes over many candidate
@@ -7463,6 +7479,18 @@ Startup status at `2026-05-16T18:57Z` reached `completed_step=8512`, active
 step `8513`, active microbatch `1 / 8`, `effective_batch_size=8`,
 `num_workers=4`, finite train loss `4.638599187135696`, and GPU utilization
 sampled at `52%` with `22359 / 81920` MiB allocated.
+
+Outcome: failed final-step stall/no-score. E146 advanced coherently to
+`completed_step=8999`, active step `9000`, and active microbatch `1 / 8`, with
+no `results.json`, result CSV, eval-detail CSV, checkpoint, or new history row
+beyond inherited E128 step `8500`. The status file stopped updating at
+`2026-05-16T20:32Z`; repeated samples through `2026-05-16T20:38:21Z` showed
+status/artifacts unchanged, trainer CPU time advancing, and GPU utilization
+sampled `0%`. Trace was preserved locally under ignored
+`artifacts/runpod_traces/e146_stalled_20260516T2038Z/`, only the owned E146
+process tree was stopped, and the same owned pod was reused for E142. Treat
+this as a runtime stall, not scored evidence against the exact
+outer-neighborhood architecture.
 
 Returned-artifact verification template, after pulling the completed remote
 artifact directory locally:

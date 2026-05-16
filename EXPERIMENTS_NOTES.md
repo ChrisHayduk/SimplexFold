@@ -8670,3 +8670,30 @@
   `6336` remained alive and CPU-active, with GPU utilization sampled at `65%`
   and `23191 / 81920` MiB allocated. Continue monitoring only E146 and keep
   `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-16T20:38Z E146 was classified as a terminal final-step stall on
+  owned Runpod pod `723hbew2jrvxjx`. It had reached `completed_step=8999`,
+  active step `9000`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  and `num_workers=4`, then stopped updating `status_full_msa_to_face.json`
+  at `2026-05-16T20:32Z`. Repeated samples through
+  `2026-05-16T20:38:21Z` showed no `results.json`, result CSV,
+  eval-detail CSV, checkpoint, or new step-9000 history row; status and
+  artifact inventory stayed unchanged, trainer CPU time continued advancing,
+  and GPU utilization sampled `0%`. Preserved the trace locally under ignored
+  `artifacts/runpod_traces/e146_stalled_20260516T2038Z/`, then stopped only
+  the owned E146 process tree. Treat E146 as a runtime stall/no-score, not
+  scored evidence against the exact outer-neighborhood architecture.
+- 2026-05-16T21:08Z Launched E142 signed tetra coboundary face update on the
+  same owned Runpod pod from `/workspace/SimplexFold_e142` at commit
+  `62fda26`. Run name:
+  `e142_signed_tetra_coboundary_from_e128_s9000_c256_m64`; launch wrapper PID
+  `13260`, trainer PID `13262`; artifact directory:
+  `/workspace/SimplexFold_e142/artifacts/nanofold_public_benchmarks/e142_signed_tetra_coboundary_from_e128_s9000_c256_m64`.
+  E142 resumed the E128 checkpoint at step `8500`, loaded `1332` matching
+  model tensors, initialized `0` new/missing tensors, and started a fresh
+  optimizer. Latest heartbeat at `2026-05-16T21:09:44Z` showed
+  `completed_step=8515`, active step `8516`, active microbatch `1 / 8`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.59290337562561`, GPU utilization sampled at `40%`, and
+  `38235 / 81920` MiB allocated. No returned result bundle exists yet, so
+  keep `EXPERIMENT_RESULTS.md` unchanged for E142 until it returns or reaches
+  a documented terminal state.
