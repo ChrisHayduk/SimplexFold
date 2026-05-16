@@ -7358,6 +7358,16 @@ step `8526`, active microbatch `1 / 8`, `effective_batch_size=8`,
 `num_workers=4`, `stopped_early=false`, inherited history ending at E128 step
 `8500`, and no returned result bundle yet.
 
+Outcome: failed final-step stall/no-score. E145 reached `completed_step=8999`,
+active step `9000`, and microbatch `1 / 8`, then stopped updating status at
+`2026-05-16T17:03:26Z`. A later `2026-05-16T17:59:50Z` to `18:00:50Z`
+interval showed CPU time advancing from `23:07:17` to `23:29:42` while status
+and artifact inventory stayed unchanged and GPU utilization sampled `0%`.
+Trace was pulled locally under ignored
+`artifacts/runpod_traces/e145_stalled_20260516T1800Z/`, only the E145 PIDs were
+stopped, and the owned pod was reused for E146. Treat this as a runtime stall,
+not scored evidence against the outer-neighborhood architecture.
+
 Validation status:
 
 - `python -m py_compile minalphafold/simplex.py minalphafold/evoformer.py minalphafold/model.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_trainer.py tests/test_nanofold_public_benchmarks.py`: passed.
@@ -7377,10 +7387,9 @@ Validation status:
   crop/MSA/template settings, `--num-workers 4`, parameter cap, static
   residual scale, and `8500`-to-`9000` runtime ramp.
 
-### E146 Parked Idea: Exact Outer-Neighborhood Context Memory Reduction
+### E146: Exact Outer-Neighborhood Context Memory Reduction
 
-Status: parked; do not launch while E145 is still alive unless E145 returns a
-verified scored bundle or becomes a documented terminal no-score run.
+Status: active on owned Runpod pod `723hbew2jrvxjx`.
 
 Hypothesis: E145 may be stressing the final-step path because the
 parameter-free outer-neighborhood cochain update computes over many candidate
@@ -7410,3 +7419,43 @@ Validation so far:
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m py_compile minalphafold/simplex.py tests/test_simplex.py`: passed.
 - `/Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/python -m pytest tests/test_simplex.py -k "outer_edge_context or outer_edge_residual"`: `7 passed, 90 deselected`; pytest emitted a cache-write warning for the parent repo `.pytest_cache`, but the tests passed.
 - `RUFF_CACHE_DIR=/private/tmp/simplexfold_ruff_cache /Users/christopherhayduk/Projects/nanoFold-Competition/.venv/bin/ruff check minalphafold/simplex.py tests/test_simplex.py --ignore E741`: passed. The `E741` ignore isolates the pre-existing ambiguous-name style pattern already present throughout `simplex.py`.
+
+Launch: E146 was launched on 2026-05-16 on the same owned Runpod pod
+`723hbew2jrvxjx` after E145 trace preservation and PID shutdown. The remote
+checkout is `/workspace/SimplexFold_e146` at commit `f610b81`; NanoFold public
+data are staged through symlinks under `/workspace/nanoFold-Competition/data`,
+with `find -L` confirming `11000` feature NPZs and `11000` label NPZs plus
+`10000 / 1000` train/val manifest rows. The run resumed the E128 checkpoint at
+step `8500`, loaded `1332` matching tensors, initialized `0` new/missing
+tensors, and started a fresh optimizer. Launch wrapper PID is `6334`, trainer
+PID is `6336`, log is
+`/workspace/SimplexFold_e146/logs/e146_outer_residual_context_exact.log`, and
+artifact directory is
+`/workspace/SimplexFold_e146/artifacts/nanofold_public_benchmarks/e146_outer_residual_context_exact_from_e128_s9000_c256_m64`.
+Startup status at `2026-05-16T18:57Z` reached `completed_step=8512`, active
+step `8513`, active microbatch `1 / 8`, `effective_batch_size=8`,
+`num_workers=4`, finite train loss `4.638599187135696`, and GPU utilization
+sampled at `52%` with `22359 / 81920` MiB allocated.
+
+Returned-artifact verification template, after pulling the completed remote
+artifact directory locally:
+
+```bash
+python scripts/verify_nanofold_benchmark_artifacts.py \
+  artifacts/nanofold_public_benchmarks/e146_outer_residual_context_exact_from_e128_s9000_c256_m64 \
+  --expected-completed-steps 9000 \
+  --expected-effective-batch-size 8 \
+  --expected-num-workers 4 \
+  --max-parameters 3261974 \
+  --expected-results-rows 1 \
+  --expected-eval-rows 1000 \
+  --expected-history-last-step 9000 \
+  --expect-stopped-early false \
+  --metadata run_name=e146_outer_residual_context_exact_from_e128_s9000_c256_m64 \
+  --metadata model_config=simplexfold_medium_param_matched \
+  --metadata simplex_outer_edge_residual_context_scale=0.25 \
+  --metadata simplex_outer_edge_residual_context_runtime_scale=0.0 \
+  --metadata simplex_outer_edge_residual_context_runtime_scale_final=0.25 \
+  --metadata simplex_outer_edge_residual_context_runtime_scale_ramp_start_step=8500 \
+  --metadata simplex_outer_edge_residual_context_runtime_scale_ramp_steps=500
+```

@@ -8346,3 +8346,43 @@
   roughly `886%`, with GPU utilization again sampled at `0%` and
   `29137 / 81920` MiB allocated. Continue the watch; do not classify this as
   terminal no-score yet without stronger evidence.
+- 2026-05-16T17:59Z-18:01Z E145 was classified as a terminal final-step
+  stall/no-score outcome on owned pod `723hbew2jrvxjx`. A one-minute interval
+  diagnostic from `17:59:50Z` to `18:00:50Z` showed the status file mtime and
+  size frozen at `2026-05-16T17:03:26Z` / `681` bytes, artifact inventory
+  still limited to `history_full_msa_to_face.json`, `run_metadata.json`, and
+  `status_full_msa_to_face.json`, trainer CPU time advancing from `23:07:17`
+  to `23:29:42`, and GPU utilization sampled at `0%` with
+  `29137 / 81920` MiB allocated. Preserved the trace locally under ignored
+  `artifacts/runpod_traces/e145_stalled_20260516T1800Z/`, including the
+  artifact directory, log, process sample, GPU sample, and artifact inventory.
+  Stopped only the owned E145 launcher/trainer PIDs `345` and `347`; no
+  benchmark process or GPU compute app remained afterward.
+- 2026-05-16T18:54Z-18:57Z E146 was launched on the same owned pod
+  `723hbew2jrvxjx` from clean checkout `/workspace/SimplexFold_e146` at
+  commit `f610b81`. E146 is the same outer-neighborhood selected-cell
+  transport gate as E145, but with the exact `cell_outer_edge_context`
+  memory-reduction code that reduces outgoing and incoming external-edge
+  means before concatenation. Public NanoFold data are symlinked under
+  `/workspace/nanoFold-Competition/data`; `find -L` confirmed `11000`
+  feature NPZs and `11000` label NPZs, and manifests are `10000 / 1000`
+  train/val rows. Remote `py_compile` passed for the model, trainer, and
+  benchmark runner modules. Launch wrapper PID is `6334`, trainer PID is
+  `6336`, run name is
+  `e146_outer_residual_context_exact_from_e128_s9000_c256_m64`, log is
+  `/workspace/SimplexFold_e146/logs/e146_outer_residual_context_exact.log`,
+  and artifact directory is
+  `/workspace/SimplexFold_e146/artifacts/nanofold_public_benchmarks/e146_outer_residual_context_exact_from_e128_s9000_c256_m64`.
+  Startup status at `18:57Z` showed resume from E128 step `8500`, `1332`
+  matching tensors loaded, `0` new/missing tensors, `completed_step=8512`,
+  active step `8513`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, finite last train loss `4.638599187135696`, and GPU
+  utilization sampled at `52%` with `22359 / 81920` MiB allocated.
+- 2026-05-16T18:58Z E146 heartbeat remained healthy on owned pod
+  `723hbew2jrvxjx`: status advanced to `completed_step=8523`, active step
+  `8524`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=4`, and finite last train loss `4.705839097499847`. Trainer
+  PID `6336` remained alive and CPU-active, and GPU utilization sampled at
+  `32%` with `22361 / 81920` MiB allocated. No returned result bundle yet;
+  keep `EXPERIMENT_RESULTS.md` unchanged for E146 until a scored or terminal
+  outcome exists.

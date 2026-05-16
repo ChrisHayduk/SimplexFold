@@ -1,3 +1,39 @@
+## 2026-05-16 Operating Plan Update: E145 Stalled, E146 Active
+
+E145 is now a terminal no-score outcome, not an in-flight result. On owned
+Runpod pod `723hbew2jrvxjx`, it reached `completed_step=8999`, active step
+`9000`, and active microbatch `1 / 8`, then stopped updating
+`status_full_msa_to_face.json` at `2026-05-16T17:03:26Z`. A later
+`2026-05-16T17:59:50Z` to `18:00:50Z` interval showed status and artifact
+inventory unchanged, trainer CPU time advancing from `23:07:17` to
+`23:29:42`, and GPU utilization sampled at `0%`. The trace was pulled locally
+under ignored `artifacts/runpod_traces/e145_stalled_20260516T1800Z/`, and
+only the E145 PIDs were stopped. Record E145 as a failed final-step stall with
+no scored architectural evidence.
+
+E146 is now the active owned Runpod gate on the same pod from clean checkout
+`/workspace/SimplexFold_e146` at commit `f610b81`. It reruns the same
+outer-neighborhood selected-cell transport hypothesis from E128, but with the
+exact `cell_outer_edge_context` memory reduction that preserves the directed
+external-edge cochain mean and parameter count. Launch wrapper PID is `6334`,
+trainer PID is `6336`, log is
+`/workspace/SimplexFold_e146/logs/e146_outer_residual_context_exact.log`, and
+artifact directory is
+`/workspace/SimplexFold_e146/artifacts/nanofold_public_benchmarks/e146_outer_residual_context_exact_from_e128_s9000_c256_m64`.
+Startup at `2026-05-16T18:57Z` reached `completed_step=8512`, active step
+`8513`, active microbatch `1 / 8`, with GPU utilization sampled at `52%`.
+
+Next actions:
+
+1. Monitor only the owned E146 pod/run for status movement and returned
+   artifacts.
+2. Do not update `EXPERIMENT_RESULTS.md` for E146 until it returns a scored
+   bundle or reaches a documented terminal no-score state.
+3. If E146 returns, run the normal verifier, goal audit, and eval-detail
+   analyzer before recording the result.
+4. Still do not spend 30,000 steps unless a short gate clears `0.45` primary
+   C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
+
 ## 2026-05-16 Operating Plan Update: E145 Final-Step Watch
 
 E145 has reached the final short-gate step region on owned Runpod pod
