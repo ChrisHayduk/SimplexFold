@@ -8454,3 +8454,13 @@
   heartbeat automation was updated from stale E145 process/artifact paths to
   E146's PID, log, and artifact paths. Continue monitoring only E146 and keep
   `EXPERIMENT_RESULTS.md` unchanged until a scored or terminal outcome exists.
+- 2026-05-16T19:20Z E146 continued advancing on owned pod
+  `723hbew2jrvxjx`. Status reached `completed_step=8632`, active step `8633`,
+  active microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`,
+  `stopped_early=false`, and finite last train loss `4.637099087238312`.
+  Artifact inventory remained pre-return with only inherited history,
+  run metadata, and live status; no `results.json`, result CSV, eval-detail
+  CSV, or E146 checkpoint exists yet. Trainer PID `6336` remained alive and
+  CPU-active, with GPU utilization sampled at `65%` and `23191 / 81920` MiB
+  allocated. Continue monitoring only E146; this is still in-flight training,
+  not a scored or terminal outcome.
