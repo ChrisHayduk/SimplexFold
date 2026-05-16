@@ -8410,3 +8410,10 @@
   eval-detail CSV, or E146 checkpoint exists yet. Trainer PID `6336` remained
   alive with GPU utilization sampled at `100%` and `23191 / 81920` MiB
   allocated. Continue monitoring E146 only.
+- 2026-05-16T19:04Z follow-up sample after the previous commit confirmed E146
+  continued advancing on owned pod `723hbew2jrvxjx`: status reached
+  `completed_step=8558`, active step `8559`, active microbatch `1 / 8`,
+  `effective_batch_size=8`, `num_workers=4`, and finite last train loss
+  `4.505498677492142`. GPU utilization sampled at `36%` with
+  `23191 / 81920` MiB allocated. No returned result bundle exists yet, so
+  `EXPERIMENT_RESULTS.md` remains unchanged.
