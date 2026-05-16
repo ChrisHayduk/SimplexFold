@@ -8441,3 +8441,16 @@
   with no `results.json`, result CSV, eval-detail CSV, or E146 checkpoint.
   Trainer PID `6336` remained alive and GPU utilization sampled at `41%` with
   `23191 / 81920` MiB allocated. Continue monitoring only E146.
+- 2026-05-16T19:16Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  `runpodctl pod get` still reported the owned pod as `RUNNING`. Status
+  advanced to `completed_step=8615`, active step `8616`, active microbatch
+  `1 / 8`, `effective_batch_size=8`, `num_workers=4`, `stopped_early=false`,
+  and finite last train loss `4.3651726841926575`. Artifact inventory
+  remained pre-return with only `history_full_msa_to_face.json`,
+  `run_metadata.json`, and `status_full_msa_to_face.json`; no `results.json`,
+  result CSV, eval-detail CSV, or E146 checkpoint exists yet. Trainer PID
+  `6336` remained alive and CPU-active, and GPU utilization sampled at `67%`
+  with `23191 / 81920` MiB allocated. The existing 30-minute SimplexFold
+  heartbeat automation was updated from stale E145 process/artifact paths to
+  E146's PID, log, and artifact paths. Continue monitoring only E146 and keep
+  `EXPERIMENT_RESULTS.md` unchanged until a scored or terminal outcome exists.
