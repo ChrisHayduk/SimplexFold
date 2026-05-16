@@ -8434,3 +8434,10 @@
   with no `results.json`, result CSV, eval-detail CSV, or E146 checkpoint.
   Trainer PID `6336` remained alive and GPU utilization sampled at `56%` with
   `23191 / 81920` MiB allocated. Continue monitoring only E146.
+- 2026-05-16T19:12Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8593`, active step `8594`, active
+  microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`, and finite
+  last train loss `4.511488437652588`. Artifact inventory remained pre-return
+  with no `results.json`, result CSV, eval-detail CSV, or E146 checkpoint.
+  Trainer PID `6336` remained alive and GPU utilization sampled at `41%` with
+  `23191 / 81920` MiB allocated. Continue monitoring only E146.
