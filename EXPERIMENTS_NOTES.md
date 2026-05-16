@@ -8427,3 +8427,10 @@
   alive and GPU utilization sampled at `47%` with `23191 / 81920` MiB
   allocated. Continue watching E146; do not update `EXPERIMENT_RESULTS.md`
   for this in-flight state.
+- 2026-05-16T19:10Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8583`, active step `8584`, active
+  microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`, and finite
+  last train loss `4.644069284200668`. Artifact inventory remained pre-return
+  with no `results.json`, result CSV, eval-detail CSV, or E146 checkpoint.
+  Trainer PID `6336` remained alive and GPU utilization sampled at `56%` with
+  `23191 / 81920` MiB allocated. Continue monitoring only E146.
