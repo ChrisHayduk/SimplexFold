@@ -6890,10 +6890,10 @@ Validation status on the local branch from the E138/E139 staging window:
   The launch uses effective batch size `8`, crop `256`, MSA depth `64`,
   `num_workers=0`, max parameter cap `3,261,974`, and no external templates,
   pretrained weights, external MSA retrieval, or metric-side C-alpha loss.
-  Latest heartbeat at `2026-05-16T21:48:54Z` showed `completed_step=8668`,
-  active step `8669`, phase `microbatch_forward_start`, active microbatch
-  `1 / 8`, finite last train loss `4.778805673122406`, GPU utilization
-  sampled at `74%`, GPU memory allocated at `43101 / 81920` MiB, and no
+  Latest heartbeat at `2026-05-16T21:51:05Z` showed `completed_step=8676`,
+  active step `8677`, phase `microbatch_done`, active microbatch `1 / 8`,
+  finite last train loss `4.334850788116455`, GPU utilization sampled at
+  `60%`, GPU memory allocated at `43101 / 81920` MiB, and no
   returned result bundle yet. Keep treating E142 as coherent in-flight
   training.
 
