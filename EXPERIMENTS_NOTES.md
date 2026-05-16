@@ -8566,3 +8566,13 @@
   at commit `f610b81`; remote `py_compile` passed for the model, trainer, and
   benchmark runner files. Updated the E142 launch recipe docs to use the
   current-pod checkpoint path.
+- 2026-05-16T19:45Z E146 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8767`, active step `8768`, active
+  microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=4`,
+  `stopped_early=false`, and finite last train loss `4.68983581662178`.
+  Artifact inventory remained pre-return with only `history_full_msa_to_face.json`,
+  `run_metadata.json`, and `status_full_msa_to_face.json`; no `results.json`,
+  result CSV, eval-detail CSV, or E146 checkpoint exists yet. Trainer PID
+  `6336` remained alive and CPU-active, with GPU utilization sampled at `44%`
+  and `23191 / 81920` MiB allocated. Continue monitoring only E146 and keep
+  `EXPERIMENT_RESULTS.md` unchanged until a scored or terminal outcome exists.
