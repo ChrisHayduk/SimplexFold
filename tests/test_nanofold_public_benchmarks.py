@@ -1748,6 +1748,250 @@ def test_e141_signed_face_cyclic_recipe_matches_running_gate():
     assert simplex_boundary_signed_face_cyclic_readout_runtime_scale_at_step(training_config, 9000) == 0.25
 
 
+def test_e142_signed_tetra_coboundary_recipe_matches_documented_gate():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face",
+            "--run-name",
+            "e142_signed_tetra_coboundary_from_e128_s9000_c256_m64",
+            "--steps",
+            "9000",
+            "--batch-size",
+            "1",
+            "--grad-accum-steps",
+            "8",
+            "--crop-size",
+            "256",
+            "--msa-depth",
+            "64",
+            "--extra-msa-depth",
+            "0",
+            "--max-templates",
+            "0",
+            "--max-parameters",
+            "3261974",
+            "--resume-model-weights-only",
+            "--simplex-boundary-edge-frame-gate-scale",
+            "0.05",
+            "--simplex-triangle-attention-bias-scale",
+            "0.0125",
+            "--simplex-signed-tetra-coboundary-scale",
+            "0.25",
+            "--simplex-signed-tetra-coboundary-runtime-scale",
+            "0.0",
+            "--simplex-signed-tetra-coboundary-runtime-scale-final",
+            "0.25",
+            "--simplex-signed-tetra-coboundary-runtime-scale-ramp-start-step",
+            "8500",
+            "--simplex-signed-tetra-coboundary-runtime-scale-ramp-steps",
+            "500",
+        ]
+    )
+
+    assert args.run_name == "e142_signed_tetra_coboundary_from_e128_s9000_c256_m64"
+    assert args.steps == 9000
+    assert args.batch_size * args.grad_accum_steps == 8
+    assert args.crop_size == 256
+    assert args.msa_depth == 64
+    assert args.extra_msa_depth == 0
+    assert args.max_templates == 0
+    assert args.max_parameters == 3_261_974
+    assert args.num_workers == 0
+    assert args.resume_model_weights_only is True
+    assert args.simplex_boundary_edge_frame_gate_scale == 0.05
+    assert args.simplex_triangle_attention_bias_scale == 0.0125
+
+    cfg = _apply_model_config_overrides(
+        _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face"),
+        args,
+    )
+    assert cfg.simplex_signed_tetra_coboundary_scale == 0.25
+    _enforce_parameter_budget(
+        variant="full_msa_to_face",
+        parameter_count=3_240_738,
+        max_parameters=args.max_parameters,
+    )
+
+    training_config = TrainingConfig(
+        simplex_signed_tetra_coboundary_runtime_scale=args.simplex_signed_tetra_coboundary_runtime_scale,
+        simplex_signed_tetra_coboundary_runtime_scale_final=(
+            args.simplex_signed_tetra_coboundary_runtime_scale_final
+        ),
+        simplex_signed_tetra_coboundary_runtime_scale_ramp_start_step=(
+            args.simplex_signed_tetra_coboundary_runtime_scale_ramp_start_step
+        ),
+        simplex_signed_tetra_coboundary_runtime_scale_ramp_steps=(
+            args.simplex_signed_tetra_coboundary_runtime_scale_ramp_steps
+        ),
+    )
+    assert simplex_signed_tetra_coboundary_runtime_scale_at_step(training_config, 8500) == 0.0
+    assert simplex_signed_tetra_coboundary_runtime_scale_at_step(training_config, 8750) == 0.125
+    assert simplex_signed_tetra_coboundary_runtime_scale_at_step(training_config, 9000) == 0.25
+
+
+def test_e143_signed_tetra_to_face_recipe_matches_documented_gate():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face",
+            "--run-name",
+            "e143_signed_tetra_to_face_from_e128_s9000_c256_m64",
+            "--steps",
+            "9000",
+            "--batch-size",
+            "1",
+            "--grad-accum-steps",
+            "8",
+            "--crop-size",
+            "256",
+            "--msa-depth",
+            "64",
+            "--extra-msa-depth",
+            "0",
+            "--max-templates",
+            "0",
+            "--max-parameters",
+            "3261974",
+            "--resume-model-weights-only",
+            "--simplex-boundary-edge-frame-gate-scale",
+            "0.05",
+            "--simplex-triangle-attention-bias-scale",
+            "0.0125",
+            "--simplex-signed-tetra-to-face-scale",
+            "0.25",
+            "--simplex-signed-tetra-to-face-runtime-scale",
+            "0.0",
+            "--simplex-signed-tetra-to-face-runtime-scale-final",
+            "0.25",
+            "--simplex-signed-tetra-to-face-runtime-scale-ramp-start-step",
+            "8500",
+            "--simplex-signed-tetra-to-face-runtime-scale-ramp-steps",
+            "500",
+        ]
+    )
+
+    assert args.run_name == "e143_signed_tetra_to_face_from_e128_s9000_c256_m64"
+    assert args.steps == 9000
+    assert args.batch_size * args.grad_accum_steps == 8
+    assert args.crop_size == 256
+    assert args.msa_depth == 64
+    assert args.extra_msa_depth == 0
+    assert args.max_templates == 0
+    assert args.max_parameters == 3_261_974
+    assert args.num_workers == 0
+    assert args.resume_model_weights_only is True
+    assert args.simplex_boundary_edge_frame_gate_scale == 0.05
+    assert args.simplex_triangle_attention_bias_scale == 0.0125
+
+    cfg = _apply_model_config_overrides(
+        _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face"),
+        args,
+    )
+    assert cfg.simplex_signed_tetra_to_face_scale == 0.25
+    _enforce_parameter_budget(
+        variant="full_msa_to_face",
+        parameter_count=3_240_738,
+        max_parameters=args.max_parameters,
+    )
+
+    training_config = TrainingConfig(
+        simplex_signed_tetra_to_face_runtime_scale=args.simplex_signed_tetra_to_face_runtime_scale,
+        simplex_signed_tetra_to_face_runtime_scale_final=args.simplex_signed_tetra_to_face_runtime_scale_final,
+        simplex_signed_tetra_to_face_runtime_scale_ramp_start_step=(
+            args.simplex_signed_tetra_to_face_runtime_scale_ramp_start_step
+        ),
+        simplex_signed_tetra_to_face_runtime_scale_ramp_steps=(
+            args.simplex_signed_tetra_to_face_runtime_scale_ramp_steps
+        ),
+    )
+    assert simplex_signed_tetra_to_face_runtime_scale_at_step(training_config, 8500) == 0.0
+    assert simplex_signed_tetra_to_face_runtime_scale_at_step(training_config, 8750) == 0.125
+    assert simplex_signed_tetra_to_face_runtime_scale_at_step(training_config, 9000) == 0.25
+
+
+def test_e144_edge_star_residual_recipe_matches_documented_gate():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face",
+            "--run-name",
+            "e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64",
+            "--steps",
+            "9000",
+            "--batch-size",
+            "1",
+            "--grad-accum-steps",
+            "8",
+            "--crop-size",
+            "256",
+            "--msa-depth",
+            "64",
+            "--extra-msa-depth",
+            "0",
+            "--max-templates",
+            "0",
+            "--max-parameters",
+            "3261974",
+            "--resume-model-weights-only",
+            "--simplex-boundary-edge-frame-gate-scale",
+            "0.05",
+            "--simplex-triangle-attention-bias-scale",
+            "0.0125",
+            "--simplex-boundary-edge-star-residual-scale",
+            "0.25",
+            "--simplex-boundary-edge-star-residual-runtime-scale",
+            "0.0",
+            "--simplex-boundary-edge-star-residual-runtime-scale-final",
+            "0.25",
+            "--simplex-boundary-edge-star-residual-runtime-scale-ramp-start-step",
+            "8500",
+            "--simplex-boundary-edge-star-residual-runtime-scale-ramp-steps",
+            "500",
+        ]
+    )
+
+    assert args.run_name == "e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64"
+    assert args.steps == 9000
+    assert args.batch_size * args.grad_accum_steps == 8
+    assert args.crop_size == 256
+    assert args.msa_depth == 64
+    assert args.extra_msa_depth == 0
+    assert args.max_templates == 0
+    assert args.max_parameters == 3_261_974
+    assert args.num_workers == 0
+    assert args.resume_model_weights_only is True
+    assert args.simplex_boundary_edge_frame_gate_scale == 0.05
+    assert args.simplex_triangle_attention_bias_scale == 0.0125
+
+    cfg = _apply_model_config_overrides(
+        _variant_config(load_model_config("simplexfold_medium_param_matched"), "full_msa_to_face"),
+        args,
+    )
+    assert cfg.simplex_boundary_edge_star_residual_scale == 0.25
+    _enforce_parameter_budget(
+        variant="full_msa_to_face",
+        parameter_count=3_240_738,
+        max_parameters=args.max_parameters,
+    )
+
+    training_config = TrainingConfig(
+        simplex_boundary_edge_star_residual_runtime_scale=args.simplex_boundary_edge_star_residual_runtime_scale,
+        simplex_boundary_edge_star_residual_runtime_scale_final=(
+            args.simplex_boundary_edge_star_residual_runtime_scale_final
+        ),
+        simplex_boundary_edge_star_residual_runtime_scale_ramp_start_step=(
+            args.simplex_boundary_edge_star_residual_runtime_scale_ramp_start_step
+        ),
+        simplex_boundary_edge_star_residual_runtime_scale_ramp_steps=(
+            args.simplex_boundary_edge_star_residual_runtime_scale_ramp_steps
+        ),
+    )
+    assert simplex_boundary_edge_star_residual_runtime_scale_at_step(training_config, 8500) == 0.0
+    assert simplex_boundary_edge_star_residual_runtime_scale_at_step(training_config, 8750) == 0.125
+    assert simplex_boundary_edge_star_residual_runtime_scale_at_step(training_config, 9000) == 0.25
+
+
 def test_e145_outer_residual_context_recipe_matches_documented_gate():
     args = parse_args(
         [

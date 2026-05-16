@@ -6868,6 +6868,11 @@ Validation status on the local branch from the E138/E139 staging window:
   validation accepted the documented E142 command with effective batch size
   `8`, max-parameter cap `3261974`, signed static scale `0.25`, and signed
   runtime final scale `0.25`.
+- Launch-recipe guard:
+  `test_e142_signed_tetra_coboundary_recipe_matches_documented_gate` locks
+  the documented run name, step target, effective batch size,
+  crop/MSA/template settings, parameter cap, default `num_workers=0`, signed
+  tetra-coboundary static scale, and the `8500`-to-`9000` runtime ramp.
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 
@@ -7000,6 +7005,11 @@ Validation status on the local branch from the E138/E139 staging window:
   validation accepted the documented E143 command with effective batch size
   `8`, max-parameter cap `3261974`, signed static scale `0.25`, and signed
   runtime final scale `0.25`.
+- Launch-recipe guard:
+  `test_e143_signed_tetra_to_face_recipe_matches_documented_gate` locks the
+  documented run name, step target, effective batch size, crop/MSA/template
+  settings, parameter cap, default `num_workers=0`, signed tetra-to-face
+  static scale, and the `8500`-to-`9000` runtime ramp.
 
 ### E144: No-Hodge Edge-Star Residual Boundary Readout
 
@@ -7125,6 +7135,11 @@ Validation status:
   size `8`, max-parameter cap `3261974`, static residual scale `0.25`, and
   runtime final scale `0.25`. The full E128-style architecture audit counted
   `3,240,738` parameters, still under the cap.
+- Launch-recipe guard:
+  `test_e144_edge_star_residual_recipe_matches_documented_gate` locks the
+  documented run name, step target, effective batch size, crop/MSA/template
+  settings, parameter cap, default `num_workers=0`, edge-star residual static
+  scale, and the `8500`-to-`9000` runtime ramp.
 
 ### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
 

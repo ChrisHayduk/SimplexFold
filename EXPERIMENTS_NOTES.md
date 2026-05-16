@@ -1,5 +1,28 @@
 # SimplexFold Experiment Notes
 
+## 2026-05-15 Parked Signed-Boundary Recipe Guards
+
+- Added local launch-recipe guards for the documented parked E142, E143, and
+  E144 fallbacks. These tests lock run names, step target `9000`, effective
+  batch size `8`, crop `256`, MSA depth `64`, no extra MSA/templates, the
+  `3,261,974` parameter cap, default `num_workers=0`, each topology-native
+  static scale, and each `8500`-to-`9000` runtime ramp.
+- This is non-invasive prep only. E141 remains the active owned Runpod run,
+  and E145 remains the next launch candidate if E141 returns below threshold
+  or fails coherently. Do not launch E142/E143/E144 ahead of E141/E145 without
+  an explicit branch-choice reason.
+- Focused validation passed:
+  `python -m pytest tests/test_nanofold_public_benchmarks.py::test_e141_signed_face_cyclic_recipe_matches_running_gate
+  tests/test_nanofold_public_benchmarks.py::test_e142_signed_tetra_coboundary_recipe_matches_documented_gate
+  tests/test_nanofold_public_benchmarks.py::test_e143_signed_tetra_to_face_recipe_matches_documented_gate
+  tests/test_nanofold_public_benchmarks.py::test_e144_edge_star_residual_recipe_matches_documented_gate
+  tests/test_nanofold_public_benchmarks.py::test_e145_outer_residual_context_recipe_matches_documented_gate`
+  (`5 passed`), `python -m py_compile
+  tests/test_nanofold_public_benchmarks.py`, and
+  `../../.venv/bin/ruff check --select F821,F822,F823
+  tests/test_nanofold_public_benchmarks.py`. Pytest cache writes were blocked
+  by the sandbox, but the selected tests passed.
+
 ## 2026-05-15 E141 Owned-Pod Heartbeat 15:37Z
 
 - Rechecked only the owned E141 Runpod pod `5ox436mhzej7j4` at
