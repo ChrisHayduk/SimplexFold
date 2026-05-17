@@ -9566,3 +9566,10 @@
   `results.json`, result CSV, eval-detail CSV, or checkpoint. Keep E143
   running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
   documented terminal no-score state exists.
+- 2026-05-17T02:56Z E143 remained coherent and pre-return. Status advanced to
+  completed step `8589`, active step `8590`, phase `microbatch_done`, finite
+  last train loss `4.8124619126319885`, `effective_batch_size=8`,
+  `num_workers=0`, and `stopped_early=false`. PID `95692` was still alive
+  with `194` threads; GPU utilization sampled `53%` with `43311 / 81920` MiB
+  allocated. Required result artifacts were still absent, so keep E143
+  running and keep `EXPERIMENT_RESULTS.md` unchanged.
