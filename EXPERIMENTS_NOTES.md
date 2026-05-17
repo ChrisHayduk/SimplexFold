@@ -9914,3 +9914,16 @@
   existed yet: no `results.json`, result CSV, eval-detail CSV, or checkpoint.
   Keep E143 running and keep `EXPERIMENT_RESULTS.md` unchanged until a scored
   bundle or documented terminal no-score state exists.
+- 2026-05-17T05:21Z E143 completed training to target step `9000` and entered
+  full validation evaluation on owned pod `723hbew2jrvxjx`. Status showed phase
+  `evaluating`, active eval batch `221 / 1000`, active eval examples `221`,
+  completed step `9000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, and last train loss `4.728216648101807`. Trainer PID
+  `95692` remained alive with `194` threads, elapsed time `02:47:55`, process
+  CPU time `1-12:33:06`, GPU memory `43311 / 81920` MiB, and status mtime
+  `2026-05-17T05:21:04Z`. The artifact tree still contained only
+  `history_full_msa_to_face.json`, `run_metadata.json`, and
+  `status_full_msa_to_face.json`; no `results.json`, result CSV,
+  eval-detail CSV, or checkpoint existed yet. Keep E143 running and keep
+  `EXPERIMENT_RESULTS.md` unchanged until a coherent scored bundle or
+  documented terminal no-score state exists.
