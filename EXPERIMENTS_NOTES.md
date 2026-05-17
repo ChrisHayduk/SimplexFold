@@ -9435,3 +9435,17 @@
   utilization sampled `0%` at both ends with `43101 / 81920` MiB allocated.
   This remains a live slow final-evaluation state; keep
   `EXPERIMENT_RESULTS.md` unchanged and leave E143 parked.
+- 2026-05-17T02:27Z E142 remained live and unreturned on owned pod
+  `723hbew2jrvxjx`. Status stayed `phase=evaluating`, completed step `9000`,
+  active step `9000`, last history step `8500`, `effective_batch_size=8`,
+  `num_workers=0`, and `stopped_early=false`; `results.json`, `results.csv`,
+  `eval_details_full_msa_to_face.csv`, and
+  `checkpoints/full_msa_to_face_latest.pt` were still absent. Over the
+  one-minute interval from `02:26:26Z` to `02:27:26Z`, trainer PID `13262`
+  stayed runnable with `194` threads, process CPU time advanced from
+  `4-01:49:45` to `4-02:12:49`, `rchar` increased from `752722453` to
+  `753406526`, `read_bytes` increased from `71344128` to `71880704`, and RSS
+  increased from `1798888` to `1885280` KiB. GPU utilization sampled `68%`
+  then `0%` with `43101 / 81920` MiB allocated. Continue treating E142 as a
+  live slow final evaluation; do not update `EXPERIMENT_RESULTS.md` or launch
+  E143 while these liveness signals persist.
