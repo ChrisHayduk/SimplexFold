@@ -9587,3 +9587,9 @@
   `194` threads, process CPU time `04:11:03`, and GPU memory `43311 / 81920`
   MiB allocated. No returned bundle existed yet: no `results.json`, result
   CSV, eval-detail CSV, or checkpoint.
+- 2026-05-17T03:01Z E143 remained live and pre-return. Status advanced to
+  completed step `8609`, active step `8610`, phase `microbatch_done`, finite
+  last train loss `4.475048989057541`, `effective_batch_size=8`,
+  `num_workers=0`, and `stopped_early=false`. PID `95692` remained alive with
+  `194` threads and process CPU time `04:28:10`. No returned bundle existed
+  yet: no `results.json`, result CSV, eval-detail CSV, or checkpoint.
