@@ -6743,9 +6743,19 @@ single-process DataLoader path.
 
 ### E142: Signed Tetra Coboundary Face Update
 
-Status: active on owned Runpod pod `723hbew2jrvxjx` after E146 reached a
-terminal no-score final-step stall. Treat this as the current topology-native
-short gate.
+Status: returned coherently on owned Runpod pod `723hbew2jrvxjx` and rejected
+as a 30k candidate. The signed tetra coboundary face update reached step
+`9000` with a complete scored bundle, `1000` eval rows, `effective_batch_size=8`,
+`num_workers=0`, `stopped_early=false`, and `3,240,738` parameters under the
+`3,261,974` cap.
+
+Result: E142 returned `val_lddt_ca=0.4210`, `val_foldscore=0.4015`,
+`val_ca_drmsd=10.7533`, and predicted/true C-alpha Rg `12.1970 / 16.3091`.
+This lowered primary C-alpha lDDT versus E128's `0.4311` and stayed below the
+`0.45` short-gate threshold. The modest dRMSD/Rg recovery is useful diagnostic
+evidence, but the primary-lDDT regression and slight FoldScore slip reject the
+signed tetra coboundary face update as a continuation branch. Launch the
+parked E143 signed tetra-to-face readout gate next rather than spending 30k.
 
 Hypothesis: the selected tetra cofaces should update face cochains through the
 oriented tetra boundary operator, not through an unsigned sibling-face mean.
@@ -6927,8 +6937,9 @@ Validation status on the local branch from the E138/E139 staging window:
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 
-Status: locally implemented, validated, and staged on the owned Runpod pod;
-do not launch while E142 is active.
+Status: next topology-native short gate after E142 returned below the `0.45`
+short-gate threshold. It is implemented, validated, and staged on the owned
+Runpod pod.
 
 Hypothesis: E142 signs the tetra coface-to-face residual, but the learned
 `tetra_to_face` readout still scatters one message to each anchored face with

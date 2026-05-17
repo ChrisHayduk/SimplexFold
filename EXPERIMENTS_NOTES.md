@@ -9449,3 +9449,25 @@
   then `0%` with `43101 / 81920` MiB allocated. Continue treating E142 as a
   live slow final evaluation; do not update `EXPERIMENT_RESULTS.md` or launch
   E143 while these liveness signals persist.
+- 2026-05-17T02:31Z E142 returned coherently on owned pod `723hbew2jrvxjx`.
+  During the `02:29:59Z` to `02:31:00Z` interval, status switched from
+  `phase=evaluating` to `phase=finished`, trainer PID `13262` exited, GPU
+  memory dropped from `43101 / 81920` MiB to `1 / 81920` MiB, and the scored
+  bundle appeared. Remote and local artifact checks confirmed `results.json`,
+  `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt`.
+- 2026-05-17T02:31Z E142 verification passed after pulling artifacts/logs
+  locally: completed step `9000`, history last step `9000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, `1000`
+  eval-detail rows, and `3,240,738` parameters under the `3,261,974` cap.
+  Goal audit failed as expected for a short gate below the full goal:
+  `val_lddt_ca=0.4210`, `9000 < 30000` confirmation steps, target `0.7` not
+  reached. Eval-detail analysis showed mean FoldScore `0.4015`, dRMSD
+  `10.7533`, predicted/true C-alpha Rg `12.1970 / 16.3091`, boundary mean
+  lDDT `0.7462`, and a high-boundary/low-global subset of `126 / 490`
+  high-boundary rows. Decision: reject E142 as a continuation or 30k candidate
+  because it fell below E128's `0.4311` primary lDDT and below the `0.45`
+  short-gate threshold; launch the parked E143 signed tetra-to-face readout
+  after result/docs are committed and no active SimplexFold training remains.

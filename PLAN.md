@@ -1,3 +1,27 @@
+## 2026-05-17 Operating Plan Update: E142 Returned, E143 Next
+
+E142 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`
+with a complete scored bundle, `effective_batch_size=8`, `num_workers=0`,
+`1000` eval-detail rows, `stopped_early=false`, and `3,240,738` parameters
+under the `3,261,974` cap. Local verification passed after pulling the
+artifact directory and log. The goal audit correctly failed because this was a
+short `9000`-step gate below both the `0.7` target and the `30,000`-step
+confirmation requirement.
+
+Decision: reject E142 as a continuation or 30k candidate. It returned
+`val_lddt_ca=0.4210`, below E128's `0.4311` leader and below the `0.45`
+short-gate threshold. E142 modestly improved dRMSD and C-alpha radius
+(`10.7533` dRMSD and `12.1970 / 16.3091` predicted/true C-alpha Rg), but
+FoldScore slipped to `0.4015`, so signed tetra coboundary face updates are
+diagnostic rather than the next spend.
+
+Next action: launch the already staged E143 signed tetra-to-face readout gate
+from `/workspace/SimplexFold_e143` on the same owned pod, only after the E142
+result/docs are committed. E143 keeps the E128 selected-complex recipe fixed
+and tests oriented incidence signs in the learned tetra-to-face readout path.
+Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
+C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
+
 ## 2026-05-16 Operating Plan Update: E146 Stalled, E142 Active
 
 E146 is now a terminal no-score outcome. On owned Runpod pod
