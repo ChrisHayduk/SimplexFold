@@ -9408,3 +9408,16 @@
   allocated. Keep E142 classified as live slow final evaluation; leave
   `EXPERIMENT_RESULTS.md` unchanged and keep E143 parked until E142 returns or
   reaches a documented terminal no-score state.
+- 2026-05-17T02:20Z E142 still had no returned bundle, but remained live on
+  owned pod `723hbew2jrvxjx`. The required scored-return files were still
+  absent (`results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`,
+  and `checkpoints/full_msa_to_face_latest.pt`), and status stayed
+  `phase=evaluating`, completed step `9000`, active step `9000`, last history
+  step `8500`. Over the one-minute interval from `02:19:41Z` to `02:20:41Z`,
+  trainer PID `13262` remained runnable with `194` threads, process CPU time
+  advanced from `3-23:08:41` to `3-23:32:04`, `rchar` increased from
+  `747677563` to `748631881`, `read_bytes` increased from `67428352` to
+  `68206592`, and RSS increased from `1777536` to `1804240` KiB. GPU
+  utilization sampled `38%` then `0%` with `43101 / 81920` MiB allocated.
+  Keep E142 in eval-watch, leave `EXPERIMENT_RESULTS.md` unchanged, and do
+  not launch E143 while these liveness signals continue.
