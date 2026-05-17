@@ -6937,9 +6937,8 @@ Validation status on the local branch from the E138/E139 staging window:
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 
-Status: next topology-native short gate after E142 returned below the `0.45`
-short-gate threshold. It is implemented, validated, and staged on the owned
-Runpod pod.
+Status: active on owned Runpod pod `723hbew2jrvxjx` after E142 returned below
+the `0.45` short-gate threshold.
 
 Hypothesis: E142 signs the tetra coface-to-face residual, but the learned
 `tetra_to_face` readout still scatters one message to each anchored face with
@@ -7074,6 +7073,20 @@ Validation status on the local branch from the E138/E139 staging window:
   documented run name, step target, effective batch size, crop/MSA/template
   settings, parameter cap, default `num_workers=0`, signed tetra-to-face
   static scale, and the `8500`-to-`9000` runtime ramp.
+- Launch: E143 was launched on 2026-05-17 from `/workspace/SimplexFold_e143`
+  after E142 was verified, recorded, and rejected as a below-threshold short
+  gate. Run name:
+  `e143_signed_tetra_to_face_from_e128_s9000_c256_m64`; trainer PID `95692`;
+  log: `/workspace/SimplexFold_e143/logs/e143_signed_tetra_to_face.log`;
+  artifact directory:
+  `/workspace/SimplexFold_e143/artifacts/nanofold_public_benchmarks/e143_signed_tetra_to_face_from_e128_s9000_c256_m64`.
+  The run resumed E128 at step `8500`, loaded `1332` matching model tensors,
+  initialized `0` new/missing tensors, and started a fresh optimizer. Initial
+  status at `2026-05-17T02:34:13Z` showed `completed_step=8501`, active step
+  `8502`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.276291459798813`, and GPU utilization `60%` with `18089 / 81920` MiB
+  allocated.
 
 ### E144: No-Hodge Edge-Star Residual Boundary Readout
 

@@ -1,3 +1,25 @@
+## 2026-05-17 Operating Plan Update: E143 Active
+
+E143 is now the active owned Runpod gate on pod `723hbew2jrvxjx` from
+`/workspace/SimplexFold_e143`. It launched at `2026-05-17T02:33Z` with run
+name `e143_signed_tetra_to_face_from_e128_s9000_c256_m64`, trainer PID
+`95692`, log `/workspace/SimplexFold_e143/logs/e143_signed_tetra_to_face.log`,
+and artifact directory
+`/workspace/SimplexFold_e143/artifacts/nanofold_public_benchmarks/e143_signed_tetra_to_face_from_e128_s9000_c256_m64`.
+It resumed the E128 checkpoint from step `8500`, loaded `1332` matching model
+tensors, initialized `0` new/missing tensors, and started a fresh optimizer.
+Initial status at `2026-05-17T02:34:13Z` showed coherent progress:
+`completed_step=8501`, active step `8502`, active microbatch `1 / 8`,
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
+train loss `4.276291459798813`, and GPU utilization `60%` with
+`18089 / 81920` MiB allocated.
+
+Monitor only E143 for progress and returned artifacts. Do not update
+`EXPERIMENT_RESULTS.md` for E143 until it returns a scored bundle or reaches a
+documented terminal no-score state. Do not spend 30,000 steps unless E143 or a
+later short gate clears `0.45` primary C-alpha lDDT with coherent FoldScore,
+dRMSD, and C-alpha Rg.
+
 ## 2026-05-17 Operating Plan Update: E142 Returned, E143 Next
 
 E142 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`

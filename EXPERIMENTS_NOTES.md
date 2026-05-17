@@ -9471,3 +9471,20 @@
   because it fell below E128's `0.4311` primary lDDT and below the `0.45`
   short-gate threshold; launch the parked E143 signed tetra-to-face readout
   after result/docs are committed and no active SimplexFold training remains.
+- 2026-05-17T02:34Z Launched E143 signed tetra-to-face boundary readout on
+  owned Runpod pod `723hbew2jrvxjx` after committing the verified E142 result.
+  Checkout: `/workspace/SimplexFold_e143`; run name:
+  `e143_signed_tetra_to_face_from_e128_s9000_c256_m64`; trainer PID `95692`;
+  log: `/workspace/SimplexFold_e143/logs/e143_signed_tetra_to_face.log`;
+  artifact directory:
+  `/workspace/SimplexFold_e143/artifacts/nanofold_public_benchmarks/e143_signed_tetra_to_face_from_e128_s9000_c256_m64`.
+  The launch resumed the E128 checkpoint at step `8500`, loaded `1332`
+  matching tensors, initialized `0` new/missing tensors, and started a fresh
+  optimizer. A post-launch status check at `02:34:13Z` showed
+  `completed_step=8501`, active step `8502`, active microbatch `1 / 8`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.276291459798813`, trainer PID `95692` runnable with
+  `194` threads, and GPU utilization `60%` with `18089 / 81920` MiB
+  allocated. Treat E143 as the only active SimplexFold run; keep
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or terminal no-score
+  state exists.
