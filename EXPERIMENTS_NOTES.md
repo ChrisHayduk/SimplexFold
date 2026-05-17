@@ -9356,3 +9356,17 @@
   `37109760` to `39784448`. GPU utilization moved from `0%` to `18%` with
   `43101 / 81920` MiB allocated. Keep classifying E142 as live final
   evaluation; leave `EXPERIMENT_RESULTS.md` unchanged and keep E143 parked.
+- 2026-05-17T01:33Z E142 remained live and unreturned. A direct owned-pod
+  check at `01:29:19Z` still showed only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`, with
+  status still `phase=evaluating`, completed step `9000`, active step `9000`,
+  and last history step `8500`. A three-minute interval from `01:30:00Z` to
+  `01:33:00Z` showed trainer PID `13262` runnable with `194` threads, process
+  CPU time advancing from `3-03:34:49` to `3-04:45:33`, `rchar` increasing
+  from `712761930` to `714913106`, and `read_bytes` increasing from
+  `41177088` to `42741760`. GPU utilization sampled `73%` at the start and
+  `0%` at the end with `43101 / 81920` MiB allocated. A thread snapshot showed
+  the main Python thread runnable and many Python worker/library threads
+  active in `futex_wait_queue`; the log tail remained only startup/resume
+  lines. Continue treating E142 as live slow final evaluation; do not update
+  `EXPERIMENT_RESULTS.md` or launch E143 yet.

@@ -79,6 +79,16 @@ Keep E142 in eval-watch, leave `EXPERIMENT_RESULTS.md` unchanged, and do not
 launch E143 unless E142 returns weak or becomes a preserved terminal no-score
 run.
 
+Latest sampling through `2026-05-17T01:33:00Z` still showed no returned bundle
+and unchanged artifact inventory, but the trainer remained runnable with
+`194` threads. Over the `01:30:00Z` to `01:33:00Z` interval, process CPU time
+advanced from `3-03:34:49` to `3-04:45:33`, `rchar` increased from
+`712761930` to `714913106`, `read_bytes` increased from `41177088` to
+`42741760`, and GPU utilization sampled `73%` then `0%` with
+`43101 / 81920` MiB allocated. Continue to treat E142 as live slow final
+evaluation; do not promote it into `EXPERIMENT_RESULTS.md` and do not launch
+E143 while this liveness evidence persists.
+
 Local runner observability now includes validation-batch progress counters in
 `status_full_msa_to_face.json` for future runs. This does not affect the
 already-running E142 checkout, but E143/E144 or any later short gate should
