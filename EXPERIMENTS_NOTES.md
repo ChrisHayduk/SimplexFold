@@ -9940,3 +9940,18 @@
   eval-detail CSV, or checkpoint existed yet. Keep E143 running and keep
   `EXPERIMENT_RESULTS.md` unchanged until a coherent scored bundle or
   documented terminal no-score state exists.
+- 2026-05-17T16:22Z E143 had returned coherently on owned pod
+  `723hbew2jrvxjx`; remote status was `finished`, completed step `9000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, and the
+  required files were present: `results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, `eval_details_full_msa_to_face.csv`,
+  `run_metadata.json`, `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt`. The artifact directory and log
+  were pulled locally. Local verification passed with `completed_steps=9000`,
+  `eval_rows=1000`, `history_last_step=9000`, `parameters=3240738`, and
+  `val_lddt_ca=0.43106790351867674`. The goal audit correctly failed because
+  `0.4311` is below `0.7` and `9000` is below the required `30000`
+  confirmation steps. Eval-detail analysis showed mean `lddt_ca=0.4311`,
+  FoldScore `0.4003`, dRMSD `11.0003`, mean boundary lDDT `0.7504`, and `79`
+  high-boundary / low-global examples. Record E143 as returned but rejected;
+  do not spend 30k.

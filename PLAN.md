@@ -1,3 +1,27 @@
+## 2026-05-17 Operating Plan Update: E143 Returned, E144 Next
+
+E143 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`
+with a complete scored bundle, `effective_batch_size=8`, `num_workers=0`,
+`1000` eval-detail rows, `stopped_early=false`, and `3,240,738` parameters
+under the `3,261,974` cap. Local artifact verification passed after pulling
+the artifact directory and log. The goal audit correctly failed because this
+was a short `9000`-step gate below both the `0.7` target and the `30,000`-step
+confirmation requirement.
+
+Decision: reject E143 as a continuation or 30k candidate. It returned
+`val_lddt_ca=0.4311`, effectively tied with but slightly below E128's
+`0.4311` leader and below the `0.45` short-gate threshold. FoldScore slipped
+to `0.4003` versus E128's `0.4025`; dRMSD was essentially tied at `11.0003`,
+and C-alpha Rg stayed contracted at `11.5782 / 16.3091`. The eval-detail
+analysis keeps the familiar failure mode: selected boundary lDDT remains high
+(`0.7504` mean boundary lDDT), but global C-alpha geometry does not improve.
+
+Next action: if the owned pod remains idle and the staged checkout is still
+coherent, launch the prepared E144 no-Hodge edge-star residual boundary
+readout as the next short gate. Do not spend 30,000 steps unless a returned
+short gate clears `0.45` primary C-alpha lDDT with coherent FoldScore, dRMSD,
+and C-alpha Rg.
+
 ## 2026-05-17 Operating Plan Update: E143 Active
 
 E143 is now the active owned Runpod gate on pod `723hbew2jrvxjx` from

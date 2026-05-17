@@ -6937,8 +6937,8 @@ Validation status on the local branch from the E138/E139 staging window:
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 
-Status: active on owned Runpod pod `723hbew2jrvxjx` after E142 returned below
-the `0.45` short-gate threshold.
+Status: returned coherently at step `9000` and rejected as a below-threshold
+short gate.
 
 Hypothesis: E142 signs the tetra coface-to-face residual, but the learned
 `tetra_to_face` readout still scatters one message to each anchored face with
@@ -7087,12 +7087,29 @@ Validation status on the local branch from the E138/E139 staging window:
   `num_workers=0`, `stopped_early=false`, finite last train loss
   `4.276291459798813`, and GPU utilization `60%` with `18089 / 81920` MiB
   allocated.
+- Result: E143 returned a coherent bundle on 2026-05-17 with step `9000`,
+  `effective_batch_size=8`, `num_workers=0`, `1000` eval-detail rows,
+  `stopped_early=false`, and `3,240,738` parameters under the `3,261,974` cap.
+  Local artifact verification passed. The goal audit correctly failed because
+  this was a `9000`-step short gate with `val_lddt_ca=0.4311`, not a 30k-step
+  `>0.7` confirmation. Final metrics were `val_lddt_ca=0.43106790351867674`,
+  FoldScore `0.4003212600648403`, dRMSD `11.000312077283859`, and predicted
+  / true C-alpha Rg `11.578188177108764 / 16.309116956710817`.
+- Eval-detail analysis: mean boundary lDDT stayed high at `0.7504`, but mean
+  C-alpha lDDT remained `0.4311`; the top lDDT stratum averaged `0.6347`, and
+  the high-boundary / low-global subset still contained `79` examples. This
+  reinforces the local-boundary/global-trace gap rather than supporting a 30k
+  spend.
+- Decision: reject. E143 effectively tied but narrowly missed E128's primary
+  C-alpha lDDT leader, slipped on FoldScore, and remained below the `0.45`
+  short-gate threshold. Use it as diagnostic evidence that signed
+  tetra-to-face readout preserves local boundary signal without improving
+  global C-alpha geometry.
 
 ### E144: No-Hodge Edge-Star Residual Boundary Readout
 
-Status: launch recipe staged and remotely validated; do not launch while E142
-is active. Treat this as a parked fallback after the signed-boundary queue is
-documented or deliberately skipped.
+Status: next prepared short gate after E143 returned below the `0.45`
+threshold; launch only if the owned pod and staged checkout remain coherent.
 
 Hypothesis: E139 tests an oriented antisymmetric selected boundary 1-cochain,
 but the selected boundary readout may also carry residue-star common modes
