@@ -9573,3 +9573,10 @@
   with `194` threads; GPU utilization sampled `53%` with `43311 / 81920` MiB
   allocated. Required result artifacts were still absent, so keep E143
   running and keep `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-17T02:58Z E143 remained coherent and pre-return. Status advanced to
+  completed step `8596`, active step `8597`, phase `microbatch_done`, finite
+  last train loss `4.003231644630432`, `effective_batch_size=8`,
+  `num_workers=0`, and `stopped_early=false`. PID `95692` remained alive with
+  `194` threads; GPU utilization sampled `58%` with `43311 / 81920` MiB
+  allocated. No returned bundle existed yet: no `results.json`, result CSV,
+  eval-detail CSV, or checkpoint.
