@@ -9548,3 +9548,12 @@
   `43%`, with `43311 / 81920` MiB allocated. Keep E143 running and leave
   `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
   terminal no-score state exists.
+- 2026-05-17T02:52Z E143 remained live and training. Direct status at
+  `02:51:01Z` showed completed step `8569`, active step `8570`, finite last
+  train loss `4.768990516662598`, PID `95692` alive, and no returned bundle.
+  A follow-up one-minute interval moved from completed step `8570`, active
+  step `8571`, to completed step `8574`, active step `8575`; required return
+  artifacts were still absent. GPU utilization sampled `0%` then `73%`, with
+  `43311 / 81920` MiB allocated. Keep E143 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
+  terminal no-score state exists.
