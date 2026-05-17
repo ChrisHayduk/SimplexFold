@@ -78,9 +78,9 @@ completed step `8900`, active step `8901`, active microbatch `1 / 8`, phase
 alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
 only.
 
-Latest live check at `2026-05-17T21:16Z` remained in the final validation sweep:
+Latest live check at `2026-05-17T21:37Z` remained in the final validation sweep:
 completed step `9000`, active step `9000`, phase `evaluating`, active eval
-batch `800 / 1000`, `effective_batch_size=8`, `num_workers=0`,
+batch `903 / 1000`, `effective_batch_size=8`, `num_workers=0`,
 `stopped_early=false`, finite last train loss `4.741060197353363`, and PID
 `172579` alive with status heartbeat still updating. The artifact tree still
 contains only history, run metadata, and status; no `results.json`, result
