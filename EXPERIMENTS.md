@@ -7797,3 +7797,8 @@ two minutes, with active step `8511`, active microbatch `1 / 8`,
 `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
 train loss `4.825184494256973`, PID `253572` alive, and GPU memory
 `28915 / 81920` MiB allocated.
+A later live check at `2026-05-17T22:21Z` reached `completed_step=8553`,
+active step `8554`, active microbatch `1 / 8`, phase `microbatch_done`,
+finite last train loss `4.593702077865601`, and PID `253572` alive with
+fresh status updates. No result bundle, eval-detail CSV, or checkpoint existed
+yet.

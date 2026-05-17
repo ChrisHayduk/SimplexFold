@@ -10192,3 +10192,12 @@
   last train loss `4.825184494256973`, and GPU memory `28915 / 81920` MiB.
   Keep E147 running and keep `EXPERIMENT_RESULTS.md` unchanged until a scored
   bundle or documented terminal no-score state exists.
+- 2026-05-17T22:21Z E147 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8553`, active step `8554`, active
+  microbatch `1 / 8`, phase `microbatch_done`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.593702077865601`, and fresh status mtime `2026-05-17T22:21:36Z`.
+  Trainer PID `253572` remained alive with elapsed time `13:05`, process CPU
+  time `01:54:53`, and `194` threads. No `results.json`, result CSV,
+  eval-detail CSV, or checkpoint existed yet. Keep E147 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged.
