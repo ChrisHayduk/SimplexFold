@@ -9316,3 +9316,18 @@
   GPU utilization sampled `76%` with `43101 / 81920` MiB allocated. Continue
   treating E142 as live final evaluation; keep `EXPERIMENT_RESULTS.md`
   unchanged and do not launch E143 yet.
+- 2026-05-17T01:11Z E142 still had no returned bundle. The owned Runpod pod
+  metadata matched `723hbew2jrvxjx` / `codex-simplexfold-e145-runpod-20260516`
+  with desired status `RUNNING`; no other pods were queried or managed. A
+  direct `01:10:40Z` artifact check showed only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; there
+  was still no `results.json`, no `eval_details_full_msa_to_face.csv`, and no
+  checkpoint directory. Status remained `phase=evaluating`, completed step
+  `9000`, active step `9000`, and last history step `8500`. A two-minute
+  interval from `01:08:15Z` to `01:10:15Z` showed trainer PID `13262`
+  runnable with `194` threads, process CPU time advancing from `2-19:00:05`
+  to `2-19:47:25`, `rchar` increasing from `697308085` to `698802022`, and
+  `read_bytes` increasing from `29544448` to `30666752`. GPU utilization
+  sampled `0%` at both ends with `43101 / 81920` MiB allocated. Continue
+  treating this as live final evaluation because CPU and read counters are
+  still moving; keep `EXPERIMENT_RESULTS.md` unchanged and leave E143 parked.

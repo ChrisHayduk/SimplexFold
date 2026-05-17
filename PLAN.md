@@ -67,6 +67,18 @@ only after `_evaluate` finishes all validation examples and lacks the newer
 `active_eval_batch` counters, unchanged artifacts are not enough to classify
 this as terminal while the process remains runnable and CPU-active.
 
+Latest sampling through `2026-05-17T01:10:40Z` still showed no returned
+artifacts, no eval-details CSV, and no checkpoint directory. E142 remained in
+`phase=evaluating` at completed step `9000`, active step `9000`, with last
+history step `8500`. The two-minute interval from `01:08:15Z` to `01:10:15Z`
+showed trainer PID `13262` runnable with `194` threads, process CPU time
+advancing from `2-19:00:05` to `2-19:47:25`, `rchar` increasing from
+`697308085` to `698802022`, and `read_bytes` increasing from `29544448` to
+`30666752`; GPU utilization sampled `0%` with `43101 / 81920` MiB allocated.
+Keep E142 in eval-watch, leave `EXPERIMENT_RESULTS.md` unchanged, and do not
+launch E143 unless E142 returns weak or becomes a preserved terminal no-score
+run.
+
 Local runner observability now includes validation-batch progress counters in
 `status_full_msa_to_face.json` for future runs. This does not affect the
 already-running E142 checkout, but E143/E144 or any later short gate should
