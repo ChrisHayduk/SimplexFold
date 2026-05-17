@@ -7923,6 +7923,14 @@ elapsed time `01:00:41`, process CPU time `09:02:36`, and `194` threads. The
 artifact directory still had only inherited history, run metadata, and status;
 `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`, and
 `checkpoints/full_msa_to_face_latest.pt` were absent.
+The latest live check at `2026-05-17T23:13Z` reached `completed_step=8774`,
+active step `8775`, active microbatch `1 / 8`, phase `microbatch_done`,
+finite last train loss `4.732333779335022`, `effective_batch_size=8`,
+`num_workers=0`, and `stopped_early=false`. PID `253572` remained alive with
+elapsed time `01:04:50`, process CPU time `09:40:58`, and `194` threads. The
+artifact directory still had only inherited history, run metadata, and status;
+`results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`, and
+`checkpoints/full_msa_to_face_latest.pt` were absent.
 
 ### E148: Degree-Normalized Selected-Boundary Expansion
 
