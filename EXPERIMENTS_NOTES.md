@@ -9539,3 +9539,12 @@
   results audit still reports E128 as best at `val_lddt_ca=0.4311`, zero
   short gates at or above `0.45`, and zero `30000`-step confirmations above
   `0.7`.
+- 2026-05-17T02:49Z E143 continued to advance. A one-minute read-only interval
+  on owned pod `723hbew2jrvxjx` moved from completed step `8559`, active step
+  `8560`, phase `microbatch_backward_start`, to completed step `8562`, active
+  step `8563`, phase `microbatch_done`. Required return artifacts were still
+  absent: no `results.json`, result CSV, eval-detail CSV, or checkpoint. PID
+  `95692` stayed alive with `194` threads; GPU utilization sampled `32%` then
+  `43%`, with `43311 / 81920` MiB allocated. Keep E143 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
+  terminal no-score state exists.
