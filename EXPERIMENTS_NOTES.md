@@ -9345,3 +9345,14 @@
   unchanged artifacts plus strong CPU/read movement is still live-eval
   evidence, not a terminal no-score trigger. Keep `EXPERIMENT_RESULTS.md`
   unchanged and do not launch E143 yet.
+- 2026-05-17T01:27Z E142 remained live and unreturned after another
+  five-minute owned-pod interval. The artifact directory still contained only
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no `results.json`, result CSV, eval-details
+  CSV, or checkpoint directory existed. Trainer PID `13262` stayed runnable
+  with `194` threads, elapsed time advanced from `04:16:49` to `04:21:49`,
+  process CPU time advanced from `3-00:27:33` to `3-02:26:00`, `rchar`
+  increased from `707304171` to `710850664`, and `read_bytes` increased from
+  `37109760` to `39784448`. GPU utilization moved from `0%` to `18%` with
+  `43101 / 81920` MiB allocated. Keep classifying E142 as live final
+  evaluation; leave `EXPERIMENT_RESULTS.md` unchanged and keep E143 parked.
