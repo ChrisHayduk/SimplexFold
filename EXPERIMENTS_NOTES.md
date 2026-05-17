@@ -9960,13 +9960,18 @@
   after E143 was verified, recorded, and rejected as a below-threshold short
   gate. Run name:
   `e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`; trainer PID
-  `175937`; log:
+  `172579`; log:
   `/workspace/SimplexFold_e144/logs/e144_no_hodge_edge_star_residual.log`;
   artifact directory:
   `/workspace/SimplexFold_e144/artifacts/nanofold_public_benchmarks/e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`.
-  Initial status was coherent: `completed_step=8501`, active step `8502`,
-  active microbatch `1 / 8`, phase `microbatch_backward_start`,
+  The launch briefly produced a duplicate Python process with PID `175937`
+  against the same run directory. A trace was preserved locally under
+  `artifacts/runpod_traces/e144_duplicate_launch_20260517T1629Z/`, then only
+  the later duplicate process group was stopped. The original launch PID
+  `172579` remained coherent: status advanced to `completed_step=8509`, active
+  step `8510`, active microbatch `1 / 8`, phase `microbatch_done`,
   `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
-  last train loss `4.276142597198486`, GPU utilization `96%`, and GPU memory
-  `37247 / 81920` MiB. Keep E144 running and keep `EXPERIMENT_RESULTS.md`
+  last train loss `4.5722126960754395`, status mtime
+  `2026-05-17T16:29:57Z`, GPU utilization `63%`, and GPU memory
+  `28669 / 81920` MiB. Keep E144 running and keep `EXPERIMENT_RESULTS.md`
   unchanged until a scored bundle or documented terminal no-score state exists.
