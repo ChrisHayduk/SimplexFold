@@ -7816,6 +7816,11 @@ active step `8597`, active microbatch `1 / 8`, phase `microbatch_done`,
 fresh status mtime `2026-05-17T22:31:50Z`, finite last train loss
 `3.9972648322582245`, and PID `253572` alive. No result bundle,
 eval-detail CSV, or checkpoint existed yet.
+The latest live check at `2026-05-17T22:39Z` reached `completed_step=8623`,
+active step `8624`, active microbatch `1 / 8`, phase `microbatch_done`,
+fresh status mtime `2026-05-17T22:38:25Z`, finite last train loss
+`4.383870333433151`, and PID `253572` alive. No result bundle, eval-detail
+CSV, or checkpoint existed yet.
 
 ### E148: Degree-Normalized Selected-Boundary Expansion
 
@@ -7903,3 +7908,98 @@ echo $!
 Decision rule: reject unless E148 crosses `0.45` primary C-alpha lDDT with
 coherent FoldScore, dRMSD, and C-alpha Rg. No 30k spend without that scored
 short-gate evidence.
+
+### E149: Selected-Cell Centroid Expansion
+
+Status: implemented locally and parked. Do not launch while E147 is active.
+Use only after scored evidence says the boundary-edge expansion path is still
+under-expanding.
+
+Hypothesis: E147/E148 act on selected boundary-edge distances, but global
+C-alpha Rg can still stay contracted if selected cells preserve local edge
+lengths while their centroids remain too close to the chain center. E149 adds
+a topology-attached anti-collapse signal at the selected-cell level: for each
+model-selected face/tetra, compare the radius of its centroid around the
+predicted chain center against the true selected-cell centroid radius, and
+penalize only contraction beyond the existing log-distance tolerance.
+
+Mechanism: add `simplex_face_centroid_expansion_weight` and
+`simplex_tetra_centroid_expansion_weight` to `SimplexGeometryLoss`. The loss
+uses only selected sparse-complex cells and training labels, adds no
+parameters, and does not introduce dense all-pairs distances, external data,
+templates, pretrained weights, validation labels, or a direct validation
+metric objective.
+
+Launch recipe, only after E147/E148 gating evidence supports it:
+
+```bash
+cd /workspace/SimplexFold_e149
+mkdir -p logs
+python3 -m py_compile \
+  minalphafold/simplex.py \
+  minalphafold/losses.py \
+  minalphafold/trainer.py \
+  scripts/run_nanofold_public_benchmarks.py
+nohup python -u scripts/run_nanofold_public_benchmarks.py \
+  --nanofold-root /workspace/nanoFold-Competition \
+  --model-config simplexfold_medium_param_matched \
+  --variants full_msa_to_face \
+  --run-name e149_selected_cell_centroid_expansion_from_e128_s9000_c256_m64 \
+  --output-dir artifacts/nanofold_public_benchmarks \
+  --resume-from-checkpoint /workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+  --resume-model-weights-only \
+  --steps 9000 \
+  --batch-size 1 \
+  --grad-accum-steps 8 \
+  --crop-size 256 \
+  --msa-depth 64 \
+  --extra-msa-depth 0 \
+  --max-templates 0 \
+  --eval-every 500 \
+  --checkpoint-every 500 \
+  --final-max-val-batches 0 \
+  --eval-max-val-batches 0 \
+  --max-parameters 3261974 \
+  --n-cycles 4 \
+  --device cuda \
+  --simplex-face-coordinate-weight 1.0 \
+  --simplex-face-coordinate-distance-weight 0.5 \
+  --simplex-face-boundary-lddt-weight 0.05 \
+  --simplex-tetra-coordinate-weight 1.0 \
+  --simplex-tetra-coordinate-distance-weight 0.5 \
+  --simplex-tetra-boundary-lddt-weight 0.05 \
+  --simplex-geometry-distance-weight 0.025 \
+  --simplex-face-top-k 24 \
+  --simplex-tetra-top-k 48 \
+  --simplex-cell-score-degree-penalty 0.75 \
+  --simplex-cell-score-outer-edge-weight 0.25 \
+  --simplex-edge-frame-message-scale 0.025 \
+  --simplex-edge-frame-message-runtime-scale 0.0125 \
+  --simplex-boundary-edge-frame-gate-scale 0.05 \
+  --simplex-boundary-readout-directionality 0.25 \
+  --simplex-boundary-readout-directionality-runtime-scale 0.25 \
+  --simplex-boundary-incidence-normalization 1.0 \
+  --simplex-global-context-scale 0.1 \
+  --simplex-vertex-star-context-scale 1.0 \
+  --simplex-vertex-star-context-runtime-scale 1.0 \
+  --simplex-edge-star-context-scale 1.0 \
+  --simplex-edge-star-context-runtime-scale 0.5 \
+  --simplex-triangle-attention-bias-scale 0.0125 \
+  --simplex-face-coordinate-expansion-weight 0.025 \
+  --simplex-tetra-coordinate-expansion-weight 0.025 \
+  --simplex-face-centroid-expansion-weight 0.05 \
+  --simplex-tetra-centroid-expansion-weight 0.05 \
+  --simplex-coordinate-expansion-tolerance 0.05 \
+  > logs/e149_selected_cell_centroid_expansion.log 2>&1 &
+echo $!
+```
+
+Decision rule: reject unless E149 crosses `0.45` primary C-alpha lDDT with
+coherent FoldScore, dRMSD, and C-alpha Rg. No 30k spend without that scored
+short-gate evidence.
+
+Local validation:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/losses.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_simplex_coordinate_realization_loss_penalizes_collapsed_cells tests/test_nanofold_public_benchmarks.py::test_e147_selected_boundary_expansion_retry_matches_documented_gate tests/test_nanofold_public_benchmarks.py::test_e148_degree_normalized_expansion_candidate_matches_documented_gate tests/test_nanofold_public_benchmarks.py::test_e149_selected_cell_centroid_expansion_candidate_matches_documented_gate tests/test_nanofold_public_benchmarks.py::test_topology_margin_args_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_benchmark_loss_builder_applies_topology_margin_config`: `6 passed`
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py`: `157 passed`

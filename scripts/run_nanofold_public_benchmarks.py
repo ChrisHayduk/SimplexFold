@@ -1153,12 +1153,14 @@ def _build_loss_fn(training_config: TrainingConfig) -> AlphaFoldLoss:
         simplex_face_coordinate_weight=training_config.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=training_config.simplex_face_coordinate_distance_weight,
         simplex_face_coordinate_expansion_weight=training_config.simplex_face_coordinate_expansion_weight,
+        simplex_face_centroid_expansion_weight=training_config.simplex_face_centroid_expansion_weight,
         simplex_face_shape_weight=training_config.simplex_face_shape_weight,
         simplex_face_normal_weight=training_config.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=training_config.simplex_face_boundary_lddt_weight,
         simplex_tetra_coordinate_weight=training_config.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=training_config.simplex_tetra_coordinate_distance_weight,
         simplex_tetra_coordinate_expansion_weight=training_config.simplex_tetra_coordinate_expansion_weight,
+        simplex_tetra_centroid_expansion_weight=training_config.simplex_tetra_centroid_expansion_weight,
         simplex_tetra_shape_weight=training_config.simplex_tetra_shape_weight,
         simplex_tetra_boundary_lddt_weight=training_config.simplex_tetra_boundary_lddt_weight,
         simplex_topology_margin_weight=training_config.simplex_topology_margin_weight,
@@ -1650,6 +1652,9 @@ def _train_variant(
                 "simplex_face_coordinate_expansion_weight": float(
                     loss_fn.simplex_geometry_loss.face_coordinate_expansion_weight
                 ),
+                "simplex_face_centroid_expansion_weight": float(
+                    loss_fn.simplex_geometry_loss.face_centroid_expansion_weight
+                ),
                 "simplex_face_shape_weight": float(loss_fn.simplex_geometry_loss.face_shape_weight),
                 "simplex_face_normal_weight": float(loss_fn.simplex_geometry_loss.face_normal_weight),
                 "simplex_face_boundary_lddt_weight": float(
@@ -1661,6 +1666,9 @@ def _train_variant(
                 ),
                 "simplex_tetra_coordinate_expansion_weight": float(
                     loss_fn.simplex_geometry_loss.tetra_coordinate_expansion_weight
+                ),
+                "simplex_tetra_centroid_expansion_weight": float(
+                    loss_fn.simplex_geometry_loss.tetra_centroid_expansion_weight
                 ),
                 "simplex_tetra_shape_weight": float(loss_fn.simplex_geometry_loss.tetra_shape_weight),
                 "simplex_tetra_boundary_lddt_weight": float(
@@ -2035,12 +2043,14 @@ def _train_variant(
         "simplex_face_coordinate_weight": training_config.simplex_face_coordinate_weight,
         "simplex_face_coordinate_distance_weight": training_config.simplex_face_coordinate_distance_weight,
         "simplex_face_coordinate_expansion_weight": training_config.simplex_face_coordinate_expansion_weight,
+        "simplex_face_centroid_expansion_weight": training_config.simplex_face_centroid_expansion_weight,
         "simplex_face_shape_weight": training_config.simplex_face_shape_weight,
         "simplex_face_boundary_lddt_weight": training_config.simplex_face_boundary_lddt_weight,
         "simplex_face_boundary_lddt_weight_final": training_config.simplex_face_boundary_lddt_weight_final,
         "simplex_tetra_coordinate_weight": training_config.simplex_tetra_coordinate_weight,
         "simplex_tetra_coordinate_distance_weight": training_config.simplex_tetra_coordinate_distance_weight,
         "simplex_tetra_coordinate_expansion_weight": training_config.simplex_tetra_coordinate_expansion_weight,
+        "simplex_tetra_centroid_expansion_weight": training_config.simplex_tetra_centroid_expansion_weight,
         "simplex_tetra_shape_weight": training_config.simplex_tetra_shape_weight,
         "simplex_tetra_boundary_lddt_weight": training_config.simplex_tetra_boundary_lddt_weight,
         "simplex_tetra_boundary_lddt_weight_final": training_config.simplex_tetra_boundary_lddt_weight_final,
@@ -2640,6 +2650,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_face_coordinate_weight",
         "simplex_face_coordinate_distance_weight",
         "simplex_face_coordinate_expansion_weight",
+        "simplex_face_centroid_expansion_weight",
         "simplex_face_shape_weight",
         "simplex_face_normal_weight",
         "simplex_face_boundary_lddt_weight",
@@ -2647,6 +2658,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "simplex_tetra_coordinate_weight",
         "simplex_tetra_coordinate_distance_weight",
         "simplex_tetra_coordinate_expansion_weight",
+        "simplex_tetra_centroid_expansion_weight",
         "simplex_tetra_shape_weight",
         "simplex_tetra_boundary_lddt_weight",
         "simplex_tetra_boundary_lddt_weight_final",
@@ -2826,12 +2838,14 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "val_simplex_face_coordinate_area_loss",
         "val_simplex_face_coordinate_distance_loss",
         "val_simplex_face_coordinate_expansion_loss",
+        "val_simplex_face_centroid_expansion_loss",
         "val_simplex_face_shape_loss",
         "val_simplex_face_boundary_lddt_loss",
         "val_simplex_face_distance_loss",
         "val_simplex_tetra_coordinate_geometry_loss",
         "val_simplex_tetra_coordinate_distance_loss",
         "val_simplex_tetra_coordinate_expansion_loss",
+        "val_simplex_tetra_centroid_expansion_loss",
         "val_simplex_tetra_shape_loss",
         "val_simplex_tetra_boundary_lddt_loss",
         "val_simplex_tetra_distance_loss",
@@ -3038,6 +3052,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override the selected-face one-sided boundary-edge expansion realization loss weight.",
     )
     parser.add_argument(
+        "--simplex-face-centroid-expansion-weight",
+        type=float,
+        default=None,
+        help="Override the selected-face one-sided centroid-radius expansion realization loss weight.",
+    )
+    parser.add_argument(
         "--simplex-face-shape-weight",
         type=float,
         default=None,
@@ -3073,6 +3093,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the selected-tetra one-sided boundary-edge expansion realization loss weight.",
+    )
+    parser.add_argument(
+        "--simplex-tetra-centroid-expansion-weight",
+        type=float,
+        default=None,
+        help="Override the selected-tetra one-sided centroid-radius expansion realization loss weight.",
     )
     parser.add_argument(
         "--simplex-tetra-shape-weight",
@@ -3842,6 +3868,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_face_coordinate_weight=args.simplex_face_coordinate_weight,
         simplex_face_coordinate_distance_weight=args.simplex_face_coordinate_distance_weight,
         simplex_face_coordinate_expansion_weight=args.simplex_face_coordinate_expansion_weight,
+        simplex_face_centroid_expansion_weight=args.simplex_face_centroid_expansion_weight,
         simplex_face_shape_weight=args.simplex_face_shape_weight,
         simplex_face_normal_weight=args.simplex_face_normal_weight,
         simplex_face_boundary_lddt_weight=args.simplex_face_boundary_lddt_weight,
@@ -3849,6 +3876,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         simplex_tetra_coordinate_weight=args.simplex_tetra_coordinate_weight,
         simplex_tetra_coordinate_distance_weight=args.simplex_tetra_coordinate_distance_weight,
         simplex_tetra_coordinate_expansion_weight=args.simplex_tetra_coordinate_expansion_weight,
+        simplex_tetra_centroid_expansion_weight=args.simplex_tetra_centroid_expansion_weight,
         simplex_tetra_shape_weight=args.simplex_tetra_shape_weight,
         simplex_tetra_boundary_lddt_weight=args.simplex_tetra_boundary_lddt_weight,
         simplex_tetra_boundary_lddt_weight_final=args.simplex_tetra_boundary_lddt_weight_final,
@@ -4205,6 +4233,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_face_coordinate_weight": args.simplex_face_coordinate_weight,
         "simplex_face_coordinate_distance_weight": args.simplex_face_coordinate_distance_weight,
         "simplex_face_coordinate_expansion_weight": args.simplex_face_coordinate_expansion_weight,
+        "simplex_face_centroid_expansion_weight": args.simplex_face_centroid_expansion_weight,
         "simplex_face_shape_weight": args.simplex_face_shape_weight,
         "simplex_face_normal_weight": args.simplex_face_normal_weight,
         "simplex_face_boundary_lddt_weight": args.simplex_face_boundary_lddt_weight,
@@ -4212,6 +4241,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "simplex_tetra_coordinate_weight": args.simplex_tetra_coordinate_weight,
         "simplex_tetra_coordinate_distance_weight": args.simplex_tetra_coordinate_distance_weight,
         "simplex_tetra_coordinate_expansion_weight": args.simplex_tetra_coordinate_expansion_weight,
+        "simplex_tetra_centroid_expansion_weight": args.simplex_tetra_centroid_expansion_weight,
         "simplex_tetra_shape_weight": args.simplex_tetra_shape_weight,
         "simplex_tetra_boundary_lddt_weight": args.simplex_tetra_boundary_lddt_weight,
         "simplex_tetra_boundary_lddt_weight_final": args.simplex_tetra_boundary_lddt_weight_final,

@@ -190,6 +190,7 @@ class TrainingConfig:
     simplex_face_coordinate_weight: float | None = None
     simplex_face_coordinate_distance_weight: float | None = None
     simplex_face_coordinate_expansion_weight: float | None = None
+    simplex_face_centroid_expansion_weight: float | None = None
     simplex_face_shape_weight: float | None = None
     simplex_face_normal_weight: float | None = None
     simplex_face_boundary_lddt_weight: float | None = None
@@ -197,6 +198,7 @@ class TrainingConfig:
     simplex_tetra_coordinate_weight: float | None = None
     simplex_tetra_coordinate_distance_weight: float | None = None
     simplex_tetra_coordinate_expansion_weight: float | None = None
+    simplex_tetra_centroid_expansion_weight: float | None = None
     simplex_tetra_shape_weight: float | None = None
     simplex_tetra_boundary_lddt_weight: float | None = None
     simplex_tetra_boundary_lddt_weight_final: float | None = None

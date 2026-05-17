@@ -10233,3 +10233,21 @@
   with elapsed time `23:20`, process CPU time `03:25:03`, and `194` threads.
   The artifact directory still had only history, run metadata, and status;
   no result bundle, eval-detail CSV, or checkpoint existed yet.
+- 2026-05-17T22:34Z E147 remained coherent and running. Status advanced to
+  `completed_step=8606`, active step `8607`, active microbatch `1 / 8`, phase
+  `microbatch_done`, fresh status mtime `2026-05-17T22:34:18Z`, and finite
+  last train loss `5.069906830787659`. Trainer PID `253572` remained alive
+  with elapsed time `25:44`, process CPU time `03:47:15`, and `194` threads.
+  No returned result bundle, eval-detail CSV, or checkpoint existed yet, so
+  `EXPERIMENT_RESULTS.md` remains unchanged. While E147 continues, implemented
+  parked E149 selected-cell centroid expansion: a parameter-free
+  face/tetra-centroid anti-collapse loss around the predicted chain center,
+  plus CLI/training metadata plumbing and parser/loss tests. E149 is not
+  launched and remains behind E147/E148 gating evidence.
+- 2026-05-17T22:39Z E147 continued coherent training. Status advanced to
+  `completed_step=8623`, active step `8624`, active microbatch `1 / 8`, phase
+  `microbatch_done`, fresh status mtime `2026-05-17T22:38:25Z`, and finite
+  last train loss `4.383870333433151`. Trainer PID `253572` remained alive
+  with elapsed time `30:01`, process CPU time `04:26:03`, and `194` threads.
+  The artifact directory still had only history, run metadata, and status;
+  no result bundle, eval-detail CSV, or checkpoint existed yet.
