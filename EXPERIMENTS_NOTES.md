@@ -2,8 +2,8 @@
 
 ## 2026-05-16 E142 Final-Validation Watch; Eval Progress Instrumentation
 
-- Rechecked only the owned Runpod pod `723hbew2jrvxjx` at
-  `2026-05-16T23:55:14Z`. E142 is still in final validation watch with
+- Rechecked only the owned Runpod pod `723hbew2jrvxjx` through
+  `2026-05-16T23:59:39Z`. E142 is still in final validation watch with
   `phase=evaluating`, `completed_step=9000`, active step `9000`, effective
   batch size `8`, `num_workers=0`, finite last train loss
   `4.721518278121948`, and status mtime `2026-05-16T23:09:53Z`.
@@ -13,11 +13,16 @@
   `eval_details_full_msa_to_face.csv`, or E142 checkpoint. History still ends
   at inherited E128 step `8500`.
 - Stall classification: not terminal yet. Trainer PID `13262` remains alive
-  and CPU-active with process time `1-14:12:37`, state `Rl`, and `194`
+  and CPU-active with process time `1-15:57:28`, state `Rl`, and `194`
   threads; GPU utilization sampled at `0%` with `43101 / 81920` MiB allocated.
   The log still contains only startup/resume lines, and `/proc/13262/wchan`
   returned `0`. Continue monitoring rather than stopping the run while CPU
   progress continues in the final validation path.
+- A one-minute interval from `2026-05-16T23:58:39Z` to `23:59:39Z` showed OS
+  progress despite unchanged artifacts: trainer CPU time increased from
+  `1-15:34:19` to `1-15:57:28`, `rchar` increased from `651303601` to
+  `651728284`, and `read_bytes` increased from `3182592` to `3219456`.
+  This supports live final-eval compute, not a terminal no-score stall.
 - Added local runner observability for future short gates: validation now
   reports `active_eval_batch`, `active_eval_batches`, and
   `active_eval_examples` through the live status file, and
