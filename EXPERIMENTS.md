@@ -7836,6 +7836,13 @@ active step `8652`, active microbatch `1 / 8`, phase
 `microbatch_forward_start`, fresh status mtime `2026-05-17T22:44:37Z`, finite
 last train loss `4.7520653903484344`, and PID `253572` alive. No result
 bundle, eval-detail CSV, or checkpoint existed yet.
+The latest live check at `2026-05-17T22:48Z` reached `completed_step=8666`,
+active step `8667`, active microbatch `1 / 8`, phase `microbatch_done`,
+finite last train loss `4.632297396659851`, `effective_batch_size=8`,
+`num_workers=0`, and `stopped_early=false`. PID `253572` remained alive with
+elapsed time `39:28`, process CPU time `05:50:53`, and `194` threads. The
+artifact directory still had only inherited history, run metadata, and status;
+no result bundle, eval-detail CSV, or checkpoint existed yet.
 
 ### E148: Degree-Normalized Selected-Boundary Expansion
 
