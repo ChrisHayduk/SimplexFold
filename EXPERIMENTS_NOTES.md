@@ -9304,3 +9304,15 @@
   `43101 / 81920` MiB allocated. Continue treating E142 as live CPU-bound
   final evaluation; keep `EXPERIMENT_RESULTS.md` unchanged and do not launch
   E143 yet.
+- 2026-05-17T01:05Z E142 remained live and unreturned on owned pod
+  `723hbew2jrvxjx`. A two-minute interval from `01:01:52Z` to `01:03:52Z`
+  showed unchanged returned artifacts, trainer PID `13262` runnable with
+  `194` threads, process CPU time advancing from `2-16:30:35` to
+  `2-17:18:20`, `rchar` increasing from `692847647` to `694284520`, and
+  `read_bytes` increasing from `26337280` to `27439104`. A fresh `01:04:50Z`
+  check still showed status `phase=evaluating`, completed step `9000`, no
+  `results.json`, no `eval_details_full_msa_to_face.csv`, and no checkpoint
+  directory; the trainer was still runnable with CPU time `2-17:41:28`, and
+  GPU utilization sampled `76%` with `43101 / 81920` MiB allocated. Continue
+  treating E142 as live final evaluation; keep `EXPERIMENT_RESULTS.md`
+  unchanged and do not launch E143 yet.
