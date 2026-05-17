@@ -31,6 +31,11 @@ completed step `8522`, active step `8523`, active microbatch `1 / 8`, phase
 alive, and GPU memory `38189 / 81920` MiB. No result bundle or checkpoint
 exists yet.
 
+Latest live check at `2026-05-17T16:40Z` remained coherent: status advanced to
+completed step `8551`, active step `8552`, active microbatch `1 / 8`, phase
+`microbatch_done`, finite last train loss `4.8796935975551605`, PID `172579`
+alive, and no result bundle or checkpoint exists yet. Keep E144 running.
+
 Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
 C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
 
