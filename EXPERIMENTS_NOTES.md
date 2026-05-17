@@ -9381,3 +9381,14 @@
   sampled `57%` then `0%` with `43101 / 81920` MiB allocated. Continue
   treating this as live slow final evaluation; leave `EXPERIMENT_RESULTS.md`
   unchanged and keep E143 parked.
+- 2026-05-17T01:45Z E142 remained live and unreturned on owned pod
+  `723hbew2jrvxjx`. A direct `01:41:48Z` check still showed the same three
+  live files and status `phase=evaluating`; no result bundle or checkpoint
+  directory existed. Over the three-minute interval ending `01:45:15Z`,
+  trainer PID `13262` stayed runnable with `194` threads, elapsed time
+  advanced from `04:36:59` to `04:39:59`, process CPU time advanced from
+  `3-08:23:11` to `3-09:33:56`, `rchar` increased from `722551744` to
+  `724367292`, and `read_bytes` increased from `48775168` to `50077696`. GPU
+  utilization sampled `0%` at both ends with `43101 / 81920` MiB allocated.
+  Keep E142 classified as live slow final evaluation; do not update
+  `EXPERIMENT_RESULTS.md` or launch E143 yet.
