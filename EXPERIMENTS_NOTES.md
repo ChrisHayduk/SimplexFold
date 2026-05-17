@@ -10201,3 +10201,9 @@
   time `01:54:53`, and `194` threads. No `results.json`, result CSV,
   eval-detail CSV, or checkpoint existed yet. Keep E147 running and leave
   `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-17T22:23Z E147 continued coherent training. Status advanced to
+  `completed_step=8562`, active step `8563`, active microbatch `1 / 8`, phase
+  `microbatch_done`, fresh status mtime `2026-05-17T22:23:41Z`, and finite
+  last train loss `4.707268834114075`. Trainer PID `253572` remained alive
+  with elapsed time `15:07`, process CPU time `02:13:52`, and `194` threads.
+  No returned result bundle, eval-detail CSV, or checkpoint existed yet.
