@@ -10265,3 +10265,10 @@
   with elapsed time `34:09`, process CPU time `05:03:50`, and `194` threads.
   The artifact directory still had only history, run metadata, and status;
   no result bundle, eval-detail CSV, or checkpoint existed yet.
+- 2026-05-17T22:45Z E147 continued coherent training. Status advanced to
+  `completed_step=8651`, active step `8652`, active microbatch `1 / 8`, phase
+  `microbatch_forward_start`, fresh status mtime `2026-05-17T22:44:37Z`, and
+  finite last train loss `4.7520653903484344`. Trainer PID `253572` remained
+  alive with elapsed time `36:02`, process CPU time `05:19:31`, and `194`
+  threads. The artifact directory still had only history, run metadata, and
+  status; no result bundle, eval-detail CSV, or checkpoint existed yet.

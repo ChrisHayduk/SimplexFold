@@ -7826,11 +7826,16 @@ active step `8633`, active microbatch `1 / 8`, phase `microbatch_done`,
 fresh status mtime `2026-05-17T22:40:34Z`, finite last train loss
 `4.628667175769806`, and PID `253572` alive. No result bundle, eval-detail
 CSV, or checkpoint existed yet.
-The latest live check at `2026-05-17T22:43Z` reached `completed_step=8642`,
+A later live check at `2026-05-17T22:43Z` reached `completed_step=8642`,
 active step `8643`, active microbatch `1 / 8`, phase `microbatch_done`,
 fresh status mtime `2026-05-17T22:42:37Z`, finite last train loss
 `4.6169679164886475`, and PID `253572` alive. No result bundle, eval-detail
 CSV, or checkpoint existed yet.
+The latest live check at `2026-05-17T22:45Z` reached `completed_step=8651`,
+active step `8652`, active microbatch `1 / 8`, phase
+`microbatch_forward_start`, fresh status mtime `2026-05-17T22:44:37Z`, finite
+last train loss `4.7520653903484344`, and PID `253572` alive. No result
+bundle, eval-detail CSV, or checkpoint existed yet.
 
 ### E148: Degree-Normalized Selected-Boundary Expansion
 
