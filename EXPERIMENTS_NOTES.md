@@ -9231,3 +9231,20 @@
   rebounded from `0%` to `45%` with `43101 / 81920` MiB allocated. Keep E142
   alive as slow final evaluation, do not update `EXPERIMENT_RESULTS.md`, and
   do not launch E143 while this liveness evidence persists.
+- 2026-05-17T00:31Z E142 remained a live CPU-bound final-evaluation watch
+  after a five-minute interval on owned pod `723hbew2jrvxjx`. Artifact
+  inventory was unchanged from `00:25:54Z` through `00:30:56Z`, still only
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; status mtime stayed
+  `2026-05-16T23:09:53Z`, with no `results.json`, result CSV, eval-detail
+  CSV, or checkpoint. Trainer PID `13262` stayed runnable with `194` threads,
+  elapsed time advanced from `03:20:38` to `03:25:40`, process CPU time
+  advanced from `2-02:15:11` to `2-04:14:45`, `%CPU` rose from `1502` to
+  `1524`, RSS stayed in the `1.7GB` band, `rchar` increased from
+  `668927868` to `672125469`, and `read_bytes` increased from `8159232` to
+  `10559488`. GPU utilization sampled `0%` throughout with
+  `43101 / 81920` MiB allocated. The active E142 checkout writes
+  `eval_details_full_msa_to_face.csv` only after `_evaluate` finishes all
+  validation examples, and it lacks the newer `active_eval_batch` status
+  counters. Keep `EXPERIMENT_RESULTS.md` unchanged and do not launch E143
+  while this CPU-active liveness pattern persists.

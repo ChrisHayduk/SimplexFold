@@ -56,6 +56,17 @@ increased from `665906345` to `666515962`, `read_bytes` increased from
 `43101 / 81920` MiB allocated. This is positive liveness evidence, so do not
 stop E142 or launch E143 yet.
 
+A longer five-minute sample from `2026-05-17T00:25:54Z` to `00:30:56Z` still
+showed unchanged artifact inventory and status mtime, but it strengthened the
+CPU-bound-evaluation classification: trainer PID `13262` stayed runnable with
+`194` threads, process CPU time advanced from `2-02:15:11` to `2-04:14:45`,
+`rchar` increased from `668927868` to `672125469`, and `read_bytes` increased
+from `8159232` to `10559488`. GPU utilization sampled `0%` throughout this
+interval. Because the old E142 checkout writes `eval_details_full_msa_to_face.csv`
+only after `_evaluate` finishes all validation examples and lacks the newer
+`active_eval_batch` counters, unchanged artifacts are not enough to classify
+this as terminal while the process remains runnable and CPU-active.
+
 Local runner observability now includes validation-batch progress counters in
 `status_full_msa_to_face.json` for future runs. This does not affect the
 already-running E142 checkout, but E143/E144 or any later short gate should

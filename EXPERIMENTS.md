@@ -6915,6 +6915,15 @@ Validation status on the local branch from the E138/E139 staging window:
   `6291456`, and GPU utilization rebounded from `0%` to `45%` with
   `43101 / 81920` MiB allocated. Keep E142 alive and do not launch E143 while
   this liveness evidence persists.
+  A longer sample from `2026-05-17T00:25:54Z` to `00:30:56Z` had no returned
+  result files, but trainer PID `13262` stayed runnable with `194` threads,
+  process CPU time advanced from `2-02:15:11` to `2-04:14:45`, `rchar`
+  increased from `668927868` to `672125469`, and `read_bytes` increased from
+  `8159232` to `10559488`. GPU utilization sampled `0%` throughout. Because
+  the active E142 checkout writes eval-detail CSV output only after full
+  validation evaluation completes and lacks the newer eval-batch status
+  counters, keep this as a live CPU-bound final-evaluation watch rather than
+  a failed result.
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 
