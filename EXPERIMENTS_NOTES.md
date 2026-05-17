@@ -10178,3 +10178,17 @@
   step `9000`, effective batch size `8`, `num_workers=0`, coordinate
   expansion weights `0.05 / 0.05`, and expansion tolerance `0.05`. Added a
   launch-recipe guard for the documented E147 command before launch.
+- 2026-05-17T22:08Z Launched E147 selected-boundary expansion retry on owned
+  pod `723hbew2jrvxjx` from `/workspace/SimplexFold_e147` at branch commit
+  `0bc7bac`. Remote `py_compile` and parser validation passed before launch,
+  and data/checkpoint readiness was verified. Trainer PID `253572`; log
+  `/workspace/SimplexFold_e147/logs/e147_selected_boundary_expansion_retry.log`;
+  artifact directory
+  `/workspace/SimplexFold_e147/artifacts/nanofold_public_benchmarks/e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64`.
+  Startup was coherent: the run resumed E128 at step `8500`, loaded `1332`
+  matching tensors, initialized `0` new/missing tensors, and advanced from
+  `completed_step=8503` to `8510` over the first two minutes with
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.825184494256973`, and GPU memory `28915 / 81920` MiB.
+  Keep E147 running and keep `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or documented terminal no-score state exists.

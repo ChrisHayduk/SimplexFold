@@ -1,11 +1,15 @@
-## 2026-05-17 Operating Plan Update: E147 Prepared
+## 2026-05-17 Operating Plan Update: E147 Active
 
-E147 should be the next short gate: a clean selected-boundary coordinate
-expansion retry from the E128 checkpoint, run as
-`e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64` for
-`9000` steps with effective batch size `8`, crop `256`, MSA depth `64`,
-`num_workers=0`, and the same AF2-medium-matched `3,240,738`-parameter
-architecture under the `3,261,974` cap.
+E147 is now the active owned Runpod short gate on pod `723hbew2jrvxjx` from
+`/workspace/SimplexFold_e147`. It launched at `2026-05-17T22:05Z` with run
+name `e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64`,
+trainer PID `253572`, log
+`/workspace/SimplexFold_e147/logs/e147_selected_boundary_expansion_retry.log`,
+and artifact directory
+`/workspace/SimplexFold_e147/artifacts/nanofold_public_benchmarks/e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64`.
+The checkout is at branch commit `0bc7bac`, public data counts were verified
+as `11000` features, `11000` labels, and train/val manifests `10000 / 1000`,
+and the current-pod E128 checkpoint exists under `/workspace/SimplexFold_e145`.
 
 Rationale: E144 is only a tiny primary-lDDT leader and still under-expands
 global C-alpha geometry. The most direct unresolved experiment for that
@@ -17,13 +21,16 @@ model-selected face/tetra boundary edges:
 `simplex_tetra_coordinate_expansion_weight=0.05`, and
 `simplex_coordinate_expansion_tolerance=0.05`.
 
-Before launch, verify the owned pod is idle, the public data layout is
-present, the current-pod E128 checkpoint exists under `/workspace/SimplexFold_e145`,
-remote `py_compile` passes, and the parser accepts the E147 command. After
-launch, monitor only E147 and keep `EXPERIMENT_RESULTS.md` unchanged until a
-scored bundle or explicit terminal no-score outcome exists. Do not spend
-30,000 steps unless a returned short gate clears `0.45` primary C-alpha lDDT
-with coherent FoldScore, dRMSD, and C-alpha Rg.
+Startup verification passed: remote `py_compile` passed, parser validation
+accepted the E147 command, the run resumed E128 at step `8500`, loaded `1332`
+matching model tensors, initialized `0` new/missing tensors, and started a
+fresh optimizer. The latest check reached `completed_step=8510`, active step
+`8511`, active microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=0`,
+`stopped_early=false`, finite train loss `4.825184494256973`, and GPU memory
+`28915 / 81920` MiB. Monitor only E147 and keep `EXPERIMENT_RESULTS.md`
+unchanged until a scored bundle or explicit terminal no-score outcome exists.
+Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
+C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
 

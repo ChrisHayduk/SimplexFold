@@ -7672,8 +7672,8 @@ python scripts/verify_nanofold_benchmark_artifacts.py \
 
 ### E147: Selected-Boundary Expansion Retry
 
-Status: prepared as the next short gate after E144 returned below the `0.45`
-short-gate threshold.
+Status: active on owned Runpod pod `723hbew2jrvxjx` after E144 returned below
+the `0.45` short-gate threshold.
 
 Hypothesis: E144 confirms the current bottleneck is still global expansion and
 coarse assembly, not another boundary-readout orientation variant. E140 was
@@ -7778,3 +7778,22 @@ python scripts/verify_nanofold_benchmark_artifacts.py \
   --metadata simplex_tetra_coordinate_expansion_weight=0.05 \
   --metadata simplex_coordinate_expansion_tolerance=0.05
 ```
+
+Launch: E147 launched on 2026-05-17 from `/workspace/SimplexFold_e147` at
+branch commit `0bc7bac`. Public data were verified before launch
+(`11000` feature NPZs, `11000` label NPZs, train/val manifests
+`10000 / 1000`), the current-pod E128 checkpoint under
+`/workspace/SimplexFold_e145` was present, remote `py_compile` passed, and
+parser validation accepted the documented command with effective batch size
+`8`, `num_workers=0`, expansion weights `0.05 / 0.05`, and tolerance `0.05`.
+The launch resumed E128 at step `8500`, loaded `1332` matching tensors,
+initialized `0` new/missing tensors, and started a fresh optimizer. Trainer
+PID is `253572`, log is
+`/workspace/SimplexFold_e147/logs/e147_selected_boundary_expansion_retry.log`,
+and artifact directory is
+`/workspace/SimplexFold_e147/artifacts/nanofold_public_benchmarks/e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64`.
+Startup status advanced from `completed_step=8503` to `8510` over the first
+two minutes, with active step `8511`, active microbatch `1 / 8`,
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
+train loss `4.825184494256973`, PID `253572` alive, and GPU memory
+`28915 / 81920` MiB allocated.
