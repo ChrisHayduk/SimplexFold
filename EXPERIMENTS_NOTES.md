@@ -10167,3 +10167,14 @@
   primary-lDDT leader after rounding but stays below the `0.45` short gate and
   regresses FoldScore/dRMSD/Rg versus E128, so it was recorded as returned but
   rejected; do not launch 30k from E144.
+- 2026-05-17T22:04Z Prepared E147 as the next short gate. The owned pod was
+  idle, GPU memory was `1 / 81920` MiB, no SimplexFold benchmark Python
+  process was running, public features/labels were present as `11000 / 11000`
+  NPZs under `/workspace/nanoFold-Competition/data`, and the current-pod E128
+  checkpoint existed under `/workspace/SimplexFold_e145`. E147 is a clean
+  retry of E140's selected-boundary coordinate-expansion loss from E128, not a
+  continuation from E144: run name
+  `e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64`, target
+  step `9000`, effective batch size `8`, `num_workers=0`, coordinate
+  expansion weights `0.05 / 0.05`, and expansion tolerance `0.05`. Added a
+  launch-recipe guard for the documented E147 command before launch.

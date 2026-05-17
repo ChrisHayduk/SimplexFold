@@ -1,3 +1,30 @@
+## 2026-05-17 Operating Plan Update: E147 Prepared
+
+E147 should be the next short gate: a clean selected-boundary coordinate
+expansion retry from the E128 checkpoint, run as
+`e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64` for
+`9000` steps with effective batch size `8`, crop `256`, MSA depth `64`,
+`num_workers=0`, and the same AF2-medium-matched `3,240,738`-parameter
+architecture under the `3,261,974` cap.
+
+Rationale: E144 is only a tiny primary-lDDT leader and still under-expands
+global C-alpha geometry. The most direct unresolved experiment for that
+failure is E140's selected-boundary coordinate expansion loss, because E140
+failed from pod I/O before writing a scored result. E147 keeps the E128
+selected-complex recipe fixed and adds only the topology-realization loss on
+model-selected face/tetra boundary edges:
+`simplex_face_coordinate_expansion_weight=0.05`,
+`simplex_tetra_coordinate_expansion_weight=0.05`, and
+`simplex_coordinate_expansion_tolerance=0.05`.
+
+Before launch, verify the owned pod is idle, the public data layout is
+present, the current-pod E128 checkpoint exists under `/workspace/SimplexFold_e145`,
+remote `py_compile` passes, and the parser accepts the E147 command. After
+launch, monitor only E147 and keep `EXPERIMENT_RESULTS.md` unchanged until a
+scored bundle or explicit terminal no-score outcome exists. Do not spend
+30,000 steps unless a returned short gate clears `0.45` primary C-alpha lDDT
+with coherent FoldScore, dRMSD, and C-alpha Rg.
+
 ## 2026-05-17 Operating Plan Update: E144 Returned
 
 E144 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`

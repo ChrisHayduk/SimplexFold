@@ -1677,6 +1677,66 @@ def test_e140_selected_boundary_expansion_recipe_matches_running_gate():
     )
 
 
+def test_e147_selected_boundary_expansion_retry_matches_documented_gate():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face",
+            "--run-name",
+            "e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64",
+            "--steps",
+            "9000",
+            "--batch-size",
+            "1",
+            "--grad-accum-steps",
+            "8",
+            "--crop-size",
+            "256",
+            "--msa-depth",
+            "64",
+            "--extra-msa-depth",
+            "0",
+            "--max-templates",
+            "0",
+            "--max-parameters",
+            "3261974",
+            "--resume-model-weights-only",
+            "--simplex-boundary-edge-frame-gate-scale",
+            "0.05",
+            "--simplex-triangle-attention-bias-scale",
+            "0.0125",
+            "--simplex-face-coordinate-expansion-weight",
+            "0.05",
+            "--simplex-tetra-coordinate-expansion-weight",
+            "0.05",
+            "--simplex-coordinate-expansion-tolerance",
+            "0.05",
+        ]
+    )
+
+    assert args.run_name == "e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64"
+    assert args.steps == 9000
+    assert args.batch_size * args.grad_accum_steps == 8
+    assert args.crop_size == 256
+    assert args.msa_depth == 64
+    assert args.extra_msa_depth == 0
+    assert args.max_templates == 0
+    assert args.max_parameters == 3_261_974
+    assert args.num_workers == 0
+    assert args.resume_model_weights_only is True
+    assert args.simplex_boundary_edge_frame_gate_scale == 0.05
+    assert args.simplex_triangle_attention_bias_scale == 0.0125
+    assert args.simplex_face_coordinate_expansion_weight == 0.05
+    assert args.simplex_tetra_coordinate_expansion_weight == 0.05
+    assert args.simplex_coordinate_expansion_tolerance == 0.05
+    assert args.simplex_boundary_signed_face_cyclic_readout_scale is None
+    _enforce_parameter_budget(
+        variant="full_msa_to_face",
+        parameter_count=3_240_738,
+        max_parameters=args.max_parameters,
+    )
+
+
 def test_e141_signed_face_cyclic_recipe_matches_running_gate():
     args = parse_args(
         [
