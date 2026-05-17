@@ -9488,3 +9488,17 @@
   allocated. Treat E143 as the only active SimplexFold run; keep
   `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or terminal no-score
   state exists.
+- 2026-05-17T02:38Z E143 remained coherent on owned pod `723hbew2jrvxjx`.
+  A direct check still showed only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; there
+  was no `results.json`, result CSV, eval-detail CSV, or checkpoint yet. Over
+  the one-minute interval from `02:36:36Z` to `02:37:36Z`, status advanced
+  from completed step `8511`, active step `8512`, microbatch `1 / 8`, to
+  completed step `8515`, active step `8516`, microbatch `1 / 8`, with
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, and
+  finite train losses. Trainer PID `95692` stayed runnable with `194` threads,
+  process CPU time advanced from `00:27:43` to `00:37:31`, `rchar` increased
+  from `95551699` to `100018226`, and GPU memory rose from
+  `28929 / 81920` to `38445 / 81920` MiB. Keep E143 running and keep
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
+  terminal no-score state exists.
