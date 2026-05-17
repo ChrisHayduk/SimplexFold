@@ -21,12 +21,12 @@ Launch wrapper PID is `13260`, trainer PID is `13262`, log is
 `/workspace/SimplexFold_e142/logs/e142_signed_tetra_coboundary.log`, and
 artifact directory is
 `/workspace/SimplexFold_e142/artifacts/nanofold_public_benchmarks/e142_signed_tetra_coboundary_from_e128_s9000_c256_m64`.
-Latest heartbeat at `2026-05-16T23:59:39Z` showed E142 still in final validation
+Latest heartbeat at `2026-05-17T00:05:52Z` showed E142 still in final validation
 watch: `completed_step=9000`, active step `9000`, phase `evaluating`,
 effective batch size `8`, `num_workers=0`, finite last train loss
 `4.721518278121948`, live trainer PID `13262`, and status mtime
 `2026-05-16T23:09:53Z`. The trainer remained strongly CPU-active, with process
-CPU time at `1-15:57:28`, while GPU utilization sampled at `0%` with GPU
+CPU time at `1-18:23:38`, while GPU utilization sampled at `0%` with GPU
 memory allocated at `43101 / 81920` MiB. The
 artifact directory still has no `results.json`, result CSV, eval-detail CSV,
 or E142 checkpoint, so this is an eval-watch state rather than a scored result
@@ -45,6 +45,16 @@ already-running E142 checkout, but E143/E144 or any later short gate should
 report `active_eval_batch`, `active_eval_batches`, and `active_eval_examples`
 during long final validation, making slow validation distinguishable from a
 terminal stall without relying only on CPU time.
+
+Parked successor readiness: the current owned pod no longer had the older
+`/workspace/SimplexFold_e143` or `/workspace/SimplexFold_e144` checkouts, so
+both were re-cloned from GitHub at branch commit `0e4ebd8` without touching
+the active E142 process. Remote `python3 -m py_compile` passed for the
+model/trainer/runner files in both checkouts, `/workspace/nanoFold-Competition`
+exists, and the current-pod E128 checkpoint exists under
+`/workspace/SimplexFold_e145`. If E142 returns weak or fails, launch E143 next
+from `/workspace/SimplexFold_e143`; keep E144 parked behind E143 unless E143
+is deliberately skipped.
 
 Next actions:
 

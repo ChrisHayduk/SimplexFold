@@ -3,7 +3,7 @@
 ## 2026-05-16 E142 Final-Validation Watch; Eval Progress Instrumentation
 
 - Rechecked only the owned Runpod pod `723hbew2jrvxjx` through
-  `2026-05-16T23:59:39Z`. E142 is still in final validation watch with
+  `2026-05-17T00:05:52Z`. E142 is still in final validation watch with
   `phase=evaluating`, `completed_step=9000`, active step `9000`, effective
   batch size `8`, `num_workers=0`, finite last train loss
   `4.721518278121948`, and status mtime `2026-05-16T23:09:53Z`.
@@ -13,7 +13,7 @@
   `eval_details_full_msa_to_face.csv`, or E142 checkpoint. History still ends
   at inherited E128 step `8500`.
 - Stall classification: not terminal yet. Trainer PID `13262` remains alive
-  and CPU-active with process time `1-15:57:28`, state `Rl`, and `194`
+  and CPU-active with process time `1-18:23:38`, state `Rl`, and `194`
   threads; GPU utilization sampled at `0%` with `43101 / 81920` MiB allocated.
   The log still contains only startup/resume lines, and `/proc/13262/wchan`
   returned `0`. Continue monitoring rather than stopping the run while CPU
@@ -29,6 +29,14 @@
   `scripts/summarize_nanofold_run_status.py` includes those counters. This is
   instrumentation only; it does not change architecture, losses, training
   data, validation scoring, or the already-running E142 checkout.
+- Successor readiness: `/workspace/SimplexFold_e143` and
+  `/workspace/SimplexFold_e144` were missing on the current owned pod despite
+  older staging notes, so both were re-cloned from GitHub at branch commit
+  `0e4ebd8` without touching the active E142 process. Remote
+  `python3 -m py_compile` passed for model/trainer/runner files in both
+  checkouts. `/workspace/nanoFold-Competition` exists, and the E128 checkpoint
+  exists under `/workspace/SimplexFold_e145`, so E143 is ready as the next
+  topology-native fallback if E142 returns weak or becomes terminal no-score.
 
 ## 2026-05-16 E141 Final-Step Stall; Pod Stopped
 

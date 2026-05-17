@@ -6890,11 +6890,11 @@ Validation status on the local branch from the E138/E139 staging window:
   The launch uses effective batch size `8`, crop `256`, MSA depth `64`,
   `num_workers=0`, max parameter cap `3,261,974`, and no external templates,
   pretrained weights, external MSA retrieval, or metric-side C-alpha loss.
-  Latest heartbeat at `2026-05-16T23:59:39Z` showed final-validation watch:
+  Latest heartbeat at `2026-05-17T00:05:52Z` showed final-validation watch:
   `completed_step=9000`, active step `9000`, phase `evaluating`, finite last
   train loss `4.721518278121948`, trainer PID `13262` still CPU-active,
   status mtime `2026-05-16T23:09:53Z`, GPU utilization sampled at `0%`, GPU
-  memory allocated at `43101 / 81920` MiB, process CPU time at `1-15:57:28`,
+  memory allocated at `43101 / 81920` MiB, process CPU time at `1-18:23:38`,
   and no returned result bundle yet. Keep treating E142 as eval-watch rather
   than a scored or terminal outcome.
   A one-minute process sample from `2026-05-16T23:58:39Z` to `23:59:39Z`
@@ -6925,7 +6925,7 @@ Candidate launch only after the active Runpod branch is documented:
 
 ```bash
 --run-name e143_signed_tetra_to_face_from_e128_s9000_c256_m64 \
---resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-from-checkpoint /workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
 --resume-model-weights-only \
 --steps 9000 \
 --simplex-boundary-edge-frame-gate-scale 0.05 \
@@ -6955,7 +6955,7 @@ nohup python -u scripts/run_nanofold_public_benchmarks.py \
   --variants full_msa_to_face \
   --run-name e143_signed_tetra_to_face_from_e128_s9000_c256_m64 \
   --output-dir artifacts/nanofold_public_benchmarks \
-  --resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+  --resume-from-checkpoint /workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
   --resume-model-weights-only \
   --steps 9000 \
   --batch-size 1 \
@@ -7026,13 +7026,15 @@ Validation status on the local branch from the E138/E139 staging window:
   the documented E143 flags, with effective batch size `8`, max-parameter cap
   `3261974`, signed static scale `0.25`, and signed runtime final scale
   `0.25`.
-- Remote readiness: `/workspace/SimplexFold_e143` was initially staged clean
-  at commit `f931bed`, then fast-forwarded to heartbeat commit `fd65f74`;
-  remote `python3 -m py_compile` passed for the model/trainer/runner files;
-  `/workspace/nanoFold-Competition` and the E128 checkpoint both exist; parser
-  validation accepted the documented E143 command with effective batch size
-  `8`, max-parameter cap `3261974`, signed static scale `0.25`, and signed
-  runtime final scale `0.25`.
+- Remote readiness: `/workspace/SimplexFold_e143` was re-staged on the active
+  owned pod from GitHub at branch commit `0e4ebd8`, after the earlier parked
+  checkout was no longer present on `/workspace`. Remote
+  `python3 -m py_compile` passed for the model/trainer/runner files;
+  `/workspace/nanoFold-Competition` and the current-pod E128 checkpoint under
+  `/workspace/SimplexFold_e145` both exist; previous parser validation
+  accepted the documented E143 flags with effective batch size `8`,
+  max-parameter cap `3261974`, signed static scale `0.25`, and signed runtime
+  final scale `0.25`.
 - Launch-recipe guard:
   `test_e143_signed_tetra_to_face_recipe_matches_documented_gate` locks the
   documented run name, step target, effective batch size, crop/MSA/template
@@ -7064,7 +7066,7 @@ Candidate launch only after the active Runpod branch is documented:
 
 ```bash
 --run-name e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64 \
---resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+--resume-from-checkpoint /workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
 --resume-model-weights-only \
 --steps 9000 \
 --simplex-boundary-edge-frame-gate-scale 0.05 \
@@ -7094,7 +7096,7 @@ nohup python -u scripts/run_nanofold_public_benchmarks.py \
   --variants full_msa_to_face \
   --run-name e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64 \
   --output-dir artifacts/nanofold_public_benchmarks \
-  --resume-from-checkpoint /workspace/SimplexFold/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+  --resume-from-checkpoint /workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
   --resume-model-weights-only \
   --steps 9000 \
   --batch-size 1 \
@@ -7156,13 +7158,16 @@ Validation status:
 
 - Existing focused parser/runtime tests cover the edge-star residual override
   path and ramp schedule.
-- Remote readiness: `/workspace/SimplexFold_e144` is clean at the branch tip;
-  remote `python3 -m py_compile` passed for the model/trainer/runner files;
-  `/workspace/nanoFold-Competition` and the E128 checkpoint both exist; parser
-  validation accepted the full documented E144 command with effective batch
-  size `8`, max-parameter cap `3261974`, static residual scale `0.25`, and
-  runtime final scale `0.25`. The full E128-style architecture audit counted
-  `3,240,738` parameters, still under the cap.
+- Remote readiness: `/workspace/SimplexFold_e144` was re-staged on the active
+  owned pod from GitHub at branch commit `0e4ebd8`, after the earlier parked
+  checkout was no longer present on `/workspace`. Remote
+  `python3 -m py_compile` passed for the model/trainer/runner files;
+  `/workspace/nanoFold-Competition` and the current-pod E128 checkpoint under
+  `/workspace/SimplexFold_e145` both exist; previous parser validation
+  accepted the full documented E144 command with effective batch size `8`,
+  max-parameter cap `3261974`, static residual scale `0.25`, and runtime final
+  scale `0.25`. The full E128-style architecture audit counted `3,240,738`
+  parameters, still under the cap.
 - Launch-recipe guard:
   `test_e144_edge_star_residual_recipe_matches_documented_gate` locks the
   documented run name, step target, effective batch size, crop/MSA/template
