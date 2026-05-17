@@ -9615,3 +9615,13 @@
   still absent: no `results.json`, result CSV, eval-detail CSV, or checkpoint.
   Leave E143 running and keep `EXPERIMENT_RESULTS.md` unchanged until a scored
   bundle or documented terminal no-score state exists.
+- 2026-05-17T03:11Z E143 continued training coherently on owned pod
+  `723hbew2jrvxjx`. Status advanced to completed step `8654`, active step
+  `8655`, phase `microbatch_done`, finite last train loss `4.755711793899536`,
+  `effective_batch_size=8`, `num_workers=0`, and `stopped_early=false`.
+  Trainer PID `95692` remained alive with `194` threads, process CPU time
+  `06:08:50`, GPU utilization sampled `42%`, and GPU memory stayed at
+  `43311 / 81920` MiB. The run remains pre-return: no `results.json`, result
+  CSV, eval-detail CSV, or checkpoint exists yet. Keep E143 running and keep
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
+  terminal no-score state exists.
