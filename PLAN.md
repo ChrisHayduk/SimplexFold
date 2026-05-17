@@ -1,95 +1,25 @@
-## 2026-05-17 Operating Plan Update: E144 Active
+## 2026-05-17 Operating Plan Update: E144 Returned
 
-E144 is now the active owned Runpod short gate on pod `723hbew2jrvxjx` from
-`/workspace/SimplexFold_e144`. It launched at `2026-05-17T16:26Z` with run
-name `e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`, trainer PID
-`172579`, log
-`/workspace/SimplexFold_e144/logs/e144_no_hodge_edge_star_residual.log`, and
-artifact directory
-`/workspace/SimplexFold_e144/artifacts/nanofold_public_benchmarks/e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`.
-The pod was idle before launch, `/workspace/SimplexFold_e144` was clean and
-fast-forwarded to branch commit `9333c32`, the E128 checkpoint existed, and the
-E144 artifact directory was absent.
+E144 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`
+from `/workspace/SimplexFold_e144`. The required bundle exists locally and
+remotely: `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+`eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+`status_full_msa_to_face.json`, and
+`checkpoints/full_msa_to_face_latest.pt`. Verification confirmed
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+`1000` eval rows, history ending at step `9000`, and `3,240,738` parameters
+under the `3,261,974` cap.
 
-The launch briefly produced a duplicate Python process with PID `175937`
-against the same run directory. A trace was preserved under
-`artifacts/runpod_traces/e144_duplicate_launch_20260517T1629Z/`, then only the
-later duplicate process group was stopped. The original launch PID `172579`
-remained coherent. Status at `2026-05-17T16:29:57Z` showed
-`completed_step=8509`, active step `8510`, active microbatch `1 / 8`, phase
-`microbatch_done`, `effective_batch_size=8`, `num_workers=0`,
-`stopped_early=false`, finite last train loss `4.5722126960754395`, and GPU
-utilization `63%` with `28669 / 81920` MiB allocated. Monitor only E144 PID
-`172579` for progress and returned artifacts. Do not update
-`EXPERIMENT_RESULTS.md` for E144 until it returns a scored bundle or reaches a
-documented terminal no-score state.
+Decision: reject E144 as a 30k candidate despite its tiny new primary-lDDT
+high. It returned `val_lddt_ca=0.4312`, only about `+0.0001` versus E128 and
+still below the `0.45` short-gate threshold. FoldScore fell to `0.4009`,
+dRMSD was `11.0131`, and predicted C-alpha Rg was `11.5188` versus true
+`16.3091`, so the result does not give a coherent continuation signal.
 
-Latest live check at `2026-05-17T16:33Z` remained coherent: status advanced to
-completed step `8522`, active step `8523`, active microbatch `1 / 8`, phase
-`microbatch_done`, finite last train loss `4.637174069881439`,
-`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, PID `172579`
-alive, and GPU memory `38189 / 81920` MiB. No result bundle or checkpoint
-exists yet.
-
-Latest live check at `2026-05-17T16:40Z` remained coherent: status advanced to
-completed step `8551`, active step `8552`, active microbatch `1 / 8`, phase
-`microbatch_done`, finite last train loss `4.8796935975551605`, PID `172579`
-alive, and no result bundle or checkpoint exists yet. Keep E144 running.
-
-Latest live check at `2026-05-17T16:54Z` remained coherent: status advanced to
-completed step `8607`, active step `8608`, active microbatch `1 / 8`, phase
-`microbatch_done`, finite last train loss `4.753740459680557`, PID `172579`
-alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
-only.
-
-Latest live check at `2026-05-17T17:05Z` remained coherent: status advanced to
-completed step `8650`, active step `8651`, active microbatch `1 / 8`, phase
-`microbatch_done`, finite last train loss `4.492419868707657`, PID `172579`
-alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
-only.
-
-Latest live check at `2026-05-17T17:18Z` remained coherent: status advanced to
-completed step `8701`, active step `8702`, active microbatch `1 / 8`, phase
-`microbatch_done`, finite last train loss `4.872242033481598`, PID `172579`
-alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
-only.
-
-Latest live check at `2026-05-17T17:31Z` remained coherent: status advanced to
-completed step `8751`, active step `8752`, active microbatch `1 / 8`, phase
-`microbatch_done`, finite last train loss `4.749566555023193`, PID `172579`
-alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
-only.
-
-Latest live check at `2026-05-17T17:43Z` remained coherent: status advanced to
-completed step `8800`, active step `8801`, active microbatch `1 / 8`, phase
-`microbatch_done`, finite last train loss `4.427721321582794`, PID `172579`
-alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
-only.
-
-Latest live check at `2026-05-17T17:56Z` remained coherent: status advanced to
-completed step `8853`, active step `8854`, active microbatch `1 / 8`, phase
-`microbatch_done`, finite last train loss `4.633165746927261`, PID `172579`
-alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
-only.
-
-Latest live check at `2026-05-17T18:08Z` remained coherent: status advanced to
-completed step `8900`, active step `8901`, active microbatch `1 / 8`, phase
-`microbatch_done`, finite last train loss `4.522779315710068`, PID `172579`
-alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
-only.
-
-Latest live check at `2026-05-17T21:37Z` remained in the final validation sweep:
-completed step `9000`, active step `9000`, phase `evaluating`, active eval
-batch `903 / 1000`, `effective_batch_size=8`, `num_workers=0`,
-`stopped_early=false`, finite last train loss `4.741060197353363`, and PID
-`172579` alive with status heartbeat still updating. The artifact tree still
-contains only history, run metadata, and status; no `results.json`, result
-CSV, eval-detail CSV, or checkpoint exists yet. Continue monitoring E144 only
-and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
-documented terminal no-score state exists.
-
-Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
-C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
+No 30,000-step run should be launched from E144. The next short gate should
+target global expansion/coarse assembly directly, not another boundary-readout
+orientation variant, and it should still clear `0.45` with coherent FoldScore,
+dRMSD, and C-alpha Rg before any 30k-step spend.
 
 ## 2026-05-17 Operating Plan Update: E143 Returned, E144 Next
 

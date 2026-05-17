@@ -10148,3 +10148,22 @@
   CSV, eval-detail CSV, or checkpoint existed. Keep E144 running and keep
   `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
   terminal no-score state exists.
+- 2026-05-17T21:58Z E144 returned coherently on owned pod `723hbew2jrvxjx`.
+  Required remote files existed (`results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, `eval_details_full_msa_to_face.csv`,
+  `run_metadata.json`, `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt`); status was `finished` with
+  `completed_step=9000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, and history ending at step `9000`. Artifacts and the
+  log were pulled locally. `scripts/verify_nanofold_benchmark_artifacts.py`
+  passed with `1000` eval rows, `1` result row, checkpoint required, and
+  `3,240,738 <= 3,261,974` parameters. `scripts/audit_goal_artifact.py`
+  verified the artifact but correctly failed the goal gate
+  (`val_lddt_ca=0.4312 <= 0.7` and `9000 < 30000` confirmation steps).
+  `scripts/analyze_nanofold_eval_details.py` reported mean
+  `lddt_ca=0.4312`, FoldScore `0.4009`, Rg ratio `0.7298`, length-bin lDDT
+  falling from `0.5082` for residues `<80` to `0.3912` for `>=220`, and
+  `74 / 519` high-boundary rows still low-global. E144 is a marginal
+  primary-lDDT leader after rounding but stays below the `0.45` short gate and
+  regresses FoldScore/dRMSD/Rg versus E128, so it was recorded as returned but
+  rejected; do not launch 30k from E144.

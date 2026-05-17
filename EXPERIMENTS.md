@@ -7108,8 +7108,8 @@ Validation status on the local branch from the E138/E139 staging window:
 
 ### E144: No-Hodge Edge-Star Residual Boundary Readout
 
-Status: active on owned Runpod pod `723hbew2jrvxjx` after E143 returned below
-the `0.45` short-gate threshold.
+Status: returned coherently on owned Runpod pod `723hbew2jrvxjx`, verified,
+and recorded as a rejected short gate.
 
 Hypothesis: E139 tests an oriented antisymmetric selected boundary 1-cochain,
 but the selected boundary readout may also carry residue-star common modes
@@ -7301,13 +7301,28 @@ Validation status:
   `results.json`, result CSV, eval-detail CSV, or checkpoint, so
   `EXPERIMENT_RESULTS.md` remains unchanged while the owned process continues
   the final validation sweep.
+- Return: E144 finished at `2026-05-17T21:58Z` with all required artifacts
+  present. Local verification passed with `completed_steps=9000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  `history_last_step=9000`, `1000` eval rows, `1` result row, checkpoint
+  present, and `3,240,738 <= 3,261,974` parameters. The final metrics were
+  `val_lddt_ca=0.43116844138503074`, `val_foldscore=0.4009473153948784`,
+  `val_ca_drmsd=11.01310022777319`, and C-alpha Rg
+  `11.51875713634491 / 16.309116956710817`.
+- Eval-detail analysis reproduced the same compact-global failure pattern:
+  mean `lddt_ca=0.4312`, mean FoldScore `0.4009`, mean Rg ratio `0.7298`,
+  length-bin lDDT falling from `0.5082` for residues `<80` to `0.3912` for
+  residues `>=220`, and `74 / 519` high-boundary rows still low-global.
+- Decision: E144 is a marginal primary-lDDT leader after rounding, but reject
+  it as a continuation or 30k candidate. It remains below the `0.45` short
+  gate and regresses FoldScore, dRMSD, and C-alpha expansion relative to E128.
+  Use it as diagnostic evidence that boundary readout orientation is saturated
+  and the next short gate should target global expansion/coarse assembly.
 
 ### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
 
-Status: running on owned Runpod pod `723hbew2jrvxjx` as
-`e145_outer_residual_context_from_e128_s9000_c256_m64`. E140 failed pre-eval
-with no scored result, and E141 later stalled at the final step with no scored
-result, so E145 is the active follow-up short gate.
+Status: failed final-step stall/no-score on owned Runpod pod `723hbew2jrvxjx`
+as `e145_outer_residual_context_from_e128_s9000_c256_m64`.
 
 Source motivation: the saved Topotein PDF (`references/papers/2509.03885v1.pdf`)
 argues that protein topological networks need persistent multi-rank states and
