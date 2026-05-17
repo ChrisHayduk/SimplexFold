@@ -9248,3 +9248,12 @@
   validation examples, and it lacks the newer `active_eval_batch` status
   counters. Keep `EXPERIMENT_RESULTS.md` unchanged and do not launch E143
   while this CPU-active liveness pattern persists.
+- 2026-05-17T00:36Z E142 still had no returned bundle, but the process
+  remained CPU-active. A two-minute interval from `00:33:59Z` to `00:35:59Z`
+  showed unchanged artifact inventory and status mtime, trainer PID `13262`
+  runnable with `194` threads, process CPU time advancing from `2-05:26:42`
+  to `2-06:14:08`, `rchar` increasing from `674351075` to `675899001`, and
+  `read_bytes` increasing from `12296192` to `13533184`. GPU utilization
+  sampled `0%` at both ends with `43101 / 81920` MiB allocated. Continue
+  treating E142 as live CPU-bound final evaluation; keep
+  `EXPERIMENT_RESULTS.md` unchanged and do not launch E143 yet.
