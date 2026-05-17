@@ -9276,3 +9276,12 @@
   `43101 / 81920` MiB allocated. Continue treating E142 as live CPU-bound
   final evaluation; keep `EXPERIMENT_RESULTS.md` unchanged and do not launch
   E143 yet.
+- 2026-05-17T00:49Z E142 remained live and unreturned on owned pod
+  `723hbew2jrvxjx`. A two-minute interval from `00:47:05Z` to `00:49:05Z`
+  showed unchanged artifact inventory and status mtime, trainer PID `13262`
+  runnable with `194` threads, process CPU time advancing from `2-10:37:25`
+  to `2-11:25:56`, `rchar` increasing from `683398826` to `684623116`, and
+  `read_bytes` increasing from `19181568` to `20189184`. GPU utilization
+  sampled `74%` at the start and `0%` at the end, with `43101 / 81920` MiB
+  allocated. Continue treating E142 as live final evaluation; keep
+  `EXPERIMENT_RESULTS.md` unchanged and do not launch E143 yet.
