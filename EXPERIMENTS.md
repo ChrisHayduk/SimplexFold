@@ -6908,6 +6908,13 @@ Validation status on the local branch from the E138/E139 staging window:
   the current final-eval metric path moves predictions to CPU for C-alpha and
   FoldScore-related summaries, this remains plausible slow evaluation rather
   than sufficient terminal evidence.
+  A fresh one-minute interval from `2026-05-17T00:21:46Z` to `00:22:46Z`
+  preserved that classification: status and artifact mtimes stayed unchanged,
+  but CPU time advanced from `2-00:36:57` to `2-01:01:20`, `rchar` increased
+  from `665906345` to `666515962`, `read_bytes` increased from `5853184` to
+  `6291456`, and GPU utilization rebounded from `0%` to `45%` with
+  `43101 / 81920` MiB allocated. Keep E142 alive and do not launch E143 while
+  this liveness evidence persists.
 
 ### E143: Signed Tetra-to-Face Boundary Readout
 

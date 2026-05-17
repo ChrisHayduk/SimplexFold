@@ -48,6 +48,14 @@ FoldScore-related summaries on CPU after moving predictions off the GPU, so
 this is still consistent with slow final evaluation rather than enough
 terminal evidence to kill the run.
 
+Latest interval sampling from `2026-05-17T00:21:46Z` to `00:22:46Z` again
+showed unchanged status/artifact mtimes, but the trainer stayed runnable,
+process CPU time advanced from `2-00:36:57` to `2-01:01:20`, `rchar`
+increased from `665906345` to `666515962`, `read_bytes` increased from
+`5853184` to `6291456`, and GPU utilization rebounded from `0%` to `45%` with
+`43101 / 81920` MiB allocated. This is positive liveness evidence, so do not
+stop E142 or launch E143 yet.
+
 Local runner observability now includes validation-batch progress counters in
 `status_full_msa_to_face.json` for future runs. This does not affect the
 already-running E142 checkout, but E143/E144 or any later short gate should

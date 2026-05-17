@@ -9218,3 +9218,16 @@
   inspection. Continue treating this as CPU-active eval-watch rather than a
   scored result or terminal no-score outcome; keep `EXPERIMENT_RESULTS.md`
   unchanged.
+- 2026-05-17T00:22Z E142 still has no returned result bundle, but a fresh
+  one-minute interval argues against a terminal stop. Status remained
+  `completed_step=9000`, active step `9000`, phase `evaluating`, with status
+  mtime `2026-05-16T23:09:53Z`; artifact inventory remained only
+  `status_full_msa_to_face.json`, `history_full_msa_to_face.json`, and
+  `run_metadata.json`, with no `results.json`, result CSV, eval-detail CSV,
+  or checkpoint. Trainer PID `13262` stayed runnable, elapsed time advanced
+  from `03:16:30` to `03:17:31`, CPU time advanced from `2-00:36:57` to
+  `2-01:01:20`, `rchar` increased from `665906345` to `666515962`,
+  `read_bytes` increased from `5853184` to `6291456`, and GPU utilization
+  rebounded from `0%` to `45%` with `43101 / 81920` MiB allocated. Keep E142
+  alive as slow final evaluation, do not update `EXPERIMENT_RESULTS.md`, and
+  do not launch E143 while this liveness evidence persists.
