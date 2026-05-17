@@ -1,3 +1,28 @@
+## 2026-05-17 Operating Plan Update: E144 Active
+
+E144 is now the active owned Runpod short gate on pod `723hbew2jrvxjx` from
+`/workspace/SimplexFold_e144`. It launched at `2026-05-17T16:26Z` with run
+name `e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`, trainer PID
+`175937`, log
+`/workspace/SimplexFold_e144/logs/e144_no_hodge_edge_star_residual.log`, and
+artifact directory
+`/workspace/SimplexFold_e144/artifacts/nanofold_public_benchmarks/e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`.
+The pod was idle before launch, `/workspace/SimplexFold_e144` was clean and
+fast-forwarded to branch commit `9333c32`, the E128 checkpoint existed, and the
+E144 artifact directory was absent.
+
+Initial status at `2026-05-17T16:27:03Z` was coherent:
+`completed_step=8501`, active step `8502`, active microbatch `1 / 8`, phase
+`microbatch_backward_start`, `effective_batch_size=8`, `num_workers=0`,
+`stopped_early=false`, finite last train loss `4.276142597198486`, and GPU
+utilization `96%` with `37247 / 81920` MiB allocated. Monitor only E144 for
+progress and returned artifacts. Do not update `EXPERIMENT_RESULTS.md` for
+E144 until it returns a scored bundle or reaches a documented terminal
+no-score state.
+
+Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
+C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
+
 ## 2026-05-17 Operating Plan Update: E143 Returned, E144 Next
 
 E143 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`

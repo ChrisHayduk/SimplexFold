@@ -9955,3 +9955,18 @@
   FoldScore `0.4003`, dRMSD `11.0003`, mean boundary lDDT `0.7504`, and `79`
   high-boundary / low-global examples. Record E143 as returned but rejected;
   do not spend 30k.
+- 2026-05-17T16:27Z Launched E144 no-Hodge edge-star residual boundary
+  readout on owned pod `723hbew2jrvxjx` from `/workspace/SimplexFold_e144`
+  after E143 was verified, recorded, and rejected as a below-threshold short
+  gate. Run name:
+  `e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`; trainer PID
+  `175937`; log:
+  `/workspace/SimplexFold_e144/logs/e144_no_hodge_edge_star_residual.log`;
+  artifact directory:
+  `/workspace/SimplexFold_e144/artifacts/nanofold_public_benchmarks/e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`.
+  Initial status was coherent: `completed_step=8501`, active step `8502`,
+  active microbatch `1 / 8`, phase `microbatch_backward_start`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.276142597198486`, GPU utilization `96%`, and GPU memory
+  `37247 / 81920` MiB. Keep E144 running and keep `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or documented terminal no-score state exists.

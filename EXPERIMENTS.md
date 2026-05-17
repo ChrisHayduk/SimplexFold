@@ -7108,8 +7108,8 @@ Validation status on the local branch from the E138/E139 staging window:
 
 ### E144: No-Hodge Edge-Star Residual Boundary Readout
 
-Status: next prepared short gate after E143 returned below the `0.45`
-threshold; launch only if the owned pod and staged checkout remain coherent.
+Status: active on owned Runpod pod `723hbew2jrvxjx` after E143 returned below
+the `0.45` short-gate threshold.
 
 Hypothesis: E139 tests an oriented antisymmetric selected boundary 1-cochain,
 but the selected boundary readout may also carry residue-star common modes
@@ -7237,6 +7237,21 @@ Validation status:
   documented run name, step target, effective batch size, crop/MSA/template
   settings, parameter cap, default `num_workers=0`, edge-star residual static
   scale, and the `8500`-to-`9000` runtime ramp.
+- Launch: E144 was launched on 2026-05-17 from `/workspace/SimplexFold_e144`
+  after E143 was verified, recorded, and rejected as a below-threshold short
+  gate. Run name:
+  `e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`; trainer PID
+  `175937`; log:
+  `/workspace/SimplexFold_e144/logs/e144_no_hodge_edge_star_residual.log`;
+  artifact directory:
+  `/workspace/SimplexFold_e144/artifacts/nanofold_public_benchmarks/e144_no_hodge_edge_star_residual_from_e128_s9000_c256_m64`.
+  The run resumed E128 at step `8500`, loaded `1332` matching model tensors,
+  initialized `0` new/missing tensors, and started a fresh optimizer. Initial
+  status at `2026-05-17T16:27:03Z` showed `completed_step=8501`, active step
+  `8502`, active microbatch `1 / 8`, phase `microbatch_backward_start`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.276142597198486`, and GPU utilization `96%` with
+  `37247 / 81920` MiB allocated.
 
 ### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
 
