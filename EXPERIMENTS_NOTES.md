@@ -9502,3 +9502,15 @@
   `28929 / 81920` to `38445 / 81920` MiB. Keep E143 running and keep
   `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
   terminal no-score state exists.
+- 2026-05-17T02:39Z E143 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status had advanced to completed step `8523`, active step `8524`,
+  microbatch `1 / 8`, with `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, and finite last train loss `4.731101334095001`.
+  Artifact inventory remained pre-return with only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; there
+  was still no `results.json`, result CSV, eval-detail CSV, or checkpoint.
+  Trainer PID `95692` stayed runnable with `194` threads, elapsed time
+  `00:05:56`, process CPU time `00:55:18`, and GPU memory
+  `38445 / 81920` MiB allocated. Keep E143 running and keep
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
+  terminal no-score state exists.
