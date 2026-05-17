@@ -10207,3 +10207,11 @@
   last train loss `4.707268834114075`. Trainer PID `253572` remained alive
   with elapsed time `15:07`, process CPU time `02:13:52`, and `194` threads.
   No returned result bundle, eval-detail CSV, or checkpoint existed yet.
+- 2026-05-17T22:26Z E147 remained coherent on owned pod `723hbew2jrvxjx`.
+  Status advanced to `completed_step=8572`, active step `8573`, active
+  microbatch `1 / 8`, phase `microbatch_done`, fresh status mtime
+  `2026-05-17T22:26:04Z`, and finite last train loss
+  `4.691354393959045`. Trainer PID `253572` remained alive with elapsed time
+  `17:33`, process CPU time `02:35:28`, and `194` threads. No result bundle,
+  eval-detail CSV, or checkpoint existed yet; leave E147 running and keep
+  `EXPERIMENT_RESULTS.md` unchanged.
