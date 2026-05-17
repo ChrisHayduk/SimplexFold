@@ -7293,6 +7293,14 @@ Validation status:
   active step `8901`, active microbatch `1 / 8`, phase `microbatch_done`,
   finite last train loss `4.522779315710068`, PID `172579` alive, and still
   no result bundle or checkpoint.
+  A final-eval check at `2026-05-17T19:23Z` reached completed step `9000`,
+  active step `9000`, phase `evaluating`, active eval batch `243 / 1000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.741060197353363`, and PID `172579` alive with a fresh
+  status heartbeat. The returned bundle was still incomplete: no
+  `results.json`, result CSV, eval-detail CSV, or checkpoint, so
+  `EXPERIMENT_RESULTS.md` remains unchanged while the owned process continues
+  the final validation sweep.
 
 ### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
 

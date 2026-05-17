@@ -78,6 +78,16 @@ completed step `8900`, active step `8901`, active microbatch `1 / 8`, phase
 alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
 only.
 
+Latest live check at `2026-05-17T19:23Z` reached the final validation sweep:
+completed step `9000`, active step `9000`, phase `evaluating`, active eval
+batch `243 / 1000`, `effective_batch_size=8`, `num_workers=0`,
+`stopped_early=false`, finite last train loss `4.741060197353363`, and PID
+`172579` alive with status heartbeat still updating. The artifact tree still
+contains only history, run metadata, and status; no `results.json`, result
+CSV, eval-detail CSV, or checkpoint exists yet. Continue monitoring E144 only
+and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
+documented terminal no-score state exists.
+
 Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
 C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
 
