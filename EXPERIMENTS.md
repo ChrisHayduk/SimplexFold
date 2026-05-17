@@ -7265,6 +7265,10 @@ Validation status:
   step `8551`, active step `8552`, active microbatch `1 / 8`, phase
   `microbatch_done`, finite last train loss `4.8796935975551605`, PID
   `172579` alive, and still no result bundle or checkpoint.
+  A milestone check at `2026-05-17T16:54Z` reached completed step `8607`,
+  active step `8608`, active microbatch `1 / 8`, phase `microbatch_done`,
+  finite last train loss `4.753740459680557`, PID `172579` alive, and still
+  no result bundle or checkpoint.
 
 ### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
 
