@@ -9392,3 +9392,19 @@
   utilization sampled `0%` at both ends with `43101 / 81920` MiB allocated.
   Keep E142 classified as live slow final evaluation; do not update
   `EXPERIMENT_RESULTS.md` or launch E143 yet.
+- 2026-05-17T02:16Z E142 remained live and unreturned on owned pod
+  `723hbew2jrvxjx`. The artifact directory still contained only
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; there was still no `results.json`, result
+  CSV, eval-detail CSV, or checkpoint directory. Status stayed
+  `phase=evaluating`, completed step `9000`, active step `9000`, last history
+  step `8500`, `effective_batch_size=8`, `num_workers=0`, and
+  `stopped_early=false`. Over the one-minute interval from `02:15:29Z` to
+  `02:16:29Z`, trainer PID `13262` remained runnable with `194` threads,
+  process CPU time advanced from `3-21:27:19` to `3-21:52:04`, `rchar`
+  increased from `744629933` to `745133394`, `read_bytes` increased from
+  `64999424` to `65376256`, and RSS increased from `1808596` to `1951028`
+  KiB. GPU utilization sampled `0%` at both ends with `43101 / 81920` MiB
+  allocated. Keep E142 classified as live slow final evaluation; leave
+  `EXPERIMENT_RESULTS.md` unchanged and keep E143 parked until E142 returns or
+  reaches a documented terminal no-score state.
