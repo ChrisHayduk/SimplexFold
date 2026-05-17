@@ -7811,3 +7811,95 @@ active step `8573`, active microbatch `1 / 8`, phase `microbatch_done`,
 fresh status mtime `2026-05-17T22:26:04Z`, finite last train loss
 `4.691354393959045`, and PID `253572` alive. No result bundle,
 eval-detail CSV, or checkpoint existed yet.
+The latest live check at `2026-05-17T22:32Z` reached `completed_step=8596`,
+active step `8597`, active microbatch `1 / 8`, phase `microbatch_done`,
+fresh status mtime `2026-05-17T22:31:50Z`, finite last train loss
+`3.9972648322582245`, and PID `253572` alive. No result bundle,
+eval-detail CSV, or checkpoint existed yet.
+
+### E148: Degree-Normalized Selected-Boundary Expansion
+
+Status: parked contingency. Do not launch while E147 is active.
+
+Hypothesis: if E147 fails to clear the `0.45` short gate, the selected
+anti-collapse signal may still be too concentrated on reused boundary edges.
+Boundary-edge reuse has been a repeated topology failure mode, and E81 showed
+that reducing overused-edge dominance can improve primary lDDT. E148 keeps the
+E147 loss and E128 selected-complex recipe fixed, but adds boundary-degree
+normalization to spread selected boundary distance supervision over unique
+edges.
+
+Mechanism: use the same one-sided selected-boundary coordinate-expansion loss
+as E147 on model-selected face/tetra boundary edges, with
+`simplex_boundary_degree_normalize=true`. This is still topology-native: it
+does not add dense all-pairs distances, C-alpha Rg supervision, validation
+lDDT supervision, external data, templates, or parameters.
+
+Launch recipe, only after E147 returns below threshold or reaches a documented
+terminal no-score outcome:
+
+```bash
+cd /workspace/SimplexFold_e148
+mkdir -p logs
+python3 -m py_compile \
+  minalphafold/simplex.py \
+  minalphafold/evoformer.py \
+  minalphafold/model.py \
+  minalphafold/trainer.py \
+  scripts/run_nanofold_public_benchmarks.py
+nohup python -u scripts/run_nanofold_public_benchmarks.py \
+  --nanofold-root /workspace/nanoFold-Competition \
+  --model-config simplexfold_medium_param_matched \
+  --variants full_msa_to_face \
+  --run-name e148_degree_normalized_expansion_from_e128_s9000_c256_m64 \
+  --output-dir artifacts/nanofold_public_benchmarks \
+  --resume-from-checkpoint /workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+  --resume-model-weights-only \
+  --steps 9000 \
+  --batch-size 1 \
+  --grad-accum-steps 8 \
+  --crop-size 256 \
+  --msa-depth 64 \
+  --extra-msa-depth 0 \
+  --max-templates 0 \
+  --eval-every 500 \
+  --checkpoint-every 500 \
+  --final-max-val-batches 0 \
+  --eval-max-val-batches 0 \
+  --max-parameters 3261974 \
+  --n-cycles 4 \
+  --device cuda \
+  --simplex-face-coordinate-weight 1.0 \
+  --simplex-face-coordinate-distance-weight 0.5 \
+  --simplex-face-boundary-lddt-weight 0.05 \
+  --simplex-tetra-coordinate-weight 1.0 \
+  --simplex-tetra-coordinate-distance-weight 0.5 \
+  --simplex-tetra-boundary-lddt-weight 0.05 \
+  --simplex-geometry-distance-weight 0.025 \
+  --simplex-face-top-k 24 \
+  --simplex-tetra-top-k 48 \
+  --simplex-cell-score-degree-penalty 0.75 \
+  --simplex-cell-score-outer-edge-weight 0.25 \
+  --simplex-edge-frame-message-scale 0.025 \
+  --simplex-edge-frame-message-runtime-scale 0.0125 \
+  --simplex-boundary-edge-frame-gate-scale 0.05 \
+  --simplex-boundary-readout-directionality 0.25 \
+  --simplex-boundary-readout-directionality-runtime-scale 0.25 \
+  --simplex-boundary-incidence-normalization 1.0 \
+  --simplex-boundary-degree-normalize \
+  --simplex-global-context-scale 0.1 \
+  --simplex-vertex-star-context-scale 1.0 \
+  --simplex-vertex-star-context-runtime-scale 1.0 \
+  --simplex-edge-star-context-scale 1.0 \
+  --simplex-edge-star-context-runtime-scale 0.5 \
+  --simplex-triangle-attention-bias-scale 0.0125 \
+  --simplex-face-coordinate-expansion-weight 0.05 \
+  --simplex-tetra-coordinate-expansion-weight 0.05 \
+  --simplex-coordinate-expansion-tolerance 0.05 \
+  > logs/e148_degree_normalized_expansion.log 2>&1 &
+echo $!
+```
+
+Decision rule: reject unless E148 crosses `0.45` primary C-alpha lDDT with
+coherent FoldScore, dRMSD, and C-alpha Rg. No 30k spend without that scored
+short-gate evidence.

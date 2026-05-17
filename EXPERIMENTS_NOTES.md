@@ -10215,3 +10215,21 @@
   `17:33`, process CPU time `02:35:28`, and `194` threads. No result bundle,
   eval-detail CSV, or checkpoint existed yet; leave E147 running and keep
   `EXPERIMENT_RESULTS.md` unchanged.
+- 2026-05-17T22:29Z E147 continued coherent training. Status advanced to
+  `completed_step=8587`, active step `8588`, active microbatch `1 / 8`, phase
+  `microbatch_done`, fresh status mtime `2026-05-17T22:29:40Z`, and finite
+  last train loss `4.614241987466812`. Trainer PID `253572` remained alive
+  with elapsed time `21:09`, process CPU time `03:06:58`, and `194` threads.
+  No result bundle, eval-detail CSV, or checkpoint existed yet. While leaving
+  E147 active, parked E148 as the next contingency: an E147-style selected
+  boundary coordinate-expansion retry from E128 with
+  `--simplex-boundary-degree-normalize`, intended to spread anti-collapse
+  pressure away from overused boundary edges if E147 returns below threshold
+  or reaches a terminal no-score outcome.
+- 2026-05-17T22:32Z E147 continued coherent training. Status advanced to
+  `completed_step=8596`, active step `8597`, active microbatch `1 / 8`, phase
+  `microbatch_done`, fresh status mtime `2026-05-17T22:31:50Z`, and finite
+  last train loss `3.9972648322582245`. Trainer PID `253572` remained alive
+  with elapsed time `23:20`, process CPU time `03:25:03`, and `194` threads.
+  The artifact directory still had only history, run metadata, and status;
+  no result bundle, eval-detail CSV, or checkpoint existed yet.

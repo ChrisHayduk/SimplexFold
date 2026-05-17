@@ -24,15 +24,22 @@ model-selected face/tetra boundary edges:
 Startup verification passed: remote `py_compile` passed, parser validation
 accepted the E147 command, the run resumed E128 at step `8500`, loaded `1332`
 matching model tensors, initialized `0` new/missing tensors, and started a
-fresh optimizer. The latest check reached `completed_step=8572`, active step
-`8573`, active microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=0`,
-`stopped_early=false`, finite train loss `4.691354393959045`, and PID
-`253572` remained alive with a fresh status mtime at `2026-05-17T22:26:04Z`.
+fresh optimizer. The latest check reached `completed_step=8596`, active step
+`8597`, active microbatch `1 / 8`, `effective_batch_size=8`, `num_workers=0`,
+`stopped_early=false`, finite train loss `3.9972648322582245`, and PID
+`253572` remained alive with a fresh status mtime at `2026-05-17T22:31:50Z`.
 No result bundle, eval details, or checkpoint exists yet. Monitor only E147 and keep
 `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
 no-score outcome exists. Do not spend 30,000 steps unless a returned short
 gate clears `0.45` primary C-alpha lDDT with coherent FoldScore, dRMSD, and
 C-alpha Rg.
+
+If E147 returns below the short gate or fails without a score, the parked next
+candidate is E148: the same selected-boundary coordinate-expansion retry from
+E128, but with `--simplex-boundary-degree-normalize`. This keeps the
+anti-collapse loss attached to selected face/tetra boundary edges while
+preventing highly reused edges from dominating the expansion signal. Do not
+launch E148 while E147 is active.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
 
