@@ -24,6 +24,13 @@ utilization `63%` with `28669 / 81920` MiB allocated. Monitor only E144 PID
 `EXPERIMENT_RESULTS.md` for E144 until it returns a scored bundle or reaches a
 documented terminal no-score state.
 
+Latest live check at `2026-05-17T16:33Z` remained coherent: status advanced to
+completed step `8522`, active step `8523`, active microbatch `1 / 8`, phase
+`microbatch_done`, finite last train loss `4.637174069881439`,
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, PID `172579`
+alive, and GPU memory `38189 / 81920` MiB. No result bundle or checkpoint
+exists yet.
+
 Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
 C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
 

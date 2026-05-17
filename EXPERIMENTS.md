@@ -7256,6 +7256,11 @@ Validation status:
   phase `microbatch_done`, `effective_batch_size=8`, `num_workers=0`,
   `stopped_early=false`, finite last train loss `4.5722126960754395`, and GPU
   utilization `63%` with `28669 / 81920` MiB allocated.
+  A later live check at `2026-05-17T16:33Z` remained coherent at completed
+  step `8522`, active step `8523`, active microbatch `1 / 8`, phase
+  `microbatch_done`, finite last train loss `4.637174069881439`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, PID
+  `172579` alive, and no result bundle or checkpoint yet.
 
 ### E145: PDF-Informed Outer-Neighborhood Selected-Cell Transport
 
