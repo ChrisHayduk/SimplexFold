@@ -9285,3 +9285,13 @@
   sampled `74%` at the start and `0%` at the end, with `43101 / 81920` MiB
   allocated. Continue treating E142 as live final evaluation; keep
   `EXPERIMENT_RESULTS.md` unchanged and do not launch E143 yet.
+- 2026-05-17T00:53Z E142 remained live and unreturned. Artifact inventory
+  still contained only `run_metadata.json`, `history_full_msa_to_face.json`,
+  and `status_full_msa_to_face.json`. A two-minute interval from `00:51:19Z`
+  to `00:53:19Z` showed trainer PID `13262` runnable with `194` threads,
+  process CPU time advancing from `2-12:18:32` to `2-13:06:00`, `rchar`
+  increasing from `686498648` to `687954460`, and `read_bytes` increasing
+  from `21590016` to `22769664`. GPU utilization sampled `0%` at both ends
+  with `43101 / 81920` MiB allocated. Continue treating E142 as live
+  CPU-bound final evaluation; keep `EXPERIMENT_RESULTS.md` unchanged and do
+  not launch E143 yet.
