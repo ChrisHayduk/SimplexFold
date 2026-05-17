@@ -10024,3 +10024,12 @@
   eval-detail CSV, or checkpoint. Keep E144 running and keep
   `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
   terminal no-score state exists.
+- 2026-05-17T17:31Z E144 continued coherent training on owned pod
+  `723hbew2jrvxjx`. Status advanced to completed step `8751`, active step
+  `8752`, active microbatch `1 / 8`, phase `microbatch_done`, finite last
+  train loss `4.749566555023193`, and active trainer PID `172579` remained
+  alive with `194` threads, elapsed time `01:05:19`, and process CPU time
+  `10:12:33`. No returned bundle existed yet: no `results.json`, result CSV,
+  eval-detail CSV, or checkpoint. Keep E144 running and keep
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
+  terminal no-score state exists.
