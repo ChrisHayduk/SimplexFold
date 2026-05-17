@@ -60,6 +60,12 @@ completed step `8751`, active step `8752`, active microbatch `1 / 8`, phase
 alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
 only.
 
+Latest live check at `2026-05-17T17:43Z` remained coherent: status advanced to
+completed step `8800`, active step `8801`, active microbatch `1 / 8`, phase
+`microbatch_done`, finite last train loss `4.427721321582794`, PID `172579`
+alive, and no result bundle or checkpoint exists yet. Continue monitoring E144
+only.
+
 Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
 C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
 
