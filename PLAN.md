@@ -21,12 +21,13 @@ Launch wrapper PID is `13260`, trainer PID is `13262`, log is
 `/workspace/SimplexFold_e142/logs/e142_signed_tetra_coboundary.log`, and
 artifact directory is
 `/workspace/SimplexFold_e142/artifacts/nanofold_public_benchmarks/e142_signed_tetra_coboundary_from_e128_s9000_c256_m64`.
-Latest heartbeat at `2026-05-17T00:10:25Z` showed E142 still in final validation
+Latest heartbeat at `2026-05-17T00:14:54Z` showed E142 still in final validation
 watch: `completed_step=9000`, active step `9000`, phase `evaluating`,
 effective batch size `8`, `num_workers=0`, finite last train loss
 `4.721518278121948`, live trainer PID `13262`, and status mtime
 `2026-05-16T23:09:53Z`. The trainer remained strongly CPU-active, with process
-CPU time at `1-20:10:02`, while GPU utilization sampled at `0%` with GPU
+CPU time still advancing after `1-21:20:16`, while GPU utilization sampled at
+`0%` with GPU
 memory allocated at `43101 / 81920` MiB. The
 artifact directory still has no `results.json`, result CSV, eval-detail CSV,
 or E142 checkpoint, so this is an eval-watch state rather than a scored result
@@ -38,6 +39,14 @@ process is still advancing at the OS level: trainer CPU time increased from
 `651728284`, and `read_bytes` increased from `3182592` to `3219456`. Artifact
 mtimes and sizes stayed unchanged. Treat E142 as live final-eval compute, not
 a terminal no-score stall.
+
+Additional sampling through `2026-05-17T00:14:54Z` still showed no returned
+artifacts, but the Python process remained runnable with `194` threads, `rchar`
+advanced from `660859786` to `661384631` over one minute, and RSS rose from
+`1712184` to `1762512` KiB. The current runner evaluates C-alpha and
+FoldScore-related summaries on CPU after moving predictions off the GPU, so
+this is still consistent with slow final evaluation rather than enough
+terminal evidence to kill the run.
 
 Local runner observability now includes validation-batch progress counters in
 `status_full_msa_to_face.json` for future runs. This does not affect the

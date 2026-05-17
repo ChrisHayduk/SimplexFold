@@ -3,7 +3,7 @@
 ## 2026-05-16 E142 Final-Validation Watch; Eval Progress Instrumentation
 
 - Rechecked only the owned Runpod pod `723hbew2jrvxjx` through
-  `2026-05-17T00:10:25Z`. E142 is still in final validation watch with
+  `2026-05-17T00:14:54Z`. E142 is still in final validation watch with
   `phase=evaluating`, `completed_step=9000`, active step `9000`, effective
   batch size `8`, `num_workers=0`, finite last train loss
   `4.721518278121948`, and status mtime `2026-05-16T23:09:53Z`.
@@ -13,7 +13,8 @@
   `eval_details_full_msa_to_face.csv`, or E142 checkpoint. History still ends
   at inherited E128 step `8500`.
 - Stall classification: not terminal yet. Trainer PID `13262` remains alive
-  and CPU-active with process time `1-20:10:02`, state `Rl`, and `194`
+  and CPU-active with process time still advancing after `1-21:20:16`, state
+  `Rl`, and `194`
   threads; GPU utilization sampled at `0%` with `43101 / 81920` MiB allocated.
   The log still contains only startup/resume lines, and `/proc/13262/wchan`
   returned `0`. Continue monitoring rather than stopping the run while CPU
@@ -23,6 +24,11 @@
   `1-15:34:19` to `1-15:57:28`, `rchar` increased from `651303601` to
   `651728284`, and `read_bytes` increased from `3182592` to `3219456`.
   This supports live final-eval compute, not a terminal no-score stall.
+- Additional sample through `2026-05-17T00:14:54Z`: artifacts were still
+  unchanged, but the process remained runnable and `rchar` increased from
+  `660859786` to `661384631` over one minute while RSS increased from
+  `1712184` to `1762512` KiB. The current final-eval path computes C-alpha and
+  FoldScore-related metrics on CPU, so this remains plausible slow validation.
 - Added local runner observability for future short gates: validation now
   reports `active_eval_batch`, `active_eval_batches`, and
   `active_eval_examples` through the live status file, and
