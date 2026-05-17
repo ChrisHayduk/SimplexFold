@@ -9370,3 +9370,14 @@
   active in `futex_wait_queue`; the log tail remained only startup/resume
   lines. Continue treating E142 as live slow final evaluation; do not update
   `EXPERIMENT_RESULTS.md` or launch E143 yet.
+- 2026-05-17T01:39Z E142 remained live and unreturned. A direct owned-pod
+  check at `01:35:34Z` still showed only the three live files and status
+  `phase=evaluating`, completed step `9000`, active step `9000`, last history
+  step `8500`. Over the three-minute interval ending `01:38:58Z`, trainer PID
+  `13262` stayed runnable with `194` threads, elapsed time advanced from
+  `04:30:42` to `04:33:42`, process CPU time advanced from `3-05:54:28` to
+  `3-07:05:56`, `rchar` increased from `717851764` to `720111462`, and
+  `read_bytes` increased from `45080576` to `46891008`. GPU utilization
+  sampled `57%` then `0%` with `43101 / 81920` MiB allocated. Continue
+  treating this as live slow final evaluation; leave `EXPERIMENT_RESULTS.md`
+  unchanged and keep E143 parked.
