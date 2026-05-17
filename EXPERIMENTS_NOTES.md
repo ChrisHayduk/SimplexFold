@@ -10104,3 +10104,14 @@
   CSV, eval-detail CSV, or checkpoint existed. Keep E144 running and keep
   `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
   terminal no-score state exists.
+- 2026-05-17T20:36Z E144 continued the final validation sweep on owned pod
+  `723hbew2jrvxjx`. Status showed completed step `9000`, active step `9000`,
+  phase `evaluating`, active eval batch `600 / 1000`, effective batch size
+  `8`, `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.741060197353363`, and a fresh status mtime at `2026-05-17T20:35:34Z`.
+  Trainer PID `172579` remained alive with elapsed time `04:10:29`, process
+  CPU time `2-19:37:03`, and active running state. The artifact directory
+  still had history, run metadata, and status only; no `results.json`, result
+  CSV, eval-detail CSV, or checkpoint existed. Keep E144 running and keep
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or documented
+  terminal no-score state exists.
