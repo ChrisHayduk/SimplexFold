@@ -10437,3 +10437,13 @@
   `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E147 running and
   leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
   terminal no-score outcome exists.
+- 2026-05-18T00:07Z E147 reached the final evaluation phase. Status reported
+  `completed_step=9000`, active step `9000`, phase `evaluating`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, and finite
+  last train loss `4.717868626117706`. Trainer PID `253572` remained alive
+  with elapsed time `01:58:47`, process CPU time `17:39:09`, and `194`
+  threads. The artifact directory still had only history, run metadata, and
+  status; `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`,
+  and `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E147 running
+  and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
+  explicit terminal no-score outcome exists.
