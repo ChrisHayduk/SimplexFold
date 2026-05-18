@@ -172,6 +172,7 @@ class AlphaFoldLoss(torch.nn.Module):
         simplex_face_coordinate_distance_weight: Optional[float] = None,
         simplex_face_coordinate_expansion_weight: Optional[float] = None,
         simplex_face_centroid_expansion_weight: Optional[float] = None,
+        simplex_face_centroid_spread_weight: Optional[float] = None,
         simplex_face_shape_weight: Optional[float] = None,
         simplex_face_normal_weight: Optional[float] = None,
         simplex_face_boundary_lddt_weight: Optional[float] = None,
@@ -179,6 +180,7 @@ class AlphaFoldLoss(torch.nn.Module):
         simplex_tetra_coordinate_distance_weight: Optional[float] = None,
         simplex_tetra_coordinate_expansion_weight: Optional[float] = None,
         simplex_tetra_centroid_expansion_weight: Optional[float] = None,
+        simplex_tetra_centroid_spread_weight: Optional[float] = None,
         simplex_tetra_shape_weight: Optional[float] = None,
         simplex_tetra_boundary_lddt_weight: Optional[float] = None,
         simplex_topology_margin_weight: Optional[float] = None,
@@ -226,6 +228,10 @@ class AlphaFoldLoss(torch.nn.Module):
             self.simplex_geometry_loss.face_centroid_expansion_weight = float(
                 simplex_face_centroid_expansion_weight
             )
+        if simplex_face_centroid_spread_weight is not None:
+            self.simplex_geometry_loss.face_centroid_spread_weight = float(
+                simplex_face_centroid_spread_weight
+            )
         if simplex_face_shape_weight is not None:
             self.simplex_geometry_loss.face_shape_weight = float(simplex_face_shape_weight)
         if simplex_face_normal_weight is not None:
@@ -245,6 +251,10 @@ class AlphaFoldLoss(torch.nn.Module):
         if simplex_tetra_centroid_expansion_weight is not None:
             self.simplex_geometry_loss.tetra_centroid_expansion_weight = float(
                 simplex_tetra_centroid_expansion_weight
+            )
+        if simplex_tetra_centroid_spread_weight is not None:
+            self.simplex_geometry_loss.tetra_centroid_spread_weight = float(
+                simplex_tetra_centroid_spread_weight
             )
         if simplex_tetra_shape_weight is not None:
             self.simplex_geometry_loss.tetra_shape_weight = float(simplex_tetra_shape_weight)

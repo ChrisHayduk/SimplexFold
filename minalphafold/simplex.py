@@ -349,6 +349,34 @@ def _selected_cell_centroid_contraction_loss(
     return loss.sum(dim=reduce_dims) / mask.sum(dim=reduce_dims).clamp_min(1.0)
 
 
+def _selected_cell_centroid_spread_contraction_loss(
+    pred_points: torch.Tensor,
+    true_points: torch.Tensor,
+    mask: torch.Tensor,
+    *,
+    distance_scale: float,
+    tolerance: float,
+) -> torch.Tensor:
+    """One-sided loss for global selected-cell centroid spread collapse."""
+
+    pred_centroid = pred_points.mean(dim=-2)
+    true_centroid = true_points.mean(dim=-2)
+    weight = mask.to(pred_points.dtype)
+    denom = weight.sum(dim=(1, 2), keepdim=True).clamp_min(1.0)
+    pred_center = (pred_centroid * weight[..., None]).sum(dim=(1, 2), keepdim=True) / denom[..., None]
+    true_center = (true_centroid * weight[..., None]).sum(dim=(1, 2), keepdim=True) / denom[..., None]
+    pred_sq = torch.sum((pred_centroid - pred_center) ** 2, dim=-1)
+    true_sq = torch.sum((true_centroid - true_center) ** 2, dim=-1)
+    pred_spread = torch.sqrt((pred_sq * weight).sum(dim=(1, 2)) / denom.flatten().clamp_min(1.0) + 1e-8)
+    true_spread = torch.sqrt((true_sq * weight).sum(dim=(1, 2)) / denom.flatten().clamp_min(1.0) + 1e-8)
+    log_denom = torch.log1p(torch.as_tensor(distance_scale, device=pred_points.device, dtype=pred_points.dtype))
+    log_denom = log_denom.clamp_min(1.0)
+    pred_log = torch.log1p(pred_spread) / log_denom
+    true_log = torch.log1p(true_spread) / log_denom
+    contraction = torch.clamp(true_log - pred_log - float(tolerance), min=0.0)
+    return torch.nn.functional.smooth_l1_loss(contraction, torch.zeros_like(contraction), reduction="none")
+
+
 def _cell_closure_weighted_mask(
     cell_mask: torch.Tensor,
     true_distances: torch.Tensor,
@@ -3480,6 +3508,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         face_coordinate_distance_weight: float = 0.0,
         face_coordinate_expansion_weight: float = 0.0,
         face_centroid_expansion_weight: float = 0.0,
+        face_centroid_spread_weight: float = 0.0,
         face_shape_weight: float = 0.0,
         face_normal_weight: float = 0.0,
         face_boundary_lddt_weight: float = 0.0,
@@ -3489,6 +3518,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         tetra_coordinate_distance_weight: float = 0.0,
         tetra_coordinate_expansion_weight: float = 0.0,
         tetra_centroid_expansion_weight: float = 0.0,
+        tetra_centroid_spread_weight: float = 0.0,
         tetra_shape_weight: float = 0.0,
         tetra_boundary_lddt_weight: float = 0.0,
         tetra_distance_weight: float = 0.05,
@@ -3515,6 +3545,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         self.face_coordinate_distance_weight = face_coordinate_distance_weight
         self.face_coordinate_expansion_weight = face_coordinate_expansion_weight
         self.face_centroid_expansion_weight = face_centroid_expansion_weight
+        self.face_centroid_spread_weight = face_centroid_spread_weight
         self.face_shape_weight = face_shape_weight
         self.face_normal_weight = face_normal_weight
         self.face_boundary_lddt_weight = face_boundary_lddt_weight
@@ -3524,6 +3555,7 @@ class SimplexGeometryLoss(torch.nn.Module):
         self.tetra_coordinate_distance_weight = tetra_coordinate_distance_weight
         self.tetra_coordinate_expansion_weight = tetra_coordinate_expansion_weight
         self.tetra_centroid_expansion_weight = tetra_centroid_expansion_weight
+        self.tetra_centroid_spread_weight = tetra_centroid_spread_weight
         self.tetra_shape_weight = tetra_shape_weight
         self.tetra_boundary_lddt_weight = tetra_boundary_lddt_weight
         self.tetra_distance_weight = tetra_distance_weight
@@ -3755,6 +3787,18 @@ class SimplexGeometryLoss(torch.nn.Module):
                 loss_terms["simplex_face_centroid_expansion_loss"] = face_centroid_expansion_loss
                 weighted = self.face_centroid_expansion_weight * face_centroid_expansion_loss
                 loss_terms["weighted_simplex_face_centroid_expansion_loss"] = weighted
+                total = total + weighted
+
+                face_centroid_spread_loss = _selected_cell_centroid_spread_contraction_loss(
+                    pred_face_points,
+                    true_face_points,
+                    coordinate_valid,
+                    distance_scale=self.distance_scale,
+                    tolerance=self.coordinate_expansion_tolerance,
+                )
+                loss_terms["simplex_face_centroid_spread_loss"] = face_centroid_spread_loss
+                weighted = self.face_centroid_spread_weight * face_centroid_spread_loss
+                loss_terms["weighted_simplex_face_centroid_spread_loss"] = weighted
                 total = total + weighted
 
                 if self.face_shape_weight > 0.0:
@@ -4059,6 +4103,18 @@ class SimplexGeometryLoss(torch.nn.Module):
                 loss_terms["simplex_tetra_centroid_expansion_loss"] = tetra_centroid_expansion_loss
                 weighted = self.tetra_centroid_expansion_weight * tetra_centroid_expansion_loss
                 loss_terms["weighted_simplex_tetra_centroid_expansion_loss"] = weighted
+                total = total + weighted
+
+                tetra_centroid_spread_loss = _selected_cell_centroid_spread_contraction_loss(
+                    pred_points,
+                    points,
+                    coordinate_valid,
+                    distance_scale=self.distance_scale,
+                    tolerance=self.coordinate_expansion_tolerance,
+                )
+                loss_terms["simplex_tetra_centroid_spread_loss"] = tetra_centroid_spread_loss
+                weighted = self.tetra_centroid_spread_weight * tetra_centroid_spread_loss
+                loss_terms["weighted_simplex_tetra_centroid_spread_loss"] = weighted
                 total = total + weighted
 
                 if self.tetra_shape_weight > 0.0:

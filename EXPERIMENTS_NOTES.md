@@ -10982,3 +10982,15 @@
   (`0.7489` mean boundary lDDT) with contracted global assembly (`0.7489`
   mean Rg ratio) and a high-boundary / low-global subset at only `0.3837`
   C-alpha lDDT.
+- 2026-05-18T15:50Z Prepared E150 selected-complex centroid spread as the next
+  short gate. The change adds parameter-free face/tetra selected-cell centroid
+  spread losses that penalize collapse of the whole model-selected complex,
+  while keeping the E128/E147-E149 selected-complex communication recipe. The
+  documented E150 command resumes E128 to step `9000` with effective batch
+  size `8`, crop `256`, MSA depth `64`, coordinate expansion weights `0.025`,
+  per-cell centroid expansion weights `0.025`, centroid-spread weights `0.10`,
+  and tolerance `0.05`. Focused local checks passed: py_compile for the model,
+  loss, trainer, runner, and tests; four parser/loss tests; and F821/F822/F823
+  ruff checks. Launch E150 only if the owned pod is idle; keep
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.

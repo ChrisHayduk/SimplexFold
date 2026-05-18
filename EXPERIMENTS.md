@@ -8387,3 +8387,99 @@ same local/global failure mode: mean boundary lDDT `0.7489`, mean Rg ratio
 lDDT. Do not spend 30k on E149; the next short gate should target global
 assembly/coarse expansion rather than another selected-boundary expansion
 loss.
+
+### E150: Selected-Complex Centroid Spread
+
+Status: prepared locally; launch only if the owned Runpod pod is idle.
+
+Hypothesis: E149 showed that penalizing each selected cell's centroid radius
+can improve contraction diagnostics without making the whole selected complex
+assemble globally. The missing signal may be the spread of the selected
+face/tetra complex as a single coarse object: local boundary geometry can look
+healthy while the selected-cell centroid cloud remains too compact.
+
+Mechanism: add `simplex_face_centroid_spread_weight` and
+`simplex_tetra_centroid_spread_weight` to `SimplexGeometryLoss`. For each
+example, compute the weighted radius of gyration of model-selected face/tetra
+centroids and penalize only predicted selected-complex spread that contracts
+below the true selected-complex spread beyond the same log-distance tolerance
+used by the expansion losses. This is topology-attached because it uses only
+model-selected sparse-complex cells; it adds no parameters and is not a dense
+all-pairs distance, direct C-alpha lDDT, validation-label, template, external
+data, or pretrained-weight objective.
+
+Launch recipe:
+
+```bash
+cd /workspace/SimplexFold_e150
+mkdir -p logs
+python3 -m py_compile \
+  minalphafold/simplex.py \
+  minalphafold/losses.py \
+  minalphafold/trainer.py \
+  scripts/run_nanofold_public_benchmarks.py
+nohup python -u scripts/run_nanofold_public_benchmarks.py \
+  --nanofold-root /workspace/nanoFold-Competition \
+  --model-config simplexfold_medium_param_matched \
+  --variants full_msa_to_face \
+  --run-name e150_selected_complex_centroid_spread_from_e128_s9000_c256_m64 \
+  --output-dir artifacts/nanofold_public_benchmarks \
+  --resume-from-checkpoint /workspace/SimplexFold_e145/artifacts/nanofold_public_benchmarks/e128_damped_triangle_bias_from_e124_s8500_c256_m64/checkpoints/full_msa_to_face_latest.pt \
+  --resume-model-weights-only \
+  --steps 9000 \
+  --batch-size 1 \
+  --grad-accum-steps 8 \
+  --crop-size 256 \
+  --msa-depth 64 \
+  --extra-msa-depth 0 \
+  --max-templates 0 \
+  --eval-every 500 \
+  --checkpoint-every 500 \
+  --final-max-val-batches 0 \
+  --eval-max-val-batches 0 \
+  --max-parameters 3261974 \
+  --n-cycles 4 \
+  --device cuda \
+  --simplex-face-coordinate-weight 1.0 \
+  --simplex-face-coordinate-distance-weight 0.5 \
+  --simplex-face-boundary-lddt-weight 0.05 \
+  --simplex-tetra-coordinate-weight 1.0 \
+  --simplex-tetra-coordinate-distance-weight 0.5 \
+  --simplex-tetra-boundary-lddt-weight 0.05 \
+  --simplex-geometry-distance-weight 0.025 \
+  --simplex-face-top-k 24 \
+  --simplex-tetra-top-k 48 \
+  --simplex-cell-score-degree-penalty 0.75 \
+  --simplex-cell-score-outer-edge-weight 0.25 \
+  --simplex-edge-frame-message-scale 0.025 \
+  --simplex-edge-frame-message-runtime-scale 0.0125 \
+  --simplex-boundary-edge-frame-gate-scale 0.05 \
+  --simplex-boundary-readout-directionality 0.25 \
+  --simplex-boundary-readout-directionality-runtime-scale 0.25 \
+  --simplex-boundary-incidence-normalization 1.0 \
+  --simplex-global-context-scale 0.1 \
+  --simplex-vertex-star-context-scale 1.0 \
+  --simplex-vertex-star-context-runtime-scale 1.0 \
+  --simplex-edge-star-context-scale 1.0 \
+  --simplex-edge-star-context-runtime-scale 0.5 \
+  --simplex-triangle-attention-bias-scale 0.0125 \
+  --simplex-face-coordinate-expansion-weight 0.025 \
+  --simplex-tetra-coordinate-expansion-weight 0.025 \
+  --simplex-face-centroid-expansion-weight 0.025 \
+  --simplex-tetra-centroid-expansion-weight 0.025 \
+  --simplex-face-centroid-spread-weight 0.10 \
+  --simplex-tetra-centroid-spread-weight 0.10 \
+  --simplex-coordinate-expansion-tolerance 0.05 \
+  > logs/e150_selected_complex_centroid_spread.log 2>&1 &
+echo $!
+```
+
+Decision rule: reject unless E150 crosses `0.45` primary C-alpha lDDT with
+coherent FoldScore, dRMSD, and C-alpha Rg. No 30k spend without that scored
+short-gate evidence.
+
+Local validation:
+
+- `python -m py_compile minalphafold/simplex.py minalphafold/losses.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_nanofold_public_benchmarks.py`
+- `python -m pytest tests/test_simplex.py::test_simplex_coordinate_realization_loss_penalizes_collapsed_cells tests/test_nanofold_public_benchmarks.py::test_e150_selected_complex_centroid_spread_candidate_matches_documented_gate tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_benchmark_loss_builder_applies_topology_margin_config`: `4 passed`
+- `../../.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py minalphafold/losses.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_nanofold_public_benchmarks.py`: passed

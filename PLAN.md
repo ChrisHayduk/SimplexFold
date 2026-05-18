@@ -1,3 +1,32 @@
+## 2026-05-18 Operating Plan Update: E150 Prepared
+
+E149 returned below the short gate, but it sharpened the failure mode: selected
+boundary geometry and selected-cell contraction diagnostics can improve while
+global C-alpha lDDT remains stuck around `0.43`. The next short gate should
+therefore target the selected complex as a global object, not another
+per-boundary or per-cell local expansion term.
+
+E150 adds a selected-complex centroid spread loss. For selected face and tetra
+cells, the new auxiliary term compares the predicted spread of all selected
+cell centroids against the true selected-cell centroid spread and penalizes
+only under-expansion beyond the log-distance tolerance. It still uses only the
+model-selected sparse complex and training labels, adds no parameters, and
+does not introduce external data, templates, pretrained weights, validation
+labels, or a dense all-pairs coordinate/lDDT objective.
+
+Prepared short-gate recipe:
+`e150_selected_complex_centroid_spread_from_e128_s9000_c256_m64`, resume E128
+model weights, target step `9000`, crop `256`, MSA depth `64`, effective batch
+size `8`, `num_workers=0`, face/tetra coordinate expansion `0.025`,
+face/tetra centroid expansion `0.025`, face/tetra centroid-spread expansion
+`0.10`, coordinate expansion tolerance `0.05`, and the same E128/E147-E149
+selected-complex communication recipe. Local validation passed with focused
+parser/loss tests and F821/F822/F823 ruff checks.
+
+Decision rule: reject unless E150 crosses `0.45` primary C-alpha lDDT with
+coherent FoldScore, dRMSD, and C-alpha Rg. Do not spend 30,000 steps unless a
+returned short gate clears that threshold.
+
 ## 2026-05-18 Operating Plan Update: E149 Returned
 
 E149 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`.

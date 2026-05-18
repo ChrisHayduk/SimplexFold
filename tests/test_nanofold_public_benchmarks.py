@@ -1869,6 +1869,80 @@ def test_e149_selected_cell_centroid_expansion_candidate_matches_documented_gate
     )
 
 
+def test_e150_selected_complex_centroid_spread_candidate_matches_documented_gate():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face",
+            "--run-name",
+            "e150_selected_complex_centroid_spread_from_e128_s9000_c256_m64",
+            "--steps",
+            "9000",
+            "--batch-size",
+            "1",
+            "--grad-accum-steps",
+            "8",
+            "--crop-size",
+            "256",
+            "--msa-depth",
+            "64",
+            "--extra-msa-depth",
+            "0",
+            "--max-templates",
+            "0",
+            "--max-parameters",
+            "3261974",
+            "--resume-model-weights-only",
+            "--simplex-boundary-edge-frame-gate-scale",
+            "0.05",
+            "--simplex-triangle-attention-bias-scale",
+            "0.0125",
+            "--simplex-face-coordinate-expansion-weight",
+            "0.025",
+            "--simplex-tetra-coordinate-expansion-weight",
+            "0.025",
+            "--simplex-face-centroid-expansion-weight",
+            "0.025",
+            "--simplex-tetra-centroid-expansion-weight",
+            "0.025",
+            "--simplex-face-centroid-spread-weight",
+            "0.1",
+            "--simplex-tetra-centroid-spread-weight",
+            "0.1",
+            "--simplex-coordinate-expansion-tolerance",
+            "0.05",
+        ]
+    )
+
+    assert (
+        args.run_name
+        == "e150_selected_complex_centroid_spread_from_e128_s9000_c256_m64"
+    )
+    assert args.steps == 9000
+    assert args.batch_size * args.grad_accum_steps == 8
+    assert args.crop_size == 256
+    assert args.msa_depth == 64
+    assert args.extra_msa_depth == 0
+    assert args.max_templates == 0
+    assert args.max_parameters == 3_261_974
+    assert args.num_workers == 0
+    assert args.resume_model_weights_only is True
+    assert args.simplex_boundary_edge_frame_gate_scale == 0.05
+    assert args.simplex_triangle_attention_bias_scale == 0.0125
+    assert args.simplex_face_coordinate_expansion_weight == 0.025
+    assert args.simplex_tetra_coordinate_expansion_weight == 0.025
+    assert args.simplex_face_centroid_expansion_weight == 0.025
+    assert args.simplex_tetra_centroid_expansion_weight == 0.025
+    assert args.simplex_face_centroid_spread_weight == 0.1
+    assert args.simplex_tetra_centroid_spread_weight == 0.1
+    assert args.simplex_coordinate_expansion_tolerance == 0.05
+    _enforce_parameter_budget(
+        variant="full_msa_to_face",
+        parameter_count=3_240_738,
+        max_parameters=args.max_parameters,
+    )
+
+
 def test_e141_signed_face_cyclic_recipe_matches_running_gate():
     args = parse_args(
         [
@@ -2437,10 +2511,14 @@ def test_topology_margin_args_are_accepted_by_cli_parser():
             "0.4",
             "--simplex-face-centroid-expansion-weight",
             "0.6",
+            "--simplex-face-centroid-spread-weight",
+            "0.8",
             "--simplex-tetra-coordinate-expansion-weight",
             "0.5",
             "--simplex-tetra-centroid-expansion-weight",
             "0.7",
+            "--simplex-tetra-centroid-spread-weight",
+            "0.9",
             "--simplex-coordinate-expansion-tolerance",
             "0.05",
             "--simplex-boundary-degree-normalize",
@@ -2461,8 +2539,10 @@ def test_topology_margin_args_are_accepted_by_cli_parser():
     assert args.simplex_cell_closure_temperature == 1.5
     assert args.simplex_face_coordinate_expansion_weight == 0.4
     assert args.simplex_face_centroid_expansion_weight == 0.6
+    assert args.simplex_face_centroid_spread_weight == 0.8
     assert args.simplex_tetra_coordinate_expansion_weight == 0.5
     assert args.simplex_tetra_centroid_expansion_weight == 0.7
+    assert args.simplex_tetra_centroid_spread_weight == 0.9
     assert args.simplex_coordinate_expansion_tolerance == 0.05
     assert args.simplex_boundary_degree_normalize is True
 
@@ -2481,8 +2561,10 @@ def test_benchmark_loss_builder_applies_topology_margin_config():
             simplex_cell_closure_temperature=1.5,
             simplex_face_coordinate_expansion_weight=0.4,
             simplex_face_centroid_expansion_weight=0.6,
+            simplex_face_centroid_spread_weight=0.8,
             simplex_tetra_coordinate_expansion_weight=0.5,
             simplex_tetra_centroid_expansion_weight=0.7,
+            simplex_tetra_centroid_spread_weight=0.9,
             simplex_coordinate_expansion_tolerance=0.05,
             simplex_boundary_degree_normalize=True,
         )
@@ -2499,7 +2581,9 @@ def test_benchmark_loss_builder_applies_topology_margin_config():
     assert loss_fn.simplex_geometry_loss.cell_closure_temperature == 1.5
     assert loss_fn.simplex_geometry_loss.face_coordinate_expansion_weight == 0.4
     assert loss_fn.simplex_geometry_loss.face_centroid_expansion_weight == 0.6
+    assert loss_fn.simplex_geometry_loss.face_centroid_spread_weight == 0.8
     assert loss_fn.simplex_geometry_loss.tetra_coordinate_expansion_weight == 0.5
     assert loss_fn.simplex_geometry_loss.tetra_centroid_expansion_weight == 0.7
+    assert loss_fn.simplex_geometry_loss.tetra_centroid_spread_weight == 0.9
     assert loss_fn.simplex_geometry_loss.coordinate_expansion_tolerance == 0.05
     assert loss_fn.simplex_geometry_loss.boundary_degree_normalize is True
