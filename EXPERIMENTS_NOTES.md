@@ -11049,11 +11049,21 @@
   `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E150 running and
   leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
   terminal no-score outcome exists.
-- Latest E150 live sample: status reported `completed_step=8570`, active step
+- E150 live sample: status reported `completed_step=8570`, active step
   `8571`, active microbatch `1 / 8`, `effective_batch_size=8`,
   `num_workers=0`, `stopped_early=false`, and finite last train loss
   `4.532555401325226`. Trainer PID `496753` remained alive with elapsed time
   `17:01` and process CPU time `02:33:42`. The artifact directory still had
+  only inherited history, run metadata, and status; `results.json`,
+  `results.csv`, `eval_details_full_msa_to_face.csv`, and
+  `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E150 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- Latest E150 live sample: status reported `completed_step=8578`, active step
+  `8579`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, and finite last train loss
+  `4.718557119369507`. Trainer PID `496753` remained alive with elapsed time
+  `18:51` and process CPU time `02:50:06`. The artifact directory still had
   only inherited history, run metadata, and status; `results.json`,
   `results.csv`, `eval_details_full_msa_to_face.csv`, and
   `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E150 running and
