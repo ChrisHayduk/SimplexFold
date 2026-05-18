@@ -30,8 +30,8 @@ command, and startup status reached `completed_step=8503` with
 loss `4.421935170888901`, and PID `331052` alive. A follow-up startup check
 at `2026-05-18T03:40Z` reached `completed_step=8511`, active step `8512`,
 finite train loss `4.392725497484207`, and PID `331052` remained alive. The
-latest live check at `2026-05-18T05:14Z` reached `completed_step=8901`, active
-step `8902`, finite train loss `4.727553129196167`, `effective_batch_size=8`,
+latest live check at `2026-05-18T05:26Z` reached `completed_step=8952`, active
+step `8953`, finite train loss `4.513890564441681`, `effective_batch_size=8`,
 `num_workers=0`, `stopped_early=false`, and PID `331052` still alive with
 `194` threads. The artifact directory still had only history, run metadata,
 and status; `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`,
