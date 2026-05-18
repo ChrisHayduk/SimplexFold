@@ -8141,10 +8141,10 @@ train loss `4.421935170888901`, and PID `331052` alive. A follow-up startup
 check at `2026-05-18T03:40Z` reached `completed_step=8511`, active step
 `8512`, active microbatch `1 / 8`, finite last train loss
 `4.392725497484207`, and PID `331052` still alive. The latest live check at
-`2026-05-18T04:38Z` reached `completed_step=8752`, active step `8753`, active
-microbatch `1 / 8`, finite last train loss `4.762001156806946`,
+`2026-05-18T04:50Z` reached `completed_step=8802`, active step `8803`, active
+microbatch `1 / 8`, finite last train loss `4.674457550048828`,
 `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, and PID
-`331052` still alive with elapsed time `01:01:00`, process CPU time `09:14:25`,
+`331052` still alive with elapsed time `01:12:49`, process CPU time `11:01:20`,
 and `194` threads. The artifact directory still had only inherited history,
 run metadata, and status; `results.json`, `results.csv`,
 `eval_details_full_msa_to_face.csv`, and
