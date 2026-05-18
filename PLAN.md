@@ -1,6 +1,6 @@
-## 2026-05-18 Operating Plan Update: E148 Returned; E149 Active
+## 2026-05-18 Operating Plan Update: E149 Returned
 
-E148 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`.
+E149 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`.
 The required bundle exists locally and remotely:
 `results.json`, `results.csv`, `history_full_msa_to_face.json`,
 `eval_details_full_msa_to_face.csv`, `run_metadata.json`,
@@ -10,87 +10,22 @@ The required bundle exists locally and remotely:
 eval rows, one result row, history ending at step `9000`, and `3,240,738`
 parameters under the `3,261,974` cap.
 
-Decision: reject E148 as a continuation or 30k candidate. It returned
-`val_lddt_ca=0.4297`, `FoldScore=0.3986`, dRMSD `10.8899`, and predicted
-C-alpha Rg `11.7537 / 16.3091`. Degree-normalizing the selected-boundary
-coordinate-expansion loss modestly improved dRMSD and C-alpha expansion versus
-E147, but primary C-alpha lDDT and FoldScore regressed and the run remained
-below the `0.45` short-gate threshold.
+Decision: reject E149 as a continuation or 30k candidate. It returned
+`val_lddt_ca=0.4300`, `FoldScore=0.4030`, dRMSD `10.8056`, and predicted
+C-alpha Rg `11.8555 / 16.3091`. Selected-cell centroid expansion reduced the
+mean selected-boundary contraction fraction to `0.5238`, but it did not lift
+global C-alpha lDDT above E147 or the `0.45` short-gate threshold. Do not
+spend 30,000 steps on this branch.
 
 The eval-detail analysis keeps the same local/global split: mean boundary
-lDDT was still high at `0.7393`, but mean Rg ratio stayed contracted at
-`0.7456`, and the high-boundary / low-global subset had only `0.3808`
-C-alpha lDDT. Treat E148 as evidence that boundary-edge degree normalization
-does not solve the global assembly bottleneck.
-
-E149 is now active as the stronger direct-expansion follow-up: a
-selected-cell centroid expansion loss that penalizes model-selected
-face/tetra centroids only when they collapse toward the predicted chain center
-relative to the true selected-cell radius. The E148 result is now the scored
-evidence that the boundary-edge expansion route is still under-expanding, so
-E149 launched from `/workspace/SimplexFold_e149` on owned pod `723hbew2jrvxjx`
-with run name `e149_selected_cell_centroid_expansion_from_e128_s9000_c256_m64`,
-trainer PID `414053`, log
-`/workspace/SimplexFold_e149/logs/e149_selected_cell_centroid_expansion.log`,
-and artifact directory
-`/workspace/SimplexFold_e149/artifacts/nanofold_public_benchmarks/e149_selected_cell_centroid_expansion_from_e128_s9000_c256_m64`.
-The fresh checkout was at commit `9e0e74f`, the E128 checkpoint and NanoFold
-data were present, remote `py_compile` passed, parser validation accepted the
-E149 command, and the launch-style parameter audit counted `3,240,738`
-parameters under the `3,261,974` cap. Startup status reached
-`completed_step=8509`, active step `8510`, active microbatch `1 / 8`,
-`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite train
-loss `4.553498417139053`, and PID `414053` alive. A follow-up live check at
-`2026-05-18T09:24Z` reached `completed_step=8552`, active step `8553`, active
-microbatch `1 / 8`, finite train loss `4.269135743379593`, and PID `414053`
-still alive with no result, eval-detail, or checkpoint artifacts yet. A later
-live check at `2026-05-18T09:37Z` reached `completed_step=8603`, active step
-`8604`, active microbatch `1 / 8`, finite train loss `4.7239959836006165`,
-and PID `414053` still alive with no result, eval-detail, or checkpoint
-artifacts yet. A later live check at `2026-05-18T09:49Z` reached
-`completed_step=8653`, active step `8654`, active microbatch `1 / 8`, finite
-train loss `4.414341956377029`, and PID `414053` still alive with no result,
-eval-detail, or checkpoint artifacts yet. A later live check at
-`2026-05-18T10:00Z` reached `completed_step=8703`, active step `8704`, active
-microbatch `1 / 8`, finite train loss `4.118043065071106`, and PID `414053`
-still alive with no result, eval-detail, or checkpoint artifacts yet. A later
-live check at `2026-05-18T10:12Z` reached `completed_step=8751`, active step
-`8752`, active microbatch `1 / 8`, finite train loss `4.752621054649353`, and
-PID `414053` still alive with no result, eval-detail, or checkpoint artifacts
-yet. A later live check at `2026-05-18T10:24Z` reached `completed_step=8801`,
-active step `8802`, active microbatch `1 / 8`, finite train loss
-`4.362206429243088`, and PID `414053` still alive with no result,
-eval-detail, or checkpoint artifacts yet. A later live check at
-`2026-05-18T10:36Z` reached `completed_step=8853`, active step `8854`, active
-microbatch `1 / 8`, finite train loss `4.603963732719421`, and PID `414053`
-still alive with no result, eval-detail, or checkpoint artifacts yet. A later
-live check at `2026-05-18T10:48Z` reached `completed_step=8900`, active step
-`8901`, active microbatch `1 / 8`, finite train loss `4.5046254098415375`, and
-PID `414053` still alive with no result, eval-detail, or checkpoint artifacts
-yet. A later live check at `2026-05-18T11:01Z` reached `completed_step=8954`,
-active step `8955`, active microbatch `1 / 8`, finite train loss
-`4.188934475183487`, and PID `414053` still alive with no result, eval-detail,
-or checkpoint artifacts yet. Later checks reached `completed_step=9000` and
-`phase=evaluating`; at `2026-05-18T11:36Z`, PID `414053` was still alive and
-compute-active, with run metadata/status/history present but no `results.json`,
-`results.csv`, eval-detail CSV, or latest checkpoint written yet. A later check
-at `2026-05-18T12:31Z` still showed `completed_step=9000`,
-`phase=evaluating`, PID `414053` alive with elapsed time `03:19:10`, process
-CPU time `2-01:02:09`, and no scored artifacts yet. A later check at
-`2026-05-18T12:55Z` still showed `completed_step=9000`, `phase=evaluating`,
-PID `414053` alive with elapsed time `03:42:54`, process CPU time
-`2-10:27:40`, and no scored artifacts yet. A later check at
-`2026-05-18T13:28Z` still showed `completed_step=9000`, `phase=evaluating`,
-PID `414053` alive with elapsed time `04:16:25`, process CPU time
-`2-23:41:05`, static startup-only log tail, and no scored artifacts yet. A
-later check at `2026-05-18T14:02Z` still showed `completed_step=9000`,
-`phase=evaluating`, PID `414053` alive with elapsed time `04:50:47`, process
-CPU time `3-13:10:37`, and no scored artifacts yet. A later check at
-`2026-05-18T14:38Z` still showed `completed_step=9000`, `phase=evaluating`,
-PID `414053` alive with elapsed time `05:26:11`, process CPU time
-`4-03:09:24`, and no scored artifacts yet. Keep E149 running through final
-validation. Do not spend 30,000 steps unless a returned short gate clears
-`0.45` primary C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
+lDDT stayed high at `0.7489`, but mean Rg ratio stayed contracted at `0.7489`,
+longer chains remained worse (`>=220` residues: `0.3894` lDDT and `0.6327`
+Rg ratio), and the high-boundary / low-global subset had only `0.3837`
+C-alpha lDDT. Treat E149 as evidence that selected-cell expansion objectives
+can relieve contraction diagnostics without solving the global assembly
+bottleneck. The next short gate should change the assembly path or coarse
+global geometry signal rather than add another local selected-boundary
+expansion variant.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
 

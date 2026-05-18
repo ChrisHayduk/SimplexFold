@@ -8167,7 +8167,7 @@ global expansion more directly.
 
 ### E149: Selected-Cell Centroid Expansion
 
-Status: active on owned pod `723hbew2jrvxjx`.
+Status: returned and rejected.
 
 Hypothesis: E147/E148 act on selected boundary-edge distances, but global
 C-alpha Rg can still stay contracted if selected cells preserve local edge
@@ -8370,6 +8370,20 @@ were absent. A later check at `2026-05-18T14:38Z` still showed
 time `05:26:11`, process CPU time `4-03:09:24`, and `194` threads. Run
 metadata, status, and inherited history were still present, but `results.json`,
 `results.csv`, `eval_details_full_msa_to_face.csv`, and
-`checkpoints/full_msa_to_face_latest.pt` were absent. Keep E149 running and
-leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
-terminal no-score outcome exists.
+`checkpoints/full_msa_to_face_latest.pt` were absent. E149 then returned
+coherently with a complete scored bundle at step `9000`; local verification
+passed with one result row, `1000` eval-detail rows, history ending at step
+`9000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, and
+`3,240,738` parameters under the `3,261,974` cap.
+
+Result: rejected. E149 returned `val_lddt_ca=0.4300`, FoldScore `0.4030`,
+`val_ca_drmsd=10.8056`, and C-alpha Rg `11.8555 / 16.3091`. The centroid
+expansion terms were active and small at validation
+(`0.00677` face, `0.00695` tetra), and mean selected-boundary contraction
+fell to `0.5238`; however, primary C-alpha lDDT stayed below E147's `0.4329`
+and below the `0.45` short-gate threshold. Eval-detail analysis showed the
+same local/global failure mode: mean boundary lDDT `0.7489`, mean Rg ratio
+`0.7489`, and a high-boundary / low-global subset at only `0.3837` C-alpha
+lDDT. Do not spend 30k on E149; the next short gate should target global
+assembly/coarse expansion rather than another selected-boundary expansion
+loss.

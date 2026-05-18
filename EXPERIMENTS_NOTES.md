@@ -10964,3 +10964,21 @@
   `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E149 running
   through final validation and leave `EXPERIMENT_RESULTS.md` unchanged until a
   scored bundle or explicit terminal no-score outcome exists.
+- 2026-05-18T15:12Z E149 returned coherently and wrote the complete scored
+  bundle. Remote and local verification confirmed `results.json`,
+  `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt`; one result row; `1000`
+  eval-detail rows; history ending at step `9000`; `effective_batch_size=8`;
+  `num_workers=0`; `stopped_early=false`; and `3,240,738` parameters under the
+  `3,261,974` cap. The trainer process was gone after normal finish.
+- Result: reject E149 below the short gate and do not launch a 30k run.
+  Metrics were `val_lddt_ca=0.4300`, FoldScore `0.4030`, dRMSD `10.8056`,
+  and C-alpha Rg `11.8555 / 16.3091`. The centroid-expansion diagnostics were
+  active and selected-boundary contraction fell to `0.5238`, but primary
+  C-alpha lDDT remained below E147 and below the `0.45` short-gate threshold.
+  Eval-detail analysis still shows high local boundary quality
+  (`0.7489` mean boundary lDDT) with contracted global assembly (`0.7489`
+  mean Rg ratio) and a high-boundary / low-global subset at only `0.3837`
+  C-alpha lDDT.
