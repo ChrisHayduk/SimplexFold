@@ -7963,6 +7963,14 @@ active step `9000`, phase `evaluating`, finite last train loss
 directory still had only inherited history, run metadata, and status;
 `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`, and
 `checkpoints/full_msa_to_face_latest.pt` were absent.
+The latest live check at `2026-05-18T00:25Z` remained in final evaluation at
+`completed_step=9000`, active step `9000`, active eval batch `87 / 1000`,
+finite last train loss `4.717868626117706`, `effective_batch_size=8`,
+`num_workers=0`, and `stopped_early=false`. PID `253572` remained alive with
+elapsed time `02:17:05`, process CPU time `1-00:50:50`, and `194` threads.
+The artifact directory still had only inherited history, run metadata, and
+status; `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`,
+and `checkpoints/full_msa_to_face_latest.pt` were absent.
 
 ### E148: Degree-Normalized Selected-Boundary Expansion
 
