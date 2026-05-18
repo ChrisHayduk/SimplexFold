@@ -60,9 +60,12 @@ PID `414053` still alive with no result, eval-detail, or checkpoint artifacts
 yet. A later live check at `2026-05-18T10:24Z` reached `completed_step=8801`,
 active step `8802`, active microbatch `1 / 8`, finite train loss
 `4.362206429243088`, and PID `414053` still alive with no result,
-eval-detail, or checkpoint artifacts yet. Do not spend 30,000 steps unless a
-returned short gate clears `0.45` primary C-alpha lDDT with coherent FoldScore,
-dRMSD, and C-alpha Rg.
+eval-detail, or checkpoint artifacts yet. A later live check at
+`2026-05-18T10:36Z` reached `completed_step=8853`, active step `8854`, active
+microbatch `1 / 8`, finite train loss `4.603963732719421`, and PID `414053`
+still alive with no result, eval-detail, or checkpoint artifacts yet. Do not
+spend 30,000 steps unless a returned short gate clears `0.45` primary C-alpha
+lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
 
