@@ -40,9 +40,12 @@ E149 command, and the launch-style parameter audit counted `3,240,738`
 parameters under the `3,261,974` cap. Startup status reached
 `completed_step=8509`, active step `8510`, active microbatch `1 / 8`,
 `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite train
-loss `4.553498417139053`, and PID `414053` alive. Do not spend 30,000 steps
-unless a returned short gate clears `0.45` primary C-alpha lDDT with coherent
-FoldScore, dRMSD, and C-alpha Rg.
+loss `4.553498417139053`, and PID `414053` alive. A follow-up live check at
+`2026-05-18T09:24Z` reached `completed_step=8552`, active step `8553`, active
+microbatch `1 / 8`, finite train loss `4.269135743379593`, and PID `414053`
+still alive with no result, eval-detail, or checkpoint artifacts yet. Do not
+spend 30,000 steps unless a returned short gate clears `0.45` primary C-alpha
+lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
 
