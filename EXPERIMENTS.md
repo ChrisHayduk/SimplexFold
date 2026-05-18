@@ -8027,10 +8027,21 @@ elapsed time `04:53:41`, process CPU time `3-14:25:33`, and `194` threads.
 The artifact directory still had only inherited history, run metadata, and
 status; `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`,
 and `checkpoints/full_msa_to_face_latest.pt` were absent.
+Result: returned and rejected as a 30k candidate. E147 wrote a coherent bundle
+at `2026-05-18T03:33Z`; local verification confirmed `completed_step=9000`,
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, one results
+row, `1000` eval-detail rows, history ending at step `9000`, a required
+checkpoint, and `3,240,738` parameters under the `3,261,974` cap. It reached
+`val_lddt_ca=0.4329`, `FoldScore=0.4034`, dRMSD `11.0628`, and C-alpha Rg
+`11.5603 / 16.3091`. This is a small new primary-lDDT high, but still below
+the `0.45` short gate and far below the `0.7` goal; the eval-detail analysis
+still shows strong selected-boundary local geometry (`boundary_lddt_mean=0.7560`)
+paired with under-expanded global geometry (`rg_ratio=0.7340`). Continue with
+the E148 degree-normalized expansion gate rather than any 30k spend.
 
 ### E148: Degree-Normalized Selected-Boundary Expansion
 
-Status: parked contingency. Do not launch while E147 is active.
+Status: active on owned pod `723hbew2jrvxjx`.
 
 Hypothesis: if E147 fails to clear the `0.45` short gate, the selected
 anti-collapse signal may still be too concentrated on reused boundary edges.
@@ -8046,8 +8057,7 @@ as E147 on model-selected face/tetra boundary edges, with
 does not add dense all-pairs distances, C-alpha Rg supervision, validation
 lDDT supervision, external data, templates, or parameters.
 
-Launch recipe, only after E147 returns below threshold or reaches a documented
-terminal no-score outcome:
+Launch recipe used after E147 returned below threshold:
 
 ```bash
 cd /workspace/SimplexFold_e148
@@ -8115,11 +8125,30 @@ Decision rule: reject unless E148 crosses `0.45` primary C-alpha lDDT with
 coherent FoldScore, dRMSD, and C-alpha Rg. No 30k spend without that scored
 short-gate evidence.
 
+Launch: E148 launched on `2026-05-18T03:37Z` from `/workspace/SimplexFold_e148`
+after cloning the E147 checkout locally on the pod. The current-pod E128
+checkpoint was present, remote `py_compile` passed, parser validation accepted
+the documented command with `simplex_boundary_degree_normalize=true`,
+`effective_batch_size=8`, `num_workers=0`, and target step `9000`. Trainer PID
+is `331052`, log is
+`/workspace/SimplexFold_e148/logs/e148_degree_normalized_expansion.log`, and
+artifact directory is
+`/workspace/SimplexFold_e148/artifacts/nanofold_public_benchmarks/e148_degree_normalized_expansion_from_e128_s9000_c256_m64`.
+Startup status resumed E128 at step `8500`, loaded `1332` matching tensors,
+initialized `0` new/missing tensors, and reached `completed_step=8503`, active
+step `8504`, active microbatch `1 / 8`, `stopped_early=false`, finite last
+train loss `4.421935170888901`, and PID `331052` alive. A follow-up startup
+check at `2026-05-18T03:40Z` reached `completed_step=8511`, active step
+`8512`, active microbatch `1 / 8`, finite last train loss
+`4.392725497484207`, and PID `331052` still alive. Keep E148 running and leave
+`EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+no-score outcome exists.
+
 ### E149: Selected-Cell Centroid Expansion
 
-Status: implemented locally and parked. Do not launch while E147 is active.
-Use only after scored evidence says the boundary-edge expansion path is still
-under-expanding.
+Status: implemented locally and parked. Do not launch while E148 is active.
+Use only after scored evidence says the degree-normalized boundary-edge
+expansion path is still under-expanding.
 
 Hypothesis: E147/E148 act on selected boundary-edge distances, but global
 C-alpha Rg can still stay contracted if selected cells preserve local edge

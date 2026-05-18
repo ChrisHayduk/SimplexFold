@@ -1,8 +1,8 @@
 # SimplexFold Experiment Results
 
-Last updated: 2026-05-17.
+Last updated: 2026-05-18.
 
-Best validation C-alpha lDDT so far: **E144**, `val_lddt_ca=0.4312` at step
+Best validation C-alpha lDDT so far: **E147**, `val_lddt_ca=0.4329` at step
 9000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records returned Runpod results and terminal stopped-run outcomes.
@@ -155,3 +155,4 @@ recorded in the running notes for that run.
 | E142 signed tetra coboundary face update | returned | 9000 | 0.4210 | 0.4210 | 0.4015 | 10.7533 | 12.1970 / 16.3091 | Rejected: signed tetra coboundary returned coherently at step 9000 but lowered primary C-alpha lDDT to 0.4210 versus E128's 0.4311 and stayed below the 0.45 short-gate threshold; dRMSD and C-alpha Rg improved modestly, but FoldScore also slipped, so use this as diagnostic evidence and launch the parked E143 signed tetra-to-face readout rather than any 30k spend. |
 | E143 signed tetra-to-face boundary readout | returned | 9000 | 0.4311 | 0.4311 | 0.4003 | 11.0003 | 11.5782 / 16.3091 | Rejected: signed tetra-to-face boundary readout returned coherently at step 9000 but slightly lowered primary C-alpha lDDT to 0.4311 versus E128's 0.4311 leader and stayed below the 0.45 short-gate threshold. FoldScore slipped to 0.4003 and C-alpha Rg under-expansion worsened despite a negligible dRMSD improvement and slightly higher selected-boundary lDDT, so do not spend 30k; use this as evidence that boundary orientation alone is saturated and the next short gate must target global expansion/coarse geometry. |
 | E144 no-Hodge edge-star residual boundary readout | returned | 9000 | 0.4312 | 0.4312 | 0.4009 | 11.0131 | 11.5188 / 16.3091 | Marginal primary-lDDT leader but rejected as a 30k candidate: no-Hodge edge-star residual returned coherently at step 9000 with val_lddt_ca=0.4312, only +0.0001 versus E128 and still below the 0.45 short-gate threshold; FoldScore, dRMSD, and C-alpha Rg under-expansion all remain worse than E128, so treat it as diagnostic evidence rather than a continuation target. |
+| E147 selected-boundary expansion retry | returned | 9000 | 0.4329 | 0.4329 | 0.4034 | 11.0628 | 11.5603 / 16.3091 | Rejected as a 30k candidate: selected-boundary coordinate expansion returned coherently and set a small new primary C-alpha lDDT high at 0.4329, but it remains below the 0.45 short-gate threshold and far below the 0.7 goal. FoldScore improved to 0.4034 versus E144, but dRMSD stayed high at 11.0628 and C-alpha Rg remained under-expanded at 11.5603 / 16.3091; continue with the parked E148 degree-normalized expansion short gate rather than spending 30k. |

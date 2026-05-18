@@ -1,53 +1,51 @@
-## 2026-05-17 Operating Plan Update: E147 Active
+## 2026-05-18 Operating Plan Update: E147 Returned; E148 Active
 
-E147 is now the active owned Runpod short gate on pod `723hbew2jrvxjx` from
-`/workspace/SimplexFold_e147`. It launched at `2026-05-17T22:05Z` with run
-name `e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64`,
-trainer PID `253572`, log
-`/workspace/SimplexFold_e147/logs/e147_selected_boundary_expansion_retry.log`,
+E147 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`.
+The required bundle exists locally and remotely:
+`results.json`, `results.csv`, `history_full_msa_to_face.json`,
+`eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+`status_full_msa_to_face.json`, and
+`checkpoints/full_msa_to_face_latest.pt`. Verification confirmed
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, `1000`
+eval rows, one result row, history ending at step `9000`, and `3,240,738`
+parameters under the `3,261,974` cap.
+
+Decision: reject E147 as a 30k candidate despite its small new primary-lDDT
+high. It returned `val_lddt_ca=0.4329`, `FoldScore=0.4034`, dRMSD `11.0628`,
+and predicted C-alpha Rg `11.5603 / 16.3091`. The selected-boundary expansion
+retry is coherent and slightly improves the short-run leader, but it remains
+below the `0.45` short-gate threshold and far below the `0.7` target, so do
+not spend 30k on this branch yet.
+
+E148 is now the active owned Runpod short gate on the same pod from
+`/workspace/SimplexFold_e148`. It launched at `2026-05-18T03:37Z` with run
+name `e148_degree_normalized_expansion_from_e128_s9000_c256_m64`, trainer PID
+`331052`, log `/workspace/SimplexFold_e148/logs/e148_degree_normalized_expansion.log`,
 and artifact directory
-`/workspace/SimplexFold_e147/artifacts/nanofold_public_benchmarks/e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64`.
-The checkout is at branch commit `0bc7bac`, public data counts were verified
-as `11000` features, `11000` labels, and train/val manifests `10000 / 1000`,
-and the current-pod E128 checkpoint exists under `/workspace/SimplexFold_e145`.
+`/workspace/SimplexFold_e148/artifacts/nanofold_public_benchmarks/e148_degree_normalized_expansion_from_e128_s9000_c256_m64`.
+The checkout was locally cloned from E147, the current-pod E128 checkpoint was
+present, remote `py_compile` passed, parser validation accepted the E148
+command, and startup status reached `completed_step=8503` with
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite train
+loss `4.421935170888901`, and PID `331052` alive. A follow-up startup check
+at `2026-05-18T03:40Z` reached `completed_step=8511`, active step `8512`,
+finite train loss `4.392725497484207`, and PID `331052` remained alive.
 
-Rationale: E144 is only a tiny primary-lDDT leader and still under-expands
-global C-alpha geometry. The most direct unresolved experiment for that
-failure is E140's selected-boundary coordinate expansion loss, because E140
-failed from pod I/O before writing a scored result. E147 keeps the E128
-selected-complex recipe fixed and adds only the topology-realization loss on
-model-selected face/tetra boundary edges:
-`simplex_face_coordinate_expansion_weight=0.05`,
-`simplex_tetra_coordinate_expansion_weight=0.05`, and
-`simplex_coordinate_expansion_tolerance=0.05`.
+Rationale: E147 improved primary lDDT slightly but still left global geometry
+under-expanded with high selected-boundary edge reuse. E148 keeps the E147
+selected-boundary coordinate-expansion loss and E128 selected-complex recipe
+fixed, but enables `--simplex-boundary-degree-normalize` so highly reused
+selected boundary edges cannot dominate the anti-collapse signal. Monitor only
+E148 now; keep `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
+explicit terminal no-score outcome exists. Do not spend 30,000 steps unless a
+returned short gate clears `0.45` primary C-alpha lDDT with coherent FoldScore,
+dRMSD, and C-alpha Rg.
 
-Startup verification passed: remote `py_compile` passed, parser validation
-accepted the E147 command, the run resumed E128 at step `8500`, loaded `1332`
-matching model tensors, initialized `0` new/missing tensors, and started a
-fresh optimizer. The latest check at `2026-05-18T03:02Z` found
-`completed_step=9000`, active step `9000`, phase `evaluating`, active eval
-batch `850 / 1000`, `effective_batch_size=8`, `num_workers=0`,
-`stopped_early=false`, finite train loss `4.717868626117706`, and PID `253572`
-remained alive with elapsed time `04:53:41`, process CPU time `3-14:25:33`,
-and `194` threads.
-No result bundle, eval details, or checkpoint exists yet. Monitor only E147 and keep
-`EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
-no-score outcome exists. Do not spend 30,000 steps unless a returned short
-gate clears `0.45` primary C-alpha lDDT with coherent FoldScore, dRMSD, and
-C-alpha Rg.
-
-If E147 returns below the short gate or fails without a score, the parked next
-candidate is E148: the same selected-boundary coordinate-expansion retry from
-E128, but with `--simplex-boundary-degree-normalize`. This keeps the
-anti-collapse loss attached to selected face/tetra boundary edges while
-preventing highly reused edges from dominating the expansion signal. Do not
-launch E148 while E147 is active.
-
-E149 is also prepared locally as the stronger direct-expansion follow-up: a
+E149 remains prepared locally as the stronger direct-expansion follow-up: a
 selected-cell centroid expansion loss that penalizes model-selected
 face/tetra centroids only when they collapse toward the predicted chain center
 relative to the true selected-cell radius. It is still sparse-complex
-supervision, adds no parameters, and should stay parked behind E147/E148 until
+supervision, adds no parameters, and should stay parked behind E148 until
 there is scored evidence that the boundary-edge expansion route is still
 under-expanding.
 

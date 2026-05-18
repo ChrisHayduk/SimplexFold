@@ -10535,3 +10535,36 @@
   `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E147 running and
   leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
   terminal no-score outcome exists.
+- 2026-05-18T03:34Z E147 returned coherently. Remote and local artifacts exist:
+  `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt`. Verification confirmed
+  `completed_step=9000`, history last step `9000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, one result row, `1000` eval-detail
+  rows, and `3,240,738` parameters under the `3,261,974` cap. E147 reached
+  `val_lddt_ca=0.4329`, `FoldScore=0.4034`, dRMSD `11.0628`, and C-alpha Rg
+  `11.5603 / 16.3091`. The goal audit correctly failed the goal-ready gate
+  because this is only a `9000`-step short run and remains below both the
+  `0.45` short gate and the `0.7` target. Record E147 as returned/rejected
+  and continue with the parked E148 degree-normalized expansion short gate,
+  not a 30k spend.
+- 2026-05-18T03:37Z Launched E148 degree-normalized selected-boundary
+  expansion on owned pod `723hbew2jrvxjx` from `/workspace/SimplexFold_e148`.
+  The checkout was cloned locally from E147, the E128 checkpoint was present
+  under `/workspace/SimplexFold_e145`, remote `py_compile` passed, and parser
+  validation accepted the documented command with
+  `simplex_boundary_degree_normalize=true`, target step `9000`,
+  `effective_batch_size=8`, and `num_workers=0`. Trainer PID is `331052`; log
+  is `/workspace/SimplexFold_e148/logs/e148_degree_normalized_expansion.log`;
+  artifacts are under
+  `/workspace/SimplexFold_e148/artifacts/nanofold_public_benchmarks/e148_degree_normalized_expansion_from_e128_s9000_c256_m64`.
+  Startup status resumed E128 at step `8500`, loaded `1332` matching tensors,
+  initialized `0` new/missing tensors, and reached `completed_step=8503`,
+  active step `8504`, active microbatch `1 / 8`, `stopped_early=false`, finite
+  last train loss `4.421935170888901`, and PID `331052` alive. A follow-up
+  startup check at `2026-05-18T03:40Z` reached `completed_step=8511`, active
+  step `8512`, active microbatch `1 / 8`, finite last train loss
+  `4.392725497484207`, and PID `331052` still alive. Keep E148 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
