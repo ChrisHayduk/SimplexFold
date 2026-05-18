@@ -10994,3 +10994,18 @@
   ruff checks. Launch E150 only if the owned pod is idle; keep
   `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
   no-score outcome exists.
+- 2026-05-18T16:02Z Launched E150 on owned Runpod pod `723hbew2jrvxjx` from
+  `/workspace/SimplexFold_e150` at commit `9d87dcd`. The E128 checkpoint and
+  NanoFold data were present, remote `py_compile` passed, and the full
+  launch-style parameter audit counted `3,240,738` parameters under the
+  `3,261,974` cap with `effective_batch_size=8`, `num_workers=0`, face/tetra
+  centroid-spread weights `0.10`, per-cell centroid weights `0.025`, and
+  coordinate expansion weights `0.025`. Trainer PID is `496753`, log is
+  `/workspace/SimplexFold_e150/logs/e150_selected_complex_centroid_spread.log`,
+  and artifact directory is
+  `/workspace/SimplexFold_e150/artifacts/nanofold_public_benchmarks/e150_selected_complex_centroid_spread_from_e128_s9000_c256_m64`.
+  Startup health reached `completed_step=8506`, active step `8507`, active
+  microbatch `1 / 8`, finite last train loss `4.88842961192131`, and
+  `stopped_early=false`, with no result, eval-detail, or checkpoint artifacts
+  yet. Keep E150 running and leave `EXPERIMENT_RESULTS.md` unchanged until a
+  scored bundle or explicit terminal no-score outcome exists.

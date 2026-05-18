@@ -1,4 +1,4 @@
-## 2026-05-18 Operating Plan Update: E150 Prepared
+## 2026-05-18 Operating Plan Update: E150 Active
 
 E149 returned below the short gate, but it sharpened the failure mode: selected
 boundary geometry and selected-cell contraction diagnostics can improve while
@@ -14,14 +14,27 @@ model-selected sparse complex and training labels, adds no parameters, and
 does not introduce external data, templates, pretrained weights, validation
 labels, or a dense all-pairs coordinate/lDDT objective.
 
-Prepared short-gate recipe:
+Active short-gate recipe:
 `e150_selected_complex_centroid_spread_from_e128_s9000_c256_m64`, resume E128
 model weights, target step `9000`, crop `256`, MSA depth `64`, effective batch
 size `8`, `num_workers=0`, face/tetra coordinate expansion `0.025`,
 face/tetra centroid expansion `0.025`, face/tetra centroid-spread expansion
 `0.10`, coordinate expansion tolerance `0.05`, and the same E128/E147-E149
 selected-complex communication recipe. Local validation passed with focused
-parser/loss tests and F821/F822/F823 ruff checks.
+parser/loss tests and F821/F822/F823 ruff checks. Remote launch validation
+used checkout commit `9d87dcd`, passed `py_compile`, and confirmed `3,240,738`
+parameters under the `3,261,974` cap.
+
+E150 is active on owned Runpod pod `723hbew2jrvxjx` from
+`/workspace/SimplexFold_e150`. Trainer PID is `496753`, log is
+`/workspace/SimplexFold_e150/logs/e150_selected_complex_centroid_spread.log`,
+and artifacts are under
+`/workspace/SimplexFold_e150/artifacts/nanofold_public_benchmarks/e150_selected_complex_centroid_spread_from_e128_s9000_c256_m64`.
+Startup status resumed E128 at step `8500`, loaded `1332` matching tensors,
+initialized `0` new/missing tensors, reached `completed_step=8506`, active
+step `8507`, active microbatch `1 / 8`, finite last train loss
+`4.88842961192131`, and had no result, eval-detail, or checkpoint artifacts
+yet.
 
 Decision rule: reject unless E150 crosses `0.45` primary C-alpha lDDT with
 coherent FoldScore, dRMSD, and C-alpha Rg. Do not spend 30,000 steps unless a

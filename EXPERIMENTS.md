@@ -8390,7 +8390,7 @@ loss.
 
 ### E150: Selected-Complex Centroid Spread
 
-Status: prepared locally; launch only if the owned Runpod pod is idle.
+Status: active on owned Runpod pod `723hbew2jrvxjx`.
 
 Hypothesis: E149 showed that penalizing each selected cell's centroid radius
 can improve contraction diagnostics without making the whole selected complex
@@ -8483,3 +8483,27 @@ Local validation:
 - `python -m py_compile minalphafold/simplex.py minalphafold/losses.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py::test_simplex_coordinate_realization_loss_penalizes_collapsed_cells tests/test_nanofold_public_benchmarks.py::test_e150_selected_complex_centroid_spread_candidate_matches_documented_gate tests/test_nanofold_public_benchmarks.py::test_model_config_override_flags_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_benchmark_loss_builder_applies_topology_margin_config`: `4 passed`
 - `../../.venv/bin/ruff check --select F821,F822,F823 minalphafold/simplex.py minalphafold/losses.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_nanofold_public_benchmarks.py`: passed
+- `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py`: `158 passed`
+
+Launch: E150 launched from `/workspace/SimplexFold_e150` on owned Runpod pod
+`723hbew2jrvxjx` after E149 returned below threshold and was documented. The
+fresh checkout was at commit `9d87dcd`, the E128 checkpoint was present,
+NanoFold data was present, remote `py_compile` passed for the model/loss/
+trainer/runner modules, and full launch-style parser validation accepted
+`effective_batch_size=8`, `num_workers=0`, face/tetra centroid-spread weights
+`0.10`, per-cell centroid expansion weights `0.025`, coordinate expansion
+weights `0.025`, and target step `9000`. The launch-style parameter audit
+counted `3,240,738` parameters under the `3,261,974` cap. Trainer PID is
+`496753`, log is
+`/workspace/SimplexFold_e150/logs/e150_selected_complex_centroid_spread.log`,
+and artifact directory is
+`/workspace/SimplexFold_e150/artifacts/nanofold_public_benchmarks/e150_selected_complex_centroid_spread_from_e128_s9000_c256_m64`.
+Startup status resumed E128 at step `8500`, loaded `1332` matching tensors,
+initialized `0` new/missing tensors, and reached `completed_step=8506`, active
+step `8507`, active microbatch `1 / 8`, `stopped_early=false`, finite last
+train loss `4.88842961192131`, and PID `496753` alive. The artifact directory
+has inherited history, run metadata, and status; `results.json`,
+`results.csv`, `eval_details_full_msa_to_face.csv`, and
+`checkpoints/full_msa_to_face_latest.pt` are absent. Keep E150 running and
+leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+terminal no-score outcome exists.
