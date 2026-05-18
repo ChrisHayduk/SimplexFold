@@ -8167,10 +8167,7 @@ global expansion more directly.
 
 ### E149: Selected-Cell Centroid Expansion
 
-Status: implemented locally and parked. E148 has now returned below the
-short-gate threshold, so E149 is the next documented short-gate candidate if
-continuing this branch. Do not launch a 30k run from E149 without a returned
-short gate above `0.45` and coherent FoldScore, dRMSD, and C-alpha Rg.
+Status: active on owned pod `723hbew2jrvxjx`.
 
 Hypothesis: E147/E148 act on selected boundary-edge distances, but global
 C-alpha Rg can still stay contracted if selected cells preserve local edge
@@ -8260,3 +8257,26 @@ Local validation:
 - `python -m py_compile minalphafold/simplex.py minalphafold/losses.py minalphafold/trainer.py scripts/run_nanofold_public_benchmarks.py tests/test_simplex.py tests/test_nanofold_public_benchmarks.py`
 - `python -m pytest tests/test_simplex.py::test_simplex_coordinate_realization_loss_penalizes_collapsed_cells tests/test_nanofold_public_benchmarks.py::test_e147_selected_boundary_expansion_retry_matches_documented_gate tests/test_nanofold_public_benchmarks.py::test_e148_degree_normalized_expansion_candidate_matches_documented_gate tests/test_nanofold_public_benchmarks.py::test_e149_selected_cell_centroid_expansion_candidate_matches_documented_gate tests/test_nanofold_public_benchmarks.py::test_topology_margin_args_are_accepted_by_cli_parser tests/test_nanofold_public_benchmarks.py::test_benchmark_loss_builder_applies_topology_margin_config`: `6 passed`
 - `python -m pytest tests/test_simplex.py tests/test_nanofold_public_benchmarks.py`: `157 passed`
+
+Launch: E149 launched on `2026-05-18T09:12Z` from
+`/workspace/SimplexFold_e149` on owned Runpod pod `723hbew2jrvxjx` after E148
+returned below threshold and was documented. The fresh checkout was at commit
+`9e0e74f`, the E128 checkpoint was present, NanoFold data was present, remote
+`py_compile` passed for the model/loss/trainer/runner modules, and parser
+validation accepted the documented command with `effective_batch_size=8`,
+`num_workers=0`, face/tetra coordinate expansion weights `0.025`, face/tetra
+centroid expansion weights `0.05`, and target step `9000`. The launch-style
+parameter audit counted `3,240,738` parameters under the `3,261,974` cap.
+Trainer PID is `414053`, log is
+`/workspace/SimplexFold_e149/logs/e149_selected_cell_centroid_expansion.log`,
+and artifact directory is
+`/workspace/SimplexFold_e149/artifacts/nanofold_public_benchmarks/e149_selected_cell_centroid_expansion_from_e128_s9000_c256_m64`.
+Startup status resumed E128 at step `8500`, loaded `1332` matching tensors,
+initialized `0` new/missing tensors, and reached `completed_step=8509`, active
+step `8510`, active microbatch `1 / 8`, `stopped_early=false`, finite last
+train loss `4.553498417139053`, and PID `414053` alive. The artifact directory
+has only inherited history, run metadata, and status; `results.json`,
+`results.csv`, `eval_details_full_msa_to_face.csv`, and
+`checkpoints/full_msa_to_face_latest.pt` are absent. Keep E149 running and
+leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+terminal no-score outcome exists.

@@ -10784,3 +10784,22 @@
   high-boundary / low-global subset at `0.3808` C-alpha lDDT. Record E148 as
   rejected below the `0.45` short gate; do not launch a 30k run. E149 is now
   the parked next short-gate candidate if continuing the expansion branch.
+- 2026-05-18T09:12Z Launched E149 selected-cell centroid expansion on owned
+  Runpod pod `723hbew2jrvxjx` from `/workspace/SimplexFold_e149`, run
+  `e149_selected_cell_centroid_expansion_from_e128_s9000_c256_m64`, after
+  E148 returned below the short gate. The fresh checkout was at commit
+  `9e0e74f`, the E128 checkpoint and NanoFold data were present, remote
+  `py_compile` passed, parser validation accepted the documented command, and
+  the launch-style parameter audit counted `3,240,738` parameters under the
+  `3,261,974` cap. Trainer PID is `414053`, log is
+  `/workspace/SimplexFold_e149/logs/e149_selected_cell_centroid_expansion.log`,
+  and artifacts are under
+  `/workspace/SimplexFold_e149/artifacts/nanofold_public_benchmarks/e149_selected_cell_centroid_expansion_from_e128_s9000_c256_m64`.
+  Startup resumed E128 at step `8500`, loaded `1332` matching tensors,
+  initialized `0` new/missing tensors, and reached `completed_step=8509`,
+  active step `8510`, active microbatch `1 / 8`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.553498417139053`, and PID `414053` alive. No result bundle exists yet;
+  keep E149 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists. Updated the heartbeat
+  monitor to track E149 rather than stale E148 details.

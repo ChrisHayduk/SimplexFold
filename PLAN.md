@@ -1,4 +1,4 @@
-## 2026-05-18 Operating Plan Update: E148 Returned
+## 2026-05-18 Operating Plan Update: E148 Returned; E149 Active
 
 E148 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`.
 The required bundle exists locally and remotely:
@@ -23,14 +23,26 @@ lDDT was still high at `0.7393`, but mean Rg ratio stayed contracted at
 C-alpha lDDT. Treat E148 as evidence that boundary-edge degree normalization
 does not solve the global assembly bottleneck.
 
-E149 remains prepared locally as the stronger direct-expansion follow-up: a
+E149 is now active as the stronger direct-expansion follow-up: a
 selected-cell centroid expansion loss that penalizes model-selected
 face/tetra centroids only when they collapse toward the predicted chain center
 relative to the true selected-cell radius. The E148 result is now the scored
 evidence that the boundary-edge expansion route is still under-expanding, so
-E149 is the next documented short-gate candidate if the branch is continued.
-Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
-C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
+E149 launched from `/workspace/SimplexFold_e149` on owned pod `723hbew2jrvxjx`
+with run name `e149_selected_cell_centroid_expansion_from_e128_s9000_c256_m64`,
+trainer PID `414053`, log
+`/workspace/SimplexFold_e149/logs/e149_selected_cell_centroid_expansion.log`,
+and artifact directory
+`/workspace/SimplexFold_e149/artifacts/nanofold_public_benchmarks/e149_selected_cell_centroid_expansion_from_e128_s9000_c256_m64`.
+The fresh checkout was at commit `9e0e74f`, the E128 checkpoint and NanoFold
+data were present, remote `py_compile` passed, parser validation accepted the
+E149 command, and the launch-style parameter audit counted `3,240,738`
+parameters under the `3,261,974` cap. Startup status reached
+`completed_step=8509`, active step `8510`, active microbatch `1 / 8`,
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite train
+loss `4.553498417139053`, and PID `414053` alive. Do not spend 30,000 steps
+unless a returned short gate clears `0.45` primary C-alpha lDDT with coherent
+FoldScore, dRMSD, and C-alpha Rg.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
 
