@@ -10954,3 +10954,13 @@
   `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E149 running
   through final validation and leave `EXPERIMENT_RESULTS.md` unchanged until a
   scored bundle or explicit terminal no-score outcome exists.
+- 2026-05-18T14:38Z E149 was still in active final validation. Status reported
+  `completed_step=9000`, `phase=evaluating`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, and finite last train loss
+  `4.7315435111522675`. Trainer PID `414053` remained alive with elapsed time
+  `05:26:11`, process CPU time `4-03:09:24`, and `194` threads. Run metadata,
+  status, and inherited history were present; `results.json`, `results.csv`,
+  `eval_details_full_msa_to_face.csv`, and
+  `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E149 running
+  through final validation and leave `EXPERIMENT_RESULTS.md` unchanged until a
+  scored bundle or explicit terminal no-score outcome exists.

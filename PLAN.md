@@ -85,8 +85,11 @@ PID `414053` alive with elapsed time `04:16:25`, process CPU time
 `2-23:41:05`, static startup-only log tail, and no scored artifacts yet. A
 later check at `2026-05-18T14:02Z` still showed `completed_step=9000`,
 `phase=evaluating`, PID `414053` alive with elapsed time `04:50:47`, process
-CPU time `3-13:10:37`, and no scored artifacts yet. Keep E149 running through
-final validation. Do not spend 30,000 steps unless a returned short gate clears
+CPU time `3-13:10:37`, and no scored artifacts yet. A later check at
+`2026-05-18T14:38Z` still showed `completed_step=9000`, `phase=evaluating`,
+PID `414053` alive with elapsed time `05:26:11`, process CPU time
+`4-03:09:24`, and no scored artifacts yet. Keep E149 running through final
+validation. Do not spend 30,000 steps unless a returned short gate clears
 `0.45` primary C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
