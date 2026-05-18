@@ -10768,3 +10768,19 @@
   `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E148 running and
   leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
   terminal no-score outcome exists.
+- 2026-05-18T09:06Z E148 returned coherently and wrote the complete scored
+  bundle. Remote checks found `results.json`, `results.csv`,
+  `history_full_msa_to_face.json`, `eval_details_full_msa_to_face.csv`,
+  `run_metadata.json`, `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt`, with `1000` eval rows, one result
+  row, history ending at step `9000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, and `3,240,738` parameters under
+  the `3,261,974` cap. Local artifact verification passed after pulling the
+  artifact directory and log. The goal audit correctly failed because this is
+  a short `9000`-step gate with `val_lddt_ca=0.4297`, below both the `0.7`
+  target and the `30,000`-step confirmation requirement. Eval-detail analysis
+  reported FoldScore `0.3986`, dRMSD `10.8899`, C-alpha Rg
+  `11.7537 / 16.3091`, `boundary_lddt_mean=0.7393`, `rg_ratio=0.7456`, and a
+  high-boundary / low-global subset at `0.3808` C-alpha lDDT. Record E148 as
+  rejected below the `0.45` short gate; do not launch a 30k run. E149 is now
+  the parked next short-gate candidate if continuing the expansion branch.

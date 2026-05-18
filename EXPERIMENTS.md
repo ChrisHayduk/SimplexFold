@@ -8041,7 +8041,7 @@ the E148 degree-normalized expansion gate rather than any 30k spend.
 
 ### E148: Degree-Normalized Selected-Boundary Expansion
 
-Status: active on owned pod `723hbew2jrvxjx`.
+Status: returned and rejected as a 30k candidate.
 
 Hypothesis: if E147 fails to clear the `0.45` short gate, the selected
 anti-collapse signal may still be too concentrated on reused boundary edges.
@@ -8148,15 +8148,29 @@ finite last train loss `4.766671359539032`, `effective_batch_size=8`,
 elapsed time `05:07:02`, process CPU time `3-19:31:50`, and `194` threads. The
 artifact directory still had only inherited history, run metadata, and status;
 `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`, and
-`checkpoints/full_msa_to_face_latest.pt` were absent. Keep E148 running and
-leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
-terminal no-score outcome exists.
+`checkpoints/full_msa_to_face_latest.pt` were absent.
+
+Result: returned and rejected. E148 finished at `2026-05-18T09:06Z` and wrote
+a coherent bundle. Remote and local verification confirmed
+`completed_step=9000`, `effective_batch_size=8`, `num_workers=0`,
+`stopped_early=false`, one results row, `1000` eval-detail rows, history
+ending at step `9000`, a required checkpoint, and `3,240,738` parameters under
+the `3,261,974` cap. It reached `val_lddt_ca=0.4297`, FoldScore `0.3986`,
+dRMSD `10.8899`, and C-alpha Rg `11.7537 / 16.3091`. Compared with E147, the
+degree-normalized boundary-edge expansion improved dRMSD and C-alpha
+expansion slightly, but primary C-alpha lDDT and FoldScore regressed and the
+run stayed below the `0.45` short gate. The eval-detail analysis showed
+`boundary_lddt_mean=0.7393`, `rg_ratio=0.7456`, and a high-boundary /
+low-global subset at only `0.3808` C-alpha lDDT. Do not spend 30k on E148;
+use this as evidence that the next short gate should target selected-cell
+global expansion more directly.
 
 ### E149: Selected-Cell Centroid Expansion
 
-Status: implemented locally and parked. Do not launch while E148 is active.
-Use only after scored evidence says the degree-normalized boundary-edge
-expansion path is still under-expanding.
+Status: implemented locally and parked. E148 has now returned below the
+short-gate threshold, so E149 is the next documented short-gate candidate if
+continuing this branch. Do not launch a 30k run from E149 without a returned
+short gate above `0.45` and coherent FoldScore, dRMSD, and C-alpha Rg.
 
 Hypothesis: E147/E148 act on selected boundary-edge distances, but global
 C-alpha Rg can still stay contracted if selected cells preserve local edge

@@ -1,6 +1,6 @@
-## 2026-05-18 Operating Plan Update: E147 Returned; E148 Active
+## 2026-05-18 Operating Plan Update: E148 Returned
 
-E147 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`.
+E148 returned coherently on owned Runpod pod `723hbew2jrvxjx` at step `9000`.
 The required bundle exists locally and remotely:
 `results.json`, `results.csv`, `history_full_msa_to_face.json`,
 `eval_details_full_msa_to_face.csv`, `run_metadata.json`,
@@ -10,53 +10,27 @@ The required bundle exists locally and remotely:
 eval rows, one result row, history ending at step `9000`, and `3,240,738`
 parameters under the `3,261,974` cap.
 
-Decision: reject E147 as a 30k candidate despite its small new primary-lDDT
-high. It returned `val_lddt_ca=0.4329`, `FoldScore=0.4034`, dRMSD `11.0628`,
-and predicted C-alpha Rg `11.5603 / 16.3091`. The selected-boundary expansion
-retry is coherent and slightly improves the short-run leader, but it remains
-below the `0.45` short-gate threshold and far below the `0.7` target, so do
-not spend 30k on this branch yet.
+Decision: reject E148 as a continuation or 30k candidate. It returned
+`val_lddt_ca=0.4297`, `FoldScore=0.3986`, dRMSD `10.8899`, and predicted
+C-alpha Rg `11.7537 / 16.3091`. Degree-normalizing the selected-boundary
+coordinate-expansion loss modestly improved dRMSD and C-alpha expansion versus
+E147, but primary C-alpha lDDT and FoldScore regressed and the run remained
+below the `0.45` short-gate threshold.
 
-E148 is now the active owned Runpod short gate on the same pod from
-`/workspace/SimplexFold_e148`. It launched at `2026-05-18T03:37Z` with run
-name `e148_degree_normalized_expansion_from_e128_s9000_c256_m64`, trainer PID
-`331052`, log `/workspace/SimplexFold_e148/logs/e148_degree_normalized_expansion.log`,
-and artifact directory
-`/workspace/SimplexFold_e148/artifacts/nanofold_public_benchmarks/e148_degree_normalized_expansion_from_e128_s9000_c256_m64`.
-The checkout was locally cloned from E147, the current-pod E128 checkpoint was
-present, remote `py_compile` passed, parser validation accepted the E148
-command, and startup status reached `completed_step=8503` with
-`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite train
-loss `4.421935170888901`, and PID `331052` alive. A follow-up startup check
-at `2026-05-18T03:40Z` reached `completed_step=8511`, active step `8512`,
-finite train loss `4.392725497484207`, and PID `331052` remained alive. The
-latest live check at `2026-05-18T08:44Z` reached `completed_step=9000`,
-entered `phase=evaluating`, and reached active eval batch `902 / 1000`. The
-run still reported `effective_batch_size=8`, `num_workers=0`,
-`stopped_early=false`, finite last train loss `4.766671359539032`, and PID
-`331052` alive with elapsed time `05:07:02`, process CPU time `3-19:31:50`,
-and `194` threads. The artifact directory still had only history, run
-metadata, and status; `results.json`, `results.csv`,
-`eval_details_full_msa_to_face.csv`, and `checkpoints/full_msa_to_face_latest.pt`
-were absent.
-
-Rationale: E147 improved primary lDDT slightly but still left global geometry
-under-expanded with high selected-boundary edge reuse. E148 keeps the E147
-selected-boundary coordinate-expansion loss and E128 selected-complex recipe
-fixed, but enables `--simplex-boundary-degree-normalize` so highly reused
-selected boundary edges cannot dominate the anti-collapse signal. Monitor only
-E148 now; keep `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
-explicit terminal no-score outcome exists. Do not spend 30,000 steps unless a
-returned short gate clears `0.45` primary C-alpha lDDT with coherent FoldScore,
-dRMSD, and C-alpha Rg.
+The eval-detail analysis keeps the same local/global split: mean boundary
+lDDT was still high at `0.7393`, but mean Rg ratio stayed contracted at
+`0.7456`, and the high-boundary / low-global subset had only `0.3808`
+C-alpha lDDT. Treat E148 as evidence that boundary-edge degree normalization
+does not solve the global assembly bottleneck.
 
 E149 remains prepared locally as the stronger direct-expansion follow-up: a
 selected-cell centroid expansion loss that penalizes model-selected
 face/tetra centroids only when they collapse toward the predicted chain center
-relative to the true selected-cell radius. It is still sparse-complex
-supervision, adds no parameters, and should stay parked behind E148 until
-there is scored evidence that the boundary-edge expansion route is still
-under-expanding.
+relative to the true selected-cell radius. The E148 result is now the scored
+evidence that the boundary-edge expansion route is still under-expanding, so
+E149 is the next documented short-gate candidate if the branch is continued.
+Do not spend 30,000 steps unless a returned short gate clears `0.45` primary
+C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
 
