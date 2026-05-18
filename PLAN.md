@@ -58,7 +58,10 @@ last train loss `4.718557119369507`, and PID `496753` alive with elapsed time
 newest live check reached `completed_step=8585`, active step `8586`, active
 microbatch `1 / 8`, finite last train loss `4.467027068138123`, and PID
 `496753` alive with elapsed time `20:39` and process CPU time `03:06:25`;
-scored artifacts remain absent.
+scored artifacts remain absent. The latest live check reached
+`completed_step=8594`, active step `8595`, active microbatch `1 / 8`, finite
+last train loss `4.8075379729270935`, and PID `496753` alive with elapsed time
+`22:46` and process CPU time `03:24:36`; scored artifacts remain absent.
 
 Decision rule: reject unless E150 crosses `0.45` primary C-alpha lDDT with
 coherent FoldScore, dRMSD, and C-alpha Rg. Do not spend 30,000 steps unless a

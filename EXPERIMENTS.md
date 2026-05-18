@@ -8529,5 +8529,9 @@ process CPU time `02:50:06`; scored artifacts remain absent. The newest live
 check reached `completed_step=8585`, active step `8586`, active microbatch
 `1 / 8`, finite last train loss `4.467027068138123`, and PID `496753` alive
 with elapsed time `20:39` and process CPU time `03:06:25`; scored artifacts
-remain absent. Keep E150 running and leave `EXPERIMENT_RESULTS.md` unchanged
-until a scored bundle or explicit terminal no-score outcome exists.
+remain absent. The latest live check reached `completed_step=8594`, active
+step `8595`, active microbatch `1 / 8`, finite last train loss
+`4.8075379729270935`, and PID `496753` alive with elapsed time `22:46` and
+process CPU time `03:24:36`; scored artifacts remain absent. Keep E150 running
+and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+terminal no-score outcome exists.
