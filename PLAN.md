@@ -34,7 +34,9 @@ Startup status resumed E128 at step `8500`, loaded `1332` matching tensors,
 initialized `0` new/missing tensors, reached `completed_step=8506`, active
 step `8507`, active microbatch `1 / 8`, finite last train loss
 `4.88842961192131`, and had no result, eval-detail, or checkpoint artifacts
-yet.
+yet. A follow-up live check reached `completed_step=8521`, active step `8522`,
+active microbatch `1 / 8`, finite last train loss `5.016878664493561`, and
+PID `496753` still alive with no scored artifacts yet.
 
 Decision rule: reject unless E150 crosses `0.45` primary C-alpha lDDT with
 coherent FoldScore, dRMSD, and C-alpha Rg. Do not spend 30,000 steps unless a

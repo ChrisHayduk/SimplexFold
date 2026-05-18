@@ -8504,6 +8504,8 @@ step `8507`, active microbatch `1 / 8`, `stopped_early=false`, finite last
 train loss `4.88842961192131`, and PID `496753` alive. The artifact directory
 has inherited history, run metadata, and status; `results.json`,
 `results.csv`, `eval_details_full_msa_to_face.csv`, and
-`checkpoints/full_msa_to_face_latest.pt` are absent. Keep E150 running and
-leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
-terminal no-score outcome exists.
+`checkpoints/full_msa_to_face_latest.pt` are absent. A follow-up live check
+reached `completed_step=8521`, active step `8522`, active microbatch `1 / 8`,
+finite last train loss `5.016878664493561`, and PID `496753` alive with no
+scored artifacts yet. Keep E150 running and leave `EXPERIMENT_RESULTS.md`
+unchanged until a scored bundle or explicit terminal no-score outcome exists.
