@@ -8511,6 +8511,9 @@ scored artifacts yet. A later live check reached `completed_step=8543`, active
 step `8544`, active microbatch `1 / 8`, finite last train loss
 `4.593395441770554`, and PID `496753` alive with elapsed time `10:30` and
 process CPU time `01:34:11`; the artifact directory still has no
-`results.json`, `results.csv`, eval-detail CSV, or checkpoint. Keep E150
-running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
-explicit terminal no-score outcome exists.
+`results.json`, `results.csv`, eval-detail CSV, or checkpoint. A newer live
+check reached `completed_step=8552`, active step `8553`, active microbatch
+`1 / 8`, finite last train loss `4.268217772245407`, and the same PID alive
+with elapsed time `12:46` and process CPU time `01:53:58`; scored artifacts
+were still absent. Keep E150 running and leave `EXPERIMENT_RESULTS.md`
+unchanged until a scored bundle or explicit terminal no-score outcome exists.
