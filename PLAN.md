@@ -79,9 +79,13 @@ at `2026-05-18T12:31Z` still showed `completed_step=9000`,
 CPU time `2-01:02:09`, and no scored artifacts yet. A later check at
 `2026-05-18T12:55Z` still showed `completed_step=9000`, `phase=evaluating`,
 PID `414053` alive with elapsed time `03:42:54`, process CPU time
-`2-10:27:40`, and no scored artifacts yet. Keep E149 running through final
-validation. Do not spend 30,000 steps unless a returned short gate clears
-`0.45` primary C-alpha lDDT with coherent FoldScore, dRMSD, and C-alpha Rg.
+`2-10:27:40`, and no scored artifacts yet. A later check at
+`2026-05-18T13:28Z` still showed `completed_step=9000`, `phase=evaluating`,
+PID `414053` alive with elapsed time `04:16:25`, process CPU time
+`2-23:41:05`, static startup-only log tail, and no scored artifacts yet. Keep
+E149 running through final validation. Do not spend 30,000 steps unless a
+returned short gate clears `0.45` primary C-alpha lDDT with coherent FoldScore,
+dRMSD, and C-alpha Rg.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
 
