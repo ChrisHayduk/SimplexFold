@@ -29,7 +29,10 @@ command, and startup status reached `completed_step=8503` with
 `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite train
 loss `4.421935170888901`, and PID `331052` alive. A follow-up startup check
 at `2026-05-18T03:40Z` reached `completed_step=8511`, active step `8512`,
-finite train loss `4.392725497484207`, and PID `331052` remained alive.
+finite train loss `4.392725497484207`, and PID `331052` remained alive. The
+latest live check at `2026-05-18T03:52Z` reached `completed_step=8559`, active
+step `8560`, finite train loss `4.291964113712311`, `effective_batch_size=8`,
+`num_workers=0`, `stopped_early=false`, and PID `331052` still alive.
 
 Rationale: E147 improved primary lDDT slightly but still left global geometry
 under-expanded with high selected-boundary edge reuse. E148 keeps the E147

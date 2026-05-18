@@ -8140,7 +8140,14 @@ step `8504`, active microbatch `1 / 8`, `stopped_early=false`, finite last
 train loss `4.421935170888901`, and PID `331052` alive. A follow-up startup
 check at `2026-05-18T03:40Z` reached `completed_step=8511`, active step
 `8512`, active microbatch `1 / 8`, finite last train loss
-`4.392725497484207`, and PID `331052` still alive. Keep E148 running and leave
+`4.392725497484207`, and PID `331052` still alive. The latest live check at
+`2026-05-18T03:52Z` reached `completed_step=8559`, active step `8560`, active
+microbatch `1 / 8`, finite last train loss `4.291964113712311`,
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, and PID
+`331052` still alive. The artifact directory still had only inherited history,
+run metadata, and status; `results.json`, `results.csv`,
+`eval_details_full_msa_to_face.csv`, and
+`checkpoints/full_msa_to_face_latest.pt` were absent. Keep E148 running and leave
 `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
 no-score outcome exists.
 
