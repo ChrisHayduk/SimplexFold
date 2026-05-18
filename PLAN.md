@@ -24,11 +24,12 @@ model-selected face/tetra boundary edges:
 Startup verification passed: remote `py_compile` passed, parser validation
 accepted the E147 command, the run resumed E128 at step `8500`, loaded `1332`
 matching model tensors, initialized `0` new/missing tensors, and started a
-fresh optimizer. The latest check at `2026-05-18T01:18Z` found
+fresh optimizer. The latest check at `2026-05-18T01:43Z` found
 `completed_step=9000`, active step `9000`, phase `evaluating`, active eval
-batch `351 / 1000`, `effective_batch_size=8`, `num_workers=0`,
+batch `458 / 1000`, `effective_batch_size=8`, `num_workers=0`,
 `stopped_early=false`, finite train loss `4.717868626117706`, and PID `253572`
-remained alive with `194` threads.
+remained alive with elapsed time `03:34:48`, process CPU time `2-07:27:34`,
+and `194` threads.
 No result bundle, eval details, or checkpoint exists yet. Monitor only E147 and keep
 `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
 no-score outcome exists. Do not spend 30,000 steps unless a returned short
