@@ -10598,3 +10598,13 @@
   and `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E148 running
   and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
   explicit terminal no-score outcome exists.
+- 2026-05-18T04:26Z E148 continued coherent training. Status reported
+  `completed_step=8701`, active step `8702`, active microbatch `1 / 8`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, and
+  finite last train loss `4.931789696216583`. Trainer PID `331052` remained
+  alive with elapsed time `48:39`, process CPU time `07:19:14`, and `194`
+  threads. The artifact directory still had only history, run metadata, and
+  status; `results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`,
+  and `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E148 running
+  and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
+  explicit terminal no-score outcome exists.
