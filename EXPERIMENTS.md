@@ -8359,6 +8359,11 @@ time `04:16:25`, process CPU time `2-23:41:05`, and `194` threads. The log
 tail still only contained the startup/resume lines, and run metadata, status,
 and the inherited history were still present, but `results.json`,
 `results.csv`, `eval_details_full_msa_to_face.csv`, and
-`checkpoints/full_msa_to_face_latest.pt` were absent. Keep E149 running and
-leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
-terminal no-score outcome exists.
+`checkpoints/full_msa_to_face_latest.pt` were absent. A later check at
+`2026-05-18T14:02Z` still showed `completed_step=9000`, `phase=evaluating`,
+and PID `414053` alive with elapsed time `04:50:47`, process CPU time
+`3-13:10:37`, and `194` threads. Run metadata, status, and inherited history
+were still present, but `results.json`, `results.csv`,
+`eval_details_full_msa_to_face.csv`, and `checkpoints/full_msa_to_face_latest.pt`
+were absent. Keep E149 running and leave `EXPERIMENT_RESULTS.md` unchanged
+until a scored bundle or explicit terminal no-score outcome exists.
