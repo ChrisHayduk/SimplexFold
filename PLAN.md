@@ -44,7 +44,10 @@ still has no `results.json`, `results.csv`, eval-detail CSV, or checkpoint. A
 newer live check reached `completed_step=8552`, active step `8553`, active
 microbatch `1 / 8`, finite last train loss `4.268217772245407`, and the same
 PID alive with elapsed time `12:46` and process CPU time `01:53:58`; scored
-artifacts were still absent.
+artifacts were still absent. The latest live check reached
+`completed_step=8562`, active step `8563`, active microbatch `1 / 8`, finite
+last train loss `4.678828120231628`, and PID `496753` alive with elapsed time
+`15:02` and process CPU time `02:15:34`; scored artifacts remain absent.
 
 Decision rule: reject unless E150 crosses `0.45` primary C-alpha lDDT with
 coherent FoldScore, dRMSD, and C-alpha Rg. Do not spend 30,000 steps unless a
