@@ -8336,5 +8336,11 @@ microbatch `1 / 8`, finite last train loss `4.188934475183487`, and PID
 `194` threads. The artifact directory still had only inherited history, run
 metadata, and status; `results.json`, `results.csv`,
 `eval_details_full_msa_to_face.csv`, and `checkpoints/full_msa_to_face_latest.pt`
-were absent. Keep E149 running and leave `EXPERIMENT_RESULTS.md` unchanged
-until a scored bundle or explicit terminal no-score outcome exists.
+were absent. Later checks reached `completed_step=9000` and `phase=evaluating`;
+at `2026-05-18T11:36Z`, PID `414053` was alive with elapsed time `02:24:05`,
+process CPU time `1-03:19:15`, and `194` threads. Run metadata, status, and
+the inherited history were present, but `results.json`, `results.csv`,
+`eval_details_full_msa_to_face.csv`, and `checkpoints/full_msa_to_face_latest.pt`
+were still absent, so this is active final validation rather than a terminal
+outcome. Keep E149 running and leave `EXPERIMENT_RESULTS.md` unchanged until a
+scored bundle or explicit terminal no-score outcome exists.

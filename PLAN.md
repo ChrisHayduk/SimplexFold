@@ -70,9 +70,13 @@ PID `414053` still alive with no result, eval-detail, or checkpoint artifacts
 yet. A later live check at `2026-05-18T11:01Z` reached `completed_step=8954`,
 active step `8955`, active microbatch `1 / 8`, finite train loss
 `4.188934475183487`, and PID `414053` still alive with no result, eval-detail,
-or checkpoint artifacts yet. Do not spend 30,000 steps unless a returned short
-gate clears `0.45` primary C-alpha lDDT with coherent FoldScore, dRMSD, and
-C-alpha Rg.
+or checkpoint artifacts yet. Later checks reached `completed_step=9000` and
+`phase=evaluating`; at `2026-05-18T11:36Z`, PID `414053` was still alive and
+compute-active, with run metadata/status/history present but no `results.json`,
+`results.csv`, eval-detail CSV, or latest checkpoint written yet. Keep E149
+running through final validation. Do not spend 30,000 steps unless a returned
+short gate clears `0.45` primary C-alpha lDDT with coherent FoldScore, dRMSD,
+and C-alpha Rg.
 
 ## 2026-05-17 Operating Plan Update: E144 Returned
 
