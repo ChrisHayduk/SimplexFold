@@ -8141,16 +8141,16 @@ train loss `4.421935170888901`, and PID `331052` alive. A follow-up startup
 check at `2026-05-18T03:40Z` reached `completed_step=8511`, active step
 `8512`, active microbatch `1 / 8`, finite last train loss
 `4.392725497484207`, and PID `331052` still alive. The latest live check at
-`2026-05-18T05:26Z` reached `completed_step=8952`, active step `8953`, active
-microbatch `1 / 8`, finite last train loss `4.513890564441681`,
-`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, and PID
-`331052` still alive with elapsed time `01:48:29`, process CPU time `16:18:36`,
-and `194` threads. The artifact directory still had only inherited history,
-run metadata, and status; `results.json`, `results.csv`,
-`eval_details_full_msa_to_face.csv`, and
-`checkpoints/full_msa_to_face_latest.pt` were absent. Keep E148 running and leave
-`EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
-no-score outcome exists.
+`2026-05-18T05:39Z` reached `completed_step=9000`, active step `9000`,
+`phase=evaluating`, and active eval batch `5 / 1000`. The run still reported
+finite last train loss `4.766671359539032`, `effective_batch_size=8`,
+`num_workers=0`, `stopped_early=false`, and PID `331052` still alive with
+elapsed time `02:00:39`, process CPU time `18:11:48`, and `194` threads. The
+artifact directory still had only inherited history, run metadata, and status;
+`results.json`, `results.csv`, `eval_details_full_msa_to_face.csv`, and
+`checkpoints/full_msa_to_face_latest.pt` were absent. Keep E148 running and
+leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+terminal no-score outcome exists.
 
 ### E149: Selected-Cell Centroid Expansion
 
