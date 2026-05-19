@@ -1,6 +1,6 @@
 # SimplexFold Experiment Results
 
-Last updated: 2026-05-18.
+Last updated: 2026-05-19.
 
 Best validation C-alpha lDDT so far: **E147**, `val_lddt_ca=0.4329` at step
 9000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
@@ -158,3 +158,4 @@ recorded in the running notes for that run.
 | E147 selected-boundary expansion retry | returned | 9000 | 0.4329 | 0.4329 | 0.4034 | 11.0628 | 11.5603 / 16.3091 | Rejected as a 30k candidate: selected-boundary coordinate expansion returned coherently and set a small new primary C-alpha lDDT high at 0.4329, but it remains below the 0.45 short-gate threshold and far below the 0.7 goal. FoldScore improved to 0.4034 versus E144, but dRMSD stayed high at 11.0628 and C-alpha Rg remained under-expanded at 11.5603 / 16.3091; continue with the parked E148 degree-normalized expansion short gate rather than spending 30k. |
 | E148 degree-normalized selected-boundary expansion | returned | 9000 | 0.4297 | 0.4297 | 0.3986 | 10.8899 | 11.7537 / 16.3091 | Rejected: verified 9k run below the 0.45 short-gate; val_lddt_ca=0.4297, FoldScore=0.3986, dRMSD=10.8899, and C-alpha Rg remains contracted (pred/true=11.7537/16.3091). |
 | E149 selected-cell centroid expansion | returned | 9000 | 0.4300 | 0.4300 | 0.4030 | 10.8056 | 11.8555 / 16.3091 | Rejected: selected-cell centroid expansion returned coherently at step 9000 with val_lddt_ca=0.4300, FoldScore=0.4030, dRMSD=10.8056, and C-alpha Rg still contracted at 11.8555 / 16.3091. It reduced selected-cell boundary contraction relative to prior expansion probes but stayed below the 0.45 short-gate threshold and below E147, so do not spend 30k on this branch. |
+| E150 selected-complex centroid spread | returned | 9000 | 0.4254 | 0.4254 | 0.4029 | 10.8991 | 11.7765 / 16.3091 | Rejected: selected-complex centroid-spread returned coherently at step 9000 with val_lddt_ca=0.4254, FoldScore=0.4029, dRMSD=10.8991, and C-alpha Rg still contracted at 11.7765 / 16.3091. It underperformed E147/E149 and stayed below the 0.45 short-gate threshold, so do not spend 30k on this branch; pivot away from more expansion-style selected-complex losses. |

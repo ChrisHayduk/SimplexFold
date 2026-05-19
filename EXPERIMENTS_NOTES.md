@@ -11089,3 +11089,21 @@
   `checkpoints/full_msa_to_face_latest.pt` were absent. Keep E150 running and
   leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
   terminal no-score outcome exists.
+- 2026-05-19T18:54Z E150 returned coherently and wrote the complete scored
+  bundle. Remote and local verification confirmed `results.json`,
+  `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt`; one result row; `1000`
+  eval-detail rows; history ending at step `9000`; `effective_batch_size=8`;
+  `num_workers=0`; `stopped_early=false`; and `3,240,738` parameters under the
+  `3,261,974` cap. The trainer process was gone after normal finish.
+- Result: reject E150 below the short gate and do not launch a 30k run.
+  Metrics were `val_lddt_ca=0.4254`, FoldScore `0.4029`, dRMSD `10.8991`,
+  and C-alpha Rg `11.7765 / 16.3091`. Eval-detail analysis still shows high
+  local boundary quality (`0.7499` mean boundary lDDT) with contracted global
+  assembly (`0.7495` mean Rg ratio), a `>=220` residue bin at only `0.3879`
+  lDDT with Rg ratio `0.6385`, and a high-boundary / low-global subset at
+  `0.3814` C-alpha lDDT. The selected-complex centroid-spread loss did not
+  relieve the global assembly bottleneck; pivot away from more
+  expansion-style selected-complex losses.

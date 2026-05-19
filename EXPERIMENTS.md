@@ -8390,7 +8390,7 @@ loss.
 
 ### E150: Selected-Complex Centroid Spread
 
-Status: active on owned Runpod pod `723hbew2jrvxjx`.
+Status: returned and rejected below the short gate.
 
 Hypothesis: E149 showed that penalizing each selected cell's centroid radius
 can improve contraction diagnostics without making the whole selected complex
@@ -8532,6 +8532,25 @@ with elapsed time `20:39` and process CPU time `03:06:25`; scored artifacts
 remain absent. The latest live check reached `completed_step=8594`, active
 step `8595`, active microbatch `1 / 8`, finite last train loss
 `4.8075379729270935`, and PID `496753` alive with elapsed time `22:46` and
-process CPU time `03:24:36`; scored artifacts remain absent. Keep E150 running
-and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
-terminal no-score outcome exists.
+process CPU time `03:24:36`; scored artifacts were still absent at that
+sample.
+
+Return: E150 subsequently finished cleanly at step `9000` and wrote the full
+scored bundle. Remote and local verification confirmed `results.json`,
+`results.csv`, `history_full_msa_to_face.json`,
+`eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+`status_full_msa_to_face.json`, and
+`checkpoints/full_msa_to_face_latest.pt`; one result row; `1000` eval-detail
+rows; history ending at step `9000`; `effective_batch_size=8`;
+`num_workers=0`; `stopped_early=false`; and `3,240,738` parameters under the
+`3,261,974` cap. The trainer process was gone after normal finish.
+
+Result: reject E150 below the short gate and do not launch a 30k run. Metrics
+were `val_lddt_ca=0.4254`, FoldScore `0.4029`, dRMSD `10.8991`, and C-alpha
+Rg `11.7765 / 16.3091`. Eval-detail analysis showed the same local/global
+failure split: mean boundary lDDT `0.7499`, mean Rg ratio `0.7495`, the
+`>=220` residue bin at only `0.3879` lDDT with Rg ratio `0.6385`, and a
+high-boundary / low-global subset at `0.3814` C-alpha lDDT. The
+centroid-spread loss did not improve the global assembly bottleneck, so the
+next short gate should pivot away from more expansion-style selected-complex
+losses.

@@ -1,4 +1,4 @@
-## 2026-05-18 Operating Plan Update: E150 Active
+## 2026-05-19 Operating Plan Update: E150 Returned
 
 E149 returned below the short gate, but it sharpened the failure mode: selected
 boundary geometry and selected-cell contraction diagnostics can improve while
@@ -25,47 +25,23 @@ parser/loss tests and F821/F822/F823 ruff checks. Remote launch validation
 used checkout commit `9d87dcd`, passed `py_compile`, and confirmed `3,240,738`
 parameters under the `3,261,974` cap.
 
-E150 is active on owned Runpod pod `723hbew2jrvxjx` from
-`/workspace/SimplexFold_e150`. Trainer PID is `496753`, log is
-`/workspace/SimplexFold_e150/logs/e150_selected_complex_centroid_spread.log`,
-and artifacts are under
-`/workspace/SimplexFold_e150/artifacts/nanofold_public_benchmarks/e150_selected_complex_centroid_spread_from_e128_s9000_c256_m64`.
-Startup status resumed E128 at step `8500`, loaded `1332` matching tensors,
-initialized `0` new/missing tensors, reached `completed_step=8506`, active
-step `8507`, active microbatch `1 / 8`, finite last train loss
-`4.88842961192131`, and had no result, eval-detail, or checkpoint artifacts
-yet. A follow-up live check reached `completed_step=8521`, active step `8522`,
-active microbatch `1 / 8`, finite last train loss `5.016878664493561`, and
-PID `496753` still alive with no scored artifacts yet. A later live check
-reached `completed_step=8543`, active step `8544`, active microbatch `1 / 8`,
-finite last train loss `4.593395441770554`, and PID `496753` alive with
-elapsed time `10:30` and process CPU time `01:34:11`; the artifact directory
-still has no `results.json`, `results.csv`, eval-detail CSV, or checkpoint. A
-newer live check reached `completed_step=8552`, active step `8553`, active
-microbatch `1 / 8`, finite last train loss `4.268217772245407`, and the same
-PID alive with elapsed time `12:46` and process CPU time `01:53:58`; scored
-artifacts were still absent. The latest live check reached
-`completed_step=8562`, active step `8563`, active microbatch `1 / 8`, finite
-last train loss `4.678828120231628`, and PID `496753` alive with elapsed time
-`15:02` and process CPU time `02:15:34`; scored artifacts remain absent. The
-newest live check reached `completed_step=8570`, active step `8571`, active
-microbatch `1 / 8`, finite last train loss `4.532555401325226`, and PID
-`496753` alive with elapsed time `17:01` and process CPU time `02:33:42`;
-scored artifacts remain absent. The most recent live check reached
-`completed_step=8578`, active step `8579`, active microbatch `1 / 8`, finite
-last train loss `4.718557119369507`, and PID `496753` alive with elapsed time
-`18:51` and process CPU time `02:50:06`; scored artifacts remain absent. The
-newest live check reached `completed_step=8585`, active step `8586`, active
-microbatch `1 / 8`, finite last train loss `4.467027068138123`, and PID
-`496753` alive with elapsed time `20:39` and process CPU time `03:06:25`;
-scored artifacts remain absent. The latest live check reached
-`completed_step=8594`, active step `8595`, active microbatch `1 / 8`, finite
-last train loss `4.8075379729270935`, and PID `496753` alive with elapsed time
-`22:46` and process CPU time `03:24:36`; scored artifacts remain absent.
+E150 returned coherently from owned Runpod pod `723hbew2jrvxjx` at step
+`9000`. The required local and remote bundle is present:
+`results.json`, `results.csv`, `history_full_msa_to_face.json`,
+`eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+`status_full_msa_to_face.json`, and
+`checkpoints/full_msa_to_face_latest.pt`. Verification confirmed
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, `1000`
+eval rows, one result row, history ending at step `9000`, and `3,240,738`
+parameters under the `3,261,974` cap.
 
-Decision rule: reject unless E150 crosses `0.45` primary C-alpha lDDT with
-coherent FoldScore, dRMSD, and C-alpha Rg. Do not spend 30,000 steps unless a
-returned short gate clears that threshold.
+Decision: reject E150 as a continuation or 30k candidate. It returned
+`val_lddt_ca=0.4254`, FoldScore `0.4029`, dRMSD `10.8991`, and predicted
+C-alpha Rg `11.7765 / 16.3091`. The selected-complex centroid-spread loss did
+not clear the `0.45` short gate and underperformed E147/E149, so do not spend
+30,000 steps on this branch. The next short gate should pivot away from adding
+more expansion-style selected-complex losses and toward a different global
+assembly mechanism.
 
 ## 2026-05-18 Operating Plan Update: E149 Returned
 
