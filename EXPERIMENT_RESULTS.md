@@ -1,6 +1,6 @@
 # SimplexFold Experiment Results
 
-Last updated: 2026-05-19.
+Last updated: 2026-05-31.
 
 Best validation C-alpha lDDT so far: **E147**, `val_lddt_ca=0.4329` at step
 9000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.

@@ -8554,3 +8554,10 @@ high-boundary / low-global subset at `0.3814` C-alpha lDDT. The
 centroid-spread loss did not improve the global assembly bottleneck, so the
 next short gate should pivot away from more expansion-style selected-complex
 losses.
+
+May 31 cleanup: the owned SimplexFold Runpod pod `723hbew2jrvxjx` had no
+active trainer/evaluator process when rechecked, and E150 remained the latest
+complete scored bundle. The E150 artifacts and log were re-pulled locally, the
+progress figures were regenerated through E150, and both inactive running pods
+(`723hbew2jrvxjx` and `156hoprq89qgae`) were stopped. There is no active
+Runpod SimplexFold work after this cleanup.

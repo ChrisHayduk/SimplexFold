@@ -1,3 +1,24 @@
+## 2026-05-31 Runpod Cleanup And Figure Refresh
+
+A fresh Runpod audit found no active SimplexFold training, evaluation, or
+artifact-writing process. The owned SimplexFold pod `723hbew2jrvxjx` still held
+the E142-E150 checkouts, and the latest complete scored bundle remained E150:
+`completed_steps=9000`, `effective_batch_size=8`, `num_workers=0`,
+`stopped_early=false`, `3,240,738` parameters, `1000` eval-detail rows,
+`val_lddt_ca=0.4254`, FoldScore `0.4029`, dRMSD `10.8991`, and predicted
+C-alpha Rg `11.7765 / 16.3091`. The E150 artifact directory and log were
+re-pulled locally before shutdown. No newer SimplexFold result exists on the
+pod, and the non-SimplexFold pod `156hoprq89qgae` had no `/workspace`
+experiment directories or matching processes.
+
+Decision: both running pods were inactive and were stopped. `runpodctl pod
+list` now returns no running pods. The ignored plot dataset and PNG figures
+under `artifacts/nanofold_public_benchmarks/plots/` were regenerated through
+E150, preserving E147 as the current best short-gate result at
+`val_lddt_ca=0.4329`. Do not launch a 30,000-step run until a future returned
+short gate clears roughly `0.45` primary C-alpha lDDT with coherent FoldScore,
+dRMSD, and C-alpha Rg.
+
 ## 2026-05-19 Operating Plan Update: E150 Returned
 
 E149 returned below the short gate, but it sharpened the failure mode: selected

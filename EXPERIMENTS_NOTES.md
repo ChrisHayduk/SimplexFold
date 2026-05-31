@@ -11107,3 +11107,21 @@
   `0.3814` C-alpha lDDT. The selected-complex centroid-spread loss did not
   relieve the global assembly bottleneck; pivot away from more
   expansion-style selected-complex losses.
+- 2026-05-31T14:28Z Runpod audit: `723hbew2jrvxjx` had no active
+  SimplexFold/training/eval/artifact-writing process. The latest complete
+  scored bundle on the pod remained E150 with `completed_steps=9000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  `3,240,738` parameters, `1000` eval-detail rows, `val_lddt_ca=0.4254`,
+  FoldScore `0.4029`, dRMSD `10.8991`, and C-alpha Rg
+  `11.7765 / 16.3091`. The E150 artifact directory and log were re-pulled
+  locally before shutdown.
+- 2026-05-31T14:29Z Plot refresh: regenerated the ignored
+  `artifacts/nanofold_public_benchmarks/plots/best_val_lddt_by_experiment_run.csv`
+  and PNG/social figure variants through E150. The refreshed series has 134
+  numeric experiment rows and keeps E147 as the running best at
+  `val_lddt_ca=0.4329`.
+- 2026-05-31T14:30Z Pod cleanup: the empty non-SimplexFold running pod
+  `156hoprq89qgae` had no `/workspace` experiment directories and no matching
+  processes, and the SimplexFold pod `723hbew2jrvxjx` had no active work after
+  the E150 pull. Both inactive pods were stopped; `runpodctl pod list` then
+  returned no running pods. No 30k run was launched.
