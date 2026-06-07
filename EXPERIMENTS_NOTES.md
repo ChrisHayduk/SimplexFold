@@ -11125,3 +11125,7886 @@
   processes, and the SimplexFold pod `723hbew2jrvxjx` had no active work after
   the E150 pull. Both inactive pods were stopped; `runpodctl pod list` then
   returned no running pods. No 30k run was launched.
+- 2026-05-31T15:39Z E151 launched as the full 30k continuation of the best
+  returned SimplexFold recipe, E147 selected-boundary expansion. The original
+  SimplexFold volume pod `723hbew2jrvxjx` could not be restarted because its
+  host had no free GPU, so the live A40 pod `ev7ulphg8dtiqe` was reused after
+  staging public processed features, labels, manifests, the NanoFold metric
+  package, the SimplexFold checkout, and the E147 step-9000 checkpoint.
+  Remote data checks confirmed `10000` train and `1000` val manifest entries,
+  the E147 checkpoint was present, CUDA was available, and `py_compile` passed
+  before launch.
+- E151 run details: checkout `/workspace/SimplexFold_e151_best30k`, trainer
+  PID `34098`, log
+  `/workspace/SimplexFold_e151_best30k/logs/e151_e147_best_full30k.log`,
+  artifact directory
+  `/workspace/SimplexFold_e151_best30k/artifacts/nanofold_public_benchmarks/e151_e147_best_full30k_from_e147_s30000_c256_m64`.
+  The run resumes E147 with full training state rather than
+  `--resume-model-weights-only`, targets step `30000`, keeps
+  `effective_batch_size=8`, `num_workers=0`, crop `256`, MSA depth `64`, no
+  extra MSA, no templates, and the E147 selected-boundary expansion weights
+  and communication settings.
+- First pulled E151 status: resumed from step `9000` with `72000` examples
+  seen. The latest sample reached `completed_step=9011`, active step `9012`,
+  active microbatch `1 / 8`, `stopped_early=false`, finite last train loss
+  `4.3228916227817535`, `history_rows=19`, and last history step `9000`.
+  No new scored artifacts exist yet; leave `EXPERIMENT_RESULTS.md` unchanged
+  until a scored bundle or explicit terminal no-score outcome exists.
+- Plot tracking update: added
+  `scripts/plot_nanofold_experiment_metrics.py`, which regenerates the ignored
+  running-best experiment figures and per-run metric traces under
+  `artifacts/nanofold_public_benchmarks/plots/`. The current E151 trace plot
+  contains inherited E147 history only; refresh after the first new validation
+  point at step `9500`.
+- 2026-05-31T15:58Z E151 live sample: status reported
+  `completed_step=9048`, active step `9049`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.67742058634758`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `19:50` elapsed with GPU memory about `37969 MiB`; the
+  artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-05-31T16:13Z E151 live sample: status reported
+  `completed_step=9084`, active step `9085`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `5.017561554908752`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `34:48` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle
+  or explicit terminal no-score outcome exists.
+- 2026-05-31T16:28Z E151 live sample: status reported
+  `completed_step=9121`, active step `9122`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.9473830461502075`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `49:45` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle
+  or explicit terminal no-score outcome exists.
+- 2026-05-31T16:43Z E151 live sample: initial status read reached
+  `completed_step=9159` but reported `last_train_loss=NaN`; a short follow-up
+  check showed continued progress and recovered finite loss. Latest status
+  reported `completed_step=9162`, active step `9163`, active microbatch
+  `1 / 8`, target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.678379714488983`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `01:05:49` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and watch for recurrence of NaN loss before taking action.
+- 2026-05-31T16:58Z E151 live sample: status reported
+  `completed_step=9200`, active step `9201`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.384715914726257`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `01:19:43` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle
+  or explicit terminal no-score outcome exists.
+- 2026-05-31T17:13Z E151 live sample: status reported
+  `completed_step=9262`, active step `9263`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.546838074922562`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `01:35:19` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle
+  or explicit terminal no-score outcome exists.
+- 2026-05-31T17:28Z E151 live sample: status reported
+  `completed_step=9322`, active step `9323`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.8731915056705475`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `01:50:17` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle
+  or explicit terminal no-score outcome exists.
+- 2026-05-31T17:43Z E151 live sample: status reported
+  `completed_step=9385`, active step `9386`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.526692509651184`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `02:05:17` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle
+  or explicit terminal no-score outcome exists.
+- 2026-05-31T17:58Z E151 live sample: status reported
+  `completed_step=9445`, active step `9446`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.439380764961243`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `02:20:20` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle
+  or explicit terminal no-score outcome exists; the next heartbeat should
+  likely capture the first new validation point near step `9500`.
+- 2026-05-31T18:13Z E151 live sample: status reported
+  `completed_step=9500`, phase `evaluating`, active eval batch `30 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.66095232963562`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `02:35:20` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until the step-9500
+  validation history row lands or a scored bundle/terminal no-score outcome
+  exists.
+- 2026-05-31T18:28Z E151 live sample: status reported
+  `completed_step=9500`, phase `evaluating`, active eval batch `243 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.66095232963562`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `02:50:25` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until the step-9500
+  validation history row lands or a scored bundle/terminal no-score outcome
+  exists.
+- 2026-05-31T18:43Z E151 live sample: status reported
+  `completed_step=9500`, phase `evaluating`, active eval batch `459 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.66095232963562`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `03:05:29` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until the step-9500
+  validation history row lands or a scored bundle/terminal no-score outcome
+  exists.
+- 2026-05-31T18:58Z E151 live sample: status reported
+  `completed_step=9500`, phase `evaluating`, active eval batch `682 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.66095232963562`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `03:20:22` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until the step-9500
+  validation history row lands or a scored bundle/terminal no-score outcome
+  exists.
+- 2026-05-31T19:13Z E151 live sample: status reported
+  `completed_step=9500`, phase `evaluating`, active eval batch `885 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.66095232963562`, and
+  `history_rows=19` with last history step `9000`. Trainer PID `34098`
+  remained alive after `03:35:20` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory still contains only `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`.
+  Local status/history/logs were pulled and plots refreshed. Keep E151
+  running and leave `EXPERIMENT_RESULTS.md` unchanged until the step-9500
+  validation history row lands or a scored bundle/terminal no-score outcome
+  exists.
+- 2026-05-31T19:28Z E151 live sample: the step-9500 validation row landed and
+  training resumed. Status reported `completed_step=9530`, active step `9531`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.522278249263763`, `history_rows=20`, and last history step `9500`.
+  Step-9500 metrics were `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, C-alpha RMSD
+  `14.615316492915154`, atom14 lDDT `0.3898610278367996`, GDT-HA
+  `0.15267845626920462`, GDT-TS `0.2384351680725813`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `03:50:26` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory now contains `checkpoints/full_msa_to_face_latest.pt`
+  plus `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T19:43Z E151 live sample: status reported
+  `completed_step=9592`, active step `9593`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.8814857006073`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `04:05:21` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T19:58Z E151 live sample: status reported
+  `completed_step=9654`, active step `9655`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.913932502269745`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `04:20:22` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T20:13Z E151 live sample: status reported
+  `completed_step=9718`, active step `9719`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.677242934703827`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `04:35:52` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T20:28Z E151 live sample: status reported
+  `completed_step=9779`, active step `9780`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.5354786813259125`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `04:50:46` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T20:43Z E151 live sample: status reported
+  `completed_step=9839`, active step `9840`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.895765244960785`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `05:05:20` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T20:58Z E151 live sample: status reported
+  `completed_step=9902`, active step `9903`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.413763254880905`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `05:20:24` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists; the next heartbeat should likely catch the step-10000 validation.
+- 2026-05-31T21:13Z E151 live sample: status reported
+  `completed_step=9963`, active step `9964`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.49318391084671`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `05:35:25` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists; the next heartbeat should likely catch the step-10000 validation.
+- 2026-05-31T21:28Z E151 live sample: status reported
+  `completed_step=10000`, phase `evaluating`, active eval batch `75 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.597865521907806`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `05:50:21` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-10000 validation row lands or a scored
+  bundle/terminal no-score outcome exists.
+- 2026-05-31T21:43Z E151 live sample: status reported
+  `completed_step=10000`, phase `evaluating`, active eval batch `303 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.597865521907806`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `06:05:24` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-10000 validation row lands or a scored
+  bundle/terminal no-score outcome exists.
+- 2026-05-31T21:58Z E151 live sample: status reported
+  `completed_step=10000`, phase `evaluating`, active eval batch `520 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.597865521907806`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `06:20:25` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-10000 validation row lands or a scored
+  bundle/terminal no-score outcome exists.
+- 2026-05-31T22:13Z E151 live sample: status reported
+  `completed_step=10000`, phase `evaluating`, active eval batch `733 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.597865521907806`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `06:35:21` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-10000 validation row lands or a scored
+  bundle/terminal no-score outcome exists.
+- 2026-05-31T22:28Z E151 live sample: status reported
+  `completed_step=10000`, phase `evaluating`, active eval batch `954 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.597865521907806`,
+  `history_rows=20`, and last history step `9500`. The latest validation row
+  remains step `9500`: `val_lddt_ca=0.436759777367115`, FoldScore
+  `0.4021002372801304`, dRMSD `11.294951216459275`, and predicted/true
+  C-alpha Rg `11.184205405235291 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `06:50:21` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-10000 validation row lands or a scored
+  bundle/terminal no-score outcome exists.
+- 2026-05-31T22:43Z E151 live sample: the step-10000 validation row landed and
+  training resumed. Status reported `completed_step=10048`, active step
+  `10049`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.80967703461647`, `history_rows=21`, and last history step
+  `10000`. Step-10000 metrics were `val_lddt_ca=0.4376961437165737`,
+  FoldScore `0.40716358280181886`, dRMSD `10.930340629547834`, C-alpha RMSD
+  `14.490285209417344`, atom14 lDDT `0.39156475207209585`, GDT-HA
+  `0.15577276713773608`, GDT-TS `0.24213953915238381`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `07:05:22` elapsed; GPU memory was about `42833 MiB`.
+  The artifact directory contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T22:58Z E151 live sample: status advanced coherently to
+  `completed_step=10110`, active step `10111`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.794774830341339`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`, still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `07:20:27`
+  elapsed; GPU memory was about `42833 MiB` with `64%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T23:13Z E151 live sample: status advanced coherently to
+  `completed_step=10170`, active step `10171`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.952162384986877`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`, still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `07:35:23`
+  elapsed; GPU memory was about `42833 MiB` with `99%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T23:28Z E151 live sample: status advanced coherently to
+  `completed_step=10227`, active step `10228`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.5392924547195435`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`, still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `07:50:24`
+  elapsed; GPU memory was about `44996 MiB` with `94%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T23:43Z E151 live sample: status advanced coherently to
+  `completed_step=10284`, active step `10285`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.34174656867981`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`, still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `08:05:25`
+  elapsed; GPU memory was about `45054 MiB` with `87%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-05-31T23:58Z E151 live sample: status advanced coherently to
+  `completed_step=10339`, active step `10340`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.462338864803314`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`, still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `08:20:21`
+  elapsed; GPU memory was about `45062 MiB` with the utilization sample at
+  `3%` during the pulse. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T00:14Z E151 live sample: status advanced coherently to
+  `completed_step=10402`, active step `10403`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.389196455478668`,
+  `history_rows=21`, and last history step `10000`. The initial pulse briefly
+  showed `last_train_loss=NaN` at `completed_step=10398`, but an immediate
+  follow-up reached `completed_step=10401` with finite loss and `100%` GPU
+  utilization, and the synced local snapshot reached `completed_step=10402`
+  with finite loss; keep watching but leave the run active. The latest
+  validation row remains step `10000`: `val_lddt_ca=0.4376961437165737`,
+  FoldScore `0.40716358280181886`, dRMSD `10.930340629547834`, and
+  predicted/true C-alpha Rg `11.591920153141022 / 16.30911695623398`, still
+  below a coherent short-gate clear. Trainer PID `34098` remained alive after
+  `08:36:42` elapsed; GPU memory was about `45064 MiB` with the follow-up
+  utilization sample at `100%`. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T00:29Z E151 live sample: status advanced coherently to
+  `completed_step=10453`, active step `10454`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.900590896606445`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`, still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `08:50:56`
+  elapsed; GPU memory was about `45064 MiB` with `88%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T00:44Z E151 live sample: status reached the next validation
+  boundary and entered evaluation. Status reported `completed_step=10500`,
+  active step `10500`, phase `evaluating`, active eval batch `27 / 1000`,
+  active eval examples `27`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.491983503103256`, `history_rows=21`, and last history step `10000`. The
+  latest validation row remains step `10000`: `val_lddt_ca=0.4376961437165737`,
+  FoldScore `0.40716358280181886`, dRMSD `10.930340629547834`, and
+  predicted/true C-alpha Rg `11.591920153141022 / 16.30911695623398`; the
+  step-10500 row is still pending. Trainer PID `34098` remained alive after
+  `09:05:58` elapsed; GPU memory was about `45448 MiB` with `95%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T00:59Z E151 live sample: step-10500 evaluation is progressing.
+  Status reported `completed_step=10500`, active step `10500`, phase
+  `evaluating`, active eval batch `220 / 1000`, active eval examples `220`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.491983503103256`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`; the step-10500 row is
+  still pending. Trainer PID `34098` remained alive after `09:20:53` elapsed;
+  GPU memory was about `45450 MiB` with `59%` utilization. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T01:14Z E151 live sample: step-10500 evaluation is progressing.
+  Status reported `completed_step=10500`, active step `10500`, phase
+  `evaluating`, active eval batch `427 / 1000`, active eval examples `427`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.491983503103256`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`; the step-10500 row is
+  still pending. Trainer PID `34098` remained alive after `09:36:02` elapsed;
+  GPU memory was about `45450 MiB` with `88%` utilization. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T01:29Z E151 live sample: step-10500 evaluation is progressing.
+  Status reported `completed_step=10500`, active step `10500`, phase
+  `evaluating`, active eval batch `620 / 1000`, active eval examples `620`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.491983503103256`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`; the step-10500 row is
+  still pending. Trainer PID `34098` remained alive after `09:50:54` elapsed;
+  GPU memory was about `45450 MiB` with `89%` utilization. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T01:44Z E151 live sample: step-10500 evaluation is progressing.
+  Status reported `completed_step=10500`, active step `10500`, phase
+  `evaluating`, active eval batch `829 / 1000`, active eval examples `829`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.491983503103256`,
+  `history_rows=21`, and last history step `10000`. The latest validation row
+  remains step `10000`: `val_lddt_ca=0.4376961437165737`, FoldScore
+  `0.40716358280181886`, dRMSD `10.930340629547834`, and predicted/true
+  C-alpha Rg `11.591920153141022 / 16.30911695623398`; the step-10500 row is
+  still pending. Trainer PID `34098` remained alive after `10:05:56` elapsed;
+  GPU memory was about `45450 MiB`; the utilization pulse was `6%`, but eval
+  progress advanced from `620 / 1000` to `829 / 1000` since the prior sample.
+  The artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T01:59Z E151 live sample: the step-10500 validation row landed and
+  training resumed. Status reported `completed_step=10509`, active step
+  `10510`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.67901885509491`, `history_rows=22`, and last history step
+  `10500`. Step-10500 metrics were `val_lddt_ca=0.43763524428009987`,
+  FoldScore `0.41201899415254595`, dRMSD `10.477823253899812`, C-alpha RMSD
+  `14.274783067822456`, atom14 lDDT `0.39053831991553306`, GDT-HA
+  `0.16085927516967058`, GDT-TS `0.2504717801064253`, and predicted/true
+  C-alpha Rg `12.364697160720825 / 16.30911695623398`. FoldScore, dRMSD, and
+  compactness improved versus step `10000`, but primary C-alpha lDDT stayed
+  flat and E151 remains below a coherent short-gate clear. Trainer PID
+  `34098` remained alive after `10:20:55` elapsed; GPU memory was about
+  `45450 MiB` with `89%` utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T02:14Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=10565`, active step `10566`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.435739099979401`, `history_rows=22`, and last history step `10500`. The
+  latest validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; still below a coherent short-gate
+  clear. Trainer PID `34098` remained alive after `10:35:53` elapsed; GPU
+  memory was about `45450 MiB` with `100%` utilization. The artifact directory
+  still contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T02:29Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=10620`, active step `10621`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.9278435707092285`, `history_rows=22`, and last history step `10500`. The
+  latest validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; still below a coherent short-gate
+  clear. Trainer PID `34098` remained alive after `10:51:26` elapsed; GPU
+  memory was about `45450 MiB` with `88%` utilization. The artifact directory
+  still contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T02:44Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=10673`, active step `10674`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.571090817451477`, `history_rows=22`, and last history step `10500`. The
+  latest validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; still below a coherent short-gate
+  clear. Trainer PID `34098` remained alive after `11:06:30` elapsed; GPU
+  memory was about `45450 MiB` with `100%` utilization. The artifact directory
+  still contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T02:59Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=10725`, active step `10726`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.589073151350021`, `history_rows=22`, and last history step `10500`. The
+  latest validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; still below a coherent short-gate
+  clear. Trainer PID `34098` remained alive after `11:21:27` elapsed; GPU
+  memory was about `45450 MiB` with `90%` utilization. The artifact directory
+  still contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T03:14Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=10777`, active step `10778`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.878211319446564`, `history_rows=22`, and last history step `10500`. The
+  latest validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; still below a coherent short-gate
+  clear. Trainer PID `34098` remained alive after `11:36:39` elapsed; GPU
+  memory was about `45450 MiB` with `93%` utilization. The artifact directory
+  still contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T03:29Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=10831`, active step `10832`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.15364596247673`, `history_rows=22`, and last history step `10500`. The
+  latest validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; still below a coherent short-gate
+  clear. Trainer PID `34098` remained alive after `11:51:23` elapsed; GPU
+  memory was about `45450 MiB` with `84%` utilization. The artifact directory
+  still contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T03:44Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=10885`, active step `10886`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.534713000059128`, `history_rows=22`, and last history step `10500`. The
+  latest validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; still below a coherent short-gate
+  clear. Trainer PID `34098` remained alive after `12:06:26` elapsed; GPU
+  memory was about `45450 MiB` with `94%` utilization. The artifact directory
+  still contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T03:59Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=10939`, active step `10940`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.281800210475922`, `history_rows=22`, and last history step `10500`. The
+  latest validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; still below a coherent short-gate
+  clear. Trainer PID `34098` remained alive after `12:21:24` elapsed; GPU
+  memory was about `45450 MiB` with `82%` utilization. The artifact directory
+  still contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T04:14Z E151 live sample: training remained coherent just before
+  the step-11000 validation boundary. Status reported `completed_step=10991`,
+  active step `10992`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
+  train loss `4.529861629009247`, `history_rows=22`, and last history step
+  `10500`. The latest validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; still below a coherent short-gate
+  clear. Trainer PID `34098` remained alive after `12:36:26` elapsed; GPU
+  memory was about `45450 MiB` with `65%` utilization. The artifact directory
+  still contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T04:29Z E151 live sample: step-11000 evaluation is in progress.
+  Status reported `completed_step=11000`, active step `11000`, phase
+  `evaluating`, active eval batch `174 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
+  train loss `4.402255445718765`, `history_rows=22`, and last history step
+  `10500`. The latest complete validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; the step-11000 row is pending.
+  Trainer PID `34098` remained alive after `12:51:26` elapsed; GPU memory was
+  about `45450 MiB` with `11%` utilization during evaluation. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T04:44Z E151 live sample: step-11000 evaluation is still in
+  progress. Status reported `completed_step=11000`, active step `11000`, phase
+  `evaluating`, active eval batch `365 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
+  train loss `4.402255445718765`, `history_rows=22`, and last history step
+  `10500`. The latest complete validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; the step-11000 row is pending.
+  Trainer PID `34098` remained alive after `13:06:24` elapsed; GPU memory was
+  about `45450 MiB` with `81%` utilization during evaluation. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T04:59Z E151 live sample: step-11000 evaluation is still in
+  progress. Status reported `completed_step=11000`, active step `11000`, phase
+  `evaluating`, active eval batch `528 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
+  train loss `4.402255445718765`, `history_rows=22`, and last history step
+  `10500`. The latest complete validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; the step-11000 row is pending.
+  Trainer PID `34098` remained alive after `13:21:24` elapsed; GPU memory was
+  about `45450 MiB` with `87%` utilization during evaluation. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T05:15Z E151 live sample: step-11000 evaluation is still in
+  progress. Status reported `completed_step=11000`, active step `11000`, phase
+  `evaluating`, active eval batch `735 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
+  train loss `4.402255445718765`, `history_rows=22`, and last history step
+  `10500`. The latest complete validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; the step-11000 row is pending.
+  Trainer PID `34098` remained alive after `13:36:51` elapsed; GPU memory was
+  about `45450 MiB` with `80%` utilization during evaluation. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T05:30Z E151 live sample: step-11000 evaluation is nearly
+  complete. Status reported `completed_step=11000`, active step `11000`, phase
+  `evaluating`, active eval batch `923 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
+  train loss `4.402255445718765`, `history_rows=22`, and last history step
+  `10500`. The latest complete validation row remains step `10500`:
+  `val_lddt_ca=0.43763524428009987`, FoldScore `0.41201899415254595`, dRMSD
+  `10.477823253899812`, C-alpha RMSD `14.274783067822456`, atom14 lDDT
+  `0.39053831991553306`, GDT-HA `0.16085927516967058`, GDT-TS
+  `0.2504717801064253`, and predicted/true C-alpha Rg
+  `12.364697160720825 / 16.30911695623398`; the step-11000 row is pending.
+  Trainer PID `34098` remained alive after `13:51:55` elapsed; GPU memory was
+  about `45450 MiB` with `100%` utilization during evaluation. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T05:45Z E151 live sample: the step-11000 validation row landed and
+  training resumed coherently. Status reported `completed_step=11030`, active
+  step `11031`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite last
+  train loss `4.539050489664078`, `history_rows=23`, and last history step
+  `11000`. Step-11000 metrics were `val_lddt_ca=0.4352795338332653`, FoldScore
+  `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`. This softened from the
+  step-10500 row and remains below a coherent short-gate clear. Trainer PID
+  `34098` remained alive after `14:06:52` elapsed; GPU memory was about
+  `45450 MiB` with `87%` utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11000`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T06:00Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=11083`, active step `11084`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.308720231056213`, `history_rows=23`, and last history step `11000`. The
+  latest validation row remains step `11000`: `val_lddt_ca=0.4352795338332653`,
+  FoldScore `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `14:21:54`
+  elapsed; GPU memory was about `45450 MiB` with `93%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11000`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T06:15Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=11133`, active step `11134`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.851139456033707`, `history_rows=23`, and last history step `11000`. The
+  latest validation row remains step `11000`: `val_lddt_ca=0.4352795338332653`,
+  FoldScore `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `14:36:55`
+  elapsed; GPU memory was about `45450 MiB` with `93%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11000`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T06:30Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=11189`, active step `11190`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.70951783657074`, `history_rows=23`, and last history step `11000`. The
+  latest validation row remains step `11000`: `val_lddt_ca=0.4352795338332653`,
+  FoldScore `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `14:51:54`
+  elapsed; GPU memory was about `45450 MiB` with `93%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11000`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T06:45Z E151 live sample: post-eval training continued
+  coherently. Status reported `completed_step=11242`, active step `11243`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.752222865819931`, `history_rows=23`, and last history step `11000`. The
+  latest validation row remains step `11000`: `val_lddt_ca=0.4352795338332653`,
+  FoldScore `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `15:06:53`
+  elapsed; GPU memory was about `45450 MiB` with `91%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11000`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T07:00Z E151 live sample: post-eval training continued
+  coherently. The local pulled status advanced during sync and reported
+  `completed_step=11295`, active step `11296`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.708400189876556`,
+  `history_rows=23`, and last history step `11000`. The latest validation row
+  remains step `11000`: `val_lddt_ca=0.4352795338332653`, FoldScore
+  `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `15:21:57`
+  elapsed; GPU memory was about `45450 MiB` with `93%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11000`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T07:15Z E151 live sample: post-eval training continued
+  coherently. The local pulled status advanced during sync and reported
+  `completed_step=11348`, active step `11349`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.430488049983978`,
+  `history_rows=23`, and last history step `11000`. The latest validation row
+  remains step `11000`: `val_lddt_ca=0.4352795338332653`, FoldScore
+  `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `15:36:57`
+  elapsed; GPU memory was about `45450 MiB` with `92%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11000`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T07:30Z E151 live sample: post-eval training continued
+  coherently. The local pulled status advanced during sync and reported
+  `completed_step=11403`, active step `11404`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.900561690330505`,
+  `history_rows=23`, and last history step `11000`. The latest validation row
+  remains step `11000`: `val_lddt_ca=0.4352795338332653`, FoldScore
+  `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `15:51:53`
+  elapsed; GPU memory was about `45450 MiB` with `86%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11000`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T07:45Z E151 live sample: post-eval training continued
+  coherently. The local pulled status advanced during sync and reported
+  `completed_step=11459`, active step `11460`, active microbatch `1 / 8`,
+  phase `microbatch_start`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.424935191869736`, `history_rows=23`, and last history step `11000`. The
+  latest validation row remains step `11000`: `val_lddt_ca=0.4352795338332653`,
+  FoldScore `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `16:06:58`
+  elapsed; GPU memory was about `45450 MiB` with `100%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11000`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T08:00Z E151 live sample: the runner reached the next eval
+  boundary coherently. Status reported `completed_step=11500`, active step
+  `11500`, phase `evaluating`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.845267653465271`, `history_rows=23`, and last history step `11000`. The
+  step-11500 evaluation had not written a new history row or log line yet, so
+  the latest validation row remains step `11000`: `val_lddt_ca=0.4352795338332653`,
+  FoldScore `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `16:21:58`
+  elapsed; GPU memory was about `45450 MiB` with `90%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11000`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T08:15Z E151 live sample: the step-11500 evaluation continued
+  coherently. The local pulled status reported `completed_step=11500`, active
+  step `11500`, phase `evaluating`, active eval batch `236 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.845267653465271`,
+  `history_rows=23`, and last history step `11000`. The step-11500 evaluation
+  had not written a new history row or log line yet, so the latest validation
+  row remains step `11000`: `val_lddt_ca=0.4352795338332653`, FoldScore
+  `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `16:37:02`
+  elapsed; GPU memory was about `45450 MiB` with `32%` utilization during the
+  eval sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11000`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T08:30Z E151 live sample: the step-11500 evaluation continued
+  coherently. The local pulled status reported `completed_step=11500`, active
+  step `11500`, phase `evaluating`, active eval batch `425 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.845267653465271`,
+  `history_rows=23`, and last history step `11000`. The step-11500 evaluation
+  had not written a new history row or log line yet, so the latest validation
+  row remains step `11000`: `val_lddt_ca=0.4352795338332653`, FoldScore
+  `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `16:51:57`
+  elapsed; GPU memory was about `45450 MiB` with `89%` utilization during the
+  eval sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11000`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T08:45Z E151 live sample: the step-11500 evaluation continued
+  coherently. The local pulled status reported `completed_step=11500`, active
+  step `11500`, phase `evaluating`, active eval batch `629 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.845267653465271`,
+  `history_rows=23`, and last history step `11000`. The step-11500 evaluation
+  had not written a new history row or log line yet, so the latest validation
+  row remains step `11000`: `val_lddt_ca=0.4352795338332653`, FoldScore
+  `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `17:06:55`
+  elapsed; GPU memory was about `45450 MiB` with `4%` utilization during the
+  eval sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11000`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T09:00Z E151 live sample: the step-11500 evaluation continued
+  coherently and was close to finishing. The local pulled status reported
+  `completed_step=11500`, active step `11500`, phase `evaluating`, active eval
+  batch `817 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.845267653465271`, `history_rows=23`, and last history step `11000`. The
+  step-11500 evaluation had not written a new history row or log line yet, so
+  the latest validation row remains step `11000`: `val_lddt_ca=0.4352795338332653`,
+  FoldScore `0.4103424735069275`, dRMSD `10.755398779034614`, C-alpha RMSD
+  `14.401264859318733`, atom14 lDDT `0.3907196820676327`, GDT-HA
+  `0.1559368948303163`, GDT-TS `0.24482029682397843`, and predicted/true
+  C-alpha Rg `12.053198247432709 / 16.30911695623398`; still below a coherent
+  short-gate clear. Trainer PID `34098` remained alive after `17:22:00`
+  elapsed; GPU memory was about `45450 MiB` with `23%` utilization during the
+  eval sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11000`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T09:15Z E151 live sample: the step-11500 evaluation landed and
+  training resumed coherently. The local pulled status reported
+  `completed_step=11505`, active step `11506`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.5235108733177185`,
+  `history_rows=24`, and last history step `11500`. The step-11500 validation
+  row reported `val_lddt_ca=0.4435200365781784`, FoldScore
+  `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This improves
+  `val_lddt_ca`, atom14 lDDT, GDT-HA/GDT-TS, and C-alpha RMSD versus step
+  `11000`, but FoldScore remains below the step-10500 high, so this is a mixed
+  live signal rather than a coherent short-gate clear. Trainer PID `34098`
+  remained alive after `17:37:01` elapsed; GPU memory was about `45450 MiB`
+  with `97%` utilization after training resumed. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11500`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T09:30Z E151 live sample: post-eval training continued
+  coherently after the step-11500 row. The local pulled status reported
+  `completed_step=11560`, active step `11561`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.822042018175125`,
+  `history_rows=24`, and last history step `11500`. The latest validation row
+  remains step `11500`: `val_lddt_ca=0.4435200365781784`, FoldScore
+  `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal rather than a coherent short-gate clear because FoldScore is
+  below the step-10500 high. Trainer PID `34098` remained alive after
+  `17:51:58` elapsed; GPU memory was about `45450 MiB` with `91%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11500`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T09:45Z E151 live sample: post-eval training continued
+  coherently after the step-11500 row. The local pulled status reported
+  `completed_step=11614`, active step `11615`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.353113919496536`,
+  `history_rows=24`, and last history step `11500`. The latest validation row
+  remains step `11500`: `val_lddt_ca=0.4435200365781784`, FoldScore
+  `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal rather than a coherent short-gate clear because FoldScore is
+  below the step-10500 high. Trainer PID `34098` remained alive after
+  `18:06:56` elapsed; GPU memory was about `45450 MiB` with `89%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11500`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T10:00Z E151 live sample: post-eval training continued
+  coherently after the step-11500 row. The local pulled status reported
+  `completed_step=11665`, active step `11666`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.403130024671555`,
+  `history_rows=24`, and last history step `11500`. The latest validation row
+  remains step `11500`: `val_lddt_ca=0.4435200365781784`, FoldScore
+  `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal rather than a coherent short-gate clear because FoldScore is
+  below the step-10500 high. Trainer PID `34098` remained alive after
+  `18:21:57` elapsed; GPU memory was about `45450 MiB` with `95%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11500`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T10:15Z E151 live sample: post-eval training continued
+  coherently after the step-11500 row. The local pulled status reported
+  `completed_step=11721`, active step `11722`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.755124449729919`, `history_rows=24`, and last history
+  step `11500`. The latest validation row remains step `11500`:
+  `val_lddt_ca=0.4435200365781784`, FoldScore `0.40814829197525976`, dRMSD
+  `10.92470969158411`, C-alpha RMSD `14.226636435747146`, atom14 lDDT
+  `0.39787372493743894`, GDT-HA `0.15686921252682806`, GDT-TS
+  `0.24671657681465148`, and predicted/true C-alpha Rg
+  `11.357499949455262 / 16.30911695623398`. This remains a mixed live signal
+  rather than a coherent short-gate clear because FoldScore is below the
+  step-10500 high. Trainer PID `34098` remained alive after `18:36:58`
+  elapsed; GPU memory was about `45450 MiB` with a sampled `4%` utilization
+  during a brief low-activity moment. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11500`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T10:30Z E151 live sample: post-eval training continued
+  coherently after the step-11500 row. The local pulled status reported
+  `completed_step=11778`, active step `11779`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.843284249305725`,
+  `history_rows=24`, and last history step `11500`. The latest validation row
+  remains step `11500`: `val_lddt_ca=0.4435200365781784`, FoldScore
+  `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal rather than a coherent short-gate clear because FoldScore is
+  below the step-10500 high. Trainer PID `34098` remained alive after
+  `18:51:56` elapsed; GPU memory was about `45450 MiB` with `100%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11500`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T10:45Z E151 live sample: post-eval training continued
+  coherently after the step-11500 row. The local pulled status reported
+  `completed_step=11833`, active step `11834`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.5489455461502075`, `history_rows=24`, and last history
+  step `11500`. The latest validation row remains step `11500`:
+  `val_lddt_ca=0.4435200365781784`, FoldScore `0.40814829197525976`, dRMSD
+  `10.92470969158411`, C-alpha RMSD `14.226636435747146`, atom14 lDDT
+  `0.39787372493743894`, GDT-HA `0.15686921252682806`, GDT-TS
+  `0.24671657681465148`, and predicted/true C-alpha Rg
+  `11.357499949455262 / 16.30911695623398`. This remains a mixed live signal
+  rather than a coherent short-gate clear because FoldScore is below the
+  step-10500 high. Trainer PID `34098` remained alive after `19:06:55`
+  elapsed; GPU memory was about `45450 MiB` with `100%` utilization. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`. Local status/history/logs were pulled and
+  plots refreshed through step `11500`. Keep E151 running and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-01T11:00Z E151 live sample: training remained coherent and advanced
+  after the previous pull. The local pulled status reported
+  `completed_step=11887`, active step `11888`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.704477846622467`, `history_rows=24`, and last history step `11500`. The
+  latest validation row remains step `11500`: `val_lddt_ca=0.4435200365781784`,
+  FoldScore `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal rather than a coherent short-gate clear because FoldScore is
+  below the step-10500 high. Trainer PID `34098` remained alive after
+  `19:21:56` elapsed; GPU memory was about `45450 MiB` with `87%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11500`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T11:15Z E151 live sample: training continued coherently toward
+  the next validation point. The local pulled status reported
+  `completed_step=11945`, active step `11946`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.43051552772522`, `history_rows=24`, and last history step `11500`. The
+  latest validation row remains step `11500`: `val_lddt_ca=0.4435200365781784`,
+  FoldScore `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal rather than a coherent short-gate clear because FoldScore is
+  below the step-10500 high. Trainer PID `34098` remained alive after
+  `19:36:56` elapsed; GPU memory was about `45450 MiB` with `93%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`. Local
+  status/history/logs were pulled and plots refreshed through step `11500`.
+  Keep E151 running and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-01T11:30Z E151 live sample: the run reached the next evaluation
+  boundary and was actively evaluating. The local pulled status reported
+  `completed_step=12000`, active step `12000`, phase `evaluating`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.632059335708618`, `history_rows=24`, and last
+  history step `11500`; the step-12000 validation row had not landed yet. The
+  latest validation row therefore remains step `11500`:
+  `val_lddt_ca=0.4435200365781784`, FoldScore `0.40814829197525976`, dRMSD
+  `10.92470969158411`, C-alpha RMSD `14.226636435747146`, atom14 lDDT
+  `0.39787372493743894`, GDT-HA `0.15686921252682806`, GDT-TS
+  `0.24671657681465148`, and predicted/true C-alpha Rg
+  `11.357499949455262 / 16.30911695623398`. This remains a mixed live signal
+  until the step-12000 row lands. Trainer PID `34098` remained alive after
+  `19:51:55` elapsed; GPU memory was about `45450 MiB` with `94%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `11500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T11:45Z E151 live sample: the step-12000 evaluation was still in
+  progress. The local pulled status reported `completed_step=12000`, active
+  step `12000`, phase `evaluating`, active eval batch `203 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.632059335708618`,
+  `history_rows=24`, and last history step `11500`; the step-12000 validation
+  row had not landed yet. The latest validation row therefore remains step
+  `11500`: `val_lddt_ca=0.4435200365781784`, FoldScore
+  `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal until the step-12000 row lands. Trainer PID `34098` remained
+  alive after `20:07:01` elapsed; GPU memory was about `45450 MiB` with a
+  sampled `15%` utilization during evaluation. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `11500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T12:00Z E151 live sample: the step-12000 evaluation continued
+  coherently. The local pulled status reported `completed_step=12000`, active
+  step `12000`, phase `evaluating`, active eval batch `384 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.632059335708618`,
+  `history_rows=24`, and last history step `11500`; the step-12000 validation
+  row had not landed yet. The latest validation row therefore remains step
+  `11500`: `val_lddt_ca=0.4435200365781784`, FoldScore
+  `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal until the step-12000 row lands. Trainer PID `34098` remained
+  alive after `20:21:57` elapsed; GPU memory was about `45450 MiB` with `94%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `11500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T12:15Z E151 live sample: the step-12000 evaluation continued
+  coherently. The local pulled status reported `completed_step=12000`, active
+  step `12000`, phase `evaluating`, active eval batch `573 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.632059335708618`,
+  `history_rows=24`, and last history step `11500`; the step-12000 validation
+  row had not landed yet. The latest validation row therefore remains step
+  `11500`: `val_lddt_ca=0.4435200365781784`, FoldScore
+  `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal until the step-12000 row lands. Trainer PID `34098` remained
+  alive after `20:36:56` elapsed; GPU memory was about `45450 MiB` with a
+  sampled `32%` utilization during evaluation. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `11500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T12:30Z E151 live sample: the step-12000 evaluation continued
+  coherently. The local pulled status reported `completed_step=12000`, active
+  step `12000`, phase `evaluating`, active eval batch `778 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.632059335708618`,
+  `history_rows=24`, and last history step `11500`; the step-12000 validation
+  row had not landed yet. The latest validation row therefore remains step
+  `11500`: `val_lddt_ca=0.4435200365781784`, FoldScore
+  `0.40814829197525976`, dRMSD `10.92470969158411`, C-alpha RMSD
+  `14.226636435747146`, atom14 lDDT `0.39787372493743894`, GDT-HA
+  `0.15686921252682806`, GDT-TS `0.24671657681465148`, and predicted/true
+  C-alpha Rg `11.357499949455262 / 16.30911695623398`. This remains a mixed
+  live signal until the step-12000 row lands. Trainer PID `34098` remained
+  alive after `20:51:54` elapsed; GPU memory was about `45450 MiB` with a
+  sampled `32%` utilization during evaluation. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `11500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T12:45Z E151 live sample: the step-12000 evaluation was almost
+  complete but had not written the history row yet. The local pulled status
+  reported `completed_step=12000`, active step `12000`, phase `evaluating`,
+  active eval batch `988 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.632059335708618`, `history_rows=24`, and last history
+  step `11500`. The latest validation row therefore remains step `11500`:
+  `val_lddt_ca=0.4435200365781784`, FoldScore `0.40814829197525976`, dRMSD
+  `10.92470969158411`, C-alpha RMSD `14.226636435747146`, atom14 lDDT
+  `0.39787372493743894`, GDT-HA `0.15686921252682806`, GDT-TS
+  `0.24671657681465148`, and predicted/true C-alpha Rg
+  `11.357499949455262 / 16.30911695623398`. This remains a mixed live signal
+  until the step-12000 row lands. Trainer PID `34098` remained alive after
+  `21:06:57` elapsed; GPU memory was about `45450 MiB` with a sampled `3%`
+  utilization during evaluation. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `11500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T13:00Z E151 live sample: the step-12000 evaluation landed and
+  training resumed coherently. The local pulled status reported
+  `completed_step=12048`, active step `12049`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.7613102197647095`, `history_rows=25`, and last history step `12000`.
+  The step-12000 validation row reported `val_lddt_ca=0.44818821775913237`,
+  FoldScore `0.41492343285679817`, dRMSD `10.427795261621474`, C-alpha RMSD
+  `13.995609036326409`, atom14 lDDT `0.4011345104277134`, GDT-HA
+  `0.16690864834561944`, GDT-TS `0.2596509027257562`, and predicted/true
+  C-alpha Rg `12.046402668476105 / 16.30911695623398`. This is the first
+  coherent E151 short-gate improvement over the step-10500 FoldScore high:
+  FoldScore, lDDT, atom14 lDDT, GDT-HA/GDT-TS, dRMSD, and C-alpha RMSD all
+  improved in the same row. Trainer PID `34098` remained alive after
+  `21:21:58` elapsed; GPU memory was about `45450 MiB` with `86%`
+  utilization after training resumed. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T13:15Z E151 live sample: post-step-12000 training continued
+  coherently after the first short-gate improvement row. The local pulled
+  status reported `completed_step=12104`, active step `12105`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.4993098974227905`, `history_rows=25`, and last history
+  step `12000`. The latest validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `21:37:00` elapsed; GPU memory was about `45450 MiB` with a
+  sampled `6%` utilization during a low-activity moment. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `12000`. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T13:30Z E151 live sample: post-step-12000 training continued
+  coherently toward the next validation checkpoint. The local pulled status
+  reported `completed_step=12160`, active step `12161`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.835630893707275`, `history_rows=25`, and last history
+  step `12000`. The latest validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `21:51:58` elapsed; GPU memory was about `45450 MiB` with `99%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T13:45Z E151 live sample: post-step-12000 training continued
+  coherently toward the next validation checkpoint. The local pulled status
+  reported `completed_step=12210`, active step `12211`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.347092866897583`, `history_rows=25`, and last history
+  step `12000`. The latest validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `22:06:56` elapsed; GPU memory was about `45450 MiB` with `50%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T14:03Z E151 live sample: post-step-12000 training continued
+  coherently toward the next validation checkpoint. The local pulled status
+  reported `completed_step=12267`, active step `12268`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.413186550140381`, `history_rows=25`, and last history
+  step `12000`. The latest validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `22:24:22` elapsed; GPU memory was about `45450 MiB` with `93%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T14:15Z E151 live sample: post-step-12000 training continued
+  coherently toward the next validation checkpoint. The local pulled status
+  reported `completed_step=12308`, active step `12309`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.516026318073273`, `history_rows=25`, and last history
+  step `12000`. The latest validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `22:37:00` elapsed; GPU memory was about `45450 MiB` with `99%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T14:30Z E151 live sample: post-step-12000 training continued
+  coherently toward the next validation checkpoint. The local pulled status
+  reported `completed_step=12353`, active step `12354`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.519759565591812`, `history_rows=25`, and last history
+  step `12000`. The latest validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `22:52:04` elapsed; GPU memory was about `45450 MiB` with `80%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T14:45Z E151 live sample: post-step-12000 training continued
+  coherently toward the next validation checkpoint. The local pulled status
+  reported `completed_step=12396`, active step `12397`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.428637892007828`, `history_rows=25`, and last history
+  step `12000`. The latest validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `23:07:02` elapsed; GPU memory was about `45450 MiB` with `94%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T15:00Z E151 live sample: post-step-12000 training continued
+  coherently toward the next validation checkpoint. The local pulled status
+  reported `completed_step=12437`, active step `12438`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.544090628623962`, `history_rows=25`, and last history
+  step `12000`. The latest validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `23:22:06` elapsed; GPU memory was about `45450 MiB` with `91%`
+  utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T15:15Z E151 live sample: post-step-12000 training continued
+  coherently and is approaching the step-12500 validation checkpoint. The
+  local pulled status reported `completed_step=12481`, active step `12482`,
+  phase `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.528971284627914`, `history_rows=25`, and last history
+  step `12000`. The latest validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `23:37:00` elapsed; GPU memory was about `45450 MiB` with
+  `100%` utilization. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists; the next heartbeat should likely catch step-12500 evaluation or its
+  landed validation row.
+- 2026-06-01T15:30Z E151 live sample: step-12500 validation is now in
+  progress. The local pulled status reported `completed_step=12500`, active
+  step `12500`, phase `evaluating`, active eval batch `121 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.880736231803894`,
+  `history_rows=25`, and last history step `12000`. The latest landed
+  validation row remains step `12000`: `val_lddt_ca=0.44818821775913237`,
+  FoldScore `0.41492343285679817`, dRMSD `10.427795261621474`, C-alpha RMSD
+  `13.995609036326409`, atom14 lDDT `0.4011345104277134`, GDT-HA
+  `0.16690864834561944`, GDT-TS `0.2596509027257562`, and predicted/true
+  C-alpha Rg `12.046402668476105 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `23:52:00` elapsed; GPU memory was about `45450 MiB`
+  with `2%` utilization during evaluation. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-12500 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T15:45Z E151 live sample: step-12500 validation remains in
+  progress and is advancing coherently. The local pulled status reported
+  `completed_step=12500`, active step `12500`, phase `evaluating`, active eval
+  batch `308 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.880736231803894`, `history_rows=25`, and last history step `12000`.
+  The latest landed validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-00:07:04` elapsed; GPU memory was about `45450 MiB` with
+  `3%` utilization during evaluation. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-12500 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T16:00Z E151 live sample: step-12500 validation remains in
+  progress and is advancing coherently. The local pulled status reported
+  `completed_step=12500`, active step `12500`, phase `evaluating`, active eval
+  batch `497 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.880736231803894`, `history_rows=25`, and last history step `12000`.
+  The latest landed validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-00:22:05` elapsed; GPU memory was about `45450 MiB` with
+  `92%` utilization during evaluation. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-12500 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T16:15Z E151 live sample: step-12500 validation remains in
+  progress and is advancing coherently. The local pulled status reported
+  `completed_step=12500`, active step `12500`, phase `evaluating`, active eval
+  batch `687 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.880736231803894`, `history_rows=25`, and last history step `12000`.
+  The latest landed validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-00:36:59` elapsed; GPU memory was about `45450 MiB` with
+  `30%` utilization during evaluation. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-12500 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T16:30Z E151 live sample: step-12500 validation remains in
+  progress and is close to completion. The local pulled status reported
+  `completed_step=12500`, active step `12500`, phase `evaluating`, active eval
+  batch `885 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.880736231803894`, `history_rows=25`, and last history step `12000`.
+  The latest landed validation row remains step `12000`:
+  `val_lddt_ca=0.44818821775913237`, FoldScore `0.41492343285679817`, dRMSD
+  `10.427795261621474`, C-alpha RMSD `13.995609036326409`, atom14 lDDT
+  `0.4011345104277134`, GDT-HA `0.16690864834561944`, GDT-TS
+  `0.2596509027257562`, and predicted/true C-alpha Rg
+  `12.046402668476105 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-00:52:01` elapsed; GPU memory was about `45450 MiB` with
+  `28%` utilization during evaluation. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-12500 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T16:45Z E151 live sample: the step-12500 validation row landed
+  and training resumed coherently. The local pulled status reported
+  `completed_step=12521`, active step `12522`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.498237818479538`, `history_rows=26`, and last history step `12500`.
+  Step 12500 reported `val_lddt_ca=0.4479508028626442`, FoldScore
+  `0.41901062923669813`, dRMSD `10.613194541096687`, C-alpha RMSD
+  `14.24897459089756`, atom14 lDDT `0.3992486073821783`, GDT-HA
+  `0.17019466833770275`, GDT-TS `0.2604387568384409`, and predicted/true
+  C-alpha Rg `12.337220246315002 / 16.30911695623398`. Versus step 12000,
+  FoldScore improved by `0.00408719637989996`, GDT-HA by
+  `0.0032860199920833055`, and GDT-TS by `0.0007878541126847272`; C-alpha
+  lDDT slipped by `0.00023741489648815284`, atom14 lDDT by
+  `0.0018859030455350978`, dRMSD worsened by `0.18539927947521306`, and
+  C-alpha RMSD worsened by `0.2533655545711522`. Trainer PID `34098`
+  remained alive after `1-01:07:08` elapsed; GPU memory was about
+  `45450 MiB` with `3%` utilization during the post-eval sample. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `12500`. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-01T17:00Z E151 live sample: training continued coherently after
+  the step-12500 validation row. The local pulled status reported
+  `completed_step=12580`, active step `12581`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.791687726974487`, `history_rows=26`, and last history step `12500`.
+  Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-01:23:38` elapsed; GPU memory was about `45450 MiB` with
+  `9%` utilization in the post-pull sample. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T17:15Z E151 live sample: training continued coherently after
+  the step-12500 validation row. The local pulled status reported
+  `completed_step=12629`, active step `12630`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.801133424043655`, `history_rows=26`, and last history step `12500`.
+  Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-01:37:02` elapsed; GPU memory was about `45450 MiB` with
+  `20%` utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T17:30Z E151 live sample: training continued coherently after
+  the step-12500 validation row. The local pulled status reported
+  `completed_step=12684`, active step `12685`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.6099873483181`, `history_rows=26`, and last history step `12500`.
+  Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-01:52:03` elapsed; GPU memory was about `45450 MiB` with
+  `5%` utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T17:45Z E151 live sample: training continued coherently after
+  the step-12500 validation row. The local pulled status reported
+  `completed_step=12740`, active step `12741`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.670715838670731`, `history_rows=26`, and last history step `12500`.
+  Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-02:07:02` elapsed; GPU memory was about `45450 MiB` with
+  `52%` utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T18:00Z E151 live sample: training continued coherently after
+  the step-12500 validation row. The local pulled status reported
+  `completed_step=12796`, active step `12797`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.401233494281769`, `history_rows=26`, and last history step `12500`.
+  Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-02:22:06` elapsed; GPU memory was about `45450 MiB` with
+  `87%` utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T18:15Z E151 live sample: training continued coherently before
+  the step-13000 validation window. The local pulled status reported
+  `completed_step=12849`, active step `12850`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.389587163925171`, `history_rows=26`, and last history step `12500`.
+  Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-02:37:09` elapsed; GPU memory was about `45450 MiB` with
+  `88%` utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T18:30Z E151 live sample: training continued coherently just
+  below the step-13000 validation window. The local pulled status reported
+  `completed_step=12901`, active step `12902`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.664325535297394`, `history_rows=26`, and last
+  history step `12500`. Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-02:52:09` elapsed; GPU memory was about `45450 MiB` with
+  `90%` utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-13000 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T18:45Z E151 live sample: training continued coherently just
+  below the step-13000 validation window. The local pulled status reported
+  `completed_step=12950`, active step `12951`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.71236577630043`, `history_rows=26`, and last history step `12500`.
+  Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-03:07:06` elapsed; GPU memory was about `45450 MiB` with
+  `82%` utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-13000 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T19:00Z E151 live sample: the run reached step `13000` and is
+  evaluating coherently. The local pulled status reported
+  `completed_step=13000`, active step `13000`, phase `evaluating`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.368380546569824`, `history_rows=26`, and last
+  history step `12500`; active eval batch counters had not been written yet.
+  Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-03:22:04` elapsed; GPU memory was about `45450 MiB` with
+  `87%` utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-13000 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T19:15Z E151 live sample: step-13000 evaluation is progressing
+  coherently. The local pulled status reported `completed_step=13000`, active
+  step `13000`, phase `evaluating`, active eval batch `199 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.368380546569824`,
+  `history_rows=26`, and last history step `12500`. Step 12500 remains the
+  latest landed validation row: `val_lddt_ca=0.4479508028626442`, FoldScore
+  `0.41901062923669813`, dRMSD `10.613194541096687`, C-alpha RMSD
+  `14.24897459089756`, atom14 lDDT `0.3992486073821783`, GDT-HA
+  `0.17019466833770275`, GDT-TS `0.2604387568384409`, and predicted/true
+  C-alpha Rg `12.337220246315002 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `1-03:37:19` elapsed; GPU memory was about
+  `45450 MiB` with `3%` utilization in the live sample. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `12500`. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until the step-13000 row lands, a
+  scored bundle appears, or an explicit terminal no-score outcome exists.
+- 2026-06-01T19:30Z E151 live sample: step-13000 evaluation continued
+  coherently. The local pulled status reported `completed_step=13000`, active
+  step `13000`, phase `evaluating`, active eval batch `400 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.368380546569824`,
+  `history_rows=26`, and last history step `12500`. Step 12500 remains the
+  latest landed validation row: `val_lddt_ca=0.4479508028626442`, FoldScore
+  `0.41901062923669813`, dRMSD `10.613194541096687`, C-alpha RMSD
+  `14.24897459089756`, atom14 lDDT `0.3992486073821783`, GDT-HA
+  `0.17019466833770275`, GDT-TS `0.2604387568384409`, and predicted/true
+  C-alpha Rg `12.337220246315002 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `1-03:52:15` elapsed; GPU memory was about
+  `45450 MiB` with `87%` utilization in the live sample. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `12500`. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until the step-13000 row lands, a
+  scored bundle appears, or an explicit terminal no-score outcome exists.
+- 2026-06-01T19:45Z E151 live sample: step-13000 evaluation continued
+  coherently. The local pulled status reported `completed_step=13000`, active
+  step `13000`, phase `evaluating`, active eval batch `591 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.368380546569824`,
+  `history_rows=26`, and last history step `12500`. Step 12500 remains the
+  latest landed validation row: `val_lddt_ca=0.4479508028626442`, FoldScore
+  `0.41901062923669813`, dRMSD `10.613194541096687`, C-alpha RMSD
+  `14.24897459089756`, atom14 lDDT `0.3992486073821783`, GDT-HA
+  `0.17019466833770275`, GDT-TS `0.2604387568384409`, and predicted/true
+  C-alpha Rg `12.337220246315002 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `1-04:08:30` elapsed; GPU memory was about
+  `45450 MiB` with `30%` utilization in the live sample. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `12500`. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until the step-13000 row lands, a
+  scored bundle appears, or an explicit terminal no-score outcome exists.
+- 2026-06-01T20:00Z E151 live sample: step-13000 evaluation continued
+  coherently. The local pulled status reported `completed_step=13000`, active
+  step `13000`, phase `evaluating`, active eval batch `784 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.368380546569824`,
+  `history_rows=26`, and last history step `12500`. Step 12500 remains the
+  latest landed validation row: `val_lddt_ca=0.4479508028626442`, FoldScore
+  `0.41901062923669813`, dRMSD `10.613194541096687`, C-alpha RMSD
+  `14.24897459089756`, atom14 lDDT `0.3992486073821783`, GDT-HA
+  `0.17019466833770275`, GDT-TS `0.2604387568384409`, and predicted/true
+  C-alpha Rg `12.337220246315002 / 16.30911695623398`. Trainer PID `34098`
+  remained alive after `1-04:22:08` elapsed; GPU memory was about
+  `45450 MiB` with `80%` utilization in the live sample. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `12500`. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until the step-13000 row lands, a
+  scored bundle appears, or an explicit terminal no-score outcome exists.
+- 2026-06-01T20:15Z E151 live sample: step-13000 evaluation continued
+  coherently and was nearly complete. The local pulled status reported
+  `completed_step=13000`, active step `13000`, phase `evaluating`, active eval
+  batch `968 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.368380546569824`, `history_rows=26`, and last history step `12500`.
+  Step 12500 remains the latest landed validation row:
+  `val_lddt_ca=0.4479508028626442`, FoldScore `0.41901062923669813`, dRMSD
+  `10.613194541096687`, C-alpha RMSD `14.24897459089756`, atom14 lDDT
+  `0.3992486073821783`, GDT-HA `0.17019466833770275`, GDT-TS
+  `0.2604387568384409`, and predicted/true C-alpha Rg
+  `12.337220246315002 / 16.30911695623398`. Trainer PID `34098` remained
+  alive after `1-04:37:07` elapsed; GPU memory was about `45450 MiB` with
+  `5%` utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `12500`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-13000 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T20:30Z E151 live sample: step-13000 validation landed and the
+  run resumed training coherently. The local pulled status reported
+  `completed_step=13051`, active step `13052`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.846587240695953`, `history_rows=27`, and last history step `13000`.
+  The step-13000 row reported `val_lddt_ca=0.44471022725105286`, FoldScore
+  `0.41580342534184456`, dRMSD `10.343714805066586`, C-alpha RMSD
+  `13.788368279695511`, atom14 lDDT `0.40120568954944613`, GDT-HA
+  `0.16590229741483928`, GDT-TS `0.261772046841681`, predicted/true C-alpha
+  Rg `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Versus step 12500, FoldScore fell by
+  `0.003207203894853572`, C-alpha lDDT fell by `0.0032405756115913564`, and
+  GDT-HA fell by `0.00429237092286347`; C-alpha RMSD improved by
+  `0.4606063112020493`, dRMSD improved by `0.26947973603010134`, atom14
+  lDDT improved by `0.0019570821672678096`, and GDT-TS improved by
+  `0.0013332900032400619`. Trainer PID `34098` remained alive after
+  `1-04:52:10` elapsed; GPU memory was about `45450 MiB` with `84%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T20:45Z E151 live sample: training continued coherently after the
+  landed step-13000 validation row. The local pulled status reported
+  `completed_step=13107`, active step `13108`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.535357892513275`, `history_rows=27`, and last history step `13000`.
+  The latest validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14
+  lDDT `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-05:07:07` elapsed; GPU memory was about `45450 MiB` with `88%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T21:00Z E151 live sample: training continued coherently after the
+  landed step-13000 validation row. The local pulled status reported
+  `completed_step=13164`, active step `13165`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.214859843254089`, `history_rows=27`, and last history step `13000`.
+  The latest validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14
+  lDDT `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-05:22:01` elapsed; GPU memory was about `45450 MiB` with `87%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T21:15Z E151 live sample: training continued coherently after the
+  landed step-13000 validation row and before the next step-13500 validation
+  window. The local pulled status reported `completed_step=13217`, active
+  step `13218`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.519784927368164`,
+  `history_rows=27`, and last history step `13000`. The latest validation row
+  remains step 13000: `val_lddt_ca=0.44471022725105286`, FoldScore
+  `0.41580342534184456`, dRMSD `10.343714805066586`, C-alpha RMSD
+  `13.788368279695511`, atom14 lDDT `0.40120568954944613`, GDT-HA
+  `0.16590229741483928`, GDT-TS `0.261772046841681`, predicted/true C-alpha
+  Rg `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-05:37:05` elapsed; GPU memory was about `45450 MiB` with `94%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T21:30Z E151 live sample: training continued coherently between
+  the landed step-13000 row and the next step-13500 validation window. The
+  local pulled status reported `completed_step=13271`, active step `13272`,
+  phase `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.568570464849472`, `history_rows=27`, and last history
+  step `13000`. The latest validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14
+  lDDT `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-05:52:07` elapsed; GPU memory was about `45450 MiB` with `93%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T21:45Z E151 live sample: training continued coherently and is
+  approaching the next step-13500 validation window. The local pulled status
+  reported `completed_step=13327`, active step `13328`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.436213970184326`, `history_rows=27`, and last history
+  step `13000`. The latest validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14
+  lDDT `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-06:07:06` elapsed; GPU memory was about `45450 MiB` with `89%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T22:00Z E151 live sample: training continued coherently and is
+  nearing the next step-13500 validation window. The local pulled status
+  reported `completed_step=13382`, active step `13383`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.338805913925171`, `history_rows=27`, and last history
+  step `13000`. The latest validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14
+  lDDT `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-06:22:23` elapsed; GPU memory was about `45450 MiB` with `84%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T22:15Z E151 live sample: training continued coherently and is
+  just short of the next step-13500 validation window. The local pulled status
+  reported `completed_step=13436`, active step `13437`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.6301610469818115`, `history_rows=27`, and last
+  history step `13000`. The latest validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14
+  lDDT `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-06:37:09` elapsed; GPU memory was about `45450 MiB` with `88%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T22:30Z E151 live sample: training continued coherently and is
+  effectively at the step-13500 validation boundary, though evaluation had not
+  started in the pulled status. The local pulled status reported
+  `completed_step=13492`, active step `13493`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.279202252626419`, `history_rows=27`, and last history step `13000`.
+  The latest validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14
+  lDDT `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-06:52:08` elapsed; GPU memory was about `45450 MiB` with `92%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-01T22:45Z E151 live sample: step-13500 evaluation is in progress
+  and coherent. The local pulled status reported `completed_step=13500`,
+  active step `13500`, phase `evaluating`, active eval batch `160 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.623633474111557`,
+  `history_rows=27`, and last history step `13000`. The latest landed
+  validation row remains step 13000: `val_lddt_ca=0.44471022725105286`,
+  FoldScore `0.41580342534184456`, dRMSD `10.343714805066586`, C-alpha RMSD
+  `13.788368279695511`, atom14 lDDT `0.40120568954944613`, GDT-HA
+  `0.16590229741483928`, GDT-TS `0.261772046841681`, predicted/true C-alpha
+  Rg `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-07:07:06` elapsed; GPU memory was about `45450 MiB` with `87%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-13500 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T23:00Z E151 live sample: step-13500 evaluation is still in
+  progress and coherent. The local pulled status reported
+  `completed_step=13500`, active step `13500`, phase `evaluating`, active eval
+  batch `362 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.623633474111557`, `history_rows=27`, and last history step `13000`.
+  The latest landed validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14 lDDT
+  `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-07:22:11` elapsed; GPU memory was about `45450 MiB` with `5%`
+  utilization in the live sample while evaluation was underway. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `13000`. Keep E151 running and
+  leave `EXPERIMENT_RESULTS.md` unchanged until the step-13500 row lands, a
+  scored bundle appears, or an explicit terminal no-score outcome exists.
+- 2026-06-01T23:15Z E151 live sample: step-13500 evaluation remains in
+  progress and coherent. The local pulled status reported
+  `completed_step=13500`, active step `13500`, phase `evaluating`, active eval
+  batch `543 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.623633474111557`, `history_rows=27`, and last history step `13000`.
+  The latest landed validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14 lDDT
+  `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-07:37:03` elapsed; GPU memory was about `45450 MiB` with `83%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-13500 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T23:30Z E151 live sample: step-13500 evaluation remains in
+  progress and coherent. The local pulled status reported
+  `completed_step=13500`, active step `13500`, phase `evaluating`, active eval
+  batch `744 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.623633474111557`, `history_rows=27`, and last history step `13000`.
+  The latest landed validation row remains step 13000:
+  `val_lddt_ca=0.44471022725105286`, FoldScore `0.41580342534184456`,
+  dRMSD `10.343714805066586`, C-alpha RMSD `13.788368279695511`, atom14 lDDT
+  `0.40120568954944613`, GDT-HA `0.16590229741483928`, GDT-TS
+  `0.261772046841681`, predicted/true C-alpha Rg
+  `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-07:52:26` elapsed; GPU memory was about `45450 MiB` with `5%`
+  utilization in the first live sample and the pulled status advanced during
+  sync. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-13500 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-01T23:45Z E151 live sample: step-13500 evaluation is nearly through
+  and still coherent. The local pulled status reported `completed_step=13500`,
+  active step `13500`, phase `evaluating`, active eval batch `927 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.623633474111557`,
+  `history_rows=27`, and last history step `13000`. The latest landed
+  validation row remains step 13000: `val_lddt_ca=0.44471022725105286`,
+  FoldScore `0.41580342534184456`, dRMSD `10.343714805066586`, C-alpha RMSD
+  `13.788368279695511`, atom14 lDDT `0.40120568954944613`, GDT-HA
+  `0.16590229741483928`, GDT-TS `0.261772046841681`, predicted/true C-alpha
+  Rg `12.009811900138855 / 16.30911695623398`, and val loss
+  `3.224207474946976`. Trainer PID `34098` remained alive after
+  `1-08:07:36` elapsed; GPU memory was about `45450 MiB` with `88%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13000`. Keep E151 running and leave `EXPERIMENT_RESULTS.md`
+  unchanged until the step-13500 row lands, a scored bundle appears, or an
+  explicit terminal no-score outcome exists.
+- 2026-06-02T00:00Z E151 live sample: the step-13500 validation row landed
+  coherently and the trainer resumed. The local pulled status reported
+  `completed_step=13535`, active step `13536`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.300016224384308`, `history_rows=28`, and last history step `13500`.
+  Step 13500 is now the strongest E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-08:22:39` elapsed; GPU memory was about `45450 MiB` with `90%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T00:15Z E151 live sample: training is progressing coherently after
+  the step-13500 validation improvement. The local pulled status reported
+  `completed_step=13591`, active step `13592`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.648269951343536`, `history_rows=28`, and last history step `13500`.
+  Step 13500 remains the strongest E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-08:37:52` elapsed; GPU memory was about `45450 MiB` with `86%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T00:30Z E151 live sample: training continues coherently after the
+  step-13500 validation improvement. The local pulled status reported
+  `completed_step=13643`, active step `13644`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.977341532707214`, `history_rows=28`, and last history step `13500`.
+  Step 13500 remains the strongest E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-08:52:35` elapsed; GPU memory was about `45450 MiB` with `48%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T00:45Z E151 live sample: training continues coherently after the
+  step-13500 validation improvement. The local pulled status reported
+  `completed_step=13698`, active step `13699`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.5980687737464905`, `history_rows=28`, and last history step `13500`.
+  Step 13500 remains the strongest E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-09:07:35` elapsed; GPU memory was about `45450 MiB` with `100%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T01:00Z E151 live sample: training continues coherently after the
+  step-13500 validation improvement. The local pulled status reported
+  `completed_step=13758`, active step `13759`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.44504776597023`, `history_rows=28`, and last history step `13500`.
+  Step 13500 remains the strongest E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-09:22:36` elapsed; GPU memory was about `45450 MiB` with `3%`
+  utilization in the live sample, and the pulled status advanced during sync.
+  The artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `13500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-02T01:15Z E151 live sample: training continues coherently after the
+  step-13500 validation improvement. The local pulled status reported
+  `completed_step=13813`, active step `13814`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.590009331703186`, `history_rows=28`, and last history step `13500`.
+  Step 13500 remains the strongest E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-09:37:35` elapsed; GPU memory was about `45450 MiB` with `100%`
+  utilization in the live sample, and the pulled status advanced during sync.
+  The artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `13500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-02T01:30Z E151 live sample: training continues coherently after the
+  step-13500 validation improvement and remains before the next step-14000
+  evaluation. The local pulled status reported `completed_step=13866`, active
+  step `13867`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.562643051147461`, `history_rows=28`, and last
+  history step `13500`. Step 13500 remains the strongest E151 continuation row
+  so far: `val_lddt_ca=0.459738107919693`, FoldScore
+  `0.42365825608372687`, dRMSD `10.182268865644932`, C-alpha RMSD
+  `13.617279356598853`, atom14 lDDT `0.40832986718416214`, GDT-HA
+  `0.17344804933667182`, GDT-TS `0.27208591351658107`, predicted/true
+  C-alpha Rg `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-09:52:34` elapsed; GPU memory was about `45450 MiB` with `3%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T01:45Z E151 live sample: training continues coherently after the
+  step-13500 validation improvement and is approaching the next step-14000
+  evaluation. The local pulled status reported `completed_step=13922`, active
+  step `13923`, phase `microbatch_start`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.222903251647949`,
+  `history_rows=28`, and last history step `13500`. Step 13500 remains the
+  strongest E151 continuation row so far: `val_lddt_ca=0.459738107919693`,
+  FoldScore `0.42365825608372687`, dRMSD `10.182268865644932`, C-alpha RMSD
+  `13.617279356598853`, atom14 lDDT `0.40832986718416214`, GDT-HA
+  `0.17344804933667182`, GDT-TS `0.27208591351658107`, predicted/true
+  C-alpha Rg `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-10:07:37` elapsed; GPU memory was about `45450 MiB` with `85%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T02:00Z E151 live sample: training continues coherently after the
+  step-13500 validation improvement and is just before the next step-14000
+  evaluation. The local pulled status reported `completed_step=13975`, active
+  step `13976`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.262787729501724`,
+  `history_rows=28`, and last history step `13500`. Step 13500 remains the
+  strongest E151 continuation row so far: `val_lddt_ca=0.459738107919693`,
+  FoldScore `0.42365825608372687`, dRMSD `10.182268865644932`, C-alpha RMSD
+  `13.617279356598853`, atom14 lDDT `0.40832986718416214`, GDT-HA
+  `0.17344804933667182`, GDT-TS `0.27208591351658107`, predicted/true
+  C-alpha Rg `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-10:22:32` elapsed; GPU memory was about `45450 MiB` with `92%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T02:15Z E151 live sample: the run has reached the step-14000
+  validation pass and remains coherent. The local pulled status reported
+  `completed_step=14000`, active step `14000`, phase `evaluating`, active eval
+  batch `125 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.573170602321625`, `history_rows=28`, and last history step `13500`.
+  Step 13500 remains the strongest completed E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-10:39:01` elapsed; GPU memory was about `45450 MiB` with `100%`
+  utilization in the live evaluation sample. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T02:30Z E151 live sample: the step-14000 validation pass is still
+  progressing coherently. The local pulled status reported
+  `completed_step=14000`, active step `14000`, phase `evaluating`, active eval
+  batch `300 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.573170602321625`, `history_rows=28`, and last history step `13500`.
+  Step 13500 remains the strongest completed E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-10:52:41` elapsed; GPU memory was about `45450 MiB` with `92%`
+  utilization in the live evaluation sample. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T02:45Z E151 live sample: the step-14000 validation pass is still
+  progressing coherently. The local pulled status reported
+  `completed_step=14000`, active step `14000`, phase `evaluating`, active eval
+  batch `494 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.573170602321625`, `history_rows=28`, and last history step `13500`.
+  Step 13500 remains the strongest completed E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-11:07:33` elapsed; GPU memory was about `45450 MiB` with `95%`
+  utilization in the live evaluation sample. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T03:00Z E151 live sample: the step-14000 validation pass is still
+  progressing coherently. The local pulled status reported
+  `completed_step=14000`, active step `14000`, phase `evaluating`, active eval
+  batch `705 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.573170602321625`, `history_rows=28`, and last history step `13500`.
+  Step 13500 remains the strongest completed E151 continuation row so far:
+  `val_lddt_ca=0.459738107919693`, FoldScore `0.42365825608372687`, dRMSD
+  `10.182268865644932`, C-alpha RMSD `13.617279356598853`, atom14 lDDT
+  `0.40832986718416214`, GDT-HA `0.17344804933667182`, GDT-TS
+  `0.27208591351658107`, predicted/true C-alpha Rg
+  `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-11:22:35` elapsed; GPU memory was about `45450 MiB` with `96%`
+  utilization in the live evaluation sample. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T03:15Z E151 live sample: the step-14000 validation pass is still
+  progressing coherently and is near completion. The local pulled status
+  reported `completed_step=14000`, active step `14000`, phase `evaluating`,
+  active eval batch `897 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.573170602321625`, `history_rows=28`, and last history
+  step `13500`. Step 13500 remains the strongest completed E151 continuation
+  row so far: `val_lddt_ca=0.459738107919693`, FoldScore
+  `0.42365825608372687`, dRMSD `10.182268865644932`, C-alpha RMSD
+  `13.617279356598853`, atom14 lDDT `0.40832986718416214`, GDT-HA
+  `0.17344804933667182`, GDT-TS `0.27208591351658107`, predicted/true
+  C-alpha Rg `12.097473777770997 / 16.30911695623398`, and val loss
+  `3.1438758741617203`. Trainer PID `34098` remained alive after
+  `1-11:37:35` elapsed; GPU memory was about `45450 MiB` with `94%`
+  utilization in the live evaluation sample. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `13500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T03:30Z E151 live sample: the step-14000 validation row landed
+  coherently and training resumed. The local pulled status reported
+  `completed_step=14027`, active step `14028`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.765279024839401`, `history_rows=29`, and last history step `14000`.
+  Step 14000 is now the strongest completed E151 continuation row so far:
+  `val_lddt_ca=0.46021930733323096`, FoldScore `0.428595109552145`, dRMSD
+  `10.060812330067158`, C-alpha RMSD `13.388133583664894`, atom14 lDDT
+  `0.4127006807029247`, GDT-HA `0.17651163583248855`, GDT-TS
+  `0.2799489717185497`, predicted/true C-alpha Rg
+  `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-11:52:44` elapsed; GPU memory was about `45450 MiB` with `100%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T03:45Z E151 live sample: training continues coherently after the
+  step-14000 validation improvement and remains before the next step-14500
+  evaluation. The local pulled status reported `completed_step=14081`, active
+  step `14082`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.330903023481369`,
+  `history_rows=29`, and last history step `14000`. Step 14000 remains the
+  strongest completed E151 continuation row so far: `val_lddt_ca=0.46021930733323096`,
+  FoldScore `0.428595109552145`, dRMSD `10.060812330067158`, C-alpha RMSD
+  `13.388133583664894`, atom14 lDDT `0.4127006807029247`, GDT-HA
+  `0.17651163583248855`, GDT-TS `0.2799489717185497`, predicted/true
+  C-alpha Rg `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-12:07:44` elapsed; GPU memory was about `45450 MiB` with `85%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T04:00Z E151 live sample: training continues coherently after the
+  step-14000 validation improvement and remains before the next step-14500
+  evaluation. The local pulled status reported `completed_step=14138`, active
+  step `14139`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.649198144674301`,
+  `history_rows=29`, and last history step `14000`. Step 14000 remains the
+  strongest completed E151 continuation row so far: `val_lddt_ca=0.46021930733323096`,
+  FoldScore `0.428595109552145`, dRMSD `10.060812330067158`, C-alpha RMSD
+  `13.388133583664894`, atom14 lDDT `0.4127006807029247`, GDT-HA
+  `0.17651163583248855`, GDT-TS `0.2799489717185497`, predicted/true
+  C-alpha Rg `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-12:22:38` elapsed; GPU memory was about `45450 MiB` with `85%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T04:15Z E151 live sample: training continues coherently after the
+  step-14000 validation improvement and remains before the next step-14500
+  evaluation. The local pulled status reported `completed_step=14196`, active
+  step `14197`, phase `microbatch_forward_start`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.450709342956543`,
+  `history_rows=29`, and last history step `14000`. Step 14000 remains the
+  strongest completed E151 continuation row so far: `val_lddt_ca=0.46021930733323096`,
+  FoldScore `0.428595109552145`, dRMSD `10.060812330067158`, C-alpha RMSD
+  `13.388133583664894`, atom14 lDDT `0.4127006807029247`, GDT-HA
+  `0.17651163583248855`, GDT-TS `0.2799489717185497`, predicted/true
+  C-alpha Rg `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-12:37:35` elapsed; GPU memory was about `45450 MiB` with `91%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T04:30Z E151 live sample: training continues coherently after the
+  step-14000 validation improvement and remains before the next step-14500
+  evaluation. The local pulled status reported `completed_step=14252`, active
+  step `14253`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.315303683280945`,
+  `history_rows=29`, and last history step `14000`. Step 14000 remains the
+  strongest completed E151 continuation row so far: `val_lddt_ca=0.46021930733323096`,
+  FoldScore `0.428595109552145`, dRMSD `10.060812330067158`, C-alpha RMSD
+  `13.388133583664894`, atom14 lDDT `0.4127006807029247`, GDT-HA
+  `0.17651163583248855`, GDT-TS `0.2799489717185497`, predicted/true
+  C-alpha Rg `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-12:52:36` elapsed; GPU memory was about `45450 MiB` with `94%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T04:45Z E151 live sample: training continues coherently after the
+  step-14000 validation improvement and remains before the next step-14500
+  evaluation. The local pulled status reported `completed_step=14310`, active
+  step `14311`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.773299843072891`,
+  `history_rows=29`, and last history step `14000`. Step 14000 remains the
+  strongest completed E151 continuation row so far: `val_lddt_ca=0.46021930733323096`,
+  FoldScore `0.428595109552145`, dRMSD `10.060812330067158`, C-alpha RMSD
+  `13.388133583664894`, atom14 lDDT `0.4127006807029247`, GDT-HA
+  `0.17651163583248855`, GDT-TS `0.2799489717185497`, predicted/true
+  C-alpha Rg `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-13:07:37` elapsed; GPU memory was about `45450 MiB` with `88%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T05:00Z E151 live sample: training continues coherently after the
+  step-14000 validation improvement and remains before the next step-14500
+  evaluation. The local pulled status reported `completed_step=14368`, active
+  step `14369`, phase `microbatch_forward_start`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.410619378089905`,
+  `history_rows=29`, and last history step `14000`. Step 14000 remains the
+  strongest completed E151 continuation row so far: `val_lddt_ca=0.46021930733323096`,
+  FoldScore `0.428595109552145`, dRMSD `10.060812330067158`, C-alpha RMSD
+  `13.388133583664894`, atom14 lDDT `0.4127006807029247`, GDT-HA
+  `0.17651163583248855`, GDT-TS `0.2799489717185497`, predicted/true
+  C-alpha Rg `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-13:22:34` elapsed; GPU memory was about `45450 MiB` with `91%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T05:15Z E151 live sample: training continues coherently after the
+  step-14000 validation improvement and is close to the next step-14500
+  evaluation. The local pulled status reported `completed_step=14422`, active
+  step `14423`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.583075523376465`,
+  `history_rows=29`, and last history step `14000`. Step 14000 remains the
+  strongest completed E151 continuation row so far: `val_lddt_ca=0.46021930733323096`,
+  FoldScore `0.428595109552145`, dRMSD `10.060812330067158`, C-alpha RMSD
+  `13.388133583664894`, atom14 lDDT `0.4127006807029247`, GDT-HA
+  `0.17651163583248855`, GDT-TS `0.2799489717185497`, predicted/true
+  C-alpha Rg `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-13:37:37` elapsed; GPU memory was about `45450 MiB` with `88%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T05:30Z E151 live sample: training continues coherently after the
+  step-14000 validation improvement and is just before the next step-14500
+  evaluation. The local pulled status reported `completed_step=14486`, active
+  step `14487`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.355685830116272`,
+  `history_rows=29`, and last history step `14000`. Step 14000 remains the
+  strongest completed E151 continuation row so far: `val_lddt_ca=0.46021930733323096`,
+  FoldScore `0.428595109552145`, dRMSD `10.060812330067158`, C-alpha RMSD
+  `13.388133583664894`, atom14 lDDT `0.4127006807029247`, GDT-HA
+  `0.17651163583248855`, GDT-TS `0.2799489717185497`, predicted/true
+  C-alpha Rg `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-13:54:32` elapsed; GPU memory was about `45450 MiB` with `82%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T05:45Z E151 live sample: step-14500 evaluation is in progress
+  and coherent. The local pulled status reported `completed_step=14500`,
+  active step `14500`, phase `evaluating`, active eval batch `126 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.343500733375549`,
+  `history_rows=29`, and last history step `14000`. Step 14000 remains the
+  strongest completed E151 continuation row so far: `val_lddt_ca=0.46021930733323096`,
+  FoldScore `0.428595109552145`, dRMSD `10.060812330067158`, C-alpha RMSD
+  `13.388133583664894`, atom14 lDDT `0.4127006807029247`, GDT-HA
+  `0.17651163583248855`, GDT-TS `0.2799489717185497`, predicted/true
+  C-alpha Rg `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-14:07:34` elapsed; GPU memory was about `45450 MiB` with `89%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T06:00Z E151 live sample: step-14500 evaluation remains in
+  progress and coherent. The local pulled status reported
+  `completed_step=14500`, active step `14500`, phase `evaluating`, active
+  eval batch `324 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.343500733375549`, `history_rows=29`, and last history step `14000`.
+  Step 14000 remains the strongest completed E151 continuation row so far:
+  `val_lddt_ca=0.46021930733323096`, FoldScore `0.428595109552145`, dRMSD
+  `10.060812330067158`, C-alpha RMSD `13.388133583664894`, atom14 lDDT
+  `0.4127006807029247`, GDT-HA `0.17651163583248855`, GDT-TS
+  `0.2799489717185497`, predicted/true C-alpha Rg
+  `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-14:22:36` elapsed; GPU memory was about `45450 MiB` with `87%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T06:15Z E151 live sample: step-14500 evaluation remains in
+  progress and coherent. The local pulled status reported
+  `completed_step=14500`, active step `14500`, phase `evaluating`, active
+  eval batch `524 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.343500733375549`, `history_rows=29`, and last history step `14000`.
+  Step 14000 remains the strongest completed E151 continuation row so far:
+  `val_lddt_ca=0.46021930733323096`, FoldScore `0.428595109552145`, dRMSD
+  `10.060812330067158`, C-alpha RMSD `13.388133583664894`, atom14 lDDT
+  `0.4127006807029247`, GDT-HA `0.17651163583248855`, GDT-TS
+  `0.2799489717185497`, predicted/true C-alpha Rg
+  `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-14:37:36` elapsed; GPU memory was about `45450 MiB` with `7%`
+  utilization in the live sample, and the eval counter advanced since the
+  previous heartbeat. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T06:30Z E151 live sample: step-14500 evaluation remains in
+  progress and coherent. The local pulled status reported
+  `completed_step=14500`, active step `14500`, phase `evaluating`, active
+  eval batch `722 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.343500733375549`, `history_rows=29`, and last history step `14000`.
+  Step 14000 remains the strongest completed E151 continuation row so far:
+  `val_lddt_ca=0.46021930733323096`, FoldScore `0.428595109552145`, dRMSD
+  `10.060812330067158`, C-alpha RMSD `13.388133583664894`, atom14 lDDT
+  `0.4127006807029247`, GDT-HA `0.17651163583248855`, GDT-TS
+  `0.2799489717185497`, predicted/true C-alpha Rg
+  `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-14:52:39` elapsed; GPU memory was about `45452 MiB` with `3%`
+  utilization in the live sample, and the eval counter advanced since the
+  previous heartbeat. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T06:45Z E151 live sample: step-14500 evaluation is nearly
+  complete and remains coherent. The local pulled status reported
+  `completed_step=14500`, active step `14500`, phase `evaluating`, active
+  eval batch `936 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.343500733375549`, `history_rows=29`, and last history step `14000`.
+  Step 14000 remains the strongest completed E151 continuation row so far:
+  `val_lddt_ca=0.46021930733323096`, FoldScore `0.428595109552145`, dRMSD
+  `10.060812330067158`, C-alpha RMSD `13.388133583664894`, atom14 lDDT
+  `0.4127006807029247`, GDT-HA `0.17651163583248855`, GDT-TS
+  `0.2799489717185497`, predicted/true C-alpha Rg
+  `12.286615623474122 / 16.30911695623398`, and val loss
+  `3.173533846974373`. Trainer PID `34098` remained alive after
+  `1-15:07:37` elapsed; GPU memory was about `45452 MiB` with `25%`
+  utilization in the live sample, and the eval counter advanced since the
+  previous heartbeat. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T07:00Z E151 live sample: the step-14500 validation row landed
+  coherently and training resumed. The local pulled status reported
+  `completed_step=14538`, active step `14539`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.449924826622009`,
+  `history_rows=30`, and last history step `14500`. Step 14500 is now the
+  strongest completed E151 continuation row so far by primary C-alpha lDDT:
+  `val_lddt_ca=0.4621276613473892`, FoldScore `0.4284872736036778`, dRMSD
+  `9.796565135866404`, C-alpha RMSD `13.444297909736633`, atom14 lDDT
+  `0.4088463173508644`, GDT-HA `0.17912531735375523`, GDT-TS
+  `0.2811791712194681`, predicted/true C-alpha Rg
+  `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. The primary metric and dRMSD improved over step
+  14000, while FoldScore is essentially flat and slightly lower than the
+  step-14000 row. Trainer PID `34098` remained alive after `1-15:22:34`
+  elapsed; GPU memory was about `45452 MiB` with `52%` utilization in the
+  live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T07:15Z E151 live sample: training continues coherently after the
+  step-14500 primary-metric improvement. The local pulled status reported
+  `completed_step=14596`, active step `14597`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.7670042514801025`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-15:37:35` elapsed; GPU memory was about `45452 MiB` with `3%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T07:30Z E151 live sample: training continues coherently after the
+  step-14500 primary-metric improvement. The local pulled status reported
+  `completed_step=14656`, active step `14657`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.063521921634674`,
+  `total_examples=117248`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-15:52:33` elapsed; GPU memory was about `45452 MiB` with `3%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T07:45Z E151 live sample: training continues coherently after the
+  step-14500 primary-metric improvement. The local pulled status reported
+  `completed_step=14716`, active step `14717`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.349907040596008`, `total_examples=117728`, `history_rows=30`, and last
+  history step `14500`. Step 14500 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT:
+  `val_lddt_ca=0.4621276613473892`, FoldScore `0.4284872736036778`, dRMSD
+  `9.796565135866404`, C-alpha RMSD `13.444297909736633`, atom14 lDDT
+  `0.4088463173508644`, GDT-HA `0.17912531735375523`, GDT-TS
+  `0.2811791712194681`, predicted/true C-alpha Rg
+  `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-16:07:34` elapsed; GPU memory was about `45452 MiB` with `87%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T08:00Z E151 live sample: training continues coherently after the
+  step-14500 primary-metric improvement and is approaching the next step-15000
+  validation. The local pulled status reported `completed_step=14774`, active
+  step `14775`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.647982984781265`,
+  `total_examples=118192`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-16:22:29` elapsed; GPU memory was about `45452 MiB` with `95%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T08:15Z E151 live sample: training continues coherently after the
+  step-14500 primary-metric improvement and is approaching the next step-15000
+  validation. The local pulled status reported `completed_step=14831`, active
+  step `14832`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.330042541027069`,
+  `total_examples=118648`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-16:37:32` elapsed; GPU memory was about `45452 MiB` with `7%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T08:30Z E151 live sample: training continues coherently after the
+  step-14500 primary-metric improvement and is close to the next step-15000
+  validation. The local pulled status reported `completed_step=14890`, active
+  step `14891`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.798802196979523`,
+  `total_examples=119120`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-16:52:34` elapsed; GPU memory was about `45452 MiB` with `21%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T08:45Z E151 live sample: training continues coherently after the
+  step-14500 primary-metric improvement and is just before the next step-15000
+  validation. The local pulled status reported `completed_step=14950`, active
+  step `14951`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.403271704912186`,
+  `total_examples=119600`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-17:07:35` elapsed; GPU memory was about `45452 MiB` with `99%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T09:00Z E151 live sample: step-15000 evaluation has started and
+  is coherent. The local pulled status reported `completed_step=15000`,
+  active step `15000`, phase `evaluating`, active eval batch `28 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.483152329921722`,
+  `total_examples=120000`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-17:22:30` elapsed; GPU memory was about `45452 MiB` with `95%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T09:15Z E151 live sample: step-15000 evaluation is progressing
+  coherently. The local pulled status reported `completed_step=15000`, active
+  step `15000`, phase `evaluating`, active eval batch `229 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.483152329921722`,
+  `total_examples=120000`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-17:37:33` elapsed; GPU memory was about `45452 MiB` with `7%`
+  utilization in the live sample, and the eval counter advanced from the
+  previous heartbeat. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T09:30Z E151 live sample: step-15000 evaluation is progressing
+  coherently. The local pulled status reported `completed_step=15000`, active
+  step `15000`, phase `evaluating`, active eval batch `442 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.483152329921722`,
+  `total_examples=120000`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-17:52:31` elapsed; GPU memory was about `45452 MiB` with `16%`
+  utilization in the live sample, and the eval counter advanced from the
+  previous heartbeat. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T09:45Z E151 live sample: step-15000 evaluation is progressing
+  coherently. The local pulled status reported `completed_step=15000`, active
+  step `15000`, phase `evaluating`, active eval batch `647 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.483152329921722`,
+  `total_examples=120000`, `history_rows=30`, and last history step `14500`.
+  Step 14500 remains the strongest completed E151 continuation row so far by
+  primary C-alpha lDDT: `val_lddt_ca=0.4621276613473892`, FoldScore
+  `0.4284872736036778`, dRMSD `9.796565135866404`, C-alpha RMSD
+  `13.444297909736633`, atom14 lDDT `0.4088463173508644`, GDT-HA
+  `0.17912531735375523`, GDT-TS `0.2811791712194681`, predicted/true
+  C-alpha Rg `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-18:07:32` elapsed; GPU memory was about `45452 MiB` with `86%`
+  utilization in the live sample, and the eval counter advanced from the
+  previous heartbeat. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T10:00Z E151 live sample: step-15000 evaluation is progressing
+  coherently and is nearing completion. The local pulled status reported
+  `completed_step=15000`, active step `15000`, phase `evaluating`, active
+  eval batch `860 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.483152329921722`, `total_examples=120000`, `history_rows=30`, and last
+  history step `14500`. Step 14500 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT:
+  `val_lddt_ca=0.4621276613473892`, FoldScore `0.4284872736036778`, dRMSD
+  `9.796565135866404`, C-alpha RMSD `13.444297909736633`, atom14 lDDT
+  `0.4088463173508644`, GDT-HA `0.17912531735375523`, GDT-TS
+  `0.2811791712194681`, predicted/true C-alpha Rg
+  `12.710552426338197 / 16.30911695623398`, and val loss
+  `3.1209509267807007`. Trainer PID `34098` remained alive after
+  `1-18:22:33` elapsed; GPU memory was about `45452 MiB` with `93%`
+  utilization in the live sample, and the eval counter advanced from the
+  previous heartbeat. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `14500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T10:15Z E151 live sample: the step-15000 validation row landed
+  coherently and training resumed. The local pulled status reported
+  `completed_step=15020`, active step `15021`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.535036593675613`, `total_examples=120160`, `history_rows=31`, and last
+  history step `15000`. Step 15000 is now the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Relative to step 14500, it improves the primary
+  metric, FoldScore, dRMSD, C-alpha RMSD, atom14 lDDT, GDT metrics, and moves
+  predicted C-alpha Rg toward the true validation average. Trainer PID
+  `34098` remained alive after `1-18:37:32` elapsed; GPU memory was about
+  `45452 MiB` with `94%` utilization in the live sample. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `15000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-02T10:30Z E151 live sample: post-step-15000 training continued
+  coherently. The local pulled status reported `completed_step=15079`, active
+  step `15080`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.382829815149307`,
+  `total_examples=120632`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-18:52:39` elapsed; GPU memory was about `45452 MiB` with `100%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T10:45Z E151 live sample: post-step-15000 training continued
+  coherently. The local pulled status reported `completed_step=15138`, active
+  step `15139`, phase `microbatch_forward_start`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.653232544660568`,
+  `total_examples=121104`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-19:07:39` elapsed; GPU memory was about `45452 MiB` with `94%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T11:00Z E151 live sample: post-step-15000 training continued
+  coherently. The local pulled status reported `completed_step=15195`, active
+  step `15196`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.497341811656952`,
+  `total_examples=121560`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-19:22:39` elapsed; GPU memory was about `45452 MiB` with `6%`
+  utilization in the live sample, but status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T11:15Z E151 live sample: post-step-15000 training continued
+  coherently. The local pulled status reported `completed_step=15252`, active
+  step `15253`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.8100226521492`,
+  `total_examples=122016`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-19:37:34` elapsed; GPU memory was about `45452 MiB` with `94%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T11:30Z E151 live sample: post-step-15000 training continued
+  coherently. The local pulled status reported `completed_step=15310`, active
+  step `15311`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.2179562747478485`,
+  `total_examples=122480`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-19:52:36` elapsed; GPU memory was about `45452 MiB` with `88%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T11:45Z E151 live sample: post-step-15000 training continued
+  coherently. The local pulled status reported `completed_step=15367`, active
+  step `15368`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.556681931018829`,
+  `total_examples=122936`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-20:07:34` elapsed; GPU memory was about `45452 MiB` with `89%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T12:00Z E151 live sample: post-step-15000 training continued
+  coherently. The local pulled status reported `completed_step=15425`, active
+  step `15426`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.275229781866074`,
+  `total_examples=123400`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-20:22:37` elapsed; GPU memory was about `45452 MiB` with `5%`
+  utilization in the live sample, but status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T12:15Z E151 live sample: post-step-15000 training continued
+  coherently. The local pulled status reported `completed_step=15485`, active
+  step `15486`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.6318448185920715`,
+  `total_examples=123880`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-20:37:39` elapsed; GPU memory was about `45452 MiB` with `54%`
+  utilization in the live sample. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T12:30Z E151 live sample: the step-15500 evaluation is in progress
+  and coherent. The local pulled status reported `completed_step=15500`,
+  active step `15500`, phase `evaluating`, active eval batch `161 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.124387830495834`,
+  `total_examples=124000`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-20:52:35` elapsed; GPU memory was about `45452 MiB` with `7%`
+  utilization in the live sample while evaluation was active, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T12:45Z E151 live sample: the step-15500 evaluation remains in
+  progress and coherent, with the eval counter advancing since the prior
+  heartbeat. The local pulled status reported `completed_step=15500`, active
+  step `15500`, phase `evaluating`, active eval batch `364 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.124387830495834`,
+  `total_examples=124000`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-21:07:41` elapsed; GPU memory was about `45452 MiB` with `8%`
+  utilization in the live sample while evaluation was active, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T13:00Z E151 live sample: the step-15500 evaluation is still in
+  progress and coherent, with the eval counter advancing since the prior
+  heartbeat. The local pulled status reported `completed_step=15500`, active
+  step `15500`, phase `evaluating`, active eval batch `573 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.124387830495834`,
+  `total_examples=124000`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-21:22:41` elapsed; GPU memory was about `45452 MiB` with `33%`
+  utilization in the live sample while evaluation was active, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T13:15Z E151 live sample: the step-15500 evaluation remains in
+  progress and coherent, with the eval counter advancing since the prior
+  heartbeat. The local pulled status reported `completed_step=15500`, active
+  step `15500`, phase `evaluating`, active eval batch `788 / 1000`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.124387830495834`,
+  `total_examples=124000`, `history_rows=31`, and last history step
+  `15000`. Step 15000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.47205819660425186`, FoldScore `0.43701653310656546`,
+  dRMSD `9.289497743427754`, C-alpha RMSD `12.776088594675064`, atom14 lDDT
+  `0.4188475891053677`, GDT-HA `0.1874709259159863`, GDT-TS
+  `0.29903801099210975`, predicted/true C-alpha Rg
+  `12.97583596944809 / 16.30911695623398`, and val loss
+  `3.1192925820350648`. Trainer PID `34098` remained alive after
+  `1-21:37:45` elapsed; GPU memory was about `45452 MiB` with `14%`
+  utilization in the live sample while evaluation was active, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T13:30Z E151 live sample: the first remote sample was near the end
+  of the step-15500 evaluation (`980 / 1000` eval batches), so a short
+  follow-up sample was taken. The step-15500 validation row landed coherently,
+  the checkpoint updated, and training resumed. The local pulled status after
+  the landed row reported `completed_step=15507`, active step `15508`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.446923851966858`, `total_examples=124056`,
+  `history_rows=32`, and last history step `15500`. Step 15500 returned:
+  `val_lddt_ca=0.4720005430877209`, FoldScore `0.4358240779042244`, dRMSD
+  `9.400342814832927`, C-alpha RMSD `12.744009859204292`, atom14 lDDT
+  `0.4185233435034752`, GDT-HA `0.19096635526791214`, GDT-TS
+  `0.3044213751256466`, predicted/true C-alpha Rg
+  `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore; relative to
+  step 15000, step 15500 improves val loss, C-alpha RMSD, GDT-HA, and GDT-TS
+  but is slightly lower on primary C-alpha lDDT, FoldScore, dRMSD, atom14
+  lDDT, and predicted C-alpha Rg. Trainer PID `34098` remained alive after
+  `1-21:55:11` elapsed; GPU memory was about `45452 MiB` with `89%`
+  utilization in the follow-up live sample. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T13:45Z E151 live sample: post-step-15500 training continued
+  coherently. The remote sample reported `completed_step=15554`, active step
+  `15555`; after the local status/history/log pull, the local status reported
+  `completed_step=15555`, active step `15556`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.3522709012031555`, `total_examples=124440`, `history_rows=32`, and last
+  history step `15500`. Step 15500 remains the latest completed validation
+  row: `val_lddt_ca=0.4720005430877209`, FoldScore `0.4358240779042244`,
+  dRMSD `9.400342814832927`, C-alpha RMSD `12.744009859204292`, atom14 lDDT
+  `0.4185233435034752`, GDT-HA `0.19096635526791214`, GDT-TS
+  `0.3044213751256466`, predicted/true C-alpha Rg
+  `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `1-22:07:42` elapsed; GPU memory was about
+  `45452 MiB` with `100%` utilization in the live sample, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T14:00Z E151 live sample: post-step-15500 training continued
+  coherently. The local pulled status reported `completed_step=15614`,
+  active step `15615`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.578878253698349`,
+  `total_examples=124912`, `history_rows=32`, and last history step
+  `15500`. Step 15500 remains the latest completed validation row:
+  `val_lddt_ca=0.4720005430877209`, FoldScore `0.4358240779042244`, dRMSD
+  `9.400342814832927`, C-alpha RMSD `12.744009859204292`, atom14 lDDT
+  `0.4185233435034752`, GDT-HA `0.19096635526791214`, GDT-TS
+  `0.3044213751256466`, predicted/true C-alpha Rg
+  `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `1-22:22:39` elapsed; GPU memory was about
+  `45452 MiB` with `83%` utilization in the live sample, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T14:05Z E151 follow-up sample: post-step-15500 training continued
+  coherently. The remote sample reported `completed_step=15625`, active step
+  `15626`; after the local status/history/log pull, the local status reported
+  `completed_step=15626`, active step `15627`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.8034064173698425`, `total_examples=125008`, `history_rows=32`, and last
+  history step `15500`. Step 15500 remains the latest completed validation
+  row: `val_lddt_ca=0.4720005430877209`, FoldScore `0.4358240779042244`,
+  dRMSD `9.400342814832927`, C-alpha RMSD `12.744009859204292`, atom14 lDDT
+  `0.4185233435034752`, GDT-HA `0.19096635526791214`, GDT-TS
+  `0.3044213751256466`, predicted/true C-alpha Rg
+  `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `1-22:25:40` elapsed; GPU memory was about
+  `45452 MiB` with `4%` utilization in the live sample, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T14:15Z E151 live sample: post-step-15500 training continued
+  coherently between scheduled evaluations. The remote sample reported
+  `completed_step=15673`, active step `15674`; after the local
+  status/history/log pull, the local status reported `completed_step=15675`,
+  active step `15676`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.573850303888321`,
+  `total_examples=125400`, `history_rows=32`, and last history step `15500`.
+  Step 15500 remains the latest completed validation row:
+  `val_lddt_ca=0.4720005430877209`, FoldScore `0.4358240779042244`, dRMSD
+  `9.400342814832927`, C-alpha RMSD `12.744009859204292`, atom14 lDDT
+  `0.4185233435034752`, GDT-HA `0.19096635526791214`, GDT-TS
+  `0.3044213751256466`, predicted/true C-alpha Rg
+  `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `1-22:37:41` elapsed; GPU memory was about
+  `45452 MiB` with `13%` utilization in the live sample, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T14:30Z E151 live sample: post-step-15500 training continued
+  coherently between scheduled evaluations. The remote sample reported
+  `completed_step=15733`, active step `15734`; after the local
+  status/history/log pull, the local status reported `completed_step=15734`,
+  active step `15735`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.4269923865795135`,
+  `total_examples=125872`, `history_rows=32`, and last history step `15500`.
+  Step 15500 remains the latest completed validation row:
+  `val_lddt_ca=0.4720005430877209`, FoldScore `0.4358240779042244`, dRMSD
+  `9.400342814832927`, C-alpha RMSD `12.744009859204292`, atom14 lDDT
+  `0.4185233435034752`, GDT-HA `0.19096635526791214`, GDT-TS
+  `0.3044213751256466`, predicted/true C-alpha Rg
+  `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `1-22:52:41` elapsed; GPU memory was about
+  `45452 MiB` with `100%` utilization in the live sample, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T14:45Z E151 live sample: post-step-15500 training continued
+  coherently between scheduled evaluations. The remote and local pulled
+  status reported `completed_step=15790`, active step `15791`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.401656657457352`, `total_examples=126320`,
+  `history_rows=32`, and last history step `15500`. Step 15500 remains the
+  latest completed validation row: `val_lddt_ca=0.4720005430877209`,
+  FoldScore `0.4358240779042244`, dRMSD `9.400342814832927`, C-alpha RMSD
+  `12.744009859204292`, atom14 lDDT `0.4185233435034752`, GDT-HA
+  `0.19096635526791214`, GDT-TS `0.3044213751256466`, predicted/true
+  C-alpha Rg `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `1-23:07:39` elapsed; GPU memory was about
+  `45454 MiB` with `93%` utilization in the live sample, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T15:00Z E151 live sample: post-step-15500 training continued
+  coherently, now close to the next scheduled evaluation boundary. The remote
+  sample reported `completed_step=15849`, active step `15850`, phase
+  `microbatch_forward_start`; after the local status/history/log pull, the
+  local status reported `completed_step=15850`, active step `15851`, phase
+  `microbatch_backward_start`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.515518933534622`, `total_examples=126800`,
+  `history_rows=32`, and last history step `15500`. Step 15500 remains the
+  latest completed validation row: `val_lddt_ca=0.4720005430877209`,
+  FoldScore `0.4358240779042244`, dRMSD `9.400342814832927`, C-alpha RMSD
+  `12.744009859204292`, atom14 lDDT `0.4185233435034752`, GDT-HA
+  `0.19096635526791214`, GDT-TS `0.3044213751256466`, predicted/true
+  C-alpha Rg `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `1-23:22:42` elapsed; GPU memory was about
+  `45454 MiB` with `3%` utilization in the live sample, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T15:15Z E151 live sample: post-step-15500 training continued
+  coherently and has not yet entered the step-16000 validation. The remote
+  sample reported `completed_step=15907`, active step `15908`, phase
+  `microbatch_backward_start`; after the local status/history/log pull, the
+  local status reported `completed_step=15908`, active step `15909`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.352199018001556`, `total_examples=127264`,
+  `history_rows=32`, and last history step `15500`. Step 15500 remains the
+  latest completed validation row: `val_lddt_ca=0.4720005430877209`,
+  FoldScore `0.4358240779042244`, dRMSD `9.400342814832927`, C-alpha RMSD
+  `12.744009859204292`, atom14 lDDT `0.4185233435034752`, GDT-HA
+  `0.19096635526791214`, GDT-TS `0.3044213751256466`, predicted/true
+  C-alpha Rg `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `1-23:37:47` elapsed; GPU memory was about
+  `45454 MiB` with `89%` utilization in the live sample, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T15:30Z E151 live sample: post-step-15500 training continued
+  coherently and is still just short of the step-16000 validation. The remote
+  sample reported `completed_step=15962`, active step `15963`, phase
+  `microbatch_done`; after the local status/history/log pull, the local
+  status reported `completed_step=15963`, active step `15964`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.381681263446808`, `total_examples=127704`,
+  `history_rows=32`, and last history step `15500`. Step 15500 remains the
+  latest completed validation row: `val_lddt_ca=0.4720005430877209`,
+  FoldScore `0.4358240779042244`, dRMSD `9.400342814832927`, C-alpha RMSD
+  `12.744009859204292`, atom14 lDDT `0.4185233435034752`, GDT-HA
+  `0.19096635526791214`, GDT-TS `0.3044213751256466`, predicted/true
+  C-alpha Rg `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `1-23:52:39` elapsed; GPU memory was about
+  `45454 MiB` with `52%` utilization in the live sample, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `15500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T15:45Z E151 live sample: the step-16000 validation is now
+  underway and coherent. The remote and local pulled status reported
+  `completed_step=16000`, active step `16000`, phase `evaluating`, active eval
+  batch `70 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.527289688587189`, `total_examples=128000`, `history_rows=32`, and last
+  completed history step `15500`. Step 15500 remains the latest completed
+  validation row: `val_lddt_ca=0.4720005430877209`, FoldScore
+  `0.4358240779042244`, dRMSD `9.400342814832927`, C-alpha RMSD
+  `12.744009859204292`, atom14 lDDT `0.4185233435034752`, GDT-HA
+  `0.19096635526791214`, GDT-TS `0.3044213751256466`, predicted/true
+  C-alpha Rg `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `2-00:07:41` elapsed; GPU memory was about
+  `45454 MiB` with `10%` utilization in the live sample while evaluation was
+  active, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `15500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-02T16:00Z E151 live sample: the step-16000 validation remains
+  underway and coherent, with the eval counter advancing since the prior
+  heartbeat. The remote sample reported active eval batch `274 / 1000`; after
+  the local status/history/log pull, the local status reported
+  `completed_step=16000`, active step `16000`, phase `evaluating`, active eval
+  batch `289 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.527289688587189`, `total_examples=128000`, `history_rows=32`, and last
+  completed history step `15500`. Step 15500 remains the latest completed
+  validation row: `val_lddt_ca=0.4720005430877209`, FoldScore
+  `0.4358240779042244`, dRMSD `9.400342814832927`, C-alpha RMSD
+  `12.744009859204292`, atom14 lDDT `0.4185233435034752`, GDT-HA
+  `0.19096635526791214`, GDT-TS `0.3044213751256466`, predicted/true
+  C-alpha Rg `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `2-00:22:42` elapsed; GPU memory was about
+  `45454 MiB` with `89%` utilization in the live sample while evaluation was
+  active, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `15500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-02T16:15Z E151 live sample: the step-16000 validation remains
+  underway and coherent, with the eval counter advancing since the prior
+  heartbeat. The remote and local pulled status reported `completed_step=16000`,
+  active step `16000`, phase `evaluating`, active eval batch `481 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.527289688587189`,
+  `total_examples=128000`, `history_rows=32`, and last completed history
+  step `15500`. Step 15500 remains the latest completed validation row:
+  `val_lddt_ca=0.4720005430877209`, FoldScore `0.4358240779042244`, dRMSD
+  `9.400342814832927`, C-alpha RMSD `12.744009859204292`, atom14 lDDT
+  `0.4185233435034752`, GDT-HA `0.19096635526791214`, GDT-TS
+  `0.3044213751256466`, predicted/true C-alpha Rg
+  `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `2-00:37:41` elapsed; GPU memory was about
+  `45454 MiB` with `95%` utilization in the live sample while evaluation was
+  active, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `15500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-02T16:30Z E151 live sample: the step-16000 validation remains
+  underway and coherent, with the eval counter advancing again since the prior
+  heartbeat. The remote sample reported active eval batch `685 / 1000`; after
+  the local status/history/log pull, the local status reported
+  `completed_step=16000`, active step `16000`, phase `evaluating`, active eval
+  batch `699 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.527289688587189`, `total_examples=128000`, `history_rows=32`, and last
+  completed history step `15500`. Step 15500 remains the latest completed
+  validation row: `val_lddt_ca=0.4720005430877209`, FoldScore
+  `0.4358240779042244`, dRMSD `9.400342814832927`, C-alpha RMSD
+  `12.744009859204292`, atom14 lDDT `0.4185233435034752`, GDT-HA
+  `0.19096635526791214`, GDT-TS `0.3044213751256466`, predicted/true
+  C-alpha Rg `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `2-00:52:41` elapsed; GPU memory was about
+  `45454 MiB` with `89%` utilization in the live sample while evaluation was
+  active, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `15500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-02T16:45Z E151 live sample: the step-16000 validation remains
+  underway and coherent, now close to completing the scheduled eval. The
+  remote and local pulled status reported `completed_step=16000`, active step
+  `16000`, phase `evaluating`, active eval batch `882 / 1000`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.527289688587189`, `total_examples=128000`,
+  `history_rows=32`, and last completed history step `15500`. Step 15500
+  remains the latest completed validation row: `val_lddt_ca=0.4720005430877209`,
+  FoldScore `0.4358240779042244`, dRMSD `9.400342814832927`, C-alpha RMSD
+  `12.744009859204292`, atom14 lDDT `0.4185233435034752`, GDT-HA
+  `0.19096635526791214`, GDT-TS `0.3044213751256466`, predicted/true
+  C-alpha Rg `12.921372354984284 / 16.30911695623398`, and val loss
+  `3.114298886060715`. Step 15000 remains the strongest completed E151
+  continuation row so far by primary C-alpha lDDT and FoldScore. Trainer PID
+  `34098` remained alive after `2-01:07:35` elapsed; GPU memory was about
+  `45454 MiB` with `88%` utilization in the live sample while evaluation was
+  active, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `15500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-02T17:00Z E151 live sample: the step-16000 validation row landed
+  coherently and training resumed. The remote sample reported
+  `completed_step=16020`, active step `16021`, phase `microbatch_done`, active
+  microbatch `1 / 8`; after the local status/history/log pull, the local
+  status reported `completed_step=16021`, active step `16022`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.220537930727005`, `total_examples=128168`,
+  `history_rows=33`, and last completed history step `16000`. Step 16000 is
+  the new strongest completed E151 continuation row so far by primary C-alpha
+  lDDT and FoldScore: `val_lddt_ca=0.4771670460402965`, FoldScore
+  `0.43844266986846925`, dRMSD `9.452204424679278`, C-alpha RMSD
+  `12.684987467825414`, atom14 lDDT `0.42456464436650276`, GDT-HA
+  `0.19091587989777326`, GDT-TS `0.3062974231764674`, predicted/true
+  C-alpha Rg `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Relative to step 15500, it improves primary C-alpha
+  lDDT, FoldScore, val loss, C-alpha RMSD, atom14 lDDT, and GDT-TS, while
+  dRMSD, GDT-HA, and predicted C-alpha Rg moved slightly backward. Trainer PID
+  `34098` remained alive after `2-01:22:35` elapsed; GPU memory was about
+  `45454 MiB` with `100%` utilization in the live sample after training
+  resumed, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `16000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-02T17:15Z E151 live sample: post-step-16000 training continued
+  coherently after the new best validation row. The remote sample reported
+  `completed_step=16067`, active step `16068`, phase `microbatch_done`, active
+  microbatch `1 / 8`; after the local status/history/log pull, the local
+  status reported `completed_step=16068`, active step `16069`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.601327031850815`, `total_examples=128544`,
+  `history_rows=33`, and last completed history step `16000`. Step 16000
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.4771670460402965`, FoldScore
+  `0.43844266986846925`, dRMSD `9.452204424679278`, C-alpha RMSD
+  `12.684987467825414`, atom14 lDDT `0.42456464436650276`, GDT-HA
+  `0.19091587989777326`, GDT-TS `0.3062974231764674`, predicted/true
+  C-alpha Rg `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-01:37:41` elapsed; GPU memory was about `45454 MiB` with `81%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T17:30Z E151 live sample: post-step-16000 training continued
+  coherently toward the next scheduled evaluation. The remote and local pulled
+  status reported `completed_step=16117`, active step `16118`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.327884465456009`, `total_examples=128936`,
+  `history_rows=33`, and last completed history step `16000`. Step 16000
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.4771670460402965`, FoldScore
+  `0.43844266986846925`, dRMSD `9.452204424679278`, C-alpha RMSD
+  `12.684987467825414`, atom14 lDDT `0.42456464436650276`, GDT-HA
+  `0.19091587989777326`, GDT-TS `0.3062974231764674`, predicted/true
+  C-alpha Rg `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-01:52:53` elapsed; GPU memory was about `45454 MiB` with `80%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T17:45Z E151 live sample: post-step-16000 training continued
+  coherently toward the step-16500 evaluation. The remote sample reported
+  `completed_step=16163`, active step `16164`, phase `microbatch_done`, active
+  microbatch `1 / 8`; after the local status/history/log pull, the local
+  status reported `completed_step=16164`, active step `16165`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.322550743818283`, `total_examples=129312`,
+  `history_rows=33`, and last completed history step `16000`. Step 16000
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.4771670460402965`, FoldScore
+  `0.43844266986846925`, dRMSD `9.452204424679278`, C-alpha RMSD
+  `12.684987467825414`, atom14 lDDT `0.42456464436650276`, GDT-HA
+  `0.19091587989777326`, GDT-TS `0.3062974231764674`, predicted/true
+  C-alpha Rg `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-02:07:36` elapsed; GPU memory was about `45454 MiB` with `90%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T18:00Z E151 live sample: post-step-16000 training continued
+  coherently toward the step-16500 evaluation. The remote and local pulled
+  status reported `completed_step=16206`, active step `16207`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.127996444702148`, `total_examples=129648`,
+  `history_rows=33`, and last completed history step `16000`. Step 16000
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.4771670460402965`, FoldScore
+  `0.43844266986846925`, dRMSD `9.452204424679278`, C-alpha RMSD
+  `12.684987467825414`, atom14 lDDT `0.42456464436650276`, GDT-HA
+  `0.19091587989777326`, GDT-TS `0.3062974231764674`, predicted/true
+  C-alpha Rg `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-02:22:45` elapsed; GPU memory was about `45454 MiB` with `3%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T18:15Z E151 live sample: post-step-16000 training continued
+  coherently and is approaching the step-16500 evaluation boundary. The remote
+  and local pulled status reported `completed_step=16247`, active step
+  `16248`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.414624899625778`, `total_examples=129976`,
+  `history_rows=33`, and last completed history step `16000`. Step 16000
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.4771670460402965`, FoldScore
+  `0.43844266986846925`, dRMSD `9.452204424679278`, C-alpha RMSD
+  `12.684987467825414`, atom14 lDDT `0.42456464436650276`, GDT-HA
+  `0.19091587989777326`, GDT-TS `0.3062974231764674`, predicted/true
+  C-alpha Rg `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-02:37:37` elapsed; GPU memory was about `45454 MiB` with `83%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T18:30Z E151 live sample: post-step-16000 training continued
+  coherently toward the step-16500 evaluation boundary. The remote sample
+  reported `completed_step=16287`, active step `16288`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull, the local status reported `completed_step=16291`,
+  active step `16292`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.581437438726425`,
+  `total_examples=130328`, `history_rows=33`, and last completed history step
+  `16000`. Step 16000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-02:52:36` elapsed; GPU memory was about `45454 MiB` with `79%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T18:45Z E151 live sample: post-step-16000 training continued
+  coherently toward the step-16500 evaluation boundary. The remote sample
+  reported `completed_step=16330`, active step `16331`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull, the local status reported `completed_step=16331`,
+  active step `16332`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.671087056398392`,
+  `total_examples=130648`, `history_rows=33`, and last completed history step
+  `16000`. Step 16000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-03:07:40` elapsed; GPU memory was about `45454 MiB` with `98%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T19:00Z E151 live sample: post-step-16000 training continued
+  coherently toward the step-16500 evaluation boundary. The remote sample
+  reported `completed_step=16374`, active step `16375`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull, the local status reported `completed_step=16375`,
+  active step `16376`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.34767746925354`,
+  `total_examples=131000`, `history_rows=33`, and last completed history step
+  `16000`. Step 16000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-03:22:40` elapsed; GPU memory was about `45454 MiB` with `78%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T19:15Z E151 live sample: post-step-16000 training continued
+  coherently toward the step-16500 evaluation boundary. The remote sample
+  reported `completed_step=16417`, active step `16418`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull, the local status reported `completed_step=16418`,
+  active step `16419`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.563318192958832`,
+  `total_examples=131344`, `history_rows=33`, and last completed history step
+  `16000`. Step 16000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-03:37:38` elapsed; GPU memory was about `45454 MiB` with `4%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T19:30Z E151 live sample: post-step-16000 training continued
+  coherently toward the step-16500 evaluation boundary. The remote sample
+  reported `completed_step=16457`, active step `16458`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull, the local status reported `completed_step=16458`,
+  active step `16459`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.746938139200211`,
+  `total_examples=131664`, `history_rows=33`, and last completed history step
+  `16000`. Step 16000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-03:52:39` elapsed; GPU memory was about `45454 MiB` with `83%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T19:45Z E151 live sample: post-step-16000 training reached the
+  step-16500 evaluation boundary but the new validation row has not started or
+  landed yet. The remote sample reported `completed_step=16498`, active step
+  `16499`, phase `microbatch_done`, active microbatch `1 / 8`; after the
+  local status/history/log pull, the local status reported
+  `completed_step=16499`, active step `16500`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.529368281364441`, `total_examples=131992`, `history_rows=33`, and last
+  completed history step `16000`. Step 16000 remains the strongest completed
+  E151 continuation row so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-04:07:34` elapsed; GPU memory was about `45454 MiB` with `3%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T20:00Z E151 live sample: the step-16500 validation is now
+  underway and coherent. The remote and local pulled status reported
+  `completed_step=16500`, active step `16500`, phase `evaluating`, active eval
+  batch `157 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.471659481525421`, `total_examples=132000`, `history_rows=33`, and last
+  completed history step `16000`. Step 16000 remains the strongest completed
+  E151 continuation row so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-04:22:45` elapsed; GPU memory was about `45454 MiB` with `19%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T20:15Z E151 live sample: the step-16500 validation remains
+  underway and coherent, with the eval counter advancing since the prior
+  heartbeat. The remote and local pulled status reported
+  `completed_step=16500`, active step `16500`, phase `evaluating`, active eval
+  batch `306 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.471659481525421`, `total_examples=132000`, `history_rows=33`, and last
+  completed history step `16000`. Step 16000 remains the strongest completed
+  E151 continuation row so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-04:37:40` elapsed; GPU memory was about `45454 MiB` with `57%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T20:30Z E151 live sample: the step-16500 validation remains
+  underway and coherent, with the eval counter advancing again since the
+  prior heartbeat. The remote and local pulled status reported
+  `completed_step=16500`, active step `16500`, phase `evaluating`, active eval
+  batch `461 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.471659481525421`, `total_examples=132000`, `history_rows=33`, and last
+  completed history step `16000`. Step 16000 remains the strongest completed
+  E151 continuation row so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-04:52:37` elapsed; GPU memory was about `45454 MiB` with `99%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T20:45Z E151 live sample: the step-16500 validation remains
+  underway and coherent, with the eval counter continuing to advance. The
+  remote and local pulled status reported `completed_step=16500`, active step
+  `16500`, phase `evaluating`, active eval batch `615 / 1000`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.471659481525421`, `total_examples=132000`,
+  `history_rows=33`, and last completed history step `16000`. Step 16000
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.4771670460402965`, FoldScore
+  `0.43844266986846925`, dRMSD `9.452204424679278`, C-alpha RMSD
+  `12.684987467825414`, atom14 lDDT `0.42456464436650276`, GDT-HA
+  `0.19091587989777326`, GDT-TS `0.3062974231764674`, predicted/true
+  C-alpha Rg `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-05:07:34` elapsed; GPU memory was about `45454 MiB` with `100%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T21:00Z E151 live sample: the step-16500 validation remains
+  underway and coherent, with the eval counter continuing to advance. The
+  remote sample reported active eval batch `779 / 1000`; after the local
+  status/history/log pull, the local status reported `completed_step=16500`,
+  active step `16500`, phase `evaluating`, active eval batch `791 / 1000`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.471659481525421`,
+  `total_examples=132000`, `history_rows=33`, and last completed history step
+  `16000`. Step 16000 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.4771670460402965`, FoldScore `0.43844266986846925`, dRMSD
+  `9.452204424679278`, C-alpha RMSD `12.684987467825414`, atom14 lDDT
+  `0.42456464436650276`, GDT-HA `0.19091587989777326`, GDT-TS
+  `0.3062974231764674`, predicted/true C-alpha Rg
+  `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-05:22:36` elapsed; GPU memory was about `45454 MiB` with `45%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T21:15Z E151 live sample: the step-16500 validation remains
+  underway and coherent, with the eval counter nearing completion. The remote
+  and local pulled status reported `completed_step=16500`, active step
+  `16500`, phase `evaluating`, active eval batch `926 / 1000`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.471659481525421`, `total_examples=132000`,
+  `history_rows=33`, and last completed history step `16000`. Step 16000
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.4771670460402965`, FoldScore
+  `0.43844266986846925`, dRMSD `9.452204424679278`, C-alpha RMSD
+  `12.684987467825414`, atom14 lDDT `0.42456464436650276`, GDT-HA
+  `0.19091587989777326`, GDT-TS `0.3062974231764674`, predicted/true
+  C-alpha Rg `12.652762608051301 / 16.30911695623398`, and val loss
+  `3.1120715342760086`. Trainer PID `34098` remained alive after
+  `2-05:37:44` elapsed; GPU memory was about `45454 MiB` with `3%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T21:30Z E151 live sample: the step-16500 validation row landed
+  coherently and post-eval training resumed. The remote sample reported
+  `completed_step=16520`, active step `16521`, phase `microbatch_done`,
+  active microbatch `1 / 8`; after the local status/history/log pull, local
+  status reported `completed_step=16521`, active step `16522`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.153515070676804`, `total_examples=132168`,
+  `history_rows=34`, and last completed history step `16500`. Step 16500 is
+  the new strongest completed E151 continuation row so far by primary C-alpha
+  lDDT: `val_lddt_ca=0.4807993733584881`, FoldScore
+  `0.43731331479549407`, dRMSD `9.63475545334816`, C-alpha RMSD
+  `12.624373125195504`, atom14 lDDT `0.4286567634344101`, GDT-HA
+  `0.1926652747169137`, GDT-TS `0.30520484745502474`, predicted/true
+  C-alpha Rg `12.199821829795837 / 16.30911695623398`, and val loss
+  `3.0976853214502333`. Relative to step 16000, it improves primary C-alpha
+  lDDT, val loss, C-alpha RMSD, atom14 lDDT, and GDT-HA, while FoldScore,
+  dRMSD, GDT-TS, and predicted C-alpha Rg moved backward; step 16000 still
+  holds the E151 FoldScore best at `0.43844266986846925`. Trainer PID
+  `34098` remained alive after `2-05:52:40` elapsed; GPU memory was about
+  `45454 MiB` with `100%` utilization in the live sample, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T21:45Z E151 live sample: post-step-16500 training continued
+  coherently toward the next scheduled evaluation. The remote sample reported
+  `completed_step=16565`, active step `16566`, phase `microbatch_start`,
+  active microbatch `1 / 8`; after the local status/history/log pull, local
+  status reported `completed_step=16565`, active step `16566`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.358866393566132`, `total_examples=132520`,
+  `history_rows=34`, and last completed history step `16500`. Step 16500
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT: `val_lddt_ca=0.4807993733584881`, FoldScore
+  `0.43731331479549407`, dRMSD `9.63475545334816`, C-alpha RMSD
+  `12.624373125195504`, atom14 lDDT `0.4286567634344101`, GDT-HA
+  `0.1926652747169137`, GDT-TS `0.30520484745502474`, predicted/true
+  C-alpha Rg `12.199821829795837 / 16.30911695623398`, and val loss
+  `3.0976853214502333`. Step 16000 still holds the E151 FoldScore best at
+  `0.43844266986846925`. Trainer PID `34098` remained alive after
+  `2-06:07:38` elapsed; GPU memory was about `45454 MiB` with `3%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T22:00Z E151 live sample: post-step-16500 training continued
+  coherently toward the next scheduled evaluation. The remote sample reported
+  `completed_step=16607`, active step `16608`, phase `microbatch_done`,
+  active microbatch `1 / 8`; after the local status/history/log pull, local
+  status reported `completed_step=16608`, active step `16609`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.477735102176666`, `total_examples=132864`,
+  `history_rows=34`, and last completed history step `16500`. Step 16500
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT: `val_lddt_ca=0.4807993733584881`, FoldScore
+  `0.43731331479549407`, dRMSD `9.63475545334816`, C-alpha RMSD
+  `12.624373125195504`, atom14 lDDT `0.4286567634344101`, GDT-HA
+  `0.1926652747169137`, GDT-TS `0.30520484745502474`, predicted/true
+  C-alpha Rg `12.199821829795837 / 16.30911695623398`, and val loss
+  `3.0976853214502333`. Step 16000 still holds the E151 FoldScore best at
+  `0.43844266986846925`. Trainer PID `34098` remained alive after
+  `2-06:22:39` elapsed; GPU memory was about `45454 MiB` with `2%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T22:15Z E151 live sample: post-step-16500 training continued
+  coherently toward the next scheduled evaluation. The remote sample reported
+  `completed_step=16648`, active step `16649`, phase `microbatch_start`,
+  active microbatch `1 / 8`; after the local status/history/log pull, local
+  status reported `completed_step=16648`, active step `16649`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.373234957456589`, `total_examples=133184`,
+  `history_rows=34`, and last completed history step `16500`. Step 16500
+  remains the strongest completed E151 continuation row so far by primary
+  C-alpha lDDT: `val_lddt_ca=0.4807993733584881`, FoldScore
+  `0.43731331479549407`, dRMSD `9.63475545334816`, C-alpha RMSD
+  `12.624373125195504`, atom14 lDDT `0.4286567634344101`, GDT-HA
+  `0.1926652747169137`, GDT-TS `0.30520484745502474`, predicted/true
+  C-alpha Rg `12.199821829795837 / 16.30911695623398`, and val loss
+  `3.0976853214502333`. Step 16000 still holds the E151 FoldScore best at
+  `0.43844266986846925`. Trainer PID `34098` remained alive after
+  `2-06:37:37` elapsed; GPU memory was about `45454 MiB` with `2%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T22:30Z E151 live sample: post-step-16500 training continued
+  coherently and is approaching the step-17000 validation boundary. The
+  remote sample reported `completed_step=16689`, active step `16690`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull, local status reported `completed_step=16690`,
+  active step `16691`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.638210028409958`,
+  `total_examples=133520`, `history_rows=34`, and last completed history step
+  `16500`. Step 16500 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT: `val_lddt_ca=0.4807993733584881`,
+  FoldScore `0.43731331479549407`, dRMSD `9.63475545334816`, C-alpha RMSD
+  `12.624373125195504`, atom14 lDDT `0.4286567634344101`, GDT-HA
+  `0.1926652747169137`, GDT-TS `0.30520484745502474`, predicted/true
+  C-alpha Rg `12.199821829795837 / 16.30911695623398`, and val loss
+  `3.0976853214502333`. Step 16000 still holds the E151 FoldScore best at
+  `0.43844266986846925`. Trainer PID `34098` remained alive after
+  `2-06:52:38` elapsed; GPU memory was about `45454 MiB` with `2%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T22:45Z E151 live sample: post-step-16500 training continued
+  coherently toward the step-17000 validation boundary. The remote sample
+  reported `completed_step=16730`, active step `16731`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull, local status reported `completed_step=16731`,
+  active step `16732`, phase `microbatch_forward_start`, active microbatch
+  `1 / 8`, target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.31462436914444`,
+  `total_examples=133848`, `history_rows=34`, and last completed history step
+  `16500`. Step 16500 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT: `val_lddt_ca=0.4807993733584881`,
+  FoldScore `0.43731331479549407`, dRMSD `9.63475545334816`, C-alpha RMSD
+  `12.624373125195504`, atom14 lDDT `0.4286567634344101`, GDT-HA
+  `0.1926652747169137`, GDT-TS `0.30520484745502474`, predicted/true
+  C-alpha Rg `12.199821829795837 / 16.30911695623398`, and val loss
+  `3.0976853214502333`. Step 16000 still holds the E151 FoldScore best at
+  `0.43844266986846925`. Trainer PID `34098` remained alive after
+  `2-07:07:41` elapsed; GPU memory was about `45454 MiB` with `81%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T23:00Z E151 live sample: post-step-16500 training continued
+  coherently toward the step-17000 validation boundary. The remote sample
+  reported `completed_step=16774`, active step `16775`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull, local status reported `completed_step=16775`,
+  active step `16776`, phase `microbatch_forward_start`, active microbatch
+  `1 / 8`, target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.04561784863472`,
+  `total_examples=134200`, `history_rows=34`, and last completed history step
+  `16500`. Step 16500 remains the strongest completed E151 continuation row
+  so far by primary C-alpha lDDT: `val_lddt_ca=0.4807993733584881`,
+  FoldScore `0.43731331479549407`, dRMSD `9.63475545334816`, C-alpha RMSD
+  `12.624373125195504`, atom14 lDDT `0.4286567634344101`, GDT-HA
+  `0.1926652747169137`, GDT-TS `0.30520484745502474`, predicted/true
+  C-alpha Rg `12.199821829795837 / 16.30911695623398`, and val loss
+  `3.0976853214502333`. Step 16000 still holds the E151 FoldScore best at
+  `0.43844266986846925`. Trainer PID `34098` remained alive after
+  `2-07:22:37` elapsed; GPU memory was about `45454 MiB` with `100%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-02T23:59Z E151 live sample: step-17000 validation is underway and
+  coherent. The live remote sample reported `completed_step=17000`, active
+  step `17000`, phase `evaluating`, active eval batch `455 / 1000`; after the
+  local status/history/log pull, local status reported active eval batch
+  `467 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.1822726130485535`, `total_examples=136000`, `history_rows=34`, and last
+  completed history step `16500`. Step 16500 remains the strongest completed
+  E151 continuation row so far by primary C-alpha lDDT:
+  `val_lddt_ca=0.4807993733584881`, FoldScore `0.43731331479549407`, dRMSD
+  `9.63475545334816`, C-alpha RMSD `12.624373125195504`, atom14 lDDT
+  `0.4286567634344101`, GDT-HA `0.1926652747169137`, GDT-TS
+  `0.30520484745502474`, predicted/true C-alpha Rg
+  `12.199821829795837 / 16.30911695623398`, and val loss
+  `3.0976853214502333`. Step 16000 still holds the E151 FoldScore best at
+  `0.43844266986846925`. Trainer PID `34098` remained alive after
+  `2-09:33:00` elapsed; GPU memory was about `45454 MiB` with `22%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `16500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T04:08Z E151 live sample: step-17000, step-17500, and step-18000
+  validation rows landed coherently, and post-step-18000 training resumed.
+  The live remote sample reported `completed_step=18037`, active step
+  `18038`, phase `microbatch_done`, active microbatch `1 / 8`; after the
+  local status/history/log pull, local status reported `completed_step=18038`,
+  active step `18039`, phase `microbatch_done`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.412696927785873`,
+  `total_examples=144304`, `history_rows=37`, and last completed history step
+  `18000`. Step 18000 is the strongest completed E151 continuation row so far
+  by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5040683607459069`, FoldScore `0.4614421293735504`, dRMSD
+  `8.487014397144318`, C-alpha RMSD `11.577975027441978`, atom14 lDDT
+  `0.44530875873565673`, GDT-HA `0.21996554366126655`, GDT-TS
+  `0.34792645506560804`, predicted/true C-alpha Rg
+  `13.321148017883301 / 16.30911695623398`, and val loss
+  `3.0598638697862626`. Relative to step 17500, step 18000 improves primary
+  C-alpha lDDT, FoldScore, val loss, dRMSD, C-alpha RMSD, atom14 lDDT,
+  GDT-HA, GDT-TS, and predicted C-alpha Rg. Trainer PID `34098` remained
+  alive after `2-19:23:56` elapsed; GPU memory was about `45454 MiB` with
+  `87%` utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `18000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T12:49Z E151 live sample: post-step-18000 training continued
+  coherently toward the step-18500 validation boundary. The remote sample
+  reported `completed_step=18428`, active step `18429`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=18430`, active step `18431`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.2928502559661865`, `total_examples=147440`, `history_rows=37`, and last
+  completed history step `18000`. Step 18000 remains the strongest completed
+  E151 continuation row so far by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5040683607459069`, FoldScore `0.4614421293735504`, dRMSD
+  `8.487014397144318`, C-alpha RMSD `11.577975027441978`, atom14 lDDT
+  `0.44530875873565673`, GDT-HA `0.21996554366126655`, GDT-TS
+  `0.34792645506560804`, predicted/true C-alpha Rg
+  `13.321148017883301 / 16.30911695623398`, and val loss
+  `3.0598638697862626`. Trainer PID `34098` remained alive after
+  `2-21:42:30` elapsed; GPU memory was about `45456 MiB` with `87%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `18000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T13:39Z E151 live sample: step-18500 validation is underway and
+  coherent. The live remote sample and local pulled status reported
+  `completed_step=18500`, active step `18500`, phase `evaluating`, active eval
+  batch `317 / 1000`, active eval examples `317`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.537469744682312`, `total_examples=148000`,
+  `history_rows=37`, and last completed history step `18000`. Step 18000
+  remains the strongest completed E151 continuation row so far by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5040683607459069`,
+  FoldScore `0.4614421293735504`, dRMSD `8.487014397144318`, C-alpha RMSD
+  `11.577975027441978`, atom14 lDDT `0.44530875873565673`, GDT-HA
+  `0.21996554366126655`, GDT-TS `0.34792645506560804`, predicted/true
+  C-alpha Rg `13.321148017883301 / 16.30911695623398`, and val loss
+  `3.0598638697862626`. Trainer PID `34098` remained alive after
+  `2-22:36:08` elapsed; GPU memory was about `45456 MiB` with `86%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `18000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T14:17Z E151 live sample: step-18500 validation remains underway
+  and coherent. The live remote sample and local pulled status reported
+  `completed_step=18500`, active step `18500`, phase `evaluating`, active eval
+  batch `350 / 1000`, active eval examples `350`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.537469744682312`, `total_examples=148000`,
+  `history_rows=37`, and last completed history step `18000`. Step 18000
+  remains the strongest completed E151 continuation row so far by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5040683607459069`,
+  FoldScore `0.4614421293735504`, dRMSD `8.487014397144318`, C-alpha RMSD
+  `11.577975027441978`, atom14 lDDT `0.44530875873565673`, GDT-HA
+  `0.21996554366126655`, GDT-TS `0.34792645506560804`, predicted/true
+  C-alpha Rg `13.321148017883301 / 16.30911695623398`, and val loss
+  `3.0598638697862626`. Trainer PID `34098` remained alive after
+  `2-22:38:56` elapsed; GPU memory was about `45456 MiB` with `92%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `18000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T14:56Z E151 live sample: the live remote sample showed
+  step-18500 validation still underway at active eval batch `748 / 1000`, then
+  the local status/history/log pull captured the completed step-18500
+  validation row and post-eval training resumed. Local status reported
+  `completed_step=18567`, active step `18568`, phase `microbatch_done`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.2607912719249725`,
+  `total_examples=148536`, `history_rows=38`, and last completed history step
+  `18500`. Step 18500 is the strongest completed E151 continuation row so far
+  by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5153927777707576`, FoldScore `0.4717597528398037`, dRMSD
+  `8.025534032464027`, C-alpha RMSD `10.947121537387371`, atom14 lDDT
+  `0.45291675901412964`, GDT-HA `0.23891739780828355`, GDT-TS
+  `0.37634598506987094`, predicted/true C-alpha Rg
+  `13.720089694023132 / 16.30911695623398`, and val loss
+  `3.0631111603975296`. Relative to step 18000, step 18500 improves primary
+  C-alpha lDDT, FoldScore, dRMSD, C-alpha RMSD, atom14 lDDT, GDT-HA, GDT-TS,
+  and predicted C-alpha Rg, while val loss moved slightly backward. Trainer
+  PID `34098` remained alive after `2-23:18:01` elapsed; GPU memory was about
+  `45456 MiB`, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `18500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-03T16:20Z E151 live sample: post-step-18500 training continued
+  coherently toward the step-19000 validation boundary. The remote sample
+  reported `completed_step=18726`, active step `18727`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`; after the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=18727`, active step `18728`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.5579973757267`, `total_examples=149816`, `history_rows=38`, and last
+  completed history step `18500`. Step 18500 remains the strongest completed
+  E151 continuation row so far by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5153927777707576`, FoldScore `0.4717597528398037`, dRMSD
+  `8.025534032464027`, C-alpha RMSD `10.947121537387371`, atom14 lDDT
+  `0.45291675901412964`, GDT-HA `0.23891739780828355`, GDT-TS
+  `0.37634598506987094`, predicted/true C-alpha Rg
+  `13.720089694023132 / 16.30911695623398`, and val loss
+  `3.0631111603975296`. Trainer PID `34098` remained alive after
+  `3-00:46:09` elapsed; GPU memory was about `45456 MiB` with `84%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `18500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T17:41Z E151 live sample: step-19000 validation is underway and
+  coherent. The live remote sample and local pulled status reported
+  `completed_step=19000`, active step `19000`, phase `evaluating`, active eval
+  batch `56 / 1000`, active eval examples `56`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.3384451270103455`, `total_examples=152000`,
+  `history_rows=38`, and last completed history step `18500`. Step 18500
+  remains the strongest completed E151 continuation row so far by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5153927777707576`,
+  FoldScore `0.4717597528398037`, dRMSD `8.025534032464027`, C-alpha RMSD
+  `10.947121537387371`, atom14 lDDT `0.45291675901412964`, GDT-HA
+  `0.23891739780828355`, GDT-TS `0.37634598506987094`, predicted/true
+  C-alpha Rg `13.720089694023132 / 16.30911695623398`, and val loss
+  `3.0631111603975296`. Trainer PID `34098` remained alive after
+  `3-02:03:31` elapsed; GPU memory was about `45456 MiB` with `94%`
+  utilization in the live sample, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `18500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T18:02Z E151 live sample: step-19000 validation completed
+  coherently and training resumed. The live remote sample reported
+  `completed_step=19057`, active step `19058`, phase `microbatch_done`,
+  active microbatch `1 / 8`; after the final local status pull, local status
+  reported `completed_step=19058`, active step `19059`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.17105695605278`, `total_examples=152464`,
+  `history_rows=39`, and last completed history step `19000`. Step 19000
+  returned `val_lddt_ca=0.5134612482786178`, FoldScore
+  `0.46937492817640303`, dRMSD `8.482924214184283`, C-alpha RMSD
+  `11.470419568181038`, atom14 lDDT `0.45303674203157424`, GDT-HA
+  `0.23367373456433416`, GDT-TS `0.36504383535683155`, predicted/true
+  C-alpha Rg `13.284050193786621 / 16.30911695623398`, and val loss
+  `3.075377009153366`, so step 18500 remains the strongest completed E151
+  continuation row by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-03:30:02` elapsed; GPU memory
+  was about `45456 MiB` with `13%` utilization in the live post-eval sample,
+  and status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T20:46Z E151 live sample: post-step-19000 training continued
+  coherently toward the step-19500 validation boundary. The remote sample
+  reported `completed_step=19445`, active step `19446`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=19453`, active step `19454`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.440570771694183`, `total_examples=155624`, `history_rows=39`, and last
+  completed history step `19000`. Step 19000 remains the latest validation
+  row: `val_lddt_ca=0.5134612482786178`, FoldScore `0.46937492817640303`,
+  dRMSD `8.482924214184283`, C-alpha RMSD `11.470419568181038`, atom14 lDDT
+  `0.45303674203157424`, GDT-HA `0.23367373456433416`, GDT-TS
+  `0.36504383535683155`, predicted/true C-alpha Rg
+  `13.284050193786621 / 16.30911695623398`, and val loss
+  `3.075377009153366`. Step 18500 remains the strongest completed E151
+  continuation row by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-05:08:52` elapsed; GPU memory
+  was about `45456 MiB` with `3%` utilization in the live microbatch sample,
+  and status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T21:20Z E151 live sample: step-19500 validation is underway and
+  coherent. The live remote sample reported `completed_step=19500`, active
+  step `19500`, phase `evaluating`, active eval batch `381 / 1000`; after the
+  separate local status/history/log pulls, plot refresh, and final status
+  refresh, local status reported active eval batch `964 / 1000`, active eval
+  examples `964`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.353085935115814`,
+  `total_examples=156000`, `history_rows=39`, and last completed history step
+  `19000`. Step 19000 remains the latest validation row:
+  `val_lddt_ca=0.5134612482786178`, FoldScore `0.46937492817640303`, dRMSD
+  `8.482924214184283`, C-alpha RMSD `11.470419568181038`, atom14 lDDT
+  `0.45303674203157424`, GDT-HA `0.23367373456433416`, GDT-TS
+  `0.36504383535683155`, predicted/true C-alpha Rg
+  `13.284050193786621 / 16.30911695623398`, and val loss
+  `3.075377009153366`. Step 18500 remains the strongest completed E151
+  continuation row by primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-05:51:22` elapsed; GPU memory
+  was about `45456 MiB` with `89%` utilization in the live eval sample, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T22:24Z E151 live sample: step-19500 validation completed
+  coherently and training resumed. The live remote sample reported
+  `completed_step=19529`, active step `19530`, phase `microbatch_done`,
+  active microbatch `1 / 8`; after the local status/history/log pull and plot
+  refresh, local status reported `completed_step=19531`, active step `19532`,
+  phase `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.083634436130524`, `total_examples=156248`,
+  `history_rows=40`, and last completed history step `19500`. Step 19500
+  returned `val_lddt_ca=0.5140581899285317`, FoldScore
+  `0.4724952958226204`, dRMSD `8.557481471776962`, C-alpha RMSD
+  `11.519455065667628`, atom14 lDDT `0.45525554445385935`, GDT-HA
+  `0.2314448622390628`, GDT-TS `0.36036865620315073`, predicted/true
+  C-alpha Rg `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 19500 is now the strongest completed E151 row
+  by FoldScore, while step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-06:46:05` elapsed; GPU memory
+  was about `45456 MiB` with `99%` utilization in the live microbatch sample,
+  and status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T00:43Z E151 live sample: E151 reached the step-20000 evaluation
+  boundary and is evaluating coherently. The remote sample reported
+  `completed_step=20000`, active step `20000`, phase `evaluating`, active eval
+  progress `181 / 1000` examples; after the local status/history/log pull and
+  plot refresh, local status reported `completed_step=20000`, active step
+  `20000`, phase `evaluating`, active eval batch `194 / 1000`,
+  `active_eval_examples=194`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.6535437405109406`, `total_examples=160000`, `history_rows=40`, and last
+  completed history step `19500`. Step 19500 remains the latest completed
+  validation row and the E151 FoldScore best: `val_lddt_ca=0.5140581899285317`,
+  FoldScore `0.4724952958226204`, dRMSD `8.557481471776962`, C-alpha RMSD
+  `11.519455065667628`, atom14 lDDT `0.45525554445385935`, GDT-HA
+  `0.2314448622390628`, GDT-TS `0.36036865620315073`, predicted/true
+  C-alpha Rg `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-09:04:57` elapsed; GPU memory
+  was about `45456 MiB` with a live sample at `95%` utilization, and
+  status/process/eval progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet, and the step-20000 history row has not been written. Local
+  status/history/logs were pulled and plots refreshed through step `19500`.
+  Keep E151 running toward `30000`, and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-04T01:31Z E151 live sample: the step-20000 evaluation remained
+  coherent and in progress. The remote and local samples both reported
+  `completed_step=20000`, active step `20000`, phase `evaluating`, active eval
+  batch `816 / 1000`, `active_eval_examples=816`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.6535437405109406`, `total_examples=160000`,
+  `history_rows=40`, and last completed history step `19500`. Step 19500
+  remains the latest completed validation row and the E151 FoldScore best:
+  `val_lddt_ca=0.5140581899285317`, FoldScore `0.4724952958226204`, dRMSD
+  `8.557481471776962`, C-alpha RMSD `11.519455065667628`, atom14 lDDT
+  `0.45525554445385935`, GDT-HA `0.2314448622390628`, GDT-TS
+  `0.36036865620315073`, predicted/true C-alpha Rg
+  `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-09:53:02` elapsed; GPU memory
+  was about `45456 MiB`, and status/process/eval progress remained coherent.
+  The artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet, and the step-20000 history
+  row has not been written. Local status/history/logs were pulled and plots
+  refreshed through step `19500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T17:44Z E151 monitor attempt: fresh Runpod inspection was blocked
+  by the local approval/sandbox path rather than by E151 itself. The first two
+  escalated `ssh` attempts timed out in the automatic permission approval
+  review, and the fallback using the already-approved `ssh` prefix returned
+  `Operation not permitted`. No fresh remote status/history/log pull was
+  possible during this heartbeat. Cached local artifacts were inspected and
+  plots were refreshed from the cached local history only: cached status still
+  shows `completed_step=22167`, active step `22168`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, last train loss
+  `4.432887941598892`, `total_examples=177336`, `history_rows=45`, and last
+  completed history step `22000`. Cached step 22000 remains the best E151 row
+  by both primary C-alpha lDDT (`0.5370787032842637`) and FoldScore
+  (`0.4960104620754719`). This cached inspection is not evidence of current
+  remote progress or failure, so leave E151 untouched and retry a fresh remote
+  pull on the next heartbeat.
+- 2026-06-04T18:44Z E151 live sample: fresh Runpod monitoring recovered after
+  the previous local SSH approval/sandbox blocker, and E151 is coherently
+  validating step `22500`. The remote sample at `2026-06-04T18:44:51Z`
+  reported `completed_step=22500`, active step `22500`, phase `evaluating`,
+  active eval batch `133 / 1000`, active eval examples `133`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.362535148859024`, `total_examples=180000`,
+  `history_rows=45`, and last completed history step `22000`. After the local
+  status/history/log pull and plot refresh, local status reported the same
+  completed step and phase with active eval batch `276 / 1000` and active eval
+  examples `276`. Step 22000 remains the best E151 row by both primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.5370787032842637`, FoldScore
+  `0.4960104620754719`, dRMSD `7.376684496045113`, C-alpha RMSD
+  `10.278077024221421`, atom14 lDDT `0.47582480958104134`, GDT-HA
+  `0.26632877461984755`, GDT-TS `0.41080276903510093`, predicted/true
+  C-alpha Rg `14.089581943511963 / 16.30911695623398`, and val loss
+  `3.0172615362405777`. Trainer PID `34098` remained alive after
+  `4-03:06:04` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `21%`, and status/process/eval progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `22000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T19:56Z E151 live sample: step-22500 validation completed
+  coherently and training resumed. The remote sample at `2026-06-04T19:56:51Z`
+  saw validation still near completion with `completed_step=22500`, active
+  step `22500`, phase `evaluating`, active eval batch `950 / 1000`, active
+  eval examples `950`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.362535148859024`, `total_examples=180000`, `history_rows=45`, and last
+  completed history step `22000`. After the status/history/log pull and plot
+  refresh, local status had advanced to `completed_step=22543`, active step
+  `22544`, phase `microbatch_done`, active microbatch `1 / 8`, finite last
+  train loss `4.293488413095474`, `total_examples=180344`, `history_rows=46`,
+  and last completed history step `22500`. Step 22500 landed below the
+  running best and did not improve FoldScore: `val_lddt_ca=0.5320300408005715`,
+  FoldScore `0.4919374040961266`, dRMSD `7.898380578130483`, C-alpha RMSD
+  `10.629506483912468`, atom14 lDDT `0.4725135043114424`, GDT-HA
+  `0.2585176802240312`, GDT-TS `0.40061077518761157`, predicted/true
+  C-alpha Rg `13.682353801727295 / 16.30911695623398`, and val loss
+  `3.0191621652841567`. Step 22000 remains the best E151 row by both primary
+  C-alpha lDDT (`0.5370787032842637`) and FoldScore (`0.4960104620754719`).
+  Trainer PID `34098` remained alive after `4-04:18:04` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `20%`, and
+  status/process/eval progress remained coherent. The artifact directory still
+  lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `22500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T21:24Z E151 live sample: post-step-22500 training is still
+  coherent and moving toward the next validation boundary. The remote sample
+  at `2026-06-04T21:24:02Z` reported `completed_step=22774`, active step
+  `22775`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.2027232348918915`, `total_examples=182192`,
+  `history_rows=46`, and last completed history step `22500`. After the
+  status/history/log pull and plot refresh, local status had advanced to
+  `completed_step=22776`, active step `22777`, phase `microbatch_done`, active
+  microbatch `1 / 8`, finite last train loss `4.704685211181641`,
+  `total_examples=182208`, `history_rows=46`, and last completed history step
+  `22500`. Step 22500 remains the latest completed validation row
+  (`val_lddt_ca=0.5320300408005715`, FoldScore `0.4919374040961266`), and
+  step 22000 remains the best E151 row by both primary C-alpha lDDT
+  (`0.5370787032842637`) and FoldScore (`0.4960104620754719`). Trainer PID
+  `34098` remained alive after `4-05:45:15` elapsed; GPU memory was about
+  `45456 MiB` with sampled utilization `83%`, and status/process progress
+  remained coherent. The artifact directory still lacks final `results.json`,
+  `results.csv`, and `eval_details_full_msa_to_face.csv`, so this is not a
+  scored final bundle. Local status/history/logs were pulled and plots
+  refreshed through step `22500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T21:53Z E151 live sample: post-step-22500 training remains
+  coherent and is approaching the step-23000 validation boundary. The remote
+  sample at `2026-06-04T21:53:52Z` reported `completed_step=22873`, active
+  step `22874`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.250234395265579`,
+  `total_examples=182984`, `history_rows=46`, and last completed history step
+  `22500`. After the status/history/log pull and plot refresh, local status
+  had advanced to `completed_step=22874`, active step `22875`, phase
+  `microbatch_done`, active microbatch `1 / 8`, finite last train loss
+  `4.238734811544418`, `total_examples=182992`, `history_rows=46`, and last
+  completed history step `22500`. Step 22500 remains the latest completed
+  validation row (`val_lddt_ca=0.5320300408005715`, FoldScore
+  `0.4919374040961266`), and step 22000 remains the best E151 row by both
+  primary C-alpha lDDT (`0.5370787032842637`) and FoldScore
+  (`0.4960104620754719`). Trainer PID `34098` remained alive after
+  `4-06:15:05` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `93%`, and status/process progress remained coherent. The
+  artifact directory still lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `22500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T22:09Z E151 live sample: E151 remains coherent and is just short
+  of the step-23000 validation boundary. The remote sample at
+  `2026-06-04T22:09:15Z` reported `completed_step=22925`, active step
+  `22926`, phase `microbatch_forward_start`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `3.9168557226657867`,
+  `total_examples=183400`, `history_rows=46`, and last completed history step
+  `22500`. After the status/history/log pull and plot refresh, local status
+  had advanced to `completed_step=22926`, active step `22927`, phase
+  `microbatch_done`, active microbatch `1 / 8`, finite last train loss
+  `4.463906675577164`, `total_examples=183408`, `history_rows=46`, and last
+  completed history step `22500`. Step 22500 remains the latest completed
+  validation row (`val_lddt_ca=0.5320300408005715`, FoldScore
+  `0.4919374040961266`), and step 22000 remains the best E151 row by both
+  primary C-alpha lDDT (`0.5370787032842637`) and FoldScore
+  (`0.4960104620754719`). Trainer PID `34098` remained alive after
+  `4-06:30:28` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `63%`, and status/process progress remained coherent. The
+  artifact directory still lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `22500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T22:24Z E151 live sample: E151 remains coherent and is within a
+  few optimizer steps of the step-23000 validation boundary. The remote sample
+  at `2026-06-04T22:24:56Z` reported `completed_step=22977`, active step
+  `22978`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.491070419549942`,
+  `total_examples=183816`, `history_rows=46`, and last completed history step
+  `22500`. After the status/history/log pull and plot refresh, local status
+  had advanced to `completed_step=22978`, active step `22979`, phase
+  `microbatch_done`, active microbatch `1 / 8`, finite last train loss
+  `4.099859684705734`, `total_examples=183824`, `history_rows=46`, and last
+  completed history step `22500`. Step 22500 remains the latest completed
+  validation row (`val_lddt_ca=0.5320300408005715`, FoldScore
+  `0.4919374040961266`), and step 22000 remains the best E151 row by both
+  primary C-alpha lDDT (`0.5370787032842637`) and FoldScore
+  (`0.4960104620754719`). Trainer PID `34098` remained alive after
+  `4-06:46:09` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `93%`, and status/process progress remained coherent. The
+  artifact directory still lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `22500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T22:39Z E151 live sample: step-23000 validation started and is
+  progressing coherently. The remote sample at `2026-06-04T22:39:52Z`
+  reported `completed_step=23000`, active step `23000`, phase `evaluating`,
+  active eval batch `99 / 1000`, active eval examples `99`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.342162698507309`, `total_examples=184000`,
+  `history_rows=46`, and last completed history step `22500`. After the
+  status/history/log pull and plot refresh, local status reported the same
+  completed step and phase with active eval batch `200 / 1000` and active eval
+  examples `200`. Step 22500 remains the latest completed validation row
+  (`val_lddt_ca=0.5320300408005715`, FoldScore `0.4919374040961266`), and
+  step 22000 remains the best E151 row by both primary C-alpha lDDT
+  (`0.5370787032842637`) and FoldScore (`0.4960104620754719`). Trainer PID
+  `34098` remained alive after `4-07:01:05` elapsed; GPU memory was about
+  `45456 MiB` with sampled utilization `80%`, and status/process/eval progress
+  remained coherent. The artifact directory still lacks final `results.json`,
+  `results.csv`, and `eval_details_full_msa_to_face.csv`, so this is not a
+  scored final bundle. Local status/history/logs were pulled and plots
+  refreshed through step `22500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T23:12Z E151 live sample: step-23000 validation continued to
+  advance coherently. The remote sample at `2026-06-04T23:12:51Z` reported
+  `completed_step=23000`, active step `23000`, phase `evaluating`, active eval
+  batch `487 / 1000`, active eval examples `487`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.342162698507309`, `total_examples=184000`,
+  `history_rows=46`, and last completed history step `22500`. After the
+  status/history/log pull and plot refresh, local status reported the same
+  completed step and phase with active eval batch `498 / 1000` and active eval
+  examples `498`. Step 22500 remains the latest completed validation row
+  (`val_lddt_ca=0.5320300408005715`, FoldScore `0.4919374040961266`), and
+  step 22000 remains the best E151 row by both primary C-alpha lDDT
+  (`0.5370787032842637`) and FoldScore (`0.4960104620754719`). Trainer PID
+  `34098` remained alive after `4-07:34:04` elapsed; GPU memory was about
+  `45456 MiB` with sampled utilization `52%`, and status/process/eval progress
+  remained coherent. The artifact directory still lacks final `results.json`,
+  `results.csv`, and `eval_details_full_msa_to_face.csv`, so this is not a
+  scored final bundle. Local status/history/logs were pulled and plots
+  refreshed through step `22500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T23:28Z E151 live sample: step-23000 validation continued to
+  progress coherently. The remote sample at `2026-06-04T23:28:36Z` reported
+  `completed_step=23000`, active step `23000`, phase `evaluating`, active eval
+  batch `679 / 1000`, active eval examples `679`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.342162698507309`, `total_examples=184000`,
+  `history_rows=46`, and last completed history step `22500`. After the
+  status/history/log pull and plot refresh, local status reported the same
+  completed step and phase with active eval batch `693 / 1000` and active eval
+  examples `693`. Step 22500 remains the latest completed validation row
+  (`val_lddt_ca=0.5320300408005715`, FoldScore `0.4919374040961266`), and
+  step 22000 remains the best E151 row by both primary C-alpha lDDT
+  (`0.5370787032842637`) and FoldScore (`0.4960104620754719`). Trainer PID
+  `34098` remained alive after `4-07:49:49` elapsed; GPU memory was about
+  `45456 MiB` with sampled utilization `45%`, and status/process/eval progress
+  remained coherent. The artifact directory still lacks final `results.json`,
+  `results.csv`, and `eval_details_full_msa_to_face.csv`, so this is not a
+  scored final bundle. Local status/history/logs were pulled and plots
+  refreshed through step `22500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T23:46Z E151 live sample: step-23000 validation is still
+  coherent and nearly through the validation set. The remote sample at
+  `2026-06-04T23:46:37Z` reported `completed_step=23000`, active step
+  `23000`, phase `evaluating`, active eval batch `907 / 1000`, active eval
+  examples `907`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.342162698507309`, `total_examples=184000`, `history_rows=46`, and last
+  completed history step `22500`. After the status/history/log pull and plot
+  refresh, local status reported the same completed step and phase with active
+  eval batch `930 / 1000` and active eval examples `930`. Step 22500 remains
+  the latest completed validation row (`val_lddt_ca=0.5320300408005715`,
+  FoldScore `0.4919374040961266`), and step 22000 remains the best E151 row
+  by both primary C-alpha lDDT (`0.5370787032842637`) and FoldScore
+  (`0.4960104620754719`). Trainer PID `34098` remained alive after
+  `4-08:07:50` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `20%`, and status/process/eval progress remained coherent. The
+  artifact directory still lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `22500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-05T00:02Z E151 live sample: the step-23000 validation row landed
+  coherently and set a new E151 primary C-alpha lDDT best, while FoldScore
+  remained below the step-22000 best. The remote sample at
+  `2026-06-05T00:02:27Z` reported `completed_step=23028`, active step
+  `23029`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.244802504777908`, `total_examples=184224`,
+  `history_rows=47`, and last completed history step `23000`. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=23030`, active step `23031`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.362013190984726`,
+  `total_examples=184240`, `history_rows=47`, and last completed history step
+  `23000`. Step 23000 is now the E151 primary C-alpha lDDT best:
+  `val_lddt_ca=0.5383805597424507`, FoldScore `0.4907858890593052`, dRMSD
+  `8.095917408585548`, C-alpha RMSD `10.576228068113327`, atom14 lDDT
+  `0.4782302520871162`, GDT-HA `0.2552247394025326`, GDT-TS
+  `0.3989377759844065`, predicted/true C-alpha Rg
+  `13.014493644237518 / 16.30911695623398`, and val loss
+  `2.999492956995964`. Step 22000 remains the E151 FoldScore best at
+  `0.4960104620754719` with primary C-alpha lDDT `0.5370787032842637`.
+  Trainer PID `34098` remained alive after `4-08:23:40` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `91%`, and status/process
+  progress remained coherent. The artifact directory still lacks final
+  `results.json`, `results.csv`, and `eval_details_full_msa_to_face.csv`, so
+  this is not a scored final bundle. Local status/history/logs were pulled and
+  plots refreshed through step `23000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T00:17Z E151 live sample: post-step-23000 training remained
+  coherent after the new primary lDDT best. The remote sample at
+  `2026-06-05T00:17:53Z` reported `completed_step=23081`, active step
+  `23082`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.479091107845306`, `total_examples=184648`,
+  `history_rows=47`, and last completed history step `23000`. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=23084`, active step `23085`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.612218618392944`,
+  `total_examples=184672`, `history_rows=47`, and last completed history step
+  `23000`. Step 23000 remains the E151 primary C-alpha lDDT best:
+  `val_lddt_ca=0.5383805597424507`, FoldScore `0.4907858890593052`, dRMSD
+  `8.095917408585548`, C-alpha RMSD `10.576228068113327`, atom14 lDDT
+  `0.4782302520871162`, GDT-HA `0.2552247394025326`, GDT-TS
+  `0.3989377759844065`, predicted/true C-alpha Rg
+  `13.014493644237518 / 16.30911695623398`, and val loss
+  `2.999492956995964`. Step 22000 remains the E151 FoldScore best at
+  `0.4960104620754719` with primary C-alpha lDDT `0.5370787032842637`.
+  Trainer PID `34098` remained alive after `4-08:39:06` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `99%`, and status/process
+  progress remained coherent. The artifact directory still lacks final
+  `results.json`, `results.csv`, and `eval_details_full_msa_to_face.csv`, so
+  this is not a scored final bundle. Local status/history/logs were pulled and
+  plots refreshed through step `23000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T00:36Z E151 live sample: post-step-23000 training remained
+  coherent and continued toward the next validation boundary at step `23500`.
+  The remote sample at `2026-06-05T00:36:40Z` reported
+  `completed_step=23143`, active step `23144`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `3.90675812959671`, `total_examples=185144`, `history_rows=47`, and last
+  completed history step `23000`. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=23211`, active step `23212`,
+  phase `microbatch_done`, active microbatch `1 / 8`, finite last train loss
+  `4.511545032262802`, `total_examples=185688`, `history_rows=47`, and last
+  completed history step `23000`. Step 23000 remains the E151 primary
+  C-alpha lDDT best: `val_lddt_ca=0.5383805597424507`, FoldScore
+  `0.4907858890593052`, dRMSD `8.095917408585548`, C-alpha RMSD
+  `10.576228068113327`, atom14 lDDT `0.4782302520871162`, GDT-HA
+  `0.2552247394025326`, GDT-TS `0.3989377759844065`, predicted/true C-alpha
+  Rg `13.014493644237518 / 16.30911695623398`, and val loss
+  `2.999492956995964`. Step 22000 remains the E151 FoldScore best at
+  `0.4960104620754719` with primary C-alpha lDDT `0.5370787032842637`.
+  Trainer PID `34098` remained alive after `4-08:57:53` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `91%`, and status/process
+  progress remained coherent. The artifact directory still lacks final
+  `results.json`, `results.csv`, and `eval_details_full_msa_to_face.csv`, so
+  this is not a scored final bundle. Local status/history/logs were pulled and
+  plots refreshed through step `23000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T01:54Z E151 live sample: E151 remained coherent and is just short
+  of the step-23500 validation boundary. The remote sample at
+  `2026-06-05T01:54:53Z` reported `completed_step=23402`, active step
+  `23403`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.331879019737244`, `total_examples=187216`,
+  `history_rows=47`, and last completed history step `23000`. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=23404`, active step `23405`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.353596806526184`,
+  `total_examples=187232`, `history_rows=47`, and last completed history step
+  `23000`. Step 23000 remains the E151 primary C-alpha lDDT best:
+  `val_lddt_ca=0.5383805597424507`, FoldScore `0.4907858890593052`, dRMSD
+  `8.095917408585548`, C-alpha RMSD `10.576228068113327`, atom14 lDDT
+  `0.4782302520871162`, GDT-HA `0.2552247394025326`, GDT-TS
+  `0.3989377759844065`, predicted/true C-alpha Rg
+  `13.014493644237518 / 16.30911695623398`, and val loss
+  `2.999492956995964`. Step 22000 remains the E151 FoldScore best at
+  `0.4960104620754719` with primary C-alpha lDDT `0.5370787032842637`.
+  Trainer PID `34098` remained alive after `4-10:16:06` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `83%`, and status/process
+  progress remained coherent. The artifact directory still lacks final
+  `results.json`, `results.csv`, and `eval_details_full_msa_to_face.csv`, so
+  this is not a scored final bundle. Local status/history/logs were pulled and
+  plots refreshed through step `23000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T02:16Z E151 live sample: E151 remained coherent and is still just
+  short of the step-23500 validation boundary. The remote sample at
+  `2026-06-05T02:16:18Z` reported `completed_step=23472`, active step
+  `23473`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.266548573970795`, `total_examples=187776`,
+  `history_rows=47`, and last completed history step `23000`. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=23474`, active step `23475`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.114134252071381`,
+  `total_examples=187792`, `history_rows=47`, and last completed history step
+  `23000`. Step 23000 remains the E151 primary C-alpha lDDT best:
+  `val_lddt_ca=0.5383805597424507`, FoldScore `0.4907858890593052`, dRMSD
+  `8.095917408585548`, C-alpha RMSD `10.576228068113327`, atom14 lDDT
+  `0.4782302520871162`, GDT-HA `0.2552247394025326`, GDT-TS
+  `0.3989377759844065`, predicted/true C-alpha Rg
+  `13.014493644237518 / 16.30911695623398`, and val loss
+  `2.999492956995964`. Step 22000 remains the E151 FoldScore best at
+  `0.4960104620754719` with primary C-alpha lDDT `0.5370787032842637`.
+  Trainer PID `34098` remained alive after `4-10:37:31` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `76%`, and status/process
+  progress remained coherent. The artifact directory still lacks final
+  `results.json`, `results.csv`, and `eval_details_full_msa_to_face.csv`, so
+  this is not a scored final bundle. Local status/history/logs were pulled and
+  plots refreshed through step `23000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T02:33Z E151 live sample: E151 reached the step-23500 validation
+  boundary and is evaluating coherently. The remote sample at
+  `2026-06-05T02:33:16Z` reported `completed_step=23500`, active step
+  `23500`, phase `evaluating`, active eval batch `96 / 1000`, active eval
+  examples `96`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.524087339639664`, `total_examples=188000`, `history_rows=47`, and last
+  completed history step `23000`. After the status/history/log pull and plot
+  refresh, local status matched the same step-23500 evaluation state. The
+  step-23500 validation row has not landed in
+  `history_full_msa_to_face.json` yet. Step 23000 remains the E151 primary
+  C-alpha lDDT best: `val_lddt_ca=0.5383805597424507`, FoldScore
+  `0.4907858890593052`, dRMSD `8.095917408585548`, C-alpha RMSD
+  `10.576228068113327`, atom14 lDDT `0.4782302520871162`, GDT-HA
+  `0.2552247394025326`, GDT-TS `0.3989377759844065`, predicted/true C-alpha
+  Rg `13.014493644237518 / 16.30911695623398`, and val loss
+  `2.999492956995964`. Step 22000 remains the E151 FoldScore best at
+  `0.4960104620754719` with primary C-alpha lDDT `0.5370787032842637`.
+  Trainer PID `34098` remained alive after `4-10:54:29` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `24%`, and status/process
+  progress remained coherent. The artifact directory still lacks final
+  `results.json`, `results.csv`, and `eval_details_full_msa_to_face.csv`, so
+  this is not a scored final bundle. Local status/history/logs were pulled and
+  plots refreshed through step `23000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T02:50Z E151 live sample: step-23500 validation continued
+  coherently. The remote sample at `2026-06-05T02:50:29Z` reported
+  `completed_step=23500`, active step `23500`, phase `evaluating`, active eval
+  batch `291 / 1000`, active eval examples `291`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.524087339639664`, `total_examples=188000`,
+  `history_rows=47`, and last completed history step `23000`. After the
+  status/history/log pull and plot refresh, local status reported active eval
+  batch `305 / 1000` and active eval examples `305` with the same
+  completed/active step and phase. The step-23500 validation row has not
+  landed in `history_full_msa_to_face.json` yet. Step 23000 remains the E151
+  primary C-alpha lDDT best: `val_lddt_ca=0.5383805597424507`, FoldScore
+  `0.4907858890593052`, dRMSD `8.095917408585548`, C-alpha RMSD
+  `10.576228068113327`, atom14 lDDT `0.4782302520871162`, GDT-HA
+  `0.2552247394025326`, GDT-TS `0.3989377759844065`, predicted/true C-alpha
+  Rg `13.014493644237518 / 16.30911695623398`, and val loss
+  `2.999492956995964`. Step 22000 remains the E151 FoldScore best at
+  `0.4960104620754719` with primary C-alpha lDDT `0.5370787032842637`.
+  Trainer PID `34098` remained alive after `4-11:11:42` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `90%`, and status/process
+  progress remained coherent. The artifact directory still lacks final
+  `results.json`, `results.csv`, and `eval_details_full_msa_to_face.csv`, so
+  this is not a scored final bundle. Local status/history/logs were pulled and
+  plots refreshed through step `23000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T03:06Z E151 live sample: step-23500 validation remained
+  coherent. The remote sample at `2026-06-05T03:06:43Z` reported
+  `completed_step=23500`, active step `23500`, phase `evaluating`, active eval
+  batch `482 / 1000`, active eval examples `482`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.524087339639664`, `total_examples=188000`,
+  `history_rows=47`, and last completed history step `23000`. After the
+  status/history/log pull and plot refresh, local status reported active eval
+  batch `678 / 1000` and active eval examples `678` with the same
+  completed/active step and phase. The step-23500 validation row has not
+  landed in `history_full_msa_to_face.json` yet. Step 23000 remains the E151
+  primary C-alpha lDDT best: `val_lddt_ca=0.5383805597424507`, FoldScore
+  `0.4907858890593052`, dRMSD `8.095917408585548`, C-alpha RMSD
+  `10.576228068113327`, atom14 lDDT `0.4782302520871162`, GDT-HA
+  `0.2552247394025326`, GDT-TS `0.3989377759844065`, predicted/true C-alpha
+  Rg `13.014493644237518 / 16.30911695623398`, and val loss
+  `2.999492956995964`. Step 22000 remains the E151 FoldScore best at
+  `0.4960104620754719` with primary C-alpha lDDT `0.5370787032842637`.
+  Trainer PID `34098` remained alive after `4-11:27:56` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `18%`, and status/process
+  progress remained coherent. The artifact directory still lacks final
+  `results.json`, `results.csv`, and `eval_details_full_msa_to_face.csv`, so
+  this is not a scored final bundle. Local status/history/logs were pulled and
+  plots refreshed through step `23000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T04:40Z E151 live sample: the step-23500 validation row landed
+  coherently and set new E151 running bests by both primary C-alpha lDDT and
+  FoldScore. The remote sample at `2026-06-05T04:40:44Z` reported
+  `completed_step=23663`, active step `23664`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `3.7913438081741333`, `total_examples=189304`, `history_rows=48`, and last
+  completed history step `23500`. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=23743`, active step `23744`,
+  phase `microbatch_start`, active microbatch `1 / 8`, finite last train loss
+  `4.453198105096817`, `total_examples=189944`, `history_rows=48`, and last
+  completed history step `23500`. Step 23500 is now the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5422983741760254`,
+  FoldScore `0.5010826866328716`, dRMSD `7.598202830970287`, C-alpha RMSD
+  `10.550966962039471`, atom14 lDDT `0.47633493760228157`, GDT-HA
+  `0.2651399732902646`, GDT-TS `0.4075173566788435`, predicted/true C-alpha
+  Rg `14.052841221809388 / 16.30911695623398`, and val loss
+  `3.014755515217781`. Step 23000 previously held the primary C-alpha lDDT
+  best at `0.5383805597424507`, and step 22000 previously held the FoldScore
+  best at `0.4960104620754719`. Trainer PID `34098` remained alive after
+  `4-13:01:57` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `93%`, and status/process progress remained coherent. The
+  artifact directory still lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `23500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T07:08Z E151 live sample: E151 is coherently evaluating step
+  `24000`. The remote sample at `2026-06-05T07:08:21Z` reported
+  `completed_step=24000`, active step `24000`, phase `evaluating`, active eval
+  batch `555 / 1000`, active eval examples `555`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.291229635477066`, `total_examples=192000`,
+  `history_rows=48`, and last completed history step `23500`. After the
+  status/history/log pull and plot refresh, local status reported active eval
+  batch `568 / 1000` and active eval examples `568` with the same
+  completed/active step and phase. The step-24000 validation row has not
+  landed in `history_full_msa_to_face.json` yet. Step 23500 remains the E151
+  best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5422983741760254`, FoldScore `0.5010826866328716`, dRMSD
+  `7.598202830970287`, C-alpha RMSD `10.550966962039471`, atom14 lDDT
+  `0.47633493760228157`, GDT-HA `0.2651399732902646`, GDT-TS
+  `0.4075173566788435`, predicted/true C-alpha Rg
+  `14.052841221809388 / 16.30911695623398`, and val loss
+  `3.014755515217781`. Trainer PID `34098` remained alive after
+  `4-15:29:34` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `49%`, and status/process progress remained coherent. The
+  artifact directory still lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `23500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T10:32Z E151 live sample: the step-24000 validation row landed
+  coherently and set a new E151 FoldScore best, while step 23500 remains the
+  primary C-alpha lDDT best. The remote sample at `2026-06-05T10:32:13Z`
+  reported `completed_step=24500`, active step `24500`, phase `evaluating`,
+  active eval batch `238 / 1000`, active eval examples `238`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.349737465381622`, `total_examples=196000`,
+  `history_rows=49`, and last completed history step `24000`. After the
+  status/history/log pull and plot refresh, local status reported active eval
+  batch `553 / 1000` and active eval examples `553` with the same
+  completed/active step and phase. The step-24500 validation row has not
+  landed in `history_full_msa_to_face.json` yet. Step 23500 remains the E151
+  primary C-alpha lDDT best: `val_lddt_ca=0.5422983741760254`, FoldScore
+  `0.5010826866328716`, dRMSD `7.598202830970287`, C-alpha RMSD
+  `10.550966962039471`, atom14 lDDT `0.47633493760228157`, GDT-HA
+  `0.2651399732902646`, GDT-TS `0.4075173566788435`, predicted/true C-alpha
+  Rg `14.052841221809388 / 16.30911695623398`, and val loss
+  `3.014755515217781`. Step 24000 is now the E151 FoldScore best:
+  `val_lddt_ca=0.5315222098827362`, FoldScore `0.5041914605498314`, dRMSD
+  `7.625493120074272`, C-alpha RMSD `10.514477755784988`, atom14 lDDT
+  `0.468451887384057`, GDT-HA `0.26632583990693093`, GDT-TS
+  `0.40869456084817646`, predicted/true C-alpha Rg
+  `15.011822196483612 / 16.30911695623398`, and val loss
+  `3.0594431890249254`. Trainer PID `34098` remained alive after
+  `4-18:53:26` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `84%`, and status/process progress remained coherent. The
+  artifact directory still lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `24000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T11:53Z E151 live sample: the step-24500 validation row landed
+  coherently and set new E151 running bests by both primary C-alpha lDDT and
+  FoldScore. The remote sample at `2026-06-05T11:53:53Z` reported
+  `completed_step=24564`, active step `24565`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.24268838763237`, `total_examples=196512`, `history_rows=50`, and last
+  completed history step `24500`. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=24691`, active step `24692`,
+  phase `microbatch_done`, active microbatch `1 / 8`, finite last train loss
+  `4.522142082452774`, `total_examples=197528`, `history_rows=50`, and last
+  completed history step `24500`. Step 24500 is now the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`,
+  FoldScore `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Step 24000 previously held the FoldScore best at
+  `0.5041914605498314`, and step 23500 previously held the primary C-alpha
+  lDDT best at `0.5422983741760254`. Trainer PID `34098` remained alive
+  after `4-20:15:06` elapsed; GPU memory was about `44594 MiB` with sampled
+  utilization `86%`, and status/process progress remained coherent. The
+  artifact directory still lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `24500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T12:48Z E151 live sample: post-step-24500 training remained
+  coherent after the new running best. The remote sample at
+  `2026-06-05T12:48:47Z` reported `completed_step=24757`, active step
+  `24758`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.016181945800781`,
+  `total_examples=198056`, `history_rows=50`, and last completed history step
+  `24500`. After the status/history/log pull and plot refresh, local status
+  reported `completed_step=24813`, active step `24814`, phase
+  `microbatch_done`, active microbatch `1 / 8`, finite last train loss
+  `4.0059495866298676`, `total_examples=198504`, `history_rows=50`, and last
+  completed history step `24500`. Step 24500 remains the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`,
+  FoldScore `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Trainer PID `34098` remained alive after
+  `4-21:10:00` elapsed; GPU memory was about `45068 MiB` with sampled
+  utilization `81%`, and status/process progress remained coherent. The
+  artifact directory still lacks final `results.json`, `results.csv`, and
+  `eval_details_full_msa_to_face.csv`, so this is not a scored final bundle.
+  Local status/history/logs were pulled and plots refreshed through step
+  `24500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T13:36Z E151 live sample: post-step-24500 training continued
+  coherently and is nearing the step-25000 validation boundary. Trainer PID
+  `34098` remained alive after `4-22:01:42` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `4%` utilization and temperature `48 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while `history_full_msa_to_face.json`,
+  `run_metadata.json`, `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt` were present. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=24938`, active step `24939`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.120609313249588`, `total_examples=199504`, `history_rows=50`, and last
+  completed history step `24500`. Step 24500 remains the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`,
+  FoldScore `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Local status/history/logs were pulled and plots
+  refreshed through step `24500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T13:53Z E151 live sample: E151 remained coherent and is fifteen
+  optimizer steps short of the step-25000 validation trigger. Trainer PID
+  `34098` remained alive after `4-22:15:07` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `92%` utilization and temperature `51 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while `history_full_msa_to_face.json`,
+  `run_metadata.json`, `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt` were present. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=24985`, active step `24986`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.276027828454971`, `total_examples=199880`, `history_rows=50`, and last
+  completed history step `24500`. Step 24500 remains the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`,
+  FoldScore `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Local status/history/logs were pulled and plots
+  refreshed through step `24500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T14:08Z E151 live sample: E151 entered the step-25000 validation
+  pass coherently. Trainer PID `34098` remained alive after `4-22:34:28`
+  elapsed; a GPU sample showed `45454 MiB` allocated with `27%` utilization
+  and temperature `45 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25000`, active step `25000`, phase
+  `evaluating`, active eval batch `180 / 1000`, active eval examples `180`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.070811718702316`,
+  `total_examples=200000`, `history_rows=50`, and last completed history step
+  `24500`. The step-25000 validation row has not landed in
+  `history_full_msa_to_face.json` yet. Step 24500 remains the E151 best by
+  both primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`,
+  FoldScore `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Local status/history/logs were pulled and plots
+  refreshed through step `24500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T14:23Z E151 live sample: step-25000 validation continued
+  coherently. Trainer PID `34098` remained alive after `4-22:46:28` elapsed;
+  a GPU sample showed `45454 MiB` allocated with `88%` utilization and
+  temperature `47 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25000`, active step `25000`, phase
+  `evaluating`, active eval batch `333 / 1000`, active eval examples `333`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.070811718702316`,
+  `total_examples=200000`, `history_rows=50`, and last completed history step
+  `24500`. The step-25000 validation row has not landed in
+  `history_full_msa_to_face.json` yet. Step 24500 remains the E151 best by
+  both primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`,
+  FoldScore `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Local status/history/logs were pulled and plots
+  refreshed through step `24500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T14:44Z E151 live sample: step-25000 validation continued
+  coherently past the halfway point. Trainer PID `34098` remained alive after
+  `4-23:06:43` elapsed; a GPU sample showed `45454 MiB` allocated with `88%`
+  utilization and temperature `47 C`. The required artifact check still found
+  no final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25000`, active step `25000`, phase
+  `evaluating`, active eval batch `561 / 1000`, active eval examples `561`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.070811718702316`,
+  `total_examples=200000`, `history_rows=50`, and last completed history step
+  `24500`. The step-25000 validation row has not landed in
+  `history_full_msa_to_face.json` yet. Step 24500 remains the E151 best by
+  both primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`,
+  FoldScore `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Local status/history/logs were pulled and plots
+  refreshed through step `24500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T14:59Z E151 live sample: the step-25000 validation row landed
+  coherently but did not improve either E151 running-best metric. Trainer PID
+  `34098` remained alive after `5-00:00:11` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `5%` utilization and temperature `48 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25073`, active step `25074`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.448436796665192`, `total_examples=200584`,
+  `history_rows=51`, and last completed history step `25000`. Step 25000
+  returned `val_lddt_ca=0.5458275735378265`, FoldScore
+  `0.5040199239850044`, dRMSD `7.703299061536789`, C-alpha RMSD
+  `10.454005774736405`, atom14 lDDT `0.4808290894925594`, GDT-HA
+  `0.27050864746421577`, GDT-TS `0.41334376730024813`, predicted/true
+  C-alpha Rg `13.826368264198303 / 16.30911695623398`, and val loss
+  `2.987638293147087`. Step 24500 remains the E151 best by both primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`, FoldScore
+  `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Local status/history/logs were pulled and plots
+  refreshed through step `25000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T15:44Z E151 live sample: post-step-25000 training continued
+  coherently toward the next validation boundary. Trainer PID `34098`
+  remained alive after `5-00:06:01` elapsed; a GPU sample showed `45454 MiB`
+  allocated with `6%` utilization and temperature `47 C`. The required
+  artifact check still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25095`, active step `25096`, phase
+  `microbatch_start`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.227492988109589`, `total_examples=200760`,
+  `history_rows=51`, and last completed history step `25000`. Step 25000
+  remains the latest completed validation row and landed below the E151
+  running best: `val_lddt_ca=0.5458275735378265`, FoldScore
+  `0.5040199239850044`, dRMSD `7.703299061536789`, C-alpha RMSD
+  `10.454005774736405`, atom14 lDDT `0.4808290894925594`, GDT-HA
+  `0.27050864746421577`, GDT-TS `0.41334376730024813`, predicted/true
+  C-alpha Rg `13.826368264198303 / 16.30911695623398`, and val loss
+  `2.987638293147087`. Step 24500 remains the E151 best by both primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`, FoldScore
+  `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Local status/history/logs were pulled and plots
+  refreshed through step `25000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T16:08Z E151 live sample: post-step-25000 training continued
+  coherently toward the step-25500 validation boundary. Trainer PID `34098`
+  remained alive after `5-00:32:08` elapsed; a GPU sample showed `45454 MiB`
+  allocated with `94%` utilization and temperature `54 C`. The required
+  artifact check still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25190`, active step `25191`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.192472875118256`, `total_examples=201520`,
+  `history_rows=51`, and last completed history step `25000`. Step 25000
+  remains the latest completed validation row and landed below the E151
+  running best: `val_lddt_ca=0.5458275735378265`, FoldScore
+  `0.5040199239850044`, dRMSD `7.703299061536789`, C-alpha RMSD
+  `10.454005774736405`, atom14 lDDT `0.4808290894925594`, GDT-HA
+  `0.27050864746421577`, GDT-TS `0.41334376730024813`, predicted/true
+  C-alpha Rg `13.826368264198303 / 16.30911695623398`, and val loss
+  `2.987638293147087`. Step 24500 remains the E151 best by both primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`, FoldScore
+  `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Local status/history/logs were pulled and plots
+  refreshed through step `25000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T16:33Z E151 live sample: post-step-25000 training continued
+  coherently toward the step-25500 validation boundary. Trainer PID `34098`
+  remained alive after `5-00:57:39` elapsed; a GPU sample showed `45454 MiB`
+  allocated with `85%` utilization and temperature `50 C`. The required
+  artifact check still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25286`, active step `25287`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.4596637189388275`, `total_examples=202288`,
+  `history_rows=51`, and last completed history step `25000`. Step 25000
+  remains the latest completed validation row and landed below the E151
+  running best: `val_lddt_ca=0.5458275735378265`, FoldScore
+  `0.5040199239850044`, dRMSD `7.703299061536789`, C-alpha RMSD
+  `10.454005774736405`, atom14 lDDT `0.4808290894925594`, GDT-HA
+  `0.27050864746421577`, GDT-TS `0.41334376730024813`, predicted/true
+  C-alpha Rg `13.826368264198303 / 16.30911695623398`, and val loss
+  `2.987638293147087`. Step 24500 remains the E151 best by both primary
+  C-alpha lDDT and FoldScore: `val_lddt_ca=0.5511660333871842`, FoldScore
+  `0.5073067330121994`, dRMSD `7.304430261135101`, C-alpha RMSD
+  `10.01258605837822`, atom14 lDDT `0.48456507912278174`, GDT-HA
+  `0.2752167057916522`, GDT-TS `0.4216399592459202`, predicted/true C-alpha
+  Rg `14.001169721126557 / 16.30911695623398`, and val loss
+  `2.974898871779442`. Local status/history/logs were pulled and plots
+  refreshed through step `25000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T18:17Z E151 live sample: step-25500 validation landed after a
+  short poll and set a new E151 running best by both primary C-alpha lDDT and
+  FoldScore. The first remote sample found trainer PID `34098` alive after
+  `5-02:39:03` elapsed, with status in phase `evaluating` at active eval batch
+  `856 / 1000`; GPU memory was `45454 MiB`, utilization `10%`, and
+  temperature `45 C`. After a short poll, PID `34098` remained alive after
+  `5-03:11:23`, the GPU sample was `45454 MiB`, `94%` utilization, and `51 C`,
+  and the log tail showed the step-25500 row plus checkpoint write. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25505`, active step `25506`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.113640278577805`, `total_examples=204040`,
+  `history_rows=52`, and last completed history step `25500`. Step 25500 is
+  now the E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5550761976540088`, FoldScore `0.514570508480072`, dRMSD
+  `7.228008404642344`, C-alpha RMSD `10.074057270646096`, atom14 lDDT
+  `0.48612843844294545`, GDT-HA `0.2821109433807433`, GDT-TS
+  `0.42835482449829576`, predicted/true C-alpha Rg
+  `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T19:07Z E151 live sample: post-step-25500 training continued
+  coherently toward the step-26000 validation boundary. Trainer PID `34098`
+  remained alive after `5-03:29:14` elapsed; a GPU sample showed `45454 MiB`
+  allocated with `99%` utilization and temperature `50 C`. The required
+  artifact check still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25575`, active step `25576`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.498924732208252`, `total_examples=204600`,
+  `history_rows=52`, and last completed history step `25500`. Step 25500
+  remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T19:25Z E151 live sample: post-step-25500 training continued
+  coherently toward the step-26000 validation boundary. Trainer PID `34098`
+  remained alive after `5-03:47:11` elapsed; a GPU sample showed `45454 MiB`
+  allocated with `49%` utilization and temperature `49 C`. The required
+  artifact check still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25667`, active step `25668`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.407043427228928`, `total_examples=205336`,
+  `history_rows=52`, and last completed history step `25500`. Step 25500
+  remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T19:40Z E151 live sample: post-step-25500 training remained
+  coherent and continued toward the step-26000 validation boundary. Trainer
+  PID `34098` remained alive after `5-04:02:13` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `86%` utilization and temperature `51 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25693`, active step `25694`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.194360226392746`, `total_examples=205544`,
+  `history_rows=52`, and last completed history step `25500`. Step 25500
+  remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T19:55Z E151 live sample: post-step-25500 training remained
+  coherent and continued toward the step-26000 validation boundary. Trainer
+  PID `34098` remained alive after `5-04:17:34` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `99%` utilization and temperature `52 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25747`, active step `25748`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.2554759085178375`, `total_examples=205976`,
+  `history_rows=52`, and last completed history step `25500`. Step 25500
+  remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T20:10Z E151 live sample: post-step-25500 training remained
+  coherent and continued toward the step-26000 validation boundary. Trainer
+  PID `34098` remained alive after `5-04:36:12` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `87%` utilization and temperature `51 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25813`, active step `25814`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.447973191738129`, `total_examples=206504`,
+  `history_rows=52`, and last completed history step `25500`. Step 25500
+  remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T20:26Z E151 live sample: post-step-25500 training remained
+  coherent and continued toward the step-26000 validation boundary. Trainer
+  PID `34098` remained alive after `5-04:47:57` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `93%` utilization and temperature `52 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25860`, active step `25861`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.4566274881362915`, `total_examples=206880`,
+  `history_rows=52`, and last completed history step `25500`. Step 25500
+  remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T20:41Z E151 live sample: post-step-25500 training remained
+  coherent and is nearing the step-26000 validation boundary. Trainer PID
+  `34098` remained alive after `5-05:03:35` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `6%` utilization and temperature `51 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25913`, active step `25914`, phase
+  `microbatch_start`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.1661330461502075`, `total_examples=207304`,
+  `history_rows=52`, and last completed history step `25500`. Step 25500
+  remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T21:02Z E151 live sample: post-step-25500 training remained
+  coherent and is just short of the step-26000 validation boundary. Trainer
+  PID `34098` remained alive after `5-05:24:31` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `5%` utilization and temperature `51 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=25983`, active step `25984`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.355847865343094`, `total_examples=207864`,
+  `history_rows=52`, and last completed history step `25500`. Step 25500
+  remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T21:17Z E151 live sample: step-26000 validation is now in
+  progress. Trainer PID `34098` remained alive after `5-05:24:31` elapsed; a
+  GPU sample showed `45454 MiB` allocated with `95%` utilization and
+  temperature `51 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26000`, active step `26000`, phase
+  `evaluating`, active eval batch `131 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.170230716466904`, `total_examples=208000`,
+  `history_rows=52`, and last completed history step `25500`. The step-26000
+  validation row has not landed in `history_full_msa_to_face.json` yet. Step
+  25500 remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T21:38Z E151 live sample: step-26000 validation continued
+  coherently. Trainer PID `34098` remained alive after `5-06:00:04` elapsed;
+  a GPU sample showed `45454 MiB` allocated with `87%` utilization and
+  temperature `48 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26000`, active step `26000`, phase
+  `evaluating`, active eval batch `378 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.170230716466904`, `total_examples=208000`,
+  `history_rows=52`, and last completed history step `25500`. The step-26000
+  validation row has not landed in `history_full_msa_to_face.json` yet. Step
+  25500 remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5550761976540088`,
+  FoldScore `0.514570508480072`, dRMSD `7.228008404642344`, C-alpha RMSD
+  `10.074057270646096`, atom14 lDDT `0.48612843844294545`, GDT-HA
+  `0.2821109433807433`, GDT-TS `0.42835482449829576`, predicted/true
+  C-alpha Rg `14.465360423088073 / 16.30911695623398`, and val loss
+  `3.0013046938180925`. Local status/history/logs were pulled and plots
+  refreshed through step `25500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T22:05Z E151 live sample: the step-26000 validation row landed
+  and training resumed coherently afterward. Trainer PID `34098` remained
+  alive after `5-06:27:11` elapsed; a GPU sample showed `45454 MiB` allocated
+  with `4%` utilization and temperature `46 C`. The required artifact check
+  still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while `history_full_msa_to_face.json`,
+  `run_metadata.json`, `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt` were present. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=26115`, active step `26116`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.094470024108887`, `total_examples=208920`, `history_rows=53`, and last
+  completed history step `26000`. Step 26000 is the new E151 best by primary
+  C-alpha lDDT and lowers validation loss: `val_lddt_ca=0.5551994798183442`,
+  FoldScore `0.5068885007202625`, dRMSD `7.717780724078417`, C-alpha RMSD
+  `10.394793866991996`, atom14 lDDT `0.48771076601743696`, GDT-HA
+  `0.27744885091111066`, GDT-TS `0.41967539802193643`, predicted/true
+  C-alpha Rg `13.782834161281587 / 16.30911695623398`, and val loss
+  `2.96700767993927`. Step 25500 remains the E151 FoldScore best at
+  FoldScore `0.514570508480072`. Local status/history/logs were pulled and
+  plots refreshed through step `26000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T23:11Z E151 live sample: post-step-26000 training remained
+  coherent. Trainer PID `34098` remained alive after `5-07:33:38` elapsed; a
+  GPU sample showed `45454 MiB` allocated with `4%` utilization and
+  temperature `49 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26158`, active step `26159`, phase
+  `microbatch_backward_start`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.420348644256592`, `total_examples=209264`,
+  `history_rows=53`, and last completed history step `26000`. Step 26000
+  remains the E151 best by primary C-alpha lDDT and lowest validation loss:
+  `val_lddt_ca=0.5551994798183442`, FoldScore `0.5068885007202625`, dRMSD
+  `7.717780724078417`, C-alpha RMSD `10.394793866991996`, atom14 lDDT
+  `0.48771076601743696`, GDT-HA `0.27744885091111066`, GDT-TS
+  `0.41967539802193643`, predicted/true C-alpha Rg
+  `13.782834161281587 / 16.30911695623398`, and val loss
+  `2.96700767993927`. Step 25500 remains the E151 FoldScore best at
+  FoldScore `0.514570508480072`. Local status/history/logs were pulled and
+  plots refreshed through step `26000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-05T23:54Z E151 live sample: post-step-26000 training continued
+  coherently toward the step-26500 validation boundary. Trainer PID `34098`
+  remained alive after `5-08:24:48` elapsed; a GPU sample showed `45454 MiB`
+  allocated with `93%` utilization and temperature `53 C`. The required
+  artifact check still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26344`, active step `26345`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.282524019479752`, `total_examples=210752`,
+  `history_rows=53`, and last completed history step `26000`. Step 26000
+  remains the E151 best by primary C-alpha lDDT and lowest validation loss:
+  `val_lddt_ca=0.5551994798183442`, FoldScore `0.5068885007202625`, dRMSD
+  `7.717780724078417`, C-alpha RMSD `10.394793866991996`, atom14 lDDT
+  `0.48771076601743696`, GDT-HA `0.27744885091111066`, GDT-TS
+  `0.41967539802193643`, predicted/true C-alpha Rg
+  `13.782834161281587 / 16.30911695623398`, and val loss
+  `2.96700767993927`. Step 25500 remains the E151 FoldScore best at
+  FoldScore `0.514570508480072`. Local status/history/logs were pulled and
+  plots refreshed through step `26000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T00:25Z E151 live sample: post-step-26000 training remained
+  coherent and is just short of the step-26500 validation boundary. Trainer
+  PID `34098` remained alive after `5-08:47:00` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `87%` utilization and temperature `50 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26425`, active step `26426`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.466815859079361`, `total_examples=211400`,
+  `history_rows=53`, and last completed history step `26000`. Step 26000
+  remains the E151 best by primary C-alpha lDDT and lowest validation loss:
+  `val_lddt_ca=0.5551994798183442`, FoldScore `0.5068885007202625`, dRMSD
+  `7.717780724078417`, C-alpha RMSD `10.394793866991996`, atom14 lDDT
+  `0.48771076601743696`, GDT-HA `0.27744885091111066`, GDT-TS
+  `0.41967539802193643`, predicted/true C-alpha Rg
+  `13.782834161281587 / 16.30911695623398`, and val loss
+  `2.96700767993927`. Step 25500 remains the E151 FoldScore best at
+  FoldScore `0.514570508480072`. Local status/history/logs were pulled and
+  plots refreshed through step `26000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T01:08Z E151 live sample: step-26500 validation is in progress.
+  Trainer PID `34098` remained alive after `5-09:29:45` elapsed; a GPU sample
+  showed `45454 MiB` allocated with `35%` utilization and temperature `47 C`.
+  The required artifact check still found no final `results.json`,
+  `results.csv`, or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26500`, active step `26500`, phase
+  `evaluating`, active eval batch `269 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.389791369438171`, `total_examples=212000`,
+  `history_rows=53`, and last completed history step `26000`. The step-26500
+  validation row has not landed in `history_full_msa_to_face.json` yet. Step
+  26000 remains the E151 best by primary C-alpha lDDT and lowest validation
+  loss: `val_lddt_ca=0.5551994798183442`, FoldScore `0.5068885007202625`,
+  dRMSD `7.717780724078417`, C-alpha RMSD `10.394793866991996`, atom14 lDDT
+  `0.48771076601743696`, GDT-HA `0.27744885091111066`, GDT-TS
+  `0.41967539802193643`, predicted/true C-alpha Rg
+  `13.782834161281587 / 16.30911695623398`, and val loss
+  `2.96700767993927`. Step 25500 remains the E151 FoldScore best at
+  FoldScore `0.514570508480072`. Local status/history/logs were pulled and
+  plots refreshed through step `26000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T01:28Z E151 live sample: step-26500 validation continued
+  coherently. Trainer PID `34098` remained alive after `5-09:51:41` elapsed;
+  a GPU sample showed `45454 MiB` allocated with `8%` utilization and
+  temperature `45 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26500`, active step `26500`, phase
+  `evaluating`, active eval batch `573 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.389791369438171`, `total_examples=212000`,
+  `history_rows=53`, and last completed history step `26000`. The step-26500
+  validation row has not landed in `history_full_msa_to_face.json` yet. Step
+  26000 remains the E151 best by primary C-alpha lDDT and lowest validation
+  loss: `val_lddt_ca=0.5551994798183442`, FoldScore `0.5068885007202625`,
+  dRMSD `7.717780724078417`, C-alpha RMSD `10.394793866991996`, atom14 lDDT
+  `0.48771076601743696`, GDT-HA `0.27744885091111066`, GDT-TS
+  `0.41967539802193643`, predicted/true C-alpha Rg
+  `13.782834161281587 / 16.30911695623398`, and val loss
+  `2.96700767993927`. Step 25500 remains the E151 FoldScore best at
+  FoldScore `0.514570508480072`. Local status/history/logs were pulled and
+  plots refreshed through step `26000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T01:46Z E151 live sample: step-26500 validation continued
+  coherently. Trainer PID `34098` remained alive after `5-10:11:47` elapsed;
+  a GPU sample showed `45454 MiB` allocated with `10%` utilization and
+  temperature `44 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26500`, active step `26500`, phase
+  `evaluating`, active eval batch `787 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.389791369438171`, `total_examples=212000`,
+  `history_rows=53`, and last completed history step `26000`. The step-26500
+  validation row has not landed in `history_full_msa_to_face.json` yet. Step
+  26000 remains the E151 best by primary C-alpha lDDT and lowest validation
+  loss: `val_lddt_ca=0.5551994798183442`, FoldScore `0.5068885007202625`,
+  dRMSD `7.717780724078417`, C-alpha RMSD `10.394793866991996`, atom14 lDDT
+  `0.48771076601743696`, GDT-HA `0.27744885091111066`, GDT-TS
+  `0.41967539802193643`, predicted/true C-alpha Rg
+  `13.782834161281587 / 16.30911695623398`, and val loss
+  `2.96700767993927`. Step 25500 remains the E151 FoldScore best at
+  FoldScore `0.514570508480072`. Local status/history/logs were pulled and
+  plots refreshed through step `26000`. Keep E151 running toward `30000`, and
+  leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T02:01Z E151 live sample: the step-26500 validation row landed
+  and training resumed coherently afterward. Trainer PID `34098` remained
+  alive after `5-10:31:41` elapsed; a GPU sample showed `45454 MiB` allocated
+  with `40%` utilization and temperature `51 C`. The required artifact check
+  still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while `history_full_msa_to_face.json`,
+  `run_metadata.json`, `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt` were present. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=26517`, active step `26518`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.489499568939209`, `total_examples=212136`, `history_rows=54`, and last
+  completed history step `26500`. Step 26500 landed below the step-26000
+  primary C-alpha lDDT best and step-25500 FoldScore best, but it improved
+  C-alpha dRMSD: `val_lddt_ca=0.5483038618266582`, FoldScore
+  `0.5143306502699851`, dRMSD `7.158594881415367`, C-alpha RMSD
+  `10.180548623859883`, atom14 lDDT `0.48043779501318934`, GDT-HA
+  `0.2783769052438438`, GDT-TS `0.4236095191836357`, predicted/true
+  C-alpha Rg `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T02:25Z E151 live sample: post-step-26500 training remained
+  coherent. Trainer PID `34098` remained alive after `5-10:48:41` elapsed; a
+  GPU sample showed `45454 MiB` allocated with `5%` utilization and
+  temperature `49 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26573`, active step `26574`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.388161599636078`, `total_examples=212584`,
+  `history_rows=54`, and last completed history step `26500`. Step 26500
+  remains the latest validation row and the E151 C-alpha dRMSD best:
+  `val_lddt_ca=0.5483038618266582`, FoldScore `0.5143306502699851`, dRMSD
+  `7.158594881415367`, C-alpha RMSD `10.180548623859883`, atom14 lDDT
+  `0.48043779501318934`, GDT-HA `0.2783769052438438`, GDT-TS
+  `0.4236095191836357`, predicted/true C-alpha Rg
+  `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T02:43Z E151 live sample: post-step-26500 training remained
+  coherent. Trainer PID `34098` remained alive after `5-11:04:55` elapsed; a
+  GPU sample showed `45454 MiB` allocated with `88%` utilization and
+  temperature `51 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26659`, active step `26660`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.065284967422485`, `total_examples=213272`,
+  `history_rows=54`, and last completed history step `26500`. Step 26500
+  remains the latest validation row and the E151 C-alpha dRMSD best:
+  `val_lddt_ca=0.5483038618266582`, FoldScore `0.5143306502699851`, dRMSD
+  `7.158594881415367`, C-alpha RMSD `10.180548623859883`, atom14 lDDT
+  `0.48043779501318934`, GDT-HA `0.2783769052438438`, GDT-TS
+  `0.4236095191836357`, predicted/true C-alpha Rg
+  `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T03:09Z E151 live sample: post-step-26500 training remained
+  coherent. Trainer PID `34098` remained alive after `5-11:30:34` elapsed; a
+  GPU sample showed `45454 MiB` allocated with `5%` utilization and
+  temperature `48 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26730`, active step `26731`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.025562733411789`, `total_examples=213840`,
+  `history_rows=54`, and last completed history step `26500`. Step 26500
+  remains the latest validation row and the E151 C-alpha dRMSD best:
+  `val_lddt_ca=0.5483038618266582`, FoldScore `0.5143306502699851`, dRMSD
+  `7.158594881415367`, C-alpha RMSD `10.180548623859883`, atom14 lDDT
+  `0.48043779501318934`, GDT-HA `0.2783769052438438`, GDT-TS
+  `0.4236095191836357`, predicted/true C-alpha Rg
+  `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T03:24Z E151 live sample: post-step-26500 training remained
+  coherent and continued toward the step-27000 validation boundary. Trainer
+  PID `34098` remained alive after `5-11:47:44` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `86%` utilization and temperature `51 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26784`, active step `26785`, phase
+  `microbatch_backward_start`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.183407753705978`,
+  `total_examples=214272`, `history_rows=54`, and last completed history step
+  `26500`. Step 26500 remains the latest validation row and the E151 C-alpha
+  dRMSD best: `val_lddt_ca=0.5483038618266582`, FoldScore
+  `0.5143306502699851`, dRMSD `7.158594881415367`, C-alpha RMSD
+  `10.180548623859883`, atom14 lDDT `0.48043779501318934`, GDT-HA
+  `0.2783769052438438`, GDT-TS `0.4236095191836357`, predicted/true C-alpha
+  Rg `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T03:49Z E151 live sample: post-step-26500 training remained
+  coherent and continued toward the step-27000 validation boundary. Trainer
+  PID `34098` remained alive after `5-12:11:40` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `93%` utilization and temperature `50 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26869`, active step `26870`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.332641005516052`, `total_examples=214952`,
+  `history_rows=54`, and last completed history step `26500`. Step 26500
+  remains the latest validation row and the E151 C-alpha dRMSD best:
+  `val_lddt_ca=0.5483038618266582`, FoldScore `0.5143306502699851`, dRMSD
+  `7.158594881415367`, C-alpha RMSD `10.180548623859883`, atom14 lDDT
+  `0.48043779501318934`, GDT-HA `0.2783769052438438`, GDT-TS
+  `0.4236095191836357`, predicted/true C-alpha Rg
+  `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T04:05Z E151 live sample: post-step-26500 training remained
+  coherent and is nearing the step-27000 validation boundary. Trainer PID
+  `34098` remained alive after `5-12:27:05` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `95%` utilization and temperature `52 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26929`, active step `26930`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `3.9604550302028656`, `total_examples=215432`,
+  `history_rows=54`, and last completed history step `26500`. Step 26500
+  remains the latest validation row and the E151 C-alpha dRMSD best:
+  `val_lddt_ca=0.5483038618266582`, FoldScore `0.5143306502699851`, dRMSD
+  `7.158594881415367`, C-alpha RMSD `10.180548623859883`, atom14 lDDT
+  `0.48043779501318934`, GDT-HA `0.2783769052438438`, GDT-TS
+  `0.4236095191836357`, predicted/true C-alpha Rg
+  `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T04:23Z E151 live sample: post-step-26500 training remained
+  coherent and is only a few optimizer steps short of the step-27000
+  validation boundary. Trainer PID `34098` remained alive after `5-12:44:49`
+  elapsed; a GPU sample showed `45454 MiB` allocated with `93%` utilization
+  and temperature `50 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=26996`, active step `26997`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.323937237262726`, `total_examples=215968`,
+  `history_rows=54`, and last completed history step `26500`. Step 26500
+  remains the latest validation row and the E151 C-alpha dRMSD best:
+  `val_lddt_ca=0.5483038618266582`, FoldScore `0.5143306502699851`, dRMSD
+  `7.158594881415367`, C-alpha RMSD `10.180548623859883`, atom14 lDDT
+  `0.48043779501318934`, GDT-HA `0.2783769052438438`, GDT-TS
+  `0.4236095191836357`, predicted/true C-alpha Rg
+  `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T04:40Z E151 live sample: step-27000 validation is in progress.
+  Trainer PID `34098` remained alive after `5-13:01:56` elapsed; a GPU sample
+  showed `45454 MiB` allocated with `4%` utilization and temperature `45 C`.
+  The required artifact check still found no final `results.json`,
+  `results.csv`, or `eval_details_full_msa_to_face.csv`, while
+  `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=27000`, active step `27000`, phase
+  `evaluating`, active eval batch `281 / 1000`, active eval examples `281`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.495053380727768`,
+  `total_examples=216000`, `history_rows=54`, and last completed history step
+  `26500`. Step 26500 remains the latest completed validation row and the
+  E151 C-alpha dRMSD best: `val_lddt_ca=0.5483038618266582`, FoldScore
+  `0.5143306502699851`, dRMSD `7.158594881415367`, C-alpha RMSD
+  `10.180548623859883`, atom14 lDDT `0.48043779501318934`, GDT-HA
+  `0.2783769052438438`, GDT-TS `0.4236095191836357`, predicted/true C-alpha
+  Rg `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T04:57Z E151 live sample: step-27000 validation continued
+  coherently. Trainer PID `34098` remained alive after `5-13:18:51` elapsed;
+  a GPU sample showed `45454 MiB` allocated with `7%` utilization and
+  temperature `45 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=27000`, active step `27000`, phase
+  `evaluating`, active eval batch `383 / 1000`, active eval examples `383`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.495053380727768`,
+  `total_examples=216000`, `history_rows=54`, and last completed history step
+  `26500`. Step 26500 remains the latest completed validation row and the
+  E151 C-alpha dRMSD best: `val_lddt_ca=0.5483038618266582`, FoldScore
+  `0.5143306502699851`, dRMSD `7.158594881415367`, C-alpha RMSD
+  `10.180548623859883`, atom14 lDDT `0.48043779501318934`, GDT-HA
+  `0.2783769052438438`, GDT-TS `0.4236095191836357`, predicted/true C-alpha
+  Rg `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T05:15Z E151 live sample: step-27000 validation continued
+  coherently. Trainer PID `34098` remained alive after `5-13:37:30` elapsed;
+  a GPU sample showed `45454 MiB` allocated with `83%` utilization and
+  temperature `46 C`. The required artifact check still found no final
+  `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`,
+  while `history_full_msa_to_face.json`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and `checkpoints/full_msa_to_face_latest.pt`
+  were present. After the status/history/log pull and plot refresh, local
+  status reported `completed_step=27000`, active step `27000`, phase
+  `evaluating`, active eval batch `617 / 1000`, active eval examples `617`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.495053380727768`,
+  `total_examples=216000`, `history_rows=54`, and last completed history step
+  `26500`. Step 26500 remains the latest completed validation row and the
+  E151 C-alpha dRMSD best: `val_lddt_ca=0.5483038618266582`, FoldScore
+  `0.5143306502699851`, dRMSD `7.158594881415367`, C-alpha RMSD
+  `10.180548623859883`, atom14 lDDT `0.48043779501318934`, GDT-HA
+  `0.2783769052438438`, GDT-TS `0.4236095191836357`, predicted/true C-alpha
+  Rg `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T05:31Z E151 live sample: step-27000 validation continued
+  coherently and is nearing completion. Trainer PID `34098` remained alive
+  after `5-13:53:32` elapsed; a GPU sample showed `45454 MiB` allocated with
+  `88%` utilization and temperature `49 C`. The required artifact check still
+  found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while `history_full_msa_to_face.json`,
+  `run_metadata.json`, `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt` were present. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=27000`, active step `27000`, phase `evaluating`, active eval
+  batch `818 / 1000`, active eval examples `818`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.495053380727768`, `total_examples=216000`,
+  `history_rows=54`, and last completed history step `26500`. Step 26500
+  remains the latest completed validation row and the E151 C-alpha dRMSD
+  best: `val_lddt_ca=0.5483038618266582`, FoldScore `0.5143306502699851`,
+  dRMSD `7.158594881415367`, C-alpha RMSD `10.180548623859883`, atom14 lDDT
+  `0.48043779501318934`, GDT-HA `0.2783769052438438`, GDT-TS
+  `0.4236095191836357`, predicted/true C-alpha Rg
+  `14.493474531650543 / 16.30911695623398`, and val loss
+  `2.973100661635399`. Step 26000 remains the E151 best by primary C-alpha
+  lDDT and lowest validation loss; step 25500 remains the FoldScore best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `26500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-06T05:49Z E151 live sample: the step-27000 validation row landed
+  and set a new E151 primary C-alpha lDDT high. Trainer PID `34098` remained
+  alive after `5-14:10:50` elapsed; a GPU sample showed `45454 MiB` allocated
+  with `90%` utilization and temperature `50 C`. The required artifact check
+  still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while the checkpoint and history file
+  advanced to `2026-06-06T05:48Z`. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=27010`, active step
+  `27011`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `3.8678932785987854`,
+  `total_examples=216080`, `history_rows=55`, and last completed history step
+  `27000`. Step 27000 is now the E151 best by primary C-alpha lDDT and
+  validation loss: `val_lddt_ca=0.5579849800020457`, FoldScore
+  `0.5105622765421868`, dRMSD `7.496918426960707`, C-alpha RMSD
+  `10.218278052389621`, atom14 lDDT `0.4911863688826561`, GDT-HA
+  `0.27974344726279377`, GDT-TS `0.4229533046931028`, predicted/true
+  C-alpha Rg `13.875714686870575 / 16.30911695623398`, and val loss
+  `2.966965937256813`. Step 25500 remains the E151 FoldScore best; step
+  26500 remains the E151 C-alpha dRMSD best. Local status/history/logs were
+  pulled and plots refreshed through step `27000`. Keep E151 running toward
+  `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle
+  or explicit terminal no-score outcome exists.
+- 2026-06-06T06:20Z E151 live sample: step-27500 validation is in progress
+  after the step-27000 primary-lDDT high. Trainer PID `34098` remained alive
+  after `5-14:58:42` elapsed; a GPU sample showed `45454 MiB` allocated with
+  `87%` utilization and temperature `50 C`. The required artifact check still
+  found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while the checkpoint, history, metadata,
+  and status file were present. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=27500`, active step `27500`,
+  phase `evaluating`, active eval batch `193 / 1000`, active eval examples
+  `193`, target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.3911795020103455`,
+  `total_examples=220000`, `history_rows=55`, and last completed history step
+  `27000`. Step 27000 remains the E151 best by primary C-alpha lDDT and
+  validation loss; step 25500 remains FoldScore best; step 26500 remains
+  C-alpha dRMSD best. Local status/history/logs were pulled and plots refreshed
+  through step `27000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-06T10:26Z E151 live sample: the step-27500 validation row landed
+  and became the E151 best by primary C-alpha lDDT, FoldScore, and validation
+  loss. Trainer PID `34098` remained alive after `5-19:23:14` elapsed; a GPU
+  sample showed `45454 MiB` allocated with `92%` utilization and temperature
+  `52 C`. The required artifact check still found no final `results.json`,
+  `results.csv`, or `eval_details_full_msa_to_face.csv`, while the checkpoint,
+  history, metadata, and status file were present. After the status/history/log
+  pull and plot refresh, local status reported `completed_step=27888`, active
+  step `27889`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.3789176642894745`, `total_examples=223104`,
+  `history_rows=56`, and last completed history step `27500`. Step 27500 now
+  leads with `val_lddt_ca=0.5588843356668949`, FoldScore
+  `0.5160341182947159`, dRMSD `7.330923620402813`, C-alpha RMSD
+  `10.153559684038163`, atom14 lDDT `0.4900786797106266`, GDT-HA
+  `0.28624098796397446`, GDT-TS `0.43188856633752587`, predicted/true C-alpha
+  Rg `14.160791177272797 / 16.30911695623398`, and val loss
+  `2.9514812287092207`. Step 26500 remains the E151 C-alpha dRMSD best. Local
+  status/history/logs were pulled and plots refreshed through step `27500`.
+  Keep E151 running toward `30000`, and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-06T12:10Z E151 live sample: step-28000 validation is in progress
+  after the step-27500 running best. Trainer PID `34098` remained alive after
+  `5-20:31:38` elapsed; a GPU sample showed `45454 MiB` allocated with `33%`
+  utilization and temperature `44 C`. The required artifact check still found
+  no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while the checkpoint, history, metadata,
+  and status file were present. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=28000`, active step `28000`,
+  phase `evaluating`, active eval batch `204 / 1000`, active eval examples
+  `204`, target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.332597136497498`,
+  `total_examples=224000`, `history_rows=56`, and last completed history step
+  `27500`. Step 27500 remains the E151 best by primary C-alpha lDDT, FoldScore,
+  and validation loss; step 26500 remains the E151 C-alpha dRMSD best. Local
+  status/history/logs were pulled and plots refreshed through step `27500`.
+  Keep E151 running toward `30000`, and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-06T12:26Z E151 live sample: step-28000 validation continued
+  coherently after the step-27500 running best. Trainer PID `34098` remained
+  alive after `5-20:48:19` elapsed; a GPU sample showed `45454 MiB` allocated
+  with `25%` utilization and temperature `44 C`. The required artifact check
+  still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while the checkpoint, history, metadata,
+  and status file were present. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=28000`, active step `28000`,
+  phase `evaluating`, active eval batch `431 / 1000`, active eval examples
+  `431`, target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.332597136497498`,
+  `total_examples=224000`, `history_rows=56`, and last completed history step
+  `27500`. Step 27500 remains the E151 best by primary C-alpha lDDT, FoldScore,
+  and validation loss; step 26500 remains the E151 C-alpha dRMSD best. Local
+  status/history/logs were pulled and plots refreshed through step `27500`.
+  Keep E151 running toward `30000`, and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-06T12:46Z E151 live sample: step-28000 validation continued
+  coherently after the step-27500 running best. Trainer PID `34098` remained
+  alive after `5-21:08:14` elapsed; a GPU sample showed `45454 MiB` allocated
+  with `16%` utilization and temperature `44 C`. The required artifact check
+  still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while the checkpoint, history, metadata,
+  and status file were present. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=28000`, active step `28000`,
+  phase `evaluating`, active eval batch `654 / 1000`, active eval examples
+  `654`, target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.332597136497498`,
+  `total_examples=224000`, `history_rows=56`, and last completed history step
+  `27500`. Step 27500 remains the E151 best by primary C-alpha lDDT, FoldScore,
+  and validation loss; step 26500 remains the E151 C-alpha dRMSD best. Local
+  status/history/logs were pulled and plots refreshed through step `27500`.
+  Keep E151 running toward `30000`, and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-06T13:01Z E151 live sample: step-28000 validation continued
+  coherently after the step-27500 running best. Trainer PID `34098` remained
+  alive after `5-21:23:20` elapsed; a GPU sample showed `45454 MiB` allocated
+  with `28%` utilization and temperature `44 C`. The required artifact check
+  still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while the checkpoint, history, metadata,
+  and status file were present. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=28000`, active step `28000`,
+  phase `evaluating`, active eval batch `847 / 1000`, active eval examples
+  `847`, target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.332597136497498`,
+  `total_examples=224000`, `history_rows=56`, and last completed history step
+  `27500`. Step 27500 remains the E151 best by primary C-alpha lDDT, FoldScore,
+  and validation loss; step 26500 remains the E151 C-alpha dRMSD best. Local
+  status/history/logs were pulled and plots refreshed through step `27500`.
+  Keep E151 running toward `30000`, and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome exists.
+- 2026-06-06T13:16Z E151 live sample: the step-28000 validation row landed
+  but did not beat the step-27500 running best. Trainer PID `34098` remained
+  alive after `5-21:38:33` elapsed; a GPU sample showed `45454 MiB` allocated
+  with `88%` utilization and temperature `49 C`. The required artifact check
+  still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while the checkpoint and history file
+  advanced to `2026-06-06T13:14Z`. After the status/history/log pull and plot
+  refresh, local status reported `completed_step=28009`, active step `28010`,
+  phase `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.412682682275772`, `total_examples=224072`,
+  `history_rows=57`, and last completed history step `28000`. Step 28000
+  landed with `val_lddt_ca=0.5581579765379429`, FoldScore
+  `0.5107787215411663`, dRMSD `7.651486100196839`, C-alpha RMSD
+  `10.332116420805454`, atom14 lDDT `0.49027597811818124`, GDT-HA
+  `0.2787664144821465`, GDT-TS `0.42466107277572157`, predicted/true C-alpha
+  Rg `13.710665215015412 / 16.30911695623398`, and val loss
+  `2.992591923713684`. Step 27500 remains the E151 best by primary C-alpha
+  lDDT, FoldScore, and validation loss; step 26500 remains the E151 C-alpha
+  dRMSD best. Local status/history/logs were pulled and plots refreshed through
+  step `28000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-06T13:32Z E151 live sample: post-step-28000 training remained
+  coherent and continued toward the next validation boundary. Trainer PID
+  `34098` remained alive after `5-21:54:12` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `94%` utilization and temperature `50 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while the checkpoint, history,
+  metadata, and status file were present. After the status/history/log pull
+  and plot refresh, local status reported `completed_step=28094`, active step
+  `28095`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.497770518064499`, `total_examples=224752`,
+  `history_rows=57`, and last completed history step `28000`. Step 28000
+  remains below the step-27500 leader; step 27500 remains the E151 best by
+  primary C-alpha lDDT, FoldScore, and validation loss; step 26500 remains the
+  E151 C-alpha dRMSD best. Local status/history/logs were pulled and plots
+  refreshed through step `28000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-06T14:01Z E151 live sample: post-step-28000 training remained
+  coherent and continued toward the step-28500 validation boundary. Trainer PID
+  `34098` remained alive after `5-22:38:18` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `90%` utilization and temperature `50 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while the checkpoint, history,
+  metadata, and status file were present. After the status/history/log pull
+  and plot refresh, local status reported `completed_step=28240`, active step
+  `28241`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.403134614229202`, `total_examples=225920`,
+  `history_rows=57`, and last completed history step `28000`. Step 28000
+  remains below the step-27500 leader; step 27500 remains the E151 best by
+  primary C-alpha lDDT, FoldScore, and validation loss; step 26500 remains the
+  E151 C-alpha dRMSD best. Local status/history/logs were pulled and plots
+  refreshed through step `28000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-06T14:42Z E151 live sample: post-step-28000 training remained
+  coherent and is nearing the step-28500 validation boundary. Trainer PID
+  `34098` remained alive after `5-23:12:46` elapsed; a GPU sample showed
+  `45454 MiB` allocated with `84%` utilization and temperature `50 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while the checkpoint, history,
+  metadata, and status file were present. After the status/history/log pull
+  and plot refresh, local status reported `completed_step=28419`, active step
+  `28420`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.707622706890106`, `total_examples=227352`,
+  `history_rows=57`, and last completed history step `28000`. Step 28000
+  remains below the step-27500 leader; step 27500 remains the E151 best by
+  primary C-alpha lDDT, FoldScore, and validation loss; step 26500 remains the
+  E151 C-alpha dRMSD best. Local status/history/logs were pulled and plots
+  refreshed through step `28000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-06T15:47Z E151 live sample: the step-28500 validation row landed
+  and set new E151 running highs for primary C-alpha lDDT, FoldScore,
+  C-alpha RMSD, GDT-HA, and GDT-TS. Trainer PID `34098` remained alive after
+  `6-01:54:15` elapsed; a GPU sample showed `45454 MiB` allocated with `87%`
+  utilization and temperature `49 C`. The required artifact check still found
+  no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while the checkpoint, history,
+  metadata, and status file were present. After the status/history/log pull
+  and plot refresh, local status reported `completed_step=29000`, active step
+  `29000`, phase `evaluating`, active eval batch `616 / 1000`, active eval
+  examples `616`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.290224015712738`, `total_examples=232000`, `history_rows=58`, and last
+  completed history step `28500`. Step 28500 is
+  now the E151 best by primary C-alpha lDDT `0.5660529679954052`, FoldScore
+  `0.5221157782971859`, C-alpha RMSD `9.850405102550983`, GDT-HA
+  `0.29332546331733467`, and GDT-TS `0.44064879827946424`; it also reported
+  dRMSD `7.196579008191824`, atom14 lDDT `0.4955333162844181`, predicted/true
+  C-alpha Rg `14.164340734958648 / 16.30911695623398`, and val loss
+  `2.9745273894071578`. Step 27500 remains the E151 validation-loss best, and
+  step 26500 remains the E151 C-alpha dRMSD best. Local status/history/logs
+  were pulled and plots refreshed through step `28500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-06T23:39Z E151 live sample: post-step-29500 training remained
+  coherent and is now near the final 30000-step validation boundary. Trainer
+  PID `34098` remained alive after `6-08:12:56` elapsed; a GPU sample showed
+  `45456 MiB` allocated with `90%` utilization and temperature `52 C`. The
+  required artifact check still found no final `results.json`, `results.csv`,
+  or `eval_details_full_msa_to_face.csv`, while the checkpoint, history,
+  metadata, and status file were present. After the status/history/log pull
+  and plot refresh, local status reported `completed_step=29577`, active step
+  `29578`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.434426635503769`, `total_examples=236616`,
+  `history_rows=60`, and last completed history step `29500`. Step 29500 is
+  the latest completed validation row with `val_lddt_ca=0.5632421828210353`,
+  FoldScore `0.5184336332976818`, dRMSD `7.256421673536301`, C-alpha RMSD
+  `10.139343995690346`, atom14 lDDT `0.4928173035383224`, GDT-HA
+  `0.2888267398998141`, GDT-TS `0.43529638439416884`, predicted/true C-alpha
+  Rg `14.136428798675537 / 16.30911695623398`, and val loss
+  `2.9590099921226503`. Step 28500 remains the E151 best by primary C-alpha
+  lDDT, FoldScore, C-alpha RMSD, GDT-HA, and GDT-TS; step 27500 remains the
+  E151 validation-loss best; step 26500 remains the E151 C-alpha dRMSD best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `29500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-07T00:13Z E151 live sample: post-step-29500 training remained
+  coherent and continued inching toward the final 30000-step boundary.
+  Trainer PID `34098` remained alive after `6-08:35:09` elapsed; a GPU sample
+  showed `45456 MiB` allocated with `3%` utilization and temperature `49 C`.
+  The required artifact check still found no final `results.json`,
+  `results.csv`, or `eval_details_full_msa_to_face.csv`, while the
+  checkpoint, history, metadata, and status file were present. After the
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=29591`, active step `29592`, phase `microbatch_done`, active
+  microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.230556964874268`, `total_examples=236728`, `history_rows=60`, and last
+  completed history step `29500`. Step 29500 remains the latest completed
+  validation row and remains below the step-28500 leader; step 28500 remains
+  the E151 best by primary C-alpha lDDT, FoldScore, C-alpha RMSD, GDT-HA, and
+  GDT-TS; step 27500 remains the E151 validation-loss best; step 26500
+  remains the E151 C-alpha dRMSD best. Local status/history/logs were pulled
+  and plots refreshed through step `29500`. Keep E151 running toward `30000`,
+  and leave `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or
+  explicit terminal no-score outcome exists.
+- 2026-06-07T00:32Z E151 live sample: final-stretch training remained
+  coherent and advanced close to the 30000-step boundary. Trainer PID `34098`
+  remained alive after `6-10:02:08` elapsed; a GPU sample showed `45456 MiB`
+  allocated with `83%` utilization and temperature `50 C`. The required
+  artifact check still found no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv`, while the checkpoint, history,
+  metadata, and status file were present. After the status/history/log pull
+  and plot refresh, local status reported `completed_step=29880`, active step
+  `29881`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.563981622457504`, `total_examples=239040`,
+  `history_rows=60`, and last completed history step `29500`. Step 29500
+  remains the latest completed validation row and remains below the
+  step-28500 leader; step 28500 remains the E151 best by primary C-alpha
+  lDDT, FoldScore, C-alpha RMSD, GDT-HA, and GDT-TS; step 27500 remains the
+  E151 validation-loss best; step 26500 remains the E151 C-alpha dRMSD best.
+  Local status/history/logs were pulled and plots refreshed through step
+  `29500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-07T03:16Z E151 terminal return: trainer PID `34098` was no longer
+  running after the final bundle landed, and the required remote files were
+  present: `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+  `eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+  `status_full_msa_to_face.json`, and
+  `checkpoints/full_msa_to_face_latest.pt`. The bundle and log were pulled
+  locally, and the E151 plots were refreshed.
+- Verification passed for E151 with `completed_steps=30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  `parameters=3,240,738 <= 3,261,974`, `1000` eval-detail rows, one result
+  row, `61` history rows, and final history step `30000`. The artifact goal
+  audit failed only the target gate because `val_lddt_ca=0.5678 < 0.70`.
+- Final E151 metrics: C-alpha lDDT `0.5678420430421829`, FoldScore
+  `0.5311576097011567`, dRMSD `6.964241918712855`, C-alpha RMSD
+  `9.75840218257904`, validation loss `2.9504879058599474`, GDT-HA
+  `0.2996282949745655`, GDT-TS `0.4497991052418947`, atom14 lDDT
+  `0.49778978404402735`, and predicted/true C-alpha Rg
+  `14.369263122558595 / 16.30911695623398`.
+- Eval-detail analysis kept the local/global split explicit: mean boundary
+  lDDT `0.8213`, mean boundary contraction `0.5794`, mean Rg ratio `0.9035`,
+  the `>=220` length bin at `0.5134` lDDT, and `35 / 817` high-boundary /
+  low-global rows with mean global lDDT `0.3780`. E151 was recorded in
+  `EXPERIMENT_RESULTS.md` as returned and best-so-far, but rejected as
+  goal-ready. The result ledger audit passed after recording. An unrelated
+  OPS generalization eval was active on the pod and was left untouched.
+- 2026-06-04T16:50Z E151 live sample: post-step-22000 training remained
+  coherent after the new running best. The remote sample at
+  `2026-06-04T16:51:11Z` reported `completed_step=22166`, active step
+  `22167`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.3617532551288605`, `total_examples=177328`,
+  `history_rows=45`, and last completed history step `22000`. After the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=22167`, active step `22168`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.432887941598892`,
+  `total_examples=177336`, `history_rows=45`, and last completed history
+  step `22000`. Step 22000 remains the best E151 row by both primary C-alpha
+  lDDT and FoldScore: `val_lddt_ca=0.5370787032842637`, FoldScore
+  `0.4960104620754719`, dRMSD `7.376684496045113`, C-alpha RMSD
+  `10.278077024221421`, atom14 lDDT `0.47582480958104134`, GDT-HA
+  `0.26632877461984755`, GDT-TS `0.41080276903510093`, predicted/true
+  C-alpha Rg `14.089581943511963 / 16.30911695623398`, and val loss
+  `3.0172615362405777`. Trainer PID `34098` remained alive after
+  `4-01:12:24` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `91%`, and status/process progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `22000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T16:30Z E151 live sample: step-22000 validation landed and set
+  a new E151 running best. The remote sample at `2026-06-04T16:30:40Z`
+  reported `completed_step=22098`, active step `22099`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.4740698635578156`, `total_examples=176784`,
+  `history_rows=45`, and last completed history step `22000`. After the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=22149`, active step `22150`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.4575508534908295`,
+  `total_examples=177192`, `history_rows=45`, and last completed history
+  step `22000`. Step 22000 is now the best E151 row by both primary C-alpha
+  lDDT and FoldScore: `val_lddt_ca=0.5370787032842637`, FoldScore
+  `0.4960104620754719`, dRMSD `7.376684496045113`, C-alpha RMSD
+  `10.278077024221421`, atom14 lDDT `0.47582480958104134`, GDT-HA
+  `0.26632877461984755`, GDT-TS `0.41080276903510093`, predicted/true
+  C-alpha Rg `14.089581943511963 / 16.30911695623398`, and val loss
+  `3.0172615362405777`. Trainer PID `34098` remained alive after
+  `4-00:51:53` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `85%`, and status/process progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `22000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T15:58Z E151 live sample: step-22000 validation remained
+  coherent and was nearly complete. The remote sample at
+  `2026-06-04T15:58:47Z` reported `completed_step=22000`, active step
+  `22000`, phase `evaluating`, active eval batch `964 / 1000`, active eval
+  examples `964`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.297362238168716`, `total_examples=176000`, `history_rows=44`, and last
+  completed history step `21500`. After the local status/history/log pull and
+  plot refresh, local status reported the same completed step and phase with
+  active eval batch `987 / 1000` and active eval examples `987`. The
+  step-22000 validation row has not landed in `history_full_msa_to_face.json`
+  yet; step 21500 remains the latest completed validation row:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `4-00:20:00` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `91%`, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `21500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T15:39Z E151 live sample: step-22000 validation remained
+  coherent and advanced to roughly three quarters complete. The remote sample
+  at `2026-06-04T15:40:16Z` reported `completed_step=22000`, active step
+  `22000`, phase `evaluating`, active eval batch `763 / 1000`, active eval
+  examples `763`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.297362238168716`, `total_examples=176000`, `history_rows=44`, and last
+  completed history step `21500`. After the local status/history/log pull and
+  plot refresh, local status reported the same values. The step-22000
+  validation row has not landed in `history_full_msa_to_face.json` yet; step
+  21500 remains the latest completed validation row:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `4-00:01:29` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `92%`, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `21500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T15:23Z E151 live sample: step-22000 validation remained
+  coherent and advanced past the halfway mark. The remote sample at
+  `2026-06-04T15:23:53Z` reported `completed_step=22000`, active step
+  `22000`, phase `evaluating`, active eval batch `562 / 1000`, active eval
+  examples `562`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.297362238168716`, `total_examples=176000`, `history_rows=44`, and last
+  completed history step `21500`. After the local status/history/log pull and
+  plot refresh, local status reported the same completed step and phase with
+  active eval batch `577 / 1000` and active eval examples `577`. The
+  step-22000 validation row has not landed in `history_full_msa_to_face.json`
+  yet; step 21500 remains the latest completed validation row:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `3-23:45:06` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `60%`, consistent with the
+  validation phase, and status/process progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `21500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T15:03Z E151 live sample: step-22000 validation remained
+  coherent and advanced during the heartbeat. The remote sample at
+  `2026-06-04T15:04:14Z` reported `completed_step=22000`, active step
+  `22000`, phase `evaluating`, active eval batch `316 / 1000`, active eval
+  examples `316`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.297362238168716`, `total_examples=176000`, `history_rows=44`, and last
+  completed history step `21500`. After the local status/history/log pull and
+  plot refresh, local status reported the same completed step and phase with
+  active eval batch `330 / 1000` and active eval examples `330`. The
+  step-22000 validation row has not landed in `history_full_msa_to_face.json`
+  yet; step 21500 remains the latest completed validation row:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `3-23:25:27` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `31%`, consistent with the
+  validation phase, and status/process progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `21500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T14:39Z E151 live sample: step-22000 validation is now in
+  progress and coherent. The remote sample at `2026-06-04T14:41:50Z`
+  reported `completed_step=22000`, active step `22000`, phase `evaluating`,
+  active eval batch `13 / 1000`, active eval examples `13`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.297362238168716`, `total_examples=176000`,
+  `history_rows=44`, and last completed history step `21500`. After the local
+  status/history/log pull and plot refresh, local status reported the same
+  completed step and phase with active eval batch `204 / 1000` and active eval
+  examples `204`. The step-22000 validation row has not landed in
+  `history_full_msa_to_face.json` yet; step 21500 remains the latest completed
+  validation row:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `3-23:03:03` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `20%`, consistent with the
+  validation phase, and status/process progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `21500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T14:16Z E151 live sample: post-step-21500 training continued
+  coherently and remained just short of the step-22000 validation boundary.
+  The remote sample at `2026-06-04T14:19:07Z` reported
+  `completed_step=21923`, active step `21924`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.337458997964859`, `total_examples=175384`, `history_rows=44`, and last
+  completed history step `21500`. After the local status/history/log pull and
+  plot refresh, local status reported `completed_step=21932`, active step
+  `21933`, phase `microbatch_done`, active microbatch `1 / 8`, finite last
+  train loss `4.479485392570496`, and `total_examples=175456`. Step 21500
+  remains the latest completed validation row:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `3-22:40:20` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `87%`, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `21500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T14:00Z E151 live sample: post-step-21500 training continued
+  coherently and is nearing the step-22000 validation boundary. The remote
+  sample at `2026-06-04T14:03:55Z` reported `completed_step=21868`, active
+  step `21869`, phase `microbatch_done`, active microbatch `1 / 8`, target
+  step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.030597120523453`,
+  `total_examples=174944`, `history_rows=44`, and last completed history step
+  `21500`. After the local status/history/log pull and plot refresh, local
+  status reported `completed_step=21870`, active step `21871`, phase
+  `microbatch_done`, active microbatch `1 / 8`, finite last train loss
+  `4.127490073442459`, and `total_examples=174960`. Step 21500 remains the
+  latest completed validation row:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `3-22:25:08` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `83%`, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `21500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T13:36Z E151 live sample: post-step-21500 training continued
+  coherently toward the step-22000 validation boundary. The remote sample at
+  `2026-06-04T13:37:18Z` reported `completed_step=21772`, active step
+  `21773`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.083873063325882`, `total_examples=174176`,
+  `history_rows=44`, and last completed history step `21500`. After the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=21777`, active step `21778`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.341630727052689`, and
+  `total_examples=174216`. Step 21500 remains the latest completed validation
+  row:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `3-21:58:31` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `90%`, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `21500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T12:54Z E151 live sample: post-step-21500 training continued
+  coherently toward the step-22000 validation boundary. The remote sample at
+  `2026-06-04T13:14:52Z` reported `completed_step=21687`, active step
+  `21688`, phase `microbatch_forward_start`, active microbatch `1 / 8`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.268553555011749`,
+  `total_examples=173496`, `history_rows=44`, and last completed history step
+  `21500`. After the local status/history/log pull and plot refresh, local
+  status reported `completed_step=21688`, active step `21689`, phase
+  `microbatch_done`, active microbatch `1 / 8`, finite last train loss
+  `4.368679225444794`, and `total_examples=173504`. Step 21500 remains the
+  latest completed validation row:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `3-21:36:05` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `94%`, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `21500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T12:39Z E151 live sample: the step-21500 validation row landed
+  coherently and post-eval training resumed. The remote sample at
+  `2026-06-04T12:40:43Z` reported `completed_step=21557`, active step
+  `21558`, phase `microbatch_done`, active microbatch `1 / 8`, target step
+  `30000`, `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+  finite last train loss `4.335349142551422`, `total_examples=172456`,
+  `history_rows=44`, and last completed history step `21500`. After the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=21559`, active step `21560`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.284328520298004`, and
+  `total_examples=172472`. Step 21500 landed near the step-21000 primary
+  C-alpha lDDT best but did not improve either running-best metric:
+  `val_lddt_ca=0.5287156385481357`, FoldScore `0.4820438790023327`, dRMSD
+  `8.164971419930458`, C-alpha RMSD `10.890244274377823`, atom14 lDDT
+  `0.4683808866739273`, GDT-HA `0.24724727566167712`, GDT-TS
+  `0.3838507747575641`, predicted/true C-alpha Rg
+  `13.443142944812775 / 16.30911695623398`, and val loss
+  `3.026405418753624`. Step 21000 remains the E151 best by both primary
+  C-alpha lDDT (`0.5289791419804096`) and FoldScore (`0.4906012045741081`).
+  Trainer PID `34098` remained alive after `3-21:01:56` elapsed; GPU memory
+  was about `45456 MiB` with sampled utilization `89%`, and status/process
+  progress remained coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `21500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T12:08Z E151 live sample: the step-21500 validation pass is still
+  coherent and nearly complete. The remote sample at `2026-06-04T12:12:47Z`
+  reported `completed_step=21500`, active step `21500`, phase `evaluating`,
+  active eval progress `819 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.728010296821594`, `total_examples=172000`,
+  `history_rows=43`, and last completed history step `21000`. After the local
+  status/history/log pull and plot refresh, local status reported the same
+  completed and active step, phase `evaluating`, active eval progress
+  `833 / 1000`, and the same last completed history step. Step 21000 remains
+  the E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5289791419804096`, FoldScore `0.4906012045741081`, dRMSD
+  `7.381506613612175`, C-alpha RMSD `10.301771914720534`, atom14 lDDT
+  `0.46870221588015554`, GDT-HA `0.25882712369412186`, GDT-TS
+  `0.40418697913736107`, predicted/true C-alpha Rg
+  `14.060315933704377 / 16.30911695623398`, and val loss
+  `3.0285377674102785`. Trainer PID `34098` remained alive after
+  `3-20:34:00` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `91%`, and status/process/eval progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet, and the step-21500 history
+  row has not been written. Local status/history/logs were pulled and plots
+  refreshed through step `21000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T11:50Z E151 live sample: the step-21500 validation pass remains
+  coherent and in progress. The remote sample at `2026-06-04T11:56:08Z`
+  reported `completed_step=21500`, active step `21500`, phase `evaluating`,
+  active eval progress `595 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.728010296821594`, `total_examples=172000`,
+  `history_rows=43`, and last completed history step `21000`. After the local
+  status/history/log pull and plot refresh, local status reported the same
+  completed and active step, phase `evaluating`, active eval progress
+  `609 / 1000`, and the same last completed history step. Step 21000 remains
+  the E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5289791419804096`, FoldScore `0.4906012045741081`, dRMSD
+  `7.381506613612175`, C-alpha RMSD `10.301771914720534`, atom14 lDDT
+  `0.46870221588015554`, GDT-HA `0.25882712369412186`, GDT-TS
+  `0.40418697913736107`, predicted/true C-alpha Rg
+  `14.060315933704377 / 16.30911695623398`, and val loss
+  `3.0285377674102785`. Trainer PID `34098` remained alive after
+  `3-20:17:21` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `32%`, and status/process/eval progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet, and the step-21500 history
+  row has not been written. Local status/history/logs were pulled and plots
+  refreshed through step `21000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T11:17Z E151 live sample: the step-21500 validation pass is in
+  progress and coherent. The remote sample at `2026-06-04T11:18:29Z`
+  reported `completed_step=21500`, active step `21500`, phase `evaluating`,
+  active eval progress `119 / 1000`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.728010296821594`, `total_examples=172000`,
+  `history_rows=43`, and last completed history step `21000`. After the local
+  status/history/log pull and plot refresh, local status reported the same
+  completed and active step, phase `evaluating`, active eval progress
+  `505 / 1000`, and the same last completed history step. Step 21000 remains
+  the E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5289791419804096`, FoldScore `0.4906012045741081`, dRMSD
+  `7.381506613612175`, C-alpha RMSD `10.301771914720534`, atom14 lDDT
+  `0.46870221588015554`, GDT-HA `0.25882712369412186`, GDT-TS
+  `0.40418697913736107`, predicted/true C-alpha Rg
+  `14.060315933704377 / 16.30911695623398`, and val loss
+  `3.0285377674102785`. Trainer PID `34098` remained alive after
+  `3-19:39:42` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `89%`, and status/process/eval progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet, and the step-21500 history
+  row has not been written. Local status/history/logs were pulled and plots
+  refreshed through step `21000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T07:44Z E151 live sample: the step-21000 validation row landed
+  coherently and post-eval training resumed. The remote sample was captured
+  during the validation pass at `2026-06-04T07:45:24Z` with
+  `completed_step=21000`, active step `21000`, phase `evaluating`, active eval
+  progress `323 / 1000`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.1433820724487305`, `total_examples=168000`, `history_rows=42`, and last
+  completed history step `20500`. After the local status/history/log pull and
+  plot refresh, local status reported `completed_step=21058`, active step
+  `21059`, phase `microbatch_done`, active microbatch `1 / 8`, finite last
+  train loss `4.4299547374248505`, `total_examples=168464`,
+  `history_rows=43`, and last completed history step `21000`. Step 21000 is
+  now the E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5289791419804096`, FoldScore `0.4906012045741081`, dRMSD
+  `7.381506613612175`, C-alpha RMSD `10.301771914720534`, atom14 lDDT
+  `0.46870221588015554`, GDT-HA `0.25882712369412186`, GDT-TS
+  `0.40418697913736107`, predicted/true C-alpha Rg
+  `14.060315933704377 / 16.30911695623398`, and val loss
+  `3.0285377674102785`. Step 20500 previously held the FoldScore best at
+  `0.4843084329068661`, and step 20000 previously held the primary C-alpha
+  lDDT best at `0.5202689414322377`. Trainer PID `34098` remained alive after
+  `3-16:06:37` elapsed; GPU memory was about `45456 MiB`, the checkpoint was
+  present, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `21000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T05:58Z E151 live sample: post-step-20500 training continued
+  coherently toward the step-21000 validation boundary. The remote sample
+  reported `completed_step=20810`, active step `20811`, phase
+  `microbatch_forward_start`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.336292088031769`, `total_examples=166480`,
+  `history_rows=42`, and last completed history step `20500`; after the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=20902`, active step `20903`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.282678127288818`, and
+  `total_examples=167216`. Step 20000 remains the primary C-alpha lDDT best at
+  `0.5202689414322377`, while step 20500 remains the E151 FoldScore best:
+  `val_lddt_ca=0.5201320223808289`, FoldScore `0.4843084329068661`, dRMSD
+  `7.774625888645649`, C-alpha RMSD `10.697512485086918`, atom14 lDDT
+  `0.45764328265190124`, GDT-HA `0.2481057433746755`, GDT-TS
+  `0.38659072525799276`, predicted/true C-alpha Rg
+  `14.424138277053833 / 16.30911695623398`, and val loss
+  `3.096491828560829`. Trainer PID `34098` remained alive after
+  `3-14:49:19` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `95%`, and status/process progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `20500`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T05:10Z E151 live sample: the step-20500 validation row landed
+  coherently and post-eval training resumed. The remote sample reported
+  `completed_step=20571`, active step `20572`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.257683545351028`, `total_examples=164568`, `history_rows=42`, and last
+  completed history step `20500`; after the local status/history/log pull and
+  plot refresh, local status reported `completed_step=20573`, active step
+  `20574`, phase `microbatch_done`, active microbatch `1 / 8`, finite last
+  train loss `4.324126452207565`, and `total_examples=164584`. Step 20500 is
+  now the E151 FoldScore best while near-tying the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5201320223808289`, FoldScore `0.4843084329068661`, dRMSD
+  `7.774625888645649`, C-alpha RMSD `10.697512485086918`, atom14 lDDT
+  `0.45764328265190124`, GDT-HA `0.2481057433746755`, GDT-TS
+  `0.38659072525799276`, predicted/true C-alpha Rg
+  `14.424138277053833 / 16.30911695623398`, and val loss
+  `3.096491828560829`. Step 20000 remains the primary C-alpha lDDT best at
+  `0.5202689414322377` with FoldScore `0.4776552207171917`. Trainer PID
+  `34098` remained alive after `3-13:49:34` elapsed; GPU memory was about
+  `45456 MiB`, the checkpoint was refreshed at step 20500, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `20500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T04:29Z E151 live sample: the step-20500 validation pass
+  continued coherently. The remote sample reported `completed_step=20500`,
+  active step `20500`, phase `evaluating`, active eval progress `449 / 1000`
+  batches, `active_eval_examples=449`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.417570650577545`, `total_examples=164000`,
+  `history_rows=41`, and last completed history step `20000`; after the local
+  status/history/log pull and plot refresh, local status reported active eval
+  progress `477 / 1000` batches and `active_eval_examples=477`. Step 20000
+  remains the latest completed validation row and the E151 best by both
+  primary C-alpha lDDT and FoldScore: `val_lddt_ca=0.5202689414322377`,
+  FoldScore `0.4776552207171917`, dRMSD `7.93154305768013`, C-alpha RMSD
+  `10.705918406784534`, atom14 lDDT `0.4612386756241322`, GDT-HA
+  `0.24105056415870785`, GDT-TS `0.3799965967983007`, predicted/true C-alpha
+  Rg `13.650551087856293 / 16.30911695623398`, and val loss
+  `3.0405507999658585`. Trainer PID `34098` remained alive after
+  `3-12:50:50` elapsed; GPU memory was about `45456 MiB` with sampled
+  utilization `6%` during evaluation, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `20000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T04:12Z E151 live sample: the step-20500 validation pass is now
+  underway and coherent. The remote sample reported `completed_step=20500`,
+  active step `20500`, phase `evaluating`, active eval batch `227 / 1000`,
+  `active_eval_examples=227`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.417570650577545`, `total_examples=164000`, `history_rows=41`, and last
+  completed history step `20000`; after the local status/history/log pull and
+  plot refresh, local status matched that state. Step 20000 remains the latest
+  completed validation row and the E151 best by both primary C-alpha lDDT and
+  FoldScore: `val_lddt_ca=0.5202689414322377`, FoldScore
+  `0.4776552207171917`, dRMSD `7.93154305768013`, C-alpha RMSD
+  `10.705918406784534`, atom14 lDDT `0.4612386756241322`, GDT-HA
+  `0.24105056415870785`, GDT-TS `0.3799965967983007`, predicted/true C-alpha
+  Rg `13.650551087856293 / 16.30911695623398`, and val loss
+  `3.0405507999658585`. Trainer PID `34098` remained alive after
+  `3-12:34:15` elapsed; GPU memory was about `45456 MiB` with `33%`
+  utilization during evaluation, and status/process progress remained
+  coherent. The artifact directory still contains
+  `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `20000`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T03:37Z E151 live sample: post-step-20000 training continued
+  coherently toward the step-20500 validation boundary. The remote sample
+  reported `completed_step=20430`, active step `20431`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.571399211883545`, and `total_examples=163440`; after
+  the local status/history/log pull and plot refresh, local status reported
+  `completed_step=20435`, active step `20436`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.392392545938492`,
+  `total_examples=163480`, `history_rows=41`, and last completed history step
+  `20000`. Step 20000 remains the latest completed validation row and the
+  E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5202689414322377`, FoldScore `0.4776552207171917`, dRMSD
+  `7.93154305768013`, C-alpha RMSD `10.705918406784534`, atom14 lDDT
+  `0.4612386756241322`, GDT-HA `0.24105056415870785`, GDT-TS
+  `0.3799965967983007`, predicted/true C-alpha Rg
+  `13.650551087856293 / 16.30911695623398`, and val loss
+  `3.0405507999658585`. Trainer PID `34098` remained alive after
+  `3-12:00:04` elapsed; GPU memory was about `45456 MiB` with `90%`
+  utilization, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `20000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T03:20Z E151 live sample: post-step-20000 training continued
+  coherently toward the step-20500 validation boundary. The remote sample
+  reported `completed_step=20366`, active step `20367`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.130556285381317`, and `total_examples=162928`; after
+  the local status/history/log pull and plot refresh, local status reported
+  `completed_step=20368`, active step `20369`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.101347476243973`,
+  `total_examples=162944`, `history_rows=41`, and last completed history step
+  `20000`. Step 20000 remains the latest completed validation row and the
+  E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5202689414322377`, FoldScore `0.4776552207171917`, dRMSD
+  `7.93154305768013`, C-alpha RMSD `10.705918406784534`, atom14 lDDT
+  `0.4612386756241322`, GDT-HA `0.24105056415870785`, GDT-TS
+  `0.3799965967983007`, predicted/true C-alpha Rg
+  `13.650551087856293 / 16.30911695623398`, and val loss
+  `3.0405507999658585`. Trainer PID `34098` remained alive after
+  `3-11:44:23` elapsed; GPU memory was about `45456 MiB` with `85%`
+  utilization, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `20000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T02:57Z E151 live sample: post-step-20000 training continued
+  coherently toward the step-20500 validation boundary. The remote sample
+  reported `completed_step=20273`, active step `20274`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `3.9882079660892487`, and `total_examples=162184`; after
+  the local status/history/log pull and plot refresh, local status reported
+  `completed_step=20311`, active step `20312`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.163559317588806`,
+  `total_examples=162488`, `history_rows=41`, and last completed history step
+  `20000`. Step 20000 remains the latest completed validation row and the
+  E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5202689414322377`, FoldScore `0.4776552207171917`, dRMSD
+  `7.93154305768013`, C-alpha RMSD `10.705918406784534`, atom14 lDDT
+  `0.4612386756241322`, GDT-HA `0.24105056415870785`, GDT-TS
+  `0.3799965967983007`, predicted/true C-alpha Rg
+  `13.650551087856293 / 16.30911695623398`, and val loss
+  `3.0405507999658585`. Trainer PID `34098` remained alive after
+  `3-11:19:33` elapsed; GPU memory was about `45456 MiB` with `84%`
+  utilization, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `20000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T02:42Z E151 live sample: post-step-20000 training continued
+  coherently toward the step-20500 validation boundary. The remote sample
+  reported `completed_step=20214`, active step `20215`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.466225266456604`, and `total_examples=161712`; after
+  the local status/history/log pull and plot refresh, local status reported
+  `completed_step=20219`, active step `20220`, phase `microbatch_start`,
+  active microbatch `1 / 8`, finite last train loss `4.065458685159683`,
+  `total_examples=161752`, `history_rows=41`, and last completed history step
+  `20000`. Step 20000 remains the latest completed validation row and the
+  E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5202689414322377`, FoldScore `0.4776552207171917`, dRMSD
+  `7.93154305768013`, C-alpha RMSD `10.705918406784534`, atom14 lDDT
+  `0.4612386756241322`, GDT-HA `0.24105056415870785`, GDT-TS
+  `0.3799965967983007`, predicted/true C-alpha Rg
+  `13.650551087856293 / 16.30911695623398`, and val loss
+  `3.0405507999658585`. Trainer PID `34098` remained alive after
+  `3-11:04:08` elapsed; GPU memory was about `45456 MiB` with `88%`
+  utilization, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `20000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T02:14Z E151 live sample: post-step-20000 training continued
+  coherently toward the step-20500 validation boundary. The remote sample
+  reported `completed_step=20150`, active step `20151`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.5774204432964325`, and `total_examples=161200`; after
+  the local status/history/log pull and plot refresh, local status reported
+  `completed_step=20188`, active step `20189`, phase `microbatch_done`,
+  active microbatch `1 / 8`, finite last train loss `4.194904863834381`,
+  `total_examples=161504`, `history_rows=41`, and last completed history step
+  `20000`. Step 20000 remains the latest completed validation row and the
+  E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5202689414322377`, FoldScore `0.4776552207171917`, dRMSD
+  `7.93154305768013`, C-alpha RMSD `10.705918406784534`, atom14 lDDT
+  `0.4612386756241322`, GDT-HA `0.24105056415870785`, GDT-TS
+  `0.3799965967983007`, predicted/true C-alpha Rg
+  `13.650551087856293 / 16.30911695623398`, and val loss
+  `3.0405507999658585`. Trainer PID `34098` remained alive after
+  `3-10:47:09` elapsed; GPU memory was about `45456 MiB` with `90%`
+  utilization, and status/process progress remained coherent. The artifact
+  directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `20000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T01:48Z E151 live sample: the step-20000 validation row completed
+  coherently and improved both E151 running-best metrics. The remote sample
+  reported `completed_step=20009`, active step `20010`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=20012`, active step `20013`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.053008675575256`, `total_examples=160096`, `history_rows=41`, and last
+  completed history step `20000`. Step 20000 is now the latest completed
+  validation row and the E151 best by both primary C-alpha lDDT and FoldScore:
+  `val_lddt_ca=0.5202689414322377`, FoldScore `0.4776552207171917`, dRMSD
+  `7.93154305768013`, C-alpha RMSD `10.705918406784534`, atom14 lDDT
+  `0.4612386756241322`, GDT-HA `0.24105056415870785`, GDT-TS
+  `0.3799965967983007`, predicted/true C-alpha Rg
+  `13.650551087856293 / 16.30911695623398`, and val loss
+  `3.0405507999658585`. Step 18500 previously held the primary C-alpha lDDT
+  best at `0.5153927777707576`; step 19500 previously held the FoldScore best
+  at `0.4724952958226204`. Trainer PID `34098` remained alive after
+  `3-10:09:54` elapsed; GPU memory was about `45456 MiB`, the checkpoint was
+  refreshed at step 20000, and status/process progress remained coherent. The
+  artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet. Local status/history/logs
+  were pulled and plots refreshed through step `20000`. Keep E151 running
+  toward `30000`, and leave `EXPERIMENT_RESULTS.md` unchanged until a scored
+  bundle or explicit terminal no-score outcome exists.
+- 2026-06-04T00:59Z E151 live sample: the step-20000 evaluation remained
+  coherent and in progress. The remote sample reported `completed_step=20000`,
+  active step `20000`, phase `evaluating`, active eval progress `383 / 1000`
+  examples; after the local status/history/log pull and plot refresh, local
+  status reported `completed_step=20000`, active step `20000`, phase
+  `evaluating`, active eval batch `395 / 1000`, `active_eval_examples=395`,
+  target step `30000`, `effective_batch_size=8`, `num_workers=0`,
+  `stopped_early=false`, finite last train loss `4.6535437405109406`,
+  `total_examples=160000`, `history_rows=40`, and last completed history step
+  `19500`. Step 19500 remains the latest completed validation row and the E151
+  FoldScore best: `val_lddt_ca=0.5140581899285317`, FoldScore
+  `0.4724952958226204`, dRMSD `8.557481471776962`, C-alpha RMSD
+  `11.519455065667628`, atom14 lDDT `0.45525554445385935`, GDT-HA
+  `0.2314448622390628`, GDT-TS `0.36036865620315073`, predicted/true
+  C-alpha Rg `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-09:20:32` elapsed; GPU memory
+  was about `45456 MiB`, and status/process/eval progress remained coherent.
+  The artifact directory still contains `checkpoints/full_msa_to_face_latest.pt`,
+  `run_metadata.json`, `history_full_msa_to_face.json`, and
+  `status_full_msa_to_face.json`; no final `results.json`, `results.csv`, or
+  `eval_details_full_msa_to_face.csv` exists yet, and the step-20000 history
+  row has not been written. Local status/history/logs were pulled and plots
+  refreshed through step `19500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit terminal
+  no-score outcome exists.
+- 2026-06-04T01:15Z E151 live sample: the step-20000 evaluation remained
+  coherent and in progress. The remote and local samples both reported
+  `completed_step=20000`, active step `20000`, phase `evaluating`, active eval
+  batch `600 / 1000`, `active_eval_examples=600`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.6535437405109406`, `total_examples=160000`,
+  `history_rows=40`, and last completed history step `19500`. Step 19500
+  remains the latest completed validation row and the E151 FoldScore best:
+  `val_lddt_ca=0.5140581899285317`, FoldScore `0.4724952958226204`, dRMSD
+  `8.557481471776962`, C-alpha RMSD `11.519455065667628`, atom14 lDDT
+  `0.45525554445385935`, GDT-HA `0.2314448622390628`, GDT-TS
+  `0.36036865620315073`, predicted/true C-alpha Rg
+  `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-09:36:16` elapsed; GPU memory
+  was about `45456 MiB` with a live sample at `87%` utilization, and
+  status/process/eval progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet, and the step-20000 history row has not been written. Local
+  status/history/logs were pulled and plots refreshed through step `19500`.
+  Keep E151 running toward `30000`, and leave `EXPERIMENT_RESULTS.md`
+  unchanged until a scored bundle or explicit terminal no-score outcome
+  exists.
+- 2026-06-04T00:27Z E151 live sample: E151 remains coherent and is only a few
+  optimizer steps short of the step-20000 validation trigger. The remote
+  sample reported `completed_step=19990`, active step `19991`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=19992`, active step `19993`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `3.95525860786438`, `total_examples=159936`, `history_rows=40`, and last
+  completed history step `19500`. Step 19500 remains the latest validation
+  row and the E151 FoldScore best: `val_lddt_ca=0.5140581899285317`,
+  FoldScore `0.4724952958226204`, dRMSD `8.557481471776962`, C-alpha RMSD
+  `11.519455065667628`, atom14 lDDT `0.45525554445385935`, GDT-HA
+  `0.2314448622390628`, GDT-TS `0.36036865620315073`, predicted/true
+  C-alpha Rg `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-08:48:31` elapsed; GPU memory
+  was about `45456 MiB` with a live sample at `95%` utilization, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T00:12Z E151 live sample: E151 remains coherent and is still just
+  short of the step-20000 validation boundary. The remote sample reported
+  `completed_step=19931`, active step `19932`, phase `microbatch_done`, active
+  microbatch `1 / 8`; after the local status/history/log pull and plot
+  refresh, local status reported `completed_step=19933`, active step `19934`,
+  phase `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.389083594083786`, `total_examples=159464`,
+  `history_rows=40`, and last completed history step `19500`. Step 19500
+  remains the latest validation row and the E151 FoldScore best:
+  `val_lddt_ca=0.5140581899285317`, FoldScore `0.4724952958226204`, dRMSD
+  `8.557481471776962`, C-alpha RMSD `11.519455065667628`, atom14 lDDT
+  `0.45525554445385935`, GDT-HA `0.2314448622390628`, GDT-TS
+  `0.36036865620315073`, predicted/true C-alpha Rg
+  `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-08:33:15` elapsed; GPU memory
+  was about `45456 MiB` with a live sample at `91%` utilization, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-04T00:06Z E151 live sample: E151 is still coherent and very close
+  to the step-20000 validation boundary. The remote sample reported
+  `completed_step=19912`, active step `19913`, phase `microbatch_done`, active
+  microbatch `1 / 8`; after the local status/history/log pull and plot
+  refresh, local status reported `completed_step=19914`, active step `19915`,
+  phase `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.793122291564941`, `total_examples=159312`,
+  `history_rows=40`, and last completed history step `19500`. Step 19500
+  remains the latest validation row and the E151 FoldScore best:
+  `val_lddt_ca=0.5140581899285317`, FoldScore `0.4724952958226204`, dRMSD
+  `8.557481471776962`, C-alpha RMSD `11.519455065667628`, atom14 lDDT
+  `0.45525554445385935`, GDT-HA `0.2314448622390628`, GDT-TS
+  `0.36036865620315073`, predicted/true C-alpha Rg
+  `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-08:28:00` elapsed; GPU memory
+  was about `45456 MiB` with a live sample at `4%` utilization, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T23:22Z E151 live sample: E151 remains coherent after the
+  post-step-19500 training stretch and is still moving toward the step-20000
+  validation boundary. The remote sample reported `completed_step=19751`,
+  active step `19752`, phase `microbatch_start`, active microbatch `1 / 8`;
+  after the local status/history/log pull and plot refresh, local status
+  reported `completed_step=19761`, active step `19762`, phase
+  `microbatch_done`, active microbatch `1 / 8`, target step `30000`,
+  `effective_batch_size=8`, `num_workers=0`, `stopped_early=false`, finite
+  last train loss `4.335193365812302`, `total_examples=158088`,
+  `history_rows=40`, and last completed history step `19500`. Step 19500
+  remains the latest validation row and the E151 FoldScore best:
+  `val_lddt_ca=0.5140581899285317`, FoldScore `0.4724952958226204`, dRMSD
+  `8.557481471776962`, C-alpha RMSD `11.519455065667628`, atom14 lDDT
+  `0.45525554445385935`, GDT-HA `0.2314448622390628`, GDT-TS
+  `0.36036865620315073`, predicted/true C-alpha Rg
+  `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-07:44:03` elapsed; GPU memory
+  was about `45456 MiB` with a live sample at `4%` utilization, and
+  status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T22:39Z E151 live sample: post-step-19500 training continued
+  coherently toward the step-20000 validation boundary. The remote sample
+  reported `completed_step=19595`, active step `19596`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=19596`, active step `19597`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.285734117031097`, `total_examples=156768`, `history_rows=40`, and last
+  completed history step `19500`. Step 19500 remains the latest validation
+  row and the E151 FoldScore best: `val_lddt_ca=0.5140581899285317`,
+  FoldScore `0.4724952958226204`, dRMSD `8.557481471776962`, C-alpha RMSD
+  `11.519455065667628`, atom14 lDDT `0.45525554445385935`, GDT-HA
+  `0.2314448622390628`, GDT-TS `0.36036865620315073`, predicted/true
+  C-alpha Rg `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-07:03:18` elapsed; GPU memory
+  was about `45456 MiB` with `88%` utilization in the live microbatch sample,
+  and status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.
+- 2026-06-03T23:03Z E151 live sample: post-step-19500 training continued
+  coherently toward the step-20000 validation boundary. The remote sample
+  reported `completed_step=19680`, active step `19681`, phase
+  `microbatch_done`, active microbatch `1 / 8`; after the local
+  status/history/log pull and plot refresh, local status reported
+  `completed_step=19681`, active step `19682`, phase `microbatch_done`,
+  active microbatch `1 / 8`, target step `30000`, `effective_batch_size=8`,
+  `num_workers=0`, `stopped_early=false`, finite last train loss
+  `4.1399350464344025`, `total_examples=157448`, `history_rows=40`, and last
+  completed history step `19500`. Step 19500 remains the latest validation
+  row and the E151 FoldScore best: `val_lddt_ca=0.5140581899285317`,
+  FoldScore `0.4724952958226204`, dRMSD `8.557481471776962`, C-alpha RMSD
+  `11.519455065667628`, atom14 lDDT `0.45525554445385935`, GDT-HA
+  `0.2314448622390628`, GDT-TS `0.36036865620315073`, predicted/true
+  C-alpha Rg `13.225807489871979 / 16.30911695623398`, and val loss
+  `3.0432572573423387`. Step 18500 remains the primary C-alpha lDDT best:
+  `val_lddt_ca=0.5153927777707576` and FoldScore `0.4717597528398037`.
+  Trainer PID `34098` remained alive after `3-07:25:50` elapsed; GPU memory
+  was about `45456 MiB` with `88%` utilization in the live microbatch sample,
+  and status/process progress remained coherent. The artifact directory still
+  contains `checkpoints/full_msa_to_face_latest.pt`, `run_metadata.json`,
+  `history_full_msa_to_face.json`, and `status_full_msa_to_face.json`; no
+  final `results.json`, `results.csv`, or `eval_details_full_msa_to_face.csv`
+  exists yet. Local status/history/logs were pulled and plots refreshed
+  through step `19500`. Keep E151 running toward `30000`, and leave
+  `EXPERIMENT_RESULTS.md` unchanged until a scored bundle or explicit
+  terminal no-score outcome exists.

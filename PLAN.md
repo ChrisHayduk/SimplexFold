@@ -1,3 +1,50 @@
+## 2026-06-07 Operating Plan Update: E151 Returned
+
+E151 returned coherently as
+`e151_e147_best_full30k_from_e147_s30000_c256_m64`, the full 30,000-step
+continuation of E147 selected-boundary expansion. Trainer PID `34098` on
+Runpod pod `ev7ulphg8dtiqe` has exited after writing the final bundle. The
+remote checkout remains `/workspace/SimplexFold_e151_best30k`, with log
+`/workspace/SimplexFold_e151_best30k/logs/e151_e147_best_full30k.log` and
+artifacts under
+`/workspace/SimplexFold_e151_best30k/artifacts/nanofold_public_benchmarks/e151_e147_best_full30k_from_e147_s30000_c256_m64`.
+Local artifacts and logs were pulled into
+`artifacts/nanofold_public_benchmarks/e151_e147_best_full30k_from_e147_s30000_c256_m64`
+and `artifacts/nanofold_public_benchmarks/logs/e151_e147_best_full30k.log`.
+An unrelated OPS generalization eval was observed on the pod and left
+untouched.
+
+Required bundle files are present locally and remotely: `results.json`,
+`results.csv`, `history_full_msa_to_face.json`,
+`eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+`status_full_msa_to_face.json`, and
+`checkpoints/full_msa_to_face_latest.pt`. Verification passed with
+`completed_steps=30000`, `effective_batch_size=8`, `num_workers=0`,
+`stopped_early=false`, `parameters=3,240,738 <= 3,261,974`, `1000` eval rows,
+one result row, `61` history rows, and final history step `30000`.
+
+E151 is the new best returned SimplexFold row but not a goal-ready candidate.
+Final metrics: `val_lddt_ca=0.5678420430421829`, FoldScore
+`0.5311576097011567`, dRMSD `6.964241918712855`, C-alpha RMSD
+`9.75840218257904`, val loss `2.9504879058599474`, GDT-HA
+`0.2996282949745655`, GDT-TS `0.4497991052418947`, atom14 lDDT
+`0.49778978404402735`, and predicted/true C-alpha Rg
+`14.369263122558595 / 16.30911695623398`. The artifact goal audit failed the
+validation target only: `0.5678 < 0.70`.
+
+Eval-detail analysis shows strong selected-boundary geometry but an unresolved
+global assembly gap. Boundary lDDT mean is `0.8213`, mean boundary contraction
+is `0.5794`, and mean Rg ratio is `0.9035`, but the `>=220` length bin
+averages only `0.5134` C-alpha lDDT and the high-boundary / low-global subset
+contains `35 / 817` rows with mean global lDDT `0.3780`.
+
+Decision: record E151 as returned and best-so-far in `EXPERIMENT_RESULTS.md`,
+but reject it as goal-ready. The selected-boundary expansion branch scaled
+well beyond the 9k short-gate band, yet another blind 30k continuation of the
+same recipe is not justified without a new global-assembly mechanism.
+`PLAN.md`, `EXPERIMENTS.md`, `EXPERIMENTS_NOTES.md`, the result ledger, and
+the ignored plot artifacts have been refreshed around this terminal outcome.
+
 ## 2026-05-31 Runpod Cleanup And Figure Refresh
 
 A fresh Runpod audit found no active SimplexFold training, evaluation, or

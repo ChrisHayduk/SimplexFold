@@ -1,9 +1,9 @@
 # SimplexFold Experiment Results
 
-Last updated: 2026-05-31.
+Last updated: 2026-06-07.
 
-Best validation C-alpha lDDT so far: **E147**, `val_lddt_ca=0.4329` at step
-9000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
+Best validation C-alpha lDDT so far: **E151**, `val_lddt_ca=0.5678` at step
+30000. The target remains `val_lddt_ca > 0.7`, so the goal is not yet met.
 
 This file records returned Runpod results and terminal stopped-run outcomes.
 In-flight plans, launch notes, and partial diagnostics belong in
@@ -159,3 +159,4 @@ recorded in the running notes for that run.
 | E148 degree-normalized selected-boundary expansion | returned | 9000 | 0.4297 | 0.4297 | 0.3986 | 10.8899 | 11.7537 / 16.3091 | Rejected: verified 9k run below the 0.45 short-gate; val_lddt_ca=0.4297, FoldScore=0.3986, dRMSD=10.8899, and C-alpha Rg remains contracted (pred/true=11.7537/16.3091). |
 | E149 selected-cell centroid expansion | returned | 9000 | 0.4300 | 0.4300 | 0.4030 | 10.8056 | 11.8555 / 16.3091 | Rejected: selected-cell centroid expansion returned coherently at step 9000 with val_lddt_ca=0.4300, FoldScore=0.4030, dRMSD=10.8056, and C-alpha Rg still contracted at 11.8555 / 16.3091. It reduced selected-cell boundary contraction relative to prior expansion probes but stayed below the 0.45 short-gate threshold and below E147, so do not spend 30k on this branch. |
 | E150 selected-complex centroid spread | returned | 9000 | 0.4254 | 0.4254 | 0.4029 | 10.8991 | 11.7765 / 16.3091 | Rejected: selected-complex centroid-spread returned coherently at step 9000 with val_lddt_ca=0.4254, FoldScore=0.4029, dRMSD=10.8991, and C-alpha Rg still contracted at 11.7765 / 16.3091. It underperformed E147/E149 and stayed below the 0.45 short-gate threshold, so do not spend 30k on this branch; pivot away from more expansion-style selected-complex losses. |
+| E151 E147 best full 30k continuation | returned | 30000 | 0.5678 | 0.5678 | 0.5312 | 6.9642 | 14.3693 / 16.3091 | Returned coherently at 30k and improved E147/E150 substantially, but rejected as goal-ready: val_lddt_ca=0.5678 and FoldScore=0.5312 remain below the 0.7 target despite best dRMSD/expansion in the selected-boundary branch. |

@@ -8561,3 +8561,65 @@ complete scored bundle. The E150 artifacts and log were re-pulled locally, the
 progress figures were regenerated through E150, and both inactive running pods
 (`723hbew2jrvxjx` and `156hoprq89qgae`) were stopped. There is no active
 Runpod SimplexFold work after this cleanup.
+
+## 2026-05-31 E151 Full E147 Continuation
+
+Hypothesis: although E147 did not clear the short gate, it remained the best
+returned SimplexFold recipe by primary validation C-alpha lDDT and was still
+learning at the 9k stop point. A full continuation tests whether that
+trajectory compounds with more optimizer steps or saturates below the `0.70`
+goal.
+
+Recipe: continue E147 selected-boundary expansion from its step-9000
+checkpoint to target step `30000`, preserving model weights, optimizer state,
+RNG state, train-loss history, and inherited validation history. Keep the E147
+`full_msa_to_face` configuration: `simplexfold_medium_param_matched`, crop
+`256`, MSA depth `64`, no extra MSA, no templates, `n_cycles=4`, effective
+batch size `8`, `num_workers=0`, max parameters `3,261,974`, face and tetra
+coordinate expansion weights `0.05`, coordinate expansion tolerance `0.05`,
+and the same selected-complex communication settings used by E147.
+
+Launch and return: E151 ran on Runpod pod `ev7ulphg8dtiqe` from checkout
+`/workspace/SimplexFold_e151_best30k` as
+`e151_e147_best_full30k_from_e147_s30000_c256_m64`. Trainer PID `34098`
+exited after the final bundle was written. The required remote and local files
+are present: `results.json`, `results.csv`, `history_full_msa_to_face.json`,
+`eval_details_full_msa_to_face.csv`, `run_metadata.json`,
+`status_full_msa_to_face.json`, and
+`checkpoints/full_msa_to_face_latest.pt`. The bundle and log were pulled
+locally, and `scripts/plot_nanofold_experiment_metrics.py` was refreshed for
+the E151 run.
+
+Artifact verification passed: `completed_steps=30000`,
+`effective_batch_size=8`, `num_workers=0`, `stopped_early=false`,
+`parameters=3,240,738 <= 3,261,974`, `1000` eval-detail rows, one result row,
+`61` history rows, and history ending at step `30000`. The goal audit failed
+only the validation target gate: E151 is complete and coherent, but
+`val_lddt_ca=0.5678` remains below `0.70`.
+
+Result: E151 returned the new SimplexFold best by primary validation C-alpha
+lDDT, FoldScore, dRMSD, C-alpha RMSD, GDT-HA, GDT-TS, and global expansion,
+but it is not goal-ready. Final step-30000 metrics:
+`val_lddt_ca=0.5678420430421829`, FoldScore `0.5311576097011567`, dRMSD
+`6.964241918712855`, C-alpha RMSD `9.75840218257904`, val loss
+`2.9504879058599474`, GDT-HA `0.2996282949745655`, GDT-TS
+`0.4497991052418947`, atom14 lDDT `0.49778978404402735`, and predicted/true
+C-alpha Rg `14.369263122558595 / 16.30911695623398`. Selected-boundary
+metrics improved locally but did not translate to enough global chain
+accuracy: face/tetra boundary lDDT `0.8296 / 0.8130`, contraction fraction
+`0.5775 / 0.5814`, and mean boundary lDDT `0.8213`.
+
+Eval-detail analysis keeps the failure mode clear. Across `1000` validation
+rows, C-alpha lDDT mean/p50/p90 was `0.5678 / 0.5670 / 0.7336`, FoldScore
+mean was `0.5312`, dRMSD mean was `6.9642`, and mean Rg ratio was `0.9035`.
+Longer proteins still lag: the `>=220` residue bin averaged `0.5134` lDDT.
+The high-boundary / low-global subset remained non-empty (`35 / 817` rows)
+with mean global lDDT `0.3780`, mean length `197.3714`, boundary metric
+`0.7775`, and Rg ratio `0.8660`.
+
+Decision: record E151 as returned and best-so-far, but reject it as a
+goal-ready candidate because `0.5678 < 0.70`. The long continuation validates
+that selected-boundary expansion can scale well beyond the old 9k short-gate
+band, yet the local-to-global gap remains. Do not spend another blind 30k run
+on the same selected-boundary expansion recipe without a new mechanism aimed
+at global assembly.
