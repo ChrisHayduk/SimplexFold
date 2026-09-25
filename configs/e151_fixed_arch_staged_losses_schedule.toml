@@ -1,0 +1,68 @@
+# E151 fixed-architecture, staged-loss curriculum.
+#
+# This is the checkpoint-ladder loss curriculum with architecture/runtime
+# changes removed. The launcher keeps final E151 architecture settings active
+# from step 0; this file changes only loss weights/tolerances. Optimizer resets
+# are kept only at historical loss-introduction boundaries that used
+# weights-only checkpoint resumes.
+
+[[stage]]
+start_step = 1
+label = "Base simplex coordinate losses"
+source_run = "e53_effective_batch8_s1000_c256_m64"
+
+[stage.training_config]
+simplex_aux_weight = 1.0
+simplex_face_coordinate_weight = 1.0
+simplex_face_coordinate_distance_weight = 0.5
+simplex_tetra_coordinate_weight = 1.0
+simplex_tetra_coordinate_distance_weight = 0.5
+simplex_boundary_degree_normalize = false
+
+[[stage]]
+start_step = 2001
+label = "Lower simplex auxiliary loss"
+source_run = "e55_effective_batch8_aux05_s3000_c256_m64"
+reset_train_iterator = true
+
+[stage.training_config]
+simplex_aux_weight = 0.5
+
+[[stage]]
+start_step = 3001
+label = "Add selected-boundary lDDT losses"
+source_run = "e63_boundary_lddt005_from_e55_s3500_c256_m64"
+optimizer_reset = true
+reset_train_iterator = true
+
+[stage.training_config]
+simplex_face_boundary_lddt_weight = 0.05
+simplex_tetra_boundary_lddt_weight = 0.05
+
+[[stage]]
+start_step = 5501
+label = "Restore auxiliary loss scale"
+source_run = "e116_global_context_from_e72_s6000_c256_m64"
+optimizer_reset = true
+reset_train_iterator = true
+
+[stage.training_config]
+simplex_aux_weight = 1.0
+
+[[stage]]
+start_step = 8501
+label = "Add selected-boundary expansion losses"
+source_run = "e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64"
+optimizer_reset = true
+reset_train_iterator = true
+
+[stage.training_config]
+simplex_face_coordinate_expansion_weight = 0.05
+simplex_tetra_coordinate_expansion_weight = 0.05
+simplex_coordinate_expansion_tolerance = 0.05
+
+[[stage]]
+start_step = 9001
+label = "E151 full-run loss hold"
+source_run = "e151_e147_best_full30k_from_e147_s30000_c256_m64"
+reset_train_iterator = true

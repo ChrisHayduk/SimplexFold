@@ -777,6 +777,32 @@ def test_collate_batch_can_make_training_features_deterministic():
     assert torch.equal(batch_1["masked_msa_mask"], batch_2["masked_msa_mask"])
 
 
+def test_stochastic_msa_sampling_resamples_rows_without_unfixing_feature_seed():
+    msa = torch.arange(8, dtype=torch.long)[:, None].repeat(1, 3)
+    cropped = {"msa": msa, "deletions": torch.zeros_like(msa).float()}
+
+    def build_with_global_seed(global_seed: int, *, stochastic: bool) -> torch.Tensor:
+        torch.manual_seed(global_seed)
+        return build_msa_features(
+            cropped,
+            msa_depth=4,
+            extra_msa_depth=0,
+            training=True,
+            block_delete_training_msa=False,
+            masked_msa_probability=0.0,
+            random_seed=11,
+            stochastic_msa_sampling=stochastic,
+        )["msa_feat"]
+
+    fixed_1 = build_with_global_seed(101, stochastic=False)
+    fixed_2 = build_with_global_seed(202, stochastic=False)
+    stochastic_1 = build_with_global_seed(101, stochastic=True)
+    stochastic_2 = build_with_global_seed(202, stochastic=True)
+
+    assert torch.equal(fixed_1, fixed_2)
+    assert not torch.equal(stochastic_1, stochastic_2)
+
+
 def test_collate_batch_can_disable_block_deletion():
     features, labels = make_feature_and_label_example("AGAGA", include_templates=False)
     example = {

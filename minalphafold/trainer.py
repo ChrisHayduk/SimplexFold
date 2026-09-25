@@ -39,7 +39,8 @@ from typing import Any, cast
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
+from torch.utils.data.distributed import DistributedSampler
 
 from .data import ProcessedOpenProteinSetDataset, collate_batch
 from .losses import AlphaFoldLoss
@@ -123,6 +124,7 @@ class DataConfig:
     block_delete_msa_num_blocks: int = 5
     masked_msa_probability: float = 0.15
     fixed_feature_seed: int | None = None
+    stochastic_msa_sampling: bool = False
 
 
 @dataclass
@@ -605,13 +607,21 @@ def build_dataloader(
     seed: int = 0,
     n_cycles: int = 1,
     n_ensemble: int = 1,
+    distributed_rank: int | None = None,
+    distributed_world_size: int = 1,
 ) -> DataLoader:
+    if distributed_world_size < 1:
+        raise ValueError("`distributed_world_size` must be positive.")
+    if distributed_rank is not None and not 0 <= distributed_rank < distributed_world_size:
+        raise ValueError("`distributed_rank` must be in [0, distributed_world_size).")
+    if distributed_world_size > 1 and distributed_rank is None:
+        raise ValueError("`distributed_rank` is required when `distributed_world_size > 1`.")
     manifest_path = None
     if split == "train":
         manifest_path = data_config.train_manifest
     elif split == "val":
         manifest_path = data_config.val_manifest
-    dataset = ProcessedOpenProteinSetDataset(
+    dataset: ProcessedOpenProteinSetDataset | Subset[Any] = ProcessedOpenProteinSetDataset(
         data_config.processed_features_dir,
         data_config.processed_labels_dir,
         split=split,
@@ -633,15 +643,34 @@ def build_dataloader(
         block_delete_msa_num_blocks=data_config.block_delete_msa_num_blocks,
         masked_msa_probability=data_config.masked_msa_probability,
         random_seed=data_config.fixed_feature_seed,
+        stochastic_msa_sampling=data_config.stochastic_msa_sampling,
         num_recycling_samples=n_cycles,
         num_ensemble_samples=n_ensemble,
     )
     generator = torch.Generator()
     generator.manual_seed(seed)
+    sampler: DistributedSampler[Any] | None = None
+    if distributed_world_size > 1:
+        assert distributed_rank is not None
+        if training:
+            sampler = DistributedSampler(
+                dataset,
+                num_replicas=int(distributed_world_size),
+                rank=int(distributed_rank),
+                shuffle=True,
+                seed=int(seed),
+                drop_last=False,
+            )
+        else:
+            dataset = Subset(
+                dataset,
+                range(int(distributed_rank), len(dataset), int(distributed_world_size)),
+            )
     return DataLoader(
         dataset,
         batch_size=batch_size,
-        shuffle=training,
+        shuffle=training and sampler is None,
+        sampler=sampler,
         num_workers=num_workers,
         pin_memory=device.startswith("cuda"),
         collate_fn=collate_fn,
@@ -2518,6 +2547,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--block-delete-msa-randomize-num-blocks", action="store_true")
     parser.add_argument("--masked-msa-probability", type=float, default=0.15)
     parser.add_argument("--fixed-feature-seed", type=int, default=None)
+    parser.add_argument(
+        "--stochastic-msa-sampling",
+        action="store_true",
+        help="Resample MSA cluster/extra rows during training even when --fixed-feature-seed is set.",
+    )
     parser.add_argument("--epochs", type=int, default=1)
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument(
@@ -3171,6 +3205,7 @@ def main(argv: list[str] | None = None) -> tuple[AlphaFold2, list[dict[str, floa
         block_delete_msa_num_blocks=args.block_delete_msa_num_blocks,
         masked_msa_probability=args.masked_msa_probability,
         fixed_feature_seed=args.fixed_feature_seed,
+        stochastic_msa_sampling=args.stochastic_msa_sampling,
     )
     grad_clip_norm = None if args.grad_clip_norm is not None and args.grad_clip_norm <= 0 else args.grad_clip_norm
     training_config = TrainingConfig(

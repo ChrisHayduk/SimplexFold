@@ -1,0 +1,23 @@
+# E151 fixed-architecture, no staged-loss control.
+#
+# The launcher keeps the final E151 architecture/runtime settings active from
+# step 0. This schedule activates the final E151 loss recipe immediately, so it
+# tests whether staging was necessary at all.
+
+[[stage]]
+start_step = 1
+label = "E151 final losses from step 0"
+source_run = "e151_fixed_arch_no_staged_losses_step0"
+
+[stage.training_config]
+simplex_aux_weight = 1.0
+simplex_face_coordinate_weight = 1.0
+simplex_face_coordinate_distance_weight = 0.5
+simplex_tetra_coordinate_weight = 1.0
+simplex_tetra_coordinate_distance_weight = 0.5
+simplex_boundary_degree_normalize = false
+simplex_face_boundary_lddt_weight = 0.05
+simplex_tetra_boundary_lddt_weight = 0.05
+simplex_face_coordinate_expansion_weight = 0.05
+simplex_tetra_coordinate_expansion_weight = 0.05
+simplex_coordinate_expansion_tolerance = 0.05

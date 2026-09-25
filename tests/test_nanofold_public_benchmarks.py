@@ -1,28 +1,29 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
+import scripts.run_nanofold_public_benchmarks as benchmark
 import torch
-
 from minalphafold.trainer import (
     TrainingConfig,
     load_model_config,
     model_inputs_from_batch,
     simplex_boundary_cochain_recycling_runtime_scale_at_step,
     simplex_boundary_edge_frame_gate_runtime_scale_at_step,
-    simplex_boundary_metric_gate_runtime_scale_at_step,
-    simplex_boundary_metric_recycling_runtime_scale_at_step,
-    simplex_boundary_pair_feedback_runtime_scale_at_step,
-    simplex_boundary_pair_gate_runtime_scale_at_step,
-    simplex_boundary_edge_star_residual_runtime_scale_at_step,
     simplex_boundary_edge_star_readout_runtime_scale_at_step,
+    simplex_boundary_edge_star_residual_runtime_scale_at_step,
     simplex_boundary_face_cyclic_readout_runtime_scale_at_step,
     simplex_boundary_hodge_readout_runtime_scale_at_step,
+    simplex_boundary_metric_gate_runtime_scale_at_step,
+    simplex_boundary_metric_recycling_runtime_scale_at_step,
     simplex_boundary_oriented_cochain_runtime_scale_at_step,
+    simplex_boundary_pair_feedback_runtime_scale_at_step,
+    simplex_boundary_pair_gate_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
     simplex_boundary_signed_face_cyclic_readout_runtime_scale_at_step,
     simplex_cell_score_outer_edge_weight_at_step,
-    simplex_edge_star_context_runtime_scale_at_step,
     simplex_edge_frame_message_runtime_scale_at_step,
+    simplex_edge_star_context_runtime_scale_at_step,
     simplex_face_top_k_at_step,
     simplex_geometry_distance_weight_at_step,
     simplex_hodge_face_runtime_scale_at_step,
@@ -41,19 +42,136 @@ from minalphafold.trainer import (
     simplex_triangle_attention_value_runtime_scale_at_step,
     simplex_vertex_star_context_runtime_scale_at_step,
 )
+from scripts.run_e151_from_scratch import (
+    FIXED_E151_ARCH_ARGS,
+    RECIPE_ORDER,
+    build_command,
+    build_commands,
+)
+from scripts.run_e151_from_scratch import (
+    parse_args as parse_e151_args,
+)
 from scripts.run_nanofold_public_benchmarks import (
     _apply_model_config_overrides,
     _build_loss_fn,
     _enforce_parameter_budget,
     _evaluate,
+    _load_training_stage_schedule,
     _run_status_payload,
     _should_force_microbatch_status,
-    _write_run_status_file,
     _simplex_boundary_geometry_metrics,
     _simplex_topology_metrics,
+    _training_config_for_stage,
     _variant_config,
+    _write_run_status_file,
     parse_args,
 )
+
+
+@pytest.mark.parametrize("rank", [0, 1])
+def test_distributed_validation_includes_metrics_from_nonempty_ranks(monkeypatch, rank):
+    local_results = [
+        {"val_examples": 0.0, "val_loss": float("nan")},
+        {"val_examples": 2.0, "val_loss": 3.0, "val_foldscore": 0.75},
+    ]
+    monkeypatch.setattr(benchmark.dist, "get_world_size", lambda: 2)
+
+    def gather_keys(result, local_keys):
+        assert local_keys == sorted(key for key in local_results[rank] if key != "val_examples")
+        result[:] = [["val_loss"], ["val_foldscore", "val_loss"]]
+
+    def reduce_metrics(tensor, op):
+        assert op == benchmark.dist.ReduceOp.SUM
+        expected_local = [0.0] * 5 if rank == 0 else [1.5, 2.0, 6.0, 2.0, 2.0]
+        torch.testing.assert_close(tensor, torch.tensor(expected_local, dtype=torch.float64))
+        tensor.copy_(torch.tensor([1.5, 2.0, 6.0, 2.0, 2.0], dtype=torch.float64))
+
+    monkeypatch.setattr(benchmark.dist, "all_gather_object", gather_keys)
+    monkeypatch.setattr(benchmark.dist, "all_reduce", reduce_metrics)
+    result = benchmark._reduce_distributed_eval_result(
+        local_results[rank], device=torch.device("cpu"), enabled=True
+    )
+
+    assert result == {"val_examples": 2.0, "val_foldscore": 0.75, "val_loss": 3.0}
+
+
+@pytest.mark.parametrize("local_stop,other_stop", [(False, False), (False, True), (True, False)])
+def test_distributed_stop_uses_the_same_decision_on_all_ranks(monkeypatch, local_stop, other_stop):
+    def reduce_stop(tensor, op):
+        assert op == benchmark.dist.ReduceOp.MAX
+        assert tensor.item() == int(local_stop)
+        tensor.fill_(int(local_stop or other_stop))
+
+    monkeypatch.setattr(benchmark.dist, "all_reduce", reduce_stop)
+
+    assert benchmark._distributed_should_stop(
+        local_stop, device=torch.device("cpu"), enabled=True
+    ) is (local_stop or other_stop)
+
+
+@pytest.mark.parametrize("reset_iterator", [False, True])
+def test_training_forward_uses_stage_config_and_advances_sampler(monkeypatch, tmp_path, reset_iterator):
+    seen_scales = []
+    sampler_epochs = []
+
+    class TrackingSampler(torch.utils.data.DistributedSampler):
+        def set_epoch(self, epoch):
+            sampler_epochs.append(epoch)
+            super().set_epoch(epoch)
+
+    dataset = [{"aatype": torch.zeros(1)}]
+    loader = torch.utils.data.DataLoader(
+        dataset, sampler=TrackingSampler(dataset, num_replicas=1, rank=0), batch_size=1
+    )
+
+    class DummyModel(torch.nn.Module):
+        def __init__(self, config):
+            super().__init__()
+            self.weight = torch.nn.Parameter(torch.ones(1))
+
+        def forward(self, **inputs):
+            seen_scales.append(inputs["scale"])
+            return {"loss": self.weight.square()}
+
+    monkeypatch.setattr(benchmark, "AlphaFold2", DummyModel)
+    monkeypatch.setattr(benchmark, "build_dataloader", lambda *a, **k: loader)
+    monkeypatch.setattr(
+        benchmark, "model_inputs_from_batch",
+        lambda batch, config, **kwargs: {"scale": config.simplex_update_scale},
+    )
+    monkeypatch.setattr(benchmark, "_loss_with_terms", lambda loss, batch, outputs: (outputs["loss"], {}))
+    monkeypatch.setattr(benchmark, "_evaluate_distributed", lambda *a, **k: {"val_loss": 1.0})
+    monkeypatch.setattr(benchmark, "_save_training_checkpoint", lambda *a, **k: None)
+    benchmark._train_variant(
+        variant="no_simplex",
+        model_config=SimpleNamespace(model_profile="test", use_simplicial_evoformer=False),
+        data_config=benchmark.DataConfig(),
+        training_config=TrainingConfig(epochs=2, device="cpu", simplex_update_scale=0.25),
+        output_dir=tmp_path,
+        eval_initial=False,
+        eval_every=0,
+        log_every=0,
+        eval_max_val_batches=None,
+        final_max_val_batches=None,
+        checkpoint_every=0,
+        checkpoint_dir=tmp_path,
+        resume_from_checkpoint=None,
+        resume_model_weights_only=False,
+        auto_resume=False,
+        stage_schedule=[
+            benchmark.TrainingStage(
+                2, "second", {"simplex_update_scale": 0.75}, reset_train_iterator=reset_iterator
+            )
+        ],
+        stop_after_seconds=None,
+        foldscore_components_fn=None,
+        mixed_precision="off",
+        max_parameters=None,
+        dist_info={"enabled": False, "world_size": 1, "rank": 0, "local_rank": 0, "is_main": True},
+    )
+
+    assert seen_scales == [0.25, 0.75]
+    assert sampler_epochs == ([0] if reset_iterator else [1])
 
 
 def test_full_msa_to_face_variant_keeps_tetra_and_enables_msa_faces():
@@ -104,6 +222,153 @@ def test_num_workers_guardrail_is_accepted_by_cli_parser():
     args = parse_args(["--num-workers", "4"])
 
     assert args.num_workers == 4
+
+
+def test_training_stage_schedule_is_accepted_by_cli_parser():
+    args = parse_args(["--training-stage-schedule", "configs/e151_fixed_arch_staged_losses_schedule.toml"])
+
+    assert args.training_stage_schedule == Path("configs/e151_fixed_arch_staged_losses_schedule.toml")
+
+
+def test_e151_fixed_arch_schedules_do_not_stage_architecture_fields():
+    config_dir = Path(__file__).resolve().parents[1] / "configs"
+    architecture_fields = {
+        "simplex_edge_frame_message_runtime_scale",
+        "simplex_boundary_readout_directionality_runtime_scale",
+        "simplex_face_top_k",
+        "simplex_tetra_top_k",
+        "simplex_vertex_star_context_runtime_scale",
+        "simplex_edge_star_context_runtime_scale",
+        "simplex_geometry_distance_weight",
+    }
+
+    for schedule_name in (
+        "e151_fixed_arch_no_staged_losses_schedule.toml",
+        "e151_fixed_arch_staged_losses_schedule.toml",
+        "e151_fixed_arch_two_stage_losses_schedule.toml",
+    ):
+        schedule = _load_training_stage_schedule(config_dir / schedule_name)
+        for stage in schedule:
+            assert not (set(stage.training_config_overrides) & architecture_fields)
+
+
+def test_e151_fixed_arch_no_staged_losses_schedule_uses_final_losses_from_step_zero():
+    schedule_path = Path(__file__).resolve().parents[1] / "configs" / "e151_fixed_arch_no_staged_losses_schedule.toml"
+    schedule = _load_training_stage_schedule(schedule_path)
+    base_config = TrainingConfig()
+
+    assert len(schedule) == 1
+    config, stage, _ = _training_config_for_stage(base_config, schedule, 1)
+
+    assert stage is not None
+    assert stage.source_run == "e151_fixed_arch_no_staged_losses_step0"
+    assert config.simplex_aux_weight == 1.0
+    assert config.simplex_face_coordinate_weight == 1.0
+    assert config.simplex_tetra_coordinate_distance_weight == 0.5
+    assert config.simplex_face_boundary_lddt_weight == 0.05
+    assert config.simplex_tetra_boundary_lddt_weight == 0.05
+    assert config.simplex_face_coordinate_expansion_weight == 0.05
+    assert config.simplex_tetra_coordinate_expansion_weight == 0.05
+    assert config.simplex_coordinate_expansion_tolerance == 0.05
+
+
+def test_e151_fixed_arch_staged_losses_schedule_accumulates_loss_values():
+    schedule_path = Path(__file__).resolve().parents[1] / "configs" / "e151_fixed_arch_staged_losses_schedule.toml"
+    schedule = _load_training_stage_schedule(schedule_path)
+    base_config = TrainingConfig()
+
+    config, stage, _ = _training_config_for_stage(base_config, schedule, 1)
+    assert stage is not None
+    assert stage.source_run == "e53_effective_batch8_s1000_c256_m64"
+    assert config.simplex_aux_weight == 1.0
+    assert config.simplex_face_coordinate_weight == 1.0
+    assert config.simplex_tetra_coordinate_distance_weight == 0.5
+    assert config.simplex_face_boundary_lddt_weight is None
+    assert config.simplex_face_coordinate_expansion_weight is None
+
+    config, stage, _ = _training_config_for_stage(base_config, schedule, 2500)
+    assert stage is not None
+    assert stage.source_run == "e55_effective_batch8_aux05_s3000_c256_m64"
+    assert config.simplex_aux_weight == 0.5
+
+    config, stage, _ = _training_config_for_stage(base_config, schedule, 3250)
+    assert stage is not None
+    assert stage.optimizer_reset is True
+    assert config.simplex_face_boundary_lddt_weight == 0.05
+    assert config.simplex_tetra_boundary_lddt_weight == 0.05
+
+    config, stage, _ = _training_config_for_stage(base_config, schedule, 5750)
+    assert stage is not None
+    assert stage.source_run == "e116_global_context_from_e72_s6000_c256_m64"
+    assert config.simplex_aux_weight == 1.0
+
+    config, stage, _ = _training_config_for_stage(base_config, schedule, 8750)
+    assert stage is not None
+    assert stage.source_run == "e147_selected_boundary_expansion_retry_from_e128_s9000_c256_m64"
+    assert config.simplex_face_coordinate_expansion_weight == 0.05
+    assert config.simplex_tetra_coordinate_expansion_weight == 0.05
+    assert config.simplex_coordinate_expansion_tolerance == 0.05
+
+    config, stage, _ = _training_config_for_stage(base_config, schedule, 9001)
+    assert stage is not None
+    assert stage.source_run == "e151_e147_best_full30k_from_e147_s30000_c256_m64"
+    assert stage.optimizer_reset is False
+    assert stage.reset_train_iterator is True
+    assert config.simplex_face_coordinate_expansion_weight == 0.05
+
+
+def test_e151_fixed_arch_two_stage_schedule_switches_once_at_e151_boundary():
+    schedule_path = Path(__file__).resolve().parents[1] / "configs" / "e151_fixed_arch_two_stage_losses_schedule.toml"
+    schedule = _load_training_stage_schedule(schedule_path)
+    base_config = TrainingConfig()
+
+    assert len(schedule) == 2
+    config, stage, _ = _training_config_for_stage(base_config, schedule, 9000)
+    assert stage is not None
+    assert stage.label == "Base simplex coordinate losses"
+    assert config.simplex_face_boundary_lddt_weight is None
+    assert config.simplex_face_coordinate_expansion_weight is None
+
+    config, stage, _ = _training_config_for_stage(base_config, schedule, 9001)
+    assert stage is not None
+    assert stage.label == "Final E151 losses"
+    assert stage.optimizer_reset is False
+    assert stage.reset_train_iterator is True
+    assert config.simplex_face_boundary_lddt_weight == 0.05
+    assert config.simplex_tetra_boundary_lddt_weight == 0.05
+    assert config.simplex_face_coordinate_expansion_weight == 0.05
+    assert config.simplex_tetra_coordinate_expansion_weight == 0.05
+    assert config.simplex_coordinate_expansion_tolerance == 0.05
+
+
+def test_e151_from_scratch_launcher_uses_fixed_arch_schedule_without_resume():
+    args = parse_e151_args(
+        ["--dry-run", "--steps", "12", "--recipe", "no_staged_losses", "--", "--train-limit", "8"]
+    )
+    command = build_command(args)
+
+    assert "--training-stage-schedule" in command
+    assert "e151_fixed_arch_no_staged_losses_schedule.toml" in command[
+        command.index("--training-stage-schedule") + 1
+    ]
+    assert "--resume-from-checkpoint" not in command
+    assert command[command.index("--steps") + 1] == "12"
+    assert command[command.index("--run-name") + 1] == "e151_fixed_arch_no_staged_losses_s30000_c256_m64"
+    for index in range(0, len(FIXED_E151_ARCH_ARGS), 2):
+        flag = FIXED_E151_ARCH_ARGS[index]
+        value = FIXED_E151_ARCH_ARGS[index + 1]
+        assert command[command.index(flag) + 1] == value
+    assert command[-2:] == ["--train-limit", "8"]
+
+
+def test_e151_from_scratch_launcher_can_build_all_fixed_arch_recipes():
+    args = parse_e151_args(["--dry-run", "--steps", "12", "--all-recipes"])
+    commands = build_commands(args)
+
+    assert len(commands) == len(RECIPE_ORDER)
+    for recipe, command in zip(RECIPE_ORDER, commands, strict=True):
+        assert f"e151_fixed_arch_{recipe}_s30000_c256_m64" in command[command.index("--run-name") + 1]
+        assert f"e151_fixed_arch_{recipe}_schedule.toml" in command[command.index("--training-stage-schedule") + 1]
 
 
 def test_run_status_payload_tracks_live_progress(tmp_path):
@@ -1660,6 +1925,7 @@ def test_e140_selected_boundary_expansion_recipe_matches_running_gate():
     assert args.crop_size == 256
     assert args.msa_depth == 64
     assert args.extra_msa_depth == 0
+    assert args.stochastic_msa_sampling is False
     assert args.max_templates == 0
     assert args.max_parameters == 3_261_974
     assert args.num_workers == 0
@@ -1675,6 +1941,30 @@ def test_e140_selected_boundary_expansion_recipe_matches_running_gate():
         parameter_count=3_240_738,
         max_parameters=args.max_parameters,
     )
+
+
+def test_stochastic_msa_sampling_flag_is_explicit_in_public_benchmark_recipe():
+    args = parse_args(
+        [
+            "--variants",
+            "full_msa_to_face",
+            "--run-name",
+            "e155_large_param_matched_stochastic_af2_pool_no_extra_s30000_c256_m64_x0",
+            "--crop-size",
+            "256",
+            "--msa-depth",
+            "64",
+            "--extra-msa-depth",
+            "0",
+            "--stochastic-msa-sampling",
+        ]
+    )
+
+    assert args.run_name == "e155_large_param_matched_stochastic_af2_pool_no_extra_s30000_c256_m64_x0"
+    assert args.crop_size == 256
+    assert args.msa_depth == 64
+    assert args.extra_msa_depth == 0
+    assert args.stochastic_msa_sampling is True
 
 
 def test_e147_selected_boundary_expansion_retry_matches_documented_gate():

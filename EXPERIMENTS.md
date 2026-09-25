@@ -30,6 +30,47 @@ pair-only baseline.
   below the full goal; capture the output and still record the returned result
   if artifact verification itself passed.
 
+## Reproducible E151 From Step 0
+
+E151 is now represented as a fixed-architecture from-scratch loss-curriculum
+matrix instead of as a dependency on historical checkpoint artifacts. Launch the
+default staged-loss recipe with:
+
+```bash
+python scripts/run_e151_from_scratch.py
+```
+
+The wrapper starts from random initialization and calls
+`scripts/run_nanofold_public_benchmarks.py` with the E151 public benchmark
+settings fixed (`simplexfold_medium_param_matched`, `full_msa_to_face`, crop
+`256`, MSA depth `64`, no templates, effective batch size `8`, `num_workers=0`,
+30,000 steps, and the `3,261,974` parameter cap). The final E151
+architecture/runtime settings are active from step 0 for every recipe:
+edge-frame messages `0.0125`, directed boundary readout `0.25`, face/tetra
+top-k `24/48`, vertex/edge-star context `1.0/0.5`, and geometry-distance
+selection weight `0.025`.
+
+The three planned loss-curriculum tests are:
+
+- `--recipe no_staged_losses`: final E151 losses from step 0, using
+  `configs/e151_fixed_arch_no_staged_losses_schedule.toml`.
+- `--recipe staged_losses`: historical loss stages with architecture changes
+  removed, using `configs/e151_fixed_arch_staged_losses_schedule.toml`.
+- `--recipe two_stage_losses`: base simplex coordinate losses through step
+  9000, then final E151 losses, using
+  `configs/e151_fixed_arch_two_stage_losses_schedule.toml`.
+
+The staged-loss recipe preserves Adam resets only at historical
+loss-introduction stages that previously used `--resume-model-weights-only`,
+and train-iterator resets at retained loss-curriculum boundaries. Use
+`python scripts/run_e151_from_scratch.py --dry-run --all-recipes` to inspect
+the exact three commands before launching full 30,000-step runs.
+
+Launch history: on 2026-06-08, the three fixed-architecture from-scratch
+recipes were launched in parallel on separate A40 instances. On 2026-06-13,
+the two-stage recipe was recovered with `--auto-resume` from its valid
+step-15000 checkpoint after a container restart interrupted training.
+
 ## Reference-Paper Design Rules
 
 The local PDFs in `references/papers/` were re-read from full-text extraction

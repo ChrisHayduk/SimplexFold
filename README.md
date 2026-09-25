@@ -357,6 +357,66 @@ and writes figure-ready JSON/CSV artifacts under
 the CSV also includes official FoldScore component metrics on the evaluated
 crops.
 
+### E151 Fixed-Architecture From-Scratch Recipes
+
+E151 was originally found through a checkpoint ladder. To test whether its loss
+curriculum transfers to a clean run from random initialization, use the
+fixed-architecture launcher:
+
+```bash
+python scripts/run_e151_from_scratch.py
+```
+
+The wrapper expands to `scripts/run_nanofold_public_benchmarks.py` with
+`simplexfold_medium_param_matched`, `full_msa_to_face`, 30,000 optimizer steps,
+crop 256, MSA depth 64, no templates, effective batch size 8, `num_workers=0`,
+and the AF2-medium +5% parameter cap. All recipes keep the final E151
+architecture/runtime settings fixed from step 0:
+edge-frame messages `0.0125`, directed boundary readout `0.25`, face/tetra
+top-k `24/48`, vertex/edge-star context `1.0/0.5`, and geometry-distance
+selection weight `0.025`.
+
+Choose one loss curriculum with `--recipe`:
+
+- `no_staged_losses`: final E151 losses from step 0.
+- `staged_losses`: historical loss stages with architecture changes removed.
+- `two_stage_losses`: base simplex coordinate losses through step 9000, then
+  final E151 losses.
+
+Use `--all-recipes` to run the three commands sequentially.
+
+To inspect the exact command without launching training:
+
+```bash
+python scripts/run_e151_from_scratch.py --dry-run
+python scripts/run_e151_from_scratch.py --dry-run --all-recipes
+```
+
+Extra benchmark-runner flags can be appended after `--`, for example:
+
+```bash
+python scripts/run_e151_from_scratch.py --steps 1000 -- --train-limit 256 --val-limit 64
+```
+
+For multiple GPUs, launch the benchmark runner with `torchrun`; it reads
+`RANK`, `WORLD_SIZE`, and `LOCAL_RANK`, partitions training examples across
+ranks, and evaluates each validation example once. Effective batch size is
+`batch_size * grad_accum_steps * WORLD_SIZE`. Checkpoints and reports are
+written by rank zero. Distributed execution requires CUDA and NCCL.
+
+`--fixed-feature-seed` fixes feature construction. Add
+`--stochastic-msa-sampling` to resample training MSA cluster/extra rows while
+keeping that feature seed; validation remains deterministic. Training-stage
+schedules can update runtime settings and losses, reset the optimizer, and
+restart the training iterator at explicitly selected stages.
+
+The plotting helpers write derived artifacts locally. Use
+`scripts/plot_nanofold_experiment_metrics.py` for the experiment ledger and
+`scripts/plot_af2_large_simplexfold_checkpoint_progress.py --help` for
+checkpoint comparisons with an experiment-specific output prefix. Supply a
+directory under `artifacts/nanofold_public_benchmarks/` to keep figures and
+source metadata out of version control.
+
 For the full model on Modal:
 
 ```bash

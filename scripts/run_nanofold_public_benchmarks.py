@@ -16,7 +16,7 @@ research figures:
 Example local smoke run:
 
     python scripts/run_nanofold_public_benchmarks.py \\
-      --nanofold-root /Users/christopherhayduk/Projects/nanoFold-Competition \\
+      --nanofold-root ../.. \\
       --model-config tiny \\
       --variants no_simplex faces full \\
       --train-limit 8 --val-limit 4 --steps 2 --crop-size 32 \\
@@ -29,18 +29,23 @@ import argparse
 import csv
 import json
 import math
+import os
 import random
 import statistics
 import sys
 import time
+import tomllib
 from contextlib import nullcontext
-from dataclasses import replace
+from dataclasses import dataclass, fields, replace
+from datetime import timedelta
 from pathlib import Path
 from typing import Any, Callable, ContextManager
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel
+from torch.utils.data import DataLoader, DistributedSampler
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -64,22 +69,22 @@ from minalphafold.trainer import (  # noqa: E402
     resolve_device,
     set_optimizer_learning_rate,
     set_seed,
-    simplex_boundary_edge_frame_gate_runtime_scale_at_step,
     simplex_boundary_cochain_recycling_runtime_scale_at_step,
-    simplex_boundary_metric_gate_runtime_scale_at_step,
-    simplex_boundary_metric_recycling_runtime_scale_at_step,
-    simplex_boundary_pair_feedback_runtime_scale_at_step,
-    simplex_boundary_pair_gate_runtime_scale_at_step,
-    simplex_boundary_edge_star_residual_runtime_scale_at_step,
+    simplex_boundary_edge_frame_gate_runtime_scale_at_step,
     simplex_boundary_edge_star_readout_runtime_scale_at_step,
+    simplex_boundary_edge_star_residual_runtime_scale_at_step,
     simplex_boundary_face_cyclic_readout_runtime_scale_at_step,
     simplex_boundary_hodge_readout_runtime_scale_at_step,
+    simplex_boundary_metric_gate_runtime_scale_at_step,
+    simplex_boundary_metric_recycling_runtime_scale_at_step,
     simplex_boundary_oriented_cochain_runtime_scale_at_step,
+    simplex_boundary_pair_feedback_runtime_scale_at_step,
+    simplex_boundary_pair_gate_runtime_scale_at_step,
     simplex_boundary_readout_directionality_runtime_scale_at_step,
     simplex_boundary_signed_face_cyclic_readout_runtime_scale_at_step,
     simplex_cell_score_outer_edge_weight_at_step,
-    simplex_edge_star_context_runtime_scale_at_step,
     simplex_edge_frame_message_runtime_scale_at_step,
+    simplex_edge_star_context_runtime_scale_at_step,
     simplex_face_top_k_at_step,
     simplex_geometry_distance_weight_at_step,
     simplex_hodge_face_runtime_scale_at_step,
@@ -95,11 +100,11 @@ from minalphafold.trainer import (  # noqa: E402
     simplex_signed_tetra_to_face_runtime_scale_at_step,
     simplex_single_update_runtime_scale_at_step,
     simplex_tetra_top_k_at_step,
+    simplex_topology_teacher_forcing_weight_at_step,
     simplex_triangle_attention_bias_runtime_scale_at_step,
     simplex_triangle_attention_value_runtime_scale_at_step,
-    simplex_vertex_star_context_runtime_scale_at_step,
-    simplex_topology_teacher_forcing_weight_at_step,
     simplex_update_scale_at_step,
+    simplex_vertex_star_context_runtime_scale_at_step,
     zero_dropout_model_config,
 )
 
@@ -196,6 +201,123 @@ def _should_force_microbatch_status(*, microbatch_index: int, is_final_step: boo
     """Write every final-step microbatch phase so stalls are diagnosable."""
 
     return is_final_step or microbatch_index == 0
+
+
+@dataclass(frozen=True)
+class TrainingStage:
+    """A step-indexed training recipe stage loaded from TOML."""
+
+    start_step: int
+    label: str
+    training_config_overrides: dict[str, Any]
+    optimizer_reset: bool = False
+    reset_train_iterator: bool = False
+    source_run: str = ""
+
+
+_STAGE_FORBIDDEN_TRAINING_FIELDS = {
+    "batch_size",
+    "best_checkpoint_path",
+    "device",
+    "epochs",
+    "grad_accum_steps",
+    "init_weights_from_checkpoint",
+    "latest_checkpoint_path",
+    "num_workers",
+    "processed_features_dir",
+    "processed_labels_dir",
+    "resume_from_checkpoint",
+    "seed",
+}
+
+
+def _load_training_stage_schedule(path: Path | None) -> list[TrainingStage]:
+    if path is None:
+        return []
+    with path.open("rb") as handle:
+        payload = tomllib.load(handle)
+    raw_stages = payload.get("stage", [])
+    if not isinstance(raw_stages, list) or not raw_stages:
+        raise ValueError(f"Training stage schedule {path} must contain at least one [[stage]] table.")
+
+    valid_training_fields = {field.name for field in fields(TrainingConfig)}
+    stages: list[TrainingStage] = []
+    for index, raw_stage in enumerate(raw_stages, start=1):
+        if not isinstance(raw_stage, dict):
+            raise ValueError(f"Stage {index} in {path} must be a TOML table.")
+        start_step = int(raw_stage.get("start_step", 0))
+        if start_step < 1:
+            raise ValueError(f"Stage {index} in {path} has invalid start_step={start_step}; expected >= 1.")
+        overrides = raw_stage.get("training_config", {})
+        if not isinstance(overrides, dict):
+            raise ValueError(f"Stage {index} in {path} must use a [stage.training_config] table.")
+        unknown = sorted(set(overrides) - valid_training_fields)
+        if unknown:
+            raise ValueError(f"Stage {index} in {path} has unknown TrainingConfig fields: {unknown}")
+        forbidden = sorted(set(overrides) & _STAGE_FORBIDDEN_TRAINING_FIELDS)
+        if forbidden:
+            raise ValueError(
+                f"Stage {index} in {path} changes fields that are fixed for a running dataloader: {forbidden}"
+            )
+        stages.append(
+            TrainingStage(
+                start_step=start_step,
+                label=str(raw_stage.get("label") or f"stage_{index}"),
+                source_run=str(raw_stage.get("source_run") or ""),
+                optimizer_reset=bool(raw_stage.get("optimizer_reset", False)),
+                reset_train_iterator=bool(raw_stage.get("reset_train_iterator", False)),
+                training_config_overrides=dict(overrides),
+            )
+        )
+
+    stages.sort(key=lambda stage: stage.start_step)
+    duplicate_starts = sorted(
+        {stage.start_step for stage in stages if sum(other.start_step == stage.start_step for other in stages) > 1}
+    )
+    if duplicate_starts:
+        raise ValueError(f"Training stage schedule {path} has duplicate start steps: {duplicate_starts}")
+    return stages
+
+
+def _training_stage_index(stage_schedule: list[TrainingStage], step: int) -> int | None:
+    active_index: int | None = None
+    for index, stage in enumerate(stage_schedule):
+        if step >= stage.start_step:
+            active_index = index
+        else:
+            break
+    return active_index
+
+
+def _training_config_for_stage(
+    training_config: TrainingConfig,
+    stage_schedule: list[TrainingStage],
+    step: int,
+) -> tuple[TrainingConfig, TrainingStage | None, int | None]:
+    index = _training_stage_index(stage_schedule, step)
+    if index is None:
+        return training_config, None, None
+    stage = stage_schedule[index]
+    overrides: dict[str, Any] = {}
+    for active_stage in stage_schedule[: index + 1]:
+        overrides.update(active_stage.training_config_overrides)
+    if not overrides:
+        return training_config, stage, index
+    return replace(training_config, **overrides), stage, index
+
+
+def _serialise_training_stage_schedule(stage_schedule: list[TrainingStage]) -> list[dict[str, Any]]:
+    return [
+        {
+            "start_step": stage.start_step,
+            "label": stage.label,
+            "source_run": stage.source_run,
+            "optimizer_reset": stage.optimizer_reset,
+            "reset_train_iterator": stage.reset_train_iterator,
+            "training_config": dict(stage.training_config_overrides),
+        }
+        for stage in stage_schedule
+    ]
 
 
 def _autocast_context(device: torch.device, mixed_precision: str) -> ContextManager[Any]:
@@ -579,6 +701,63 @@ def _enforce_parameter_budget(*, variant: str, parameter_count: int, max_paramet
         )
 
 
+def _init_distributed() -> dict[str, int | bool]:
+    world_size = int(os.environ.get("WORLD_SIZE", "1"))
+    rank = int(os.environ.get("RANK", "0"))
+    local_rank = int(os.environ.get("LOCAL_RANK", "0"))
+    if world_size <= 1:
+        return {
+            "enabled": False,
+            "world_size": 1,
+            "rank": 0,
+            "local_rank": 0,
+            "is_main": True,
+        }
+    if not torch.cuda.is_available():
+        raise RuntimeError("Distributed training requires CUDA devices.")
+    torch.cuda.set_device(local_rank)
+    timeout_seconds_raw = os.environ.get("NANOFOLD_DDP_TIMEOUT_SECONDS")
+    if timeout_seconds_raw:
+        timeout_seconds = int(timeout_seconds_raw)
+        if timeout_seconds <= 0:
+            raise ValueError("NANOFOLD_DDP_TIMEOUT_SECONDS must be positive when set.")
+        dist.init_process_group(backend="nccl", timeout=timedelta(seconds=timeout_seconds))
+    else:
+        dist.init_process_group(backend="nccl")
+    return {
+        "enabled": True,
+        "world_size": world_size,
+        "rank": rank,
+        "local_rank": local_rank,
+        "is_main": rank == 0,
+    }
+
+
+def _distributed_barrier(enabled: bool) -> None:
+    if enabled and dist.is_available() and dist.is_initialized():
+        dist.barrier()
+
+
+def _destroy_distributed(enabled: bool) -> None:
+    if enabled and dist.is_available() and dist.is_initialized():
+        dist.destroy_process_group()
+
+
+def _distributed_sum_floats(values: list[float], *, device: torch.device, enabled: bool) -> list[float]:
+    tensor = torch.tensor(values, device=device, dtype=torch.float64)
+    if enabled:
+        dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
+    return [float(value) for value in tensor.detach().cpu().tolist()]
+
+
+def _distributed_should_stop(local_should_stop: bool, *, device: torch.device, enabled: bool) -> bool:
+    if not enabled:
+        return local_should_stop
+    should_stop = torch.tensor(int(local_should_stop), device=device, dtype=torch.int32)
+    dist.all_reduce(should_stop, op=dist.ReduceOp.MAX)
+    return bool(should_stop.item())
+
+
 def _loss_with_terms(
     loss_fn: AlphaFoldLoss,
     batch: dict[str, Any],
@@ -710,7 +889,7 @@ def _load_training_checkpoint(
 
 
 def _evaluate(
-    model: AlphaFold2,
+    model: torch.nn.Module,
     loss_fn: AlphaFoldLoss,
     dataloader: DataLoader,
     training_config: TrainingConfig,
@@ -837,6 +1016,110 @@ def _evaluate(
             writer = csv.DictWriter(handle, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(detail_rows)
+    return result
+
+
+def _reduce_distributed_eval_result(
+    local_result: dict[str, float],
+    *,
+    device: torch.device,
+    enabled: bool,
+) -> dict[str, float]:
+    if not enabled:
+        return local_result
+    local_keys = sorted(key for key in local_result if key != "val_examples")
+    rank_keys: list[Any] = [None] * dist.get_world_size()
+    dist.all_gather_object(rank_keys, local_keys)
+    keys = sorted({key for keys_on_rank in rank_keys for key in keys_on_rank})
+    local_examples = float(local_result.get("val_examples", 0.0))
+    values: list[float] = []
+    for key in keys:
+        value = float(local_result.get(key, float("nan")))
+        if math.isfinite(value) and local_examples > 0:
+            values.extend([value * local_examples, local_examples])
+        else:
+            values.extend([0.0, 0.0])
+    values.append(local_examples)
+    tensor = torch.tensor(values, device=device, dtype=torch.float64)
+    dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
+    reduced = tensor.detach().cpu().tolist()
+    result: dict[str, float] = {}
+    offset = 0
+    for key in keys:
+        numerator = float(reduced[offset])
+        denominator = float(reduced[offset + 1])
+        result[key] = numerator / denominator if denominator > 0 else float("nan")
+        offset += 2
+    result["val_examples"] = float(reduced[offset])
+    return result
+
+
+def _merge_rank_detail_csvs(detail_path: Path, rank_detail_paths: list[Path]) -> None:
+    rows: list[dict[str, str]] = []
+    fieldnames: set[str] = set()
+    for rank_detail_path in rank_detail_paths:
+        if not rank_detail_path.exists():
+            continue
+        with rank_detail_path.open(newline="", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            fieldnames.update(reader.fieldnames or [])
+            rows.extend(dict(row) for row in reader)
+    detail_path.parent.mkdir(parents=True, exist_ok=True)
+    ordered_fieldnames = sorted(fieldnames)
+    rows.sort(key=lambda row: row.get("chain_id", ""))
+    with detail_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=ordered_fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _evaluate_distributed(
+    model: torch.nn.Module,
+    loss_fn: AlphaFoldLoss,
+    dataloader: DataLoader,
+    training_config: TrainingConfig,
+    device: torch.device,
+    *,
+    max_batches: int | None,
+    foldscore_components_fn: Any | None,
+    mixed_precision: str,
+    distributed: bool,
+    rank: int,
+    world_size: int,
+    step: int | None = None,
+    detail_path: Path | None = None,
+    progress_callback: Callable[[int, int | None, int], None] | None = None,
+) -> dict[str, float]:
+    rank_detail_path = None
+    if detail_path is not None:
+        rank_detail_path = (
+            detail_path
+            if not distributed
+            else detail_path.with_name(f".{detail_path.stem}.rank{rank}{detail_path.suffix}")
+        )
+    local_result = _evaluate(
+        model,
+        loss_fn,
+        dataloader,
+        training_config,
+        device,
+        max_batches=max_batches,
+        foldscore_components_fn=foldscore_components_fn,
+        mixed_precision=mixed_precision,
+        step=step,
+        detail_path=rank_detail_path,
+        progress_callback=progress_callback,
+    )
+    result = _reduce_distributed_eval_result(local_result, device=device, enabled=distributed)
+    if detail_path is not None and distributed:
+        _distributed_barrier(distributed)
+        if rank == 0:
+            rank_detail_paths = [
+                detail_path.with_name(f".{detail_path.stem}.rank{rank_index}{detail_path.suffix}")
+                for rank_index in range(world_size)
+            ]
+            _merge_rank_detail_csvs(detail_path, rank_detail_paths)
+        _distributed_barrier(distributed)
     return result
 
 
@@ -1186,6 +1469,7 @@ def _train_variant(
     data_config: DataConfig,
     training_config: TrainingConfig,
     output_dir: Path,
+    eval_initial: bool,
     eval_every: int,
     log_every: int,
     eval_max_val_batches: int | None,
@@ -1195,13 +1479,20 @@ def _train_variant(
     resume_from_checkpoint: Path | None,
     resume_model_weights_only: bool,
     auto_resume: bool,
+    stage_schedule: list[TrainingStage],
     stop_after_seconds: int | None,
     foldscore_components_fn: Any | None,
     mixed_precision: str,
     max_parameters: int | None,
+    dist_info: dict[str, int | bool],
 ) -> dict[str, Any]:
     set_seed(training_config.seed)
-    device = resolve_device(training_config.device)
+    distributed = bool(dist_info["enabled"])
+    world_size = int(dist_info["world_size"])
+    rank = int(dist_info["rank"])
+    local_rank = int(dist_info["local_rank"])
+    is_main = bool(dist_info["is_main"])
+    device = torch.device("cuda", local_rank) if distributed else resolve_device(training_config.device)
     model = AlphaFold2(model_config).to(device)
     initial_parameter_count = sum(p.numel() for p in model.parameters())
     _enforce_parameter_budget(
@@ -1209,14 +1500,19 @@ def _train_variant(
         parameter_count=initial_parameter_count,
         max_parameters=max_parameters,
     )
-    loss_fn = _build_loss_fn(training_config).to(device)
-    loss_fn.msa_weight = training_config.msa_loss_weight
-    loss_fn.distogram_weight = training_config.distogram_loss_weight
-    loss_fn.confidence_weight = training_config.confidence_loss_weight
+    active_training_config, active_stage, active_stage_index = _training_config_for_stage(
+        training_config,
+        stage_schedule,
+        1,
+    )
+    loss_fn = _build_loss_fn(active_training_config).to(device)
+    loss_fn.msa_weight = active_training_config.msa_loss_weight
+    loss_fn.distogram_weight = active_training_config.distogram_loss_weight
+    loss_fn.confidence_weight = active_training_config.confidence_loss_weight
     target_violation_weight = loss_fn.structural_violation_weight
     finetune_started = False
-    finetune_start_step = training_config.finetune_start_step
-    optimizer = build_optimizer(model, training_config)
+    finetune_start_step = active_training_config.finetune_start_step
+    optimizer = build_optimizer(model, active_training_config)
     ema_model = (
         build_ema_model(model, training_config.ema_decay).to(device)
         if training_config.ema_decay is not None
@@ -1232,6 +1528,8 @@ def _train_variant(
         seed=training_config.seed,
         n_cycles=training_config.n_cycles,
         n_ensemble=training_config.n_ensemble,
+        distributed_rank=rank if distributed else None,
+        distributed_world_size=world_size,
     )
     val_loader = build_dataloader(
         "val",
@@ -1243,6 +1541,8 @@ def _train_variant(
         seed=training_config.seed,
         n_cycles=training_config.n_cycles,
         n_ensemble=training_config.n_ensemble,
+        distributed_rank=rank if distributed else None,
+        distributed_world_size=world_size,
     )
 
     latest_checkpoint_path = checkpoint_dir / f"{variant}_latest.pt"
@@ -1253,13 +1553,31 @@ def _train_variant(
     history: list[dict[str, Any]] = []
     history_path = output_dir / f"history_{variant}.json"
     status_path = output_dir / f"status_{variant}.json"
+    train_sampler = getattr(train_loader, "sampler", None)
+    train_epoch = 0
     train_iter = iter(train_loader)
     train_losses: list[float] = []
     prior_elapsed_seconds = 0.0
     start_step = 1
     total_examples = 0
     last_eval: dict[str, float] | None = None
-    grad_accum_steps = max(int(training_config.grad_accum_steps), 1)
+    configured_grad_accum_steps = max(int(training_config.grad_accum_steps), 1)
+    configured_effective_batch_size = training_config.batch_size * configured_grad_accum_steps
+    grad_accum_steps = configured_grad_accum_steps
+    if distributed:
+        per_microbatch_world_examples = training_config.batch_size * world_size
+        if configured_effective_batch_size % per_microbatch_world_examples != 0:
+            raise ValueError(
+                "Distributed training cannot preserve the configured effective batch size exactly: "
+                f"effective_batch_size={configured_effective_batch_size}, "
+                f"batch_size={training_config.batch_size}, world_size={world_size}."
+            )
+        grad_accum_steps = configured_effective_batch_size // per_microbatch_world_examples
+        if grad_accum_steps <= 0:
+            raise ValueError(
+                "Distributed training would require fewer than one local accumulation step. "
+                f"Use at most {configured_effective_batch_size // max(1, training_config.batch_size)} ranks."
+            )
     model_profile = str(getattr(model_config, "model_profile", "custom"))
 
     if resume_checkpoint_path is not None:
@@ -1283,12 +1601,13 @@ def _train_variant(
         history = list(checkpoint.get("history", []))
         last_eval = checkpoint.get("last_eval")
         prior_elapsed_seconds = float(checkpoint.get("elapsed_seconds_total", 0.0))
-        history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
-        print(
-            f"[{variant}] resumed from {resume_checkpoint_path} "
-            f"at step={start_step - 1} examples={total_examples}"
-        )
-        if resume_model_weights_only:
+        if is_main:
+            history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
+            print(
+                f"[{variant}] resumed from {resume_checkpoint_path} "
+                f"at step={start_step - 1} examples={total_examples}"
+            )
+        if is_main and resume_model_weights_only:
             partial = checkpoint.get("partial_model_load", {})
             print(
                 f"[{variant}] loaded {partial.get('loaded_tensors', 0)} matching model tensors; "
@@ -1296,6 +1615,26 @@ def _train_variant(
                 "and started a fresh optimizer",
                 flush=True,
             )
+
+    active_training_config, active_stage, active_stage_index = _training_config_for_stage(
+        training_config,
+        stage_schedule,
+        start_step,
+    )
+    loss_fn = _build_loss_fn(active_training_config).to(device)
+    loss_fn.msa_weight = active_training_config.msa_loss_weight
+    loss_fn.distogram_weight = active_training_config.distogram_loss_weight
+    loss_fn.confidence_weight = active_training_config.confidence_loss_weight
+    target_violation_weight = loss_fn.structural_violation_weight
+    finetune_start_step = active_training_config.finetune_start_step
+    train_model: torch.nn.Module = model
+    if distributed:
+        train_model = DistributedDataParallel(
+            model,
+            device_ids=[local_rank],
+            output_device=local_rank,
+            find_unused_parameters=True,
+        )
 
     start_time = time.perf_counter()
     status_write_interval_seconds = 60.0
@@ -1318,6 +1657,8 @@ def _train_variant(
         active_eval_examples: int | None = None,
     ) -> None:
         nonlocal next_status_write_at
+        if not is_main:
+            return
         now = time.perf_counter()
         if not force and now < next_status_write_at:
             return
@@ -1328,7 +1669,7 @@ def _train_variant(
             target_steps=training_config.epochs,
             start_step=start_step,
             total_examples=total_examples,
-            effective_batch_size=training_config.batch_size * grad_accum_steps,
+            effective_batch_size=configured_effective_batch_size,
             num_workers=training_config.num_workers,
             elapsed_seconds_total=elapsed_total(),
             elapsed_seconds_run=now - start_time,
@@ -1350,6 +1691,8 @@ def _train_variant(
         next_status_write_at = now + status_write_interval_seconds
 
     def save_latest_checkpoint(*, stopped: bool) -> None:
+        if not is_main:
+            return
         write_run_status("checkpointing", force=True)
         _save_training_checkpoint(
             latest_checkpoint_path,
@@ -1370,122 +1713,212 @@ def _train_variant(
         write_run_status("checkpointed", force=True)
 
     write_run_status("starting", force=True)
+    if eval_initial and start_step <= 1:
+        if is_main:
+            write_run_status("evaluating_initial", force=True, active_step=0)
+        initial_eval = _evaluate_distributed(
+            model,
+            loss_fn,
+            val_loader,
+            active_training_config,
+            device,
+            max_batches=eval_max_val_batches,
+            foldscore_components_fn=foldscore_components_fn,
+            mixed_precision=mixed_precision,
+            distributed=distributed,
+            rank=rank,
+            world_size=world_size,
+            step=0,
+            detail_path=None,
+            progress_callback=lambda batch_index, total_batches, examples: write_run_status(
+                "evaluating_initial",
+                active_step=0,
+                active_eval_batch=batch_index,
+                active_eval_batches=(
+                    min(len(val_loader), eval_max_val_batches)
+                    if eval_max_val_batches is not None
+                    else len(val_loader)
+                )
+                if total_batches is not None
+                else None,
+                active_eval_examples=examples * world_size if distributed else examples,
+            ),
+        )
+        if is_main:
+            initial_row: dict[str, float | int | str] = {
+                "variant": variant,
+                "step": 0,
+                "train_loss": float("nan"),
+                "learning_rate": learning_rate_at_step(
+                    active_training_config,
+                    0,
+                    training_config.epochs,
+                    is_finetune=False,
+                    samples_seen=0,
+                ),
+                "train_examples": 0,
+                "sampled_n_cycles": active_training_config.n_cycles,
+                "training_stage_index": -1 if active_stage_index is None else int(active_stage_index),
+                "training_stage": "" if active_stage is None else active_stage.label,
+                "training_stage_source_run": "" if active_stage is None else active_stage.source_run,
+                "grad_norm": float("nan"),
+                "finetune": int(loss_fn.finetune),
+            }
+            initial_row.update(initial_eval)
+            history.append(initial_row)
+            last_eval = initial_eval
+            history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
+            write_run_status("evaluated_initial", force=True, active_step=0)
+            print(
+                f"[{variant}] step=0/{training_config.epochs} "
+                f"val_foldscore={initial_eval.get('val_foldscore', float('nan')):.4f} "
+                f"val_lddt_ca={initial_eval.get('val_lddt_ca', float('nan')):.4f}",
+                flush=True,
+            )
+        _distributed_barrier(distributed)
 
     for step in range(start_step, training_config.epochs + 1):
-        model.train()
+        next_training_config, next_stage, next_stage_index = _training_config_for_stage(
+            training_config,
+            stage_schedule,
+            step,
+        )
+        if next_stage_index != active_stage_index:
+            active_training_config = next_training_config
+            active_stage = next_stage
+            active_stage_index = next_stage_index
+            loss_fn = _build_loss_fn(active_training_config).to(device)
+            target_violation_weight = loss_fn.structural_violation_weight
+            finetune_started = False
+            finetune_start_step = active_training_config.finetune_start_step
+            if active_stage is not None and active_stage.reset_train_iterator:
+                train_epoch = 0
+                if isinstance(train_sampler, DistributedSampler):
+                    train_sampler.set_epoch(train_epoch)
+                train_iter = iter(train_loader)
+            if active_stage is not None and active_stage.optimizer_reset:
+                optimizer = build_optimizer(model, active_training_config)
+            label = active_stage.label if active_stage is not None else "base"
+            if is_main:
+                print(f"[{variant}] step={step}: entering training stage {label}", flush=True)
+        train_model.train()
         if finetune_start_step is not None and (not finetune_started) and step > finetune_start_step:
             loss_fn.finetune = True
             loss_fn.structural_violation_weight = 0.0
             finetune_started = True
-            print(
-                f"[{variant}] step={step}: enabling fine-tune losses "
-                f"and LR scale {training_config.finetune_lr_scale}"
-            )
+            if is_main:
+                print(
+                    f"[{variant}] step={step}: enabling fine-tune losses "
+                    f"and LR scale {active_training_config.finetune_lr_scale}"
+                )
         if finetune_started and loss_fn.structural_violation_weight < target_violation_weight:
-            ramp_steps = max(int(getattr(training_config, "violation_ramp_steps", 0)), 1)
+            ramp_steps = max(int(getattr(active_training_config, "violation_ramp_steps", 0)), 1)
             ramp_progress = (step - int(finetune_start_step or step)) / ramp_steps
             loss_fn.structural_violation_weight = min(target_violation_weight, ramp_progress * target_violation_weight)
-        apply_loss_weight_schedule(loss_fn, training_config, step)
-        teacher_forcing_weight = simplex_topology_teacher_forcing_weight_at_step(training_config, step)
-        simplex_update_scale = simplex_update_scale_at_step(training_config, step)
-        simplex_pair_update_runtime_scale = simplex_pair_update_runtime_scale_at_step(training_config, step)
-        simplex_single_update_runtime_scale = simplex_single_update_runtime_scale_at_step(training_config, step)
+        apply_loss_weight_schedule(loss_fn, active_training_config, step)
+        teacher_forcing_weight = simplex_topology_teacher_forcing_weight_at_step(active_training_config, step)
+        simplex_update_scale = simplex_update_scale_at_step(active_training_config, step)
+        simplex_pair_update_runtime_scale = simplex_pair_update_runtime_scale_at_step(active_training_config, step)
+        simplex_single_update_runtime_scale = simplex_single_update_runtime_scale_at_step(active_training_config, step)
         simplex_outer_edge_context_runtime_scale = simplex_outer_edge_context_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_outer_edge_residual_context_runtime_scale = (
             simplex_outer_edge_residual_context_runtime_scale_at_step(
-                training_config,
+                active_training_config,
                 step,
             )
         )
         simplex_edge_frame_message_runtime_scale = simplex_edge_frame_message_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_boundary_edge_frame_gate_runtime_scale = simplex_boundary_edge_frame_gate_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_boundary_readout_directionality_runtime_scale = (
-            simplex_boundary_readout_directionality_runtime_scale_at_step(training_config, step)
+            simplex_boundary_readout_directionality_runtime_scale_at_step(active_training_config, step)
         )
         simplex_boundary_hodge_readout_runtime_scale = (
-            simplex_boundary_hodge_readout_runtime_scale_at_step(training_config, step)
+            simplex_boundary_hodge_readout_runtime_scale_at_step(active_training_config, step)
         )
         simplex_boundary_edge_star_readout_runtime_scale = (
-            simplex_boundary_edge_star_readout_runtime_scale_at_step(training_config, step)
+            simplex_boundary_edge_star_readout_runtime_scale_at_step(active_training_config, step)
         )
         simplex_boundary_edge_star_residual_runtime_scale = (
-            simplex_boundary_edge_star_residual_runtime_scale_at_step(training_config, step)
+            simplex_boundary_edge_star_residual_runtime_scale_at_step(active_training_config, step)
         )
         simplex_boundary_oriented_cochain_runtime_scale = (
-            simplex_boundary_oriented_cochain_runtime_scale_at_step(training_config, step)
+            simplex_boundary_oriented_cochain_runtime_scale_at_step(active_training_config, step)
         )
         simplex_boundary_face_cyclic_readout_runtime_scale = (
-            simplex_boundary_face_cyclic_readout_runtime_scale_at_step(training_config, step)
+            simplex_boundary_face_cyclic_readout_runtime_scale_at_step(active_training_config, step)
         )
         simplex_boundary_signed_face_cyclic_readout_runtime_scale = (
-            simplex_boundary_signed_face_cyclic_readout_runtime_scale_at_step(training_config, step)
+            simplex_boundary_signed_face_cyclic_readout_runtime_scale_at_step(active_training_config, step)
         )
         simplex_vertex_star_context_runtime_scale = simplex_vertex_star_context_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_edge_star_context_runtime_scale = simplex_edge_star_context_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_pre_triangle_update_runtime_scale = simplex_pre_triangle_update_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_pre_triangle_single_update_runtime_scale = simplex_pre_triangle_single_update_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_triangle_attention_bias_runtime_scale = (
-            simplex_triangle_attention_bias_runtime_scale_at_step(training_config, step)
+            simplex_triangle_attention_bias_runtime_scale_at_step(active_training_config, step)
         )
         simplex_triangle_attention_value_runtime_scale = (
-            simplex_triangle_attention_value_runtime_scale_at_step(training_config, step)
+            simplex_triangle_attention_value_runtime_scale_at_step(active_training_config, step)
         )
-        simplex_hodge_face_runtime_scale = simplex_hodge_face_runtime_scale_at_step(training_config, step)
+        simplex_hodge_face_runtime_scale = simplex_hodge_face_runtime_scale_at_step(active_training_config, step)
         simplex_signed_tetra_coboundary_runtime_scale = (
-            simplex_signed_tetra_coboundary_runtime_scale_at_step(training_config, step)
+            simplex_signed_tetra_coboundary_runtime_scale_at_step(active_training_config, step)
         )
         simplex_signed_tetra_to_face_runtime_scale = simplex_signed_tetra_to_face_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
-        simplex_segment_cell_runtime_scale = simplex_segment_cell_runtime_scale_at_step(training_config, step)
-        simplex_msa_feedback_runtime_scale = simplex_msa_feedback_runtime_scale_at_step(training_config, step)
+        simplex_segment_cell_runtime_scale = simplex_segment_cell_runtime_scale_at_step(active_training_config, step)
+        simplex_msa_feedback_runtime_scale = simplex_msa_feedback_runtime_scale_at_step(active_training_config, step)
         simplex_boundary_pair_feedback_runtime_scale = simplex_boundary_pair_feedback_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_boundary_pair_gate_runtime_scale = simplex_boundary_pair_gate_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_boundary_metric_gate_runtime_scale = simplex_boundary_metric_gate_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_boundary_metric_recycling_runtime_scale = simplex_boundary_metric_recycling_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
         simplex_boundary_cochain_recycling_runtime_scale = simplex_boundary_cochain_recycling_runtime_scale_at_step(
-            training_config,
+            active_training_config,
             step,
         )
-        simplex_local_neighbor_k = simplex_local_neighbor_k_at_step(training_config, step)
-        simplex_geometry_distance_weight = simplex_geometry_distance_weight_at_step(training_config, step)
-        simplex_face_top_k = simplex_face_top_k_at_step(training_config, step)
-        simplex_tetra_top_k = simplex_tetra_top_k_at_step(training_config, step)
-        simplex_cell_score_outer_edge_weight = simplex_cell_score_outer_edge_weight_at_step(training_config, step)
+        simplex_local_neighbor_k = simplex_local_neighbor_k_at_step(active_training_config, step)
+        simplex_geometry_distance_weight = simplex_geometry_distance_weight_at_step(active_training_config, step)
+        simplex_face_top_k = simplex_face_top_k_at_step(active_training_config, step)
+        simplex_tetra_top_k = simplex_tetra_top_k_at_step(active_training_config, step)
+        simplex_cell_score_outer_edge_weight = simplex_cell_score_outer_edge_weight_at_step(
+            active_training_config,
+            step,
+        )
         is_final_step = step == training_config.epochs
         optimizer.zero_grad(set_to_none=True)
         loss_accum = 0.0
@@ -1508,6 +1941,9 @@ def _train_variant(
             try:
                 batch = next(train_iter)
             except StopIteration:
+                train_epoch += 1
+                if isinstance(train_sampler, DistributedSampler):
+                    train_sampler.set_epoch(train_epoch)
                 train_iter = iter(train_loader)
                 batch = next(train_iter)
 
@@ -1527,10 +1963,10 @@ def _train_variant(
                 active_microbatches=grad_accum_steps,
             )
             with _autocast_context(device, mixed_precision):
-                outputs = model(
+                outputs = train_model(
                     **model_inputs_from_batch(
                         batch,
-                        training_config,
+                        active_training_config,
                         use_simplex_teacher_forcing=True,
                         use_simplex_update_scale=True,
                         use_simplex_outer_edge_context_runtime_scale=True,
@@ -1603,9 +2039,15 @@ def _train_variant(
                 active_microbatches=grad_accum_steps,
             )
 
-        if training_config.grad_clip_norm is not None:
+        global_loss_accum, global_micro_examples_value = _distributed_sum_floats(
+            [loss_accum, float(micro_examples)],
+            device=device,
+            enabled=distributed,
+        )
+        global_micro_examples = max(int(round(global_micro_examples_value)), 1)
+        if active_training_config.grad_clip_norm is not None:
             grad_norm = float(
-                torch.nn.utils.clip_grad_norm_(model.parameters(), training_config.grad_clip_norm)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), active_training_config.grad_clip_norm)
                 .detach()
                 .float()
                 .cpu()
@@ -1614,33 +2056,96 @@ def _train_variant(
         else:
             grad_norm = _global_grad_norm(model.parameters())
         current_lr = learning_rate_at_step(
-            training_config,
+            active_training_config,
             step - 1,
             training_config.epochs,
             is_finetune=loss_fn.finetune,
-            samples_seen=total_examples + micro_examples,
+            samples_seen=total_examples + global_micro_examples,
         )
         set_optimizer_learning_rate(optimizer, current_lr)
         optimizer.step()
         if ema_model is not None:
             ema_model.update_parameters(model)
 
-        loss_value = loss_accum / max(micro_examples, 1)
+        loss_value = global_loss_accum / global_micro_examples
         train_losses.append(loss_value)
-        total_examples += micro_examples
+        total_examples += global_micro_examples
         completed_step = step
         write_run_status("training")
 
         should_eval = is_final_step or (eval_every > 0 and step % eval_every == 0)
         should_log = step == 1 or should_eval or (log_every > 0 and step % log_every == 0)
-        if should_log:
+        eval_result: dict[str, float] | None = None
+        ema_eval_result: dict[str, float] | None = None
+        eval_batch_total = len(val_loader)
+        if should_eval:
+            val_batch_limit = final_max_val_batches if is_final_step else eval_max_val_batches
+            if val_batch_limit is not None:
+                eval_batch_total = min(eval_batch_total, val_batch_limit)
+            if is_main:
+                write_run_status("evaluating", force=True, active_step=step)
+            eval_result = _evaluate_distributed(
+                model,
+                loss_fn,
+                val_loader,
+                active_training_config,
+                device,
+                max_batches=val_batch_limit,
+                foldscore_components_fn=foldscore_components_fn,
+                mixed_precision=mixed_precision,
+                distributed=distributed,
+                rank=rank,
+                world_size=world_size,
+                step=step,
+                detail_path=output_dir / f"eval_details_{variant}.csv" if is_final_step else None,
+                progress_callback=lambda batch_index, total_batches, examples: write_run_status(
+                    "evaluating",
+                    active_step=step,
+                    active_eval_batch=batch_index,
+                    active_eval_batches=eval_batch_total if total_batches is not None else None,
+                    active_eval_examples=examples * world_size if distributed else examples,
+                ),
+            )
+            if is_main:
+                write_run_status("evaluated", force=True, active_step=step)
+            if ema_model is not None and is_final_step:
+                if is_main:
+                    write_run_status("evaluating_ema", force=True, active_step=step)
+                ema_eval_result = _evaluate_distributed(
+                    ema_model,
+                    loss_fn,
+                    val_loader,
+                    active_training_config,
+                    device,
+                    max_batches=final_max_val_batches,
+                    foldscore_components_fn=foldscore_components_fn,
+                    mixed_precision=mixed_precision,
+                    distributed=distributed,
+                    rank=rank,
+                    world_size=world_size,
+                    step=step,
+                    detail_path=output_dir / f"eval_details_ema_{variant}.csv",
+                    progress_callback=lambda batch_index, total_batches, examples: write_run_status(
+                        "evaluating_ema",
+                        active_step=step,
+                        active_eval_batch=batch_index,
+                        active_eval_batches=eval_batch_total if total_batches is not None else None,
+                        active_eval_examples=examples * world_size if distributed else examples,
+                    ),
+                )
+                if is_main:
+                    write_run_status("evaluated_ema", force=True, active_step=step)
+        if should_log and is_main:
             row: dict[str, float | int | str] = {
                 "variant": variant,
                 "step": step,
                 "train_loss": loss_value,
                 "learning_rate": current_lr,
                 "train_examples": total_examples,
-                "sampled_n_cycles": int(getattr(model, "last_n_cycles", training_config.n_cycles)),
+                "sampled_n_cycles": int(getattr(model, "last_n_cycles", active_training_config.n_cycles)),
+                "training_stage_index": -1 if active_stage_index is None else int(active_stage_index),
+                "training_stage": "" if active_stage is None else active_stage.label,
+                "training_stage_source_run": "" if active_stage is None else active_stage.source_run,
                 "grad_norm": grad_norm,
                 "finetune": int(loss_fn.finetune),
                 "structural_violation_weight": float(loss_fn.structural_violation_weight),
@@ -1867,64 +2372,18 @@ def _train_variant(
             for key, values in term_accum.items():
                 row[f"train_{key}"] = _mean(values)
             if should_eval:
-                val_batch_limit = final_max_val_batches if is_final_step else eval_max_val_batches
-                write_run_status("evaluating", force=True, active_step=step)
-                eval_batch_total = len(val_loader)
-                if val_batch_limit is not None:
-                    eval_batch_total = min(eval_batch_total, val_batch_limit)
-                last_eval = _evaluate(
-                    model,
-                    loss_fn,
-                    val_loader,
-                    training_config,
-                    device,
-                    max_batches=val_batch_limit,
-                    foldscore_components_fn=foldscore_components_fn,
-                    mixed_precision=mixed_precision,
-                    step=step,
-                    detail_path=output_dir / f"eval_details_{variant}.csv"
-                    if is_final_step
-                    else None,
-                    progress_callback=lambda batch_index, total_batches, examples: write_run_status(
-                        "evaluating",
-                        active_step=step,
-                        active_eval_batch=batch_index,
-                        active_eval_batches=eval_batch_total if total_batches is not None else None,
-                        active_eval_examples=examples,
-                    ),
-                )
-                write_run_status("evaluated", force=True, active_step=step)
+                last_eval = dict(eval_result or {})
                 row.update(last_eval)
-                if ema_model is not None and is_final_step:
-                    write_run_status("evaluating_ema", force=True, active_step=step)
-                    ema_eval = _evaluate(
-                        ema_model,
-                        loss_fn,
-                        val_loader,
-                        training_config,
-                        device,
-                        max_batches=final_max_val_batches,
-                        foldscore_components_fn=foldscore_components_fn,
-                        mixed_precision=mixed_precision,
-                        step=step,
-                        detail_path=output_dir / f"eval_details_ema_{variant}.csv",
-                        progress_callback=lambda batch_index, total_batches, examples: write_run_status(
-                            "evaluating_ema",
-                            active_step=step,
-                            active_eval_batch=batch_index,
-                            active_eval_batches=eval_batch_total if total_batches is not None else None,
-                            active_eval_examples=examples,
-                        ),
-                    )
+                if ema_eval_result is not None:
+                    ema_eval = ema_eval_result
                     prefixed_ema_eval = _prefix_metrics(ema_eval, "ema_")
                     row.update(prefixed_ema_eval)
                     last_eval.update(prefixed_ema_eval)
-                    write_run_status("evaluated_ema", force=True, active_step=step)
             history.append(row)
             write_run_status("writing_history", force=True, active_step=step)
             history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
             write_run_status("logged", force=True)
-            val_parts = []
+            val_parts: list[str] = []
             for key in (
                 "grad_norm",
                 "train_backbone_loss",
@@ -1939,36 +2398,42 @@ def _train_variant(
                 "val_FoldScore",
             ):
                 if key in row:
-                    value = row[key]
-                    if isinstance(value, (float, int)) and math.isfinite(float(value)):
-                        val_parts.append(f"{key}={float(value):.4f}")
+                    metric_value = row[key]
+                    if isinstance(metric_value, (float, int)) and math.isfinite(float(metric_value)):
+                        val_parts.append(f"{key}={float(metric_value):.4f}")
             val_fragment = (" " + " ".join(val_parts)) if val_parts else ""
             print(
                 f"[{variant}] step={step}/{training_config.epochs} "
                 f"train_loss={loss_value:.4f}{val_fragment}"
             )
-
         if checkpoint_every > 0 and step % checkpoint_every == 0:
             save_latest_checkpoint(stopped=False)
+            _distributed_barrier(distributed)
         if stop_after_seconds is not None and stop_after_seconds > 0:
-            if time.perf_counter() - start_time >= stop_after_seconds:
+            if _distributed_should_stop(
+                time.perf_counter() - start_time >= stop_after_seconds,
+                device=device,
+                enabled=distributed,
+            ):
                 stopped_early = step < training_config.epochs
                 save_latest_checkpoint(stopped=stopped_early)
-                print(
-                    f"[{variant}] stopping after {time.perf_counter() - start_time:.1f}s "
-                    f"at step={step}/{training_config.epochs}; resume from {latest_checkpoint_path}",
-                    flush=True,
-                )
+                _distributed_barrier(distributed)
+                if is_main:
+                    print(
+                        f"[{variant}] stopping after {time.perf_counter() - start_time:.1f}s "
+                        f"at step={step}/{training_config.epochs}; resume from {latest_checkpoint_path}",
+                        flush=True,
+                    )
                 break
 
     elapsed = elapsed_total()
-    if completed_step >= training_config.epochs and last_eval is None:
+    if is_main and completed_step >= training_config.epochs and last_eval is None:
         write_run_status("evaluating_final_fallback", force=True, active_step=completed_step)
         final_eval = _evaluate(
             model,
             loss_fn,
             val_loader,
-            training_config,
+            active_training_config,
             device,
             max_batches=final_max_val_batches,
             foldscore_components_fn=foldscore_components_fn,
@@ -1996,7 +2461,7 @@ def _train_variant(
                 ema_model,
                 loss_fn,
                 val_loader,
-                training_config,
+                active_training_config,
                 device,
                 max_batches=final_max_val_batches,
                 foldscore_components_fn=foldscore_components_fn,
@@ -2019,11 +2484,14 @@ def _train_variant(
             )
             final_eval.update(_prefix_metrics(ema_eval, "ema_"))
             write_run_status("evaluated_final_fallback_ema", force=True, active_step=completed_step)
-    elif last_eval is None:
+    elif (not is_main) or last_eval is None:
         final_eval = {}
     else:
         final_eval = last_eval
     save_latest_checkpoint(stopped=stopped_early)
+    _distributed_barrier(distributed)
+    if not is_main:
+        return {}
     parameter_count = sum(p.numel() for p in model.parameters())
     use_simplicial = bool(getattr(model_config, "use_simplicial_evoformer", False))
     result: dict[str, Any] = {
@@ -2033,9 +2501,13 @@ def _train_variant(
         "steps": training_config.epochs,
         "completed_steps": completed_step,
         "stopped_early": bool(stopped_early),
+        "training_stage_schedule": _serialise_training_stage_schedule(stage_schedule),
+        "final_training_stage": "" if active_stage is None else active_stage.label,
         "train_examples": total_examples,
-        "grad_accum_steps": grad_accum_steps,
-        "effective_batch_size": training_config.batch_size * grad_accum_steps,
+        "grad_accum_steps": configured_grad_accum_steps,
+        "local_grad_accum_steps": grad_accum_steps,
+        "effective_batch_size": configured_effective_batch_size,
+        "distributed_world_size": world_size,
         "num_workers": training_config.num_workers,
         "learning_rate": training_config.learning_rate,
         "warmup_samples": training_config.warmup_samples,
@@ -2628,6 +3100,7 @@ def _train_variant(
         "latest_checkpoint": str(latest_checkpoint_path),
         "resume_from_checkpoint": str(resume_checkpoint_path) if resume_checkpoint_path is not None else "",
         "resume_model_weights_only": bool(resume_model_weights_only),
+        "eval_initial": bool(eval_initial),
         "eval_every": eval_every,
         "eval_max_val_batches": eval_max_val_batches or 0,
         "final_max_val_batches": final_max_val_batches or 0,
@@ -2649,7 +3122,9 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "stopped_early",
         "train_examples",
         "grad_accum_steps",
+        "local_grad_accum_steps",
         "effective_batch_size",
+        "distributed_world_size",
         "num_workers",
         "learning_rate",
         "warmup_samples",
@@ -2827,6 +3302,7 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         "examples_per_second",
         "train_loss_final",
         "train_loss_mean",
+        "eval_initial",
         "eval_every",
         "eval_max_val_batches",
         "final_max_val_batches",
@@ -2981,6 +3457,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Use the same chain ID for train and validation manifests, bypassing official split membership checks.",
     )
     parser.add_argument("--steps", type=int, default=50, help="Optimizer steps per variant.")
+    parser.add_argument(
+        "--eval-initial",
+        action="store_true",
+        help="Evaluate the randomly initialized model at step 0 before training.",
+    )
     parser.add_argument("--eval-every", type=int, default=0, help="0 evaluates only at the final step.")
     parser.add_argument("--log-every", type=int, default=0, help="0 logs only the first step and eval steps.")
     parser.add_argument("--max-val-batches", type=int, default=0, help="0 evaluates the whole selected val manifest.")
@@ -3005,6 +3486,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--checkpoint-dir", type=Path, default=None)
     parser.add_argument("--resume-from-checkpoint", type=Path, default=None)
     parser.add_argument(
+        "--training-stage-schedule",
+        type=Path,
+        default=None,
+        help=(
+            "TOML file with [[stage]] tables that change TrainingConfig fields by step. "
+            "Use this for one-process reproductions of staged checkpoint experiments."
+        ),
+    )
+    parser.add_argument(
         "--resume-model-weights-only",
         action="store_true",
         help=(
@@ -3022,6 +3512,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--crop-size", type=int, default=128)
     parser.add_argument("--msa-depth", type=int, default=32)
     parser.add_argument("--extra-msa-depth", type=int, default=0)
+    parser.add_argument(
+        "--stochastic-msa-sampling",
+        action="store_true",
+        help="Resample MSA cluster/extra rows during training while keeping the configured MSA depths.",
+    )
     parser.add_argument("--max-templates", type=int, default=0)
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument(
@@ -3826,6 +4321,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
     args = parse_args(argv)
+    dist_info = _init_distributed()
+    is_main = bool(dist_info["is_main"])
     nanofold_root = args.nanofold_root.resolve()
     features_dir = nanofold_root / "data" / "processed_features"
     labels_dir = nanofold_root / "data" / "processed_labels"
@@ -3874,6 +4371,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         max_templates=args.max_templates,
         block_delete_training_msa=False,
         fixed_feature_seed=args.seed,
+        stochastic_msa_sampling=args.stochastic_msa_sampling,
     )
     training_config = TrainingConfig(
         epochs=args.steps,
@@ -4226,6 +4724,8 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         else max_val_batches
     )
     checkpoint_dir = (args.checkpoint_dir or (output_dir / "checkpoints")).resolve()
+    stage_schedule_path = args.training_stage_schedule.resolve() if args.training_stage_schedule else None
+    stage_schedule = _load_training_stage_schedule(stage_schedule_path)
 
     metadata = {
         "nanofold_root": str(nanofold_root),
@@ -4242,11 +4742,16 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "crop_size": args.crop_size,
         "msa_depth": args.msa_depth,
         "extra_msa_depth": args.extra_msa_depth,
+        "stochastic_msa_sampling": bool(args.stochastic_msa_sampling),
         "max_templates": args.max_templates,
         "steps": args.steps,
         "batch_size": args.batch_size,
         "grad_accum_steps": args.grad_accum_steps,
         "effective_batch_size": args.batch_size * max(args.grad_accum_steps, 1),
+        "distributed": {
+            "enabled": bool(dist_info["enabled"]),
+            "world_size": int(dist_info["world_size"]),
+        },
         "learning_rate": args.learning_rate,
         "warmup_samples": args.warmup_samples,
         "lr_decay_samples": args.lr_decay_samples,
@@ -4588,6 +5093,7 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "max_parameters": args.max_parameters,
         "mixed_precision": args.mixed_precision,
         "log_every": args.log_every,
+        "eval_initial": bool(args.eval_initial),
         "eval_every": args.eval_every,
         "max_val_batches": args.max_val_batches,
         "eval_max_val_batches": eval_max_val_batches or 0,
@@ -4597,49 +5103,57 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         "resume_from_checkpoint": str(args.resume_from_checkpoint) if args.resume_from_checkpoint else "",
         "resume_model_weights_only": bool(args.resume_model_weights_only),
         "auto_resume": bool(args.auto_resume),
+        "training_stage_schedule": str(stage_schedule_path) if stage_schedule_path is not None else "",
+        "training_stages": _serialise_training_stage_schedule(stage_schedule),
         "stop_after_seconds": args.stop_after_seconds,
         "run_name": args.run_name or "",
     }
-    (output_dir / "run_metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
-    print(f"[nanofold-public] artifacts -> {output_dir}")
-    print(
-        f"[nanofold-public] train={metadata['train_manifest_size']} "
-        f"val={metadata['val_manifest_size']} crop={args.crop_size} msa={args.msa_depth}"
-    )
+    if is_main:
+        (output_dir / "run_metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+        print(f"[nanofold-public] artifacts -> {output_dir}")
+        print(
+            f"[nanofold-public] train={metadata['train_manifest_size']} "
+            f"val={metadata['val_manifest_size']} crop={args.crop_size} msa={args.msa_depth}"
+        )
     if args.resume_from_checkpoint is not None and len(args.variants) != 1:
         raise ValueError("--resume-from-checkpoint is only supported when running one variant.")
 
     rows: list[dict[str, Any]] = []
     for variant in args.variants:
         config = _apply_model_config_overrides(_variant_config(base_config, variant), args)
-        rows.append(
-            _train_variant(
-                variant=variant,
-                model_config=config,
-                data_config=data_config,
-                training_config=training_config,
-                output_dir=output_dir,
-                eval_every=args.eval_every,
-                log_every=args.log_every,
-                eval_max_val_batches=eval_max_val_batches,
-                final_max_val_batches=final_max_val_batches,
-                checkpoint_every=max(args.checkpoint_every, 0),
-                checkpoint_dir=checkpoint_dir,
-                resume_from_checkpoint=args.resume_from_checkpoint.resolve()
-                if args.resume_from_checkpoint is not None
-                else None,
-                resume_model_weights_only=bool(args.resume_model_weights_only),
-                auto_resume=bool(args.auto_resume),
-                stop_after_seconds=args.stop_after_seconds if args.stop_after_seconds > 0 else None,
-                foldscore_components_fn=foldscore_components_fn,
-                mixed_precision=args.mixed_precision,
-                max_parameters=args.max_parameters,
-            )
+        row = _train_variant(
+            variant=variant,
+            model_config=config,
+            data_config=data_config,
+            training_config=training_config,
+            output_dir=output_dir,
+            eval_initial=bool(args.eval_initial),
+            eval_every=args.eval_every,
+            log_every=args.log_every,
+            eval_max_val_batches=eval_max_val_batches,
+            final_max_val_batches=final_max_val_batches,
+            checkpoint_every=max(args.checkpoint_every, 0),
+            checkpoint_dir=checkpoint_dir,
+            resume_from_checkpoint=args.resume_from_checkpoint.resolve()
+            if args.resume_from_checkpoint is not None
+            else None,
+            resume_model_weights_only=bool(args.resume_model_weights_only),
+            auto_resume=bool(args.auto_resume),
+            stage_schedule=stage_schedule,
+            stop_after_seconds=args.stop_after_seconds if args.stop_after_seconds > 0 else None,
+            foldscore_components_fn=foldscore_components_fn,
+            mixed_precision=args.mixed_precision,
+            max_parameters=args.max_parameters,
+            dist_info=dist_info,
         )
-        (output_dir / "results.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")
-        _write_csv(output_dir / "results.csv", rows)
+        if is_main:
+            rows.append(row)
+            (output_dir / "results.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")
+            _write_csv(output_dir / "results.csv", rows)
 
-    print(f"[nanofold-public] results -> {output_dir / 'results.csv'}")
+    if is_main:
+        print(f"[nanofold-public] results -> {output_dir / 'results.csv'}")
+    _destroy_distributed(bool(dist_info["enabled"]))
     return rows
 
 

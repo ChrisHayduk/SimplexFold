@@ -1,0 +1,31 @@
+# E151 fixed-architecture, two-stage loss curriculum.
+#
+# The launcher keeps the final E151 architecture/runtime settings active from
+# step 0. This schedule tests a simpler curriculum: base simplex coordinate
+# losses through step 9000, then the final E151 loss recipe for the 30k run.
+
+[[stage]]
+start_step = 1
+label = "Base simplex coordinate losses"
+source_run = "e151_fixed_arch_two_stage_base"
+
+[stage.training_config]
+simplex_aux_weight = 1.0
+simplex_face_coordinate_weight = 1.0
+simplex_face_coordinate_distance_weight = 0.5
+simplex_tetra_coordinate_weight = 1.0
+simplex_tetra_coordinate_distance_weight = 0.5
+simplex_boundary_degree_normalize = false
+
+[[stage]]
+start_step = 9001
+label = "Final E151 losses"
+source_run = "e151_fixed_arch_two_stage_final"
+reset_train_iterator = true
+
+[stage.training_config]
+simplex_face_boundary_lddt_weight = 0.05
+simplex_tetra_boundary_lddt_weight = 0.05
+simplex_face_coordinate_expansion_weight = 0.05
+simplex_tetra_coordinate_expansion_weight = 0.05
+simplex_coordinate_expansion_tolerance = 0.05

@@ -1,5 +1,47 @@
 # SimplexFold Experiment Notes
 
+## 2026-06-07 E151 Fixed-Architecture From-Scratch Setup
+
+- Added fixed-architecture E151 loss-curriculum schedules and
+  `scripts/run_e151_from_scratch.py` so E151 can be retrained from random
+  initialization without supplying E53/E147/E151 checkpoints.
+- The launcher keeps the final E151 architecture/runtime settings active from
+  step 0 for every recipe: edge-frame messages `0.0125`, directed boundary
+  readout `0.25`, face/tetra top-k `24/48`, vertex/edge-star context
+  `1.0/0.5`, and geometry-distance selection weight `0.025`.
+- The three planned recipes are `no_staged_losses`,
+  `staged_losses`, and `two_stage_losses`. `staged_losses` keeps only the
+  historical loss-curriculum changes, removing architecture changes from the
+  old checkpoint ladder. Adam resets are retained only at loss-introduction
+  boundaries that previously used `--resume-model-weights-only`.
+- Use the new launcher for future E151 reproduction attempts; historical
+  checkpoint paths should remain provenance evidence, not runtime dependencies.
+
+## 2026-06-08 E151 Fixed-Architecture Parallel Launch
+
+- The three recipes were launched on separate A40 instances. The original
+  sequential matrix wrapper was stopped after its first trainer started,
+  leaving `no_staged_losses` active while `staged_losses` and
+  `two_stage_losses` ran independently.
+- Prelaunch checks passed for public data availability: `11000` feature NPZs,
+  `11000` label NPZs, `10000` train manifest rows, and `1000` validation rows.
+  Dry runs resolved the expected commands, and
+  `nanofold.metrics.foldscore_components` imported successfully.
+- All three recipes completed a one-step smoke test before the full runs.
+  Per-run outputs use `artifacts/nanofold_public_benchmarks/`.
+
+## 2026-06-13 E151 Two-Stage Recovery
+
+- A container restart interrupted `two_stage_losses`. The checkpoint state
+  remained coherent but incomplete: no final results or evaluation-detail CSV
+  existed. The status file recorded step `15050`, while the latest valid
+  checkpoint held step `15000`, `120000` examples, and `31` history rows.
+- Recovery used
+  `python scripts/run_e151_from_scratch.py --recipe two_stage_losses -- --auto-resume`.
+  Training resumed at step `15001` and reported a finite loss of `4.1603`.
+- The resume used the run's own checkpoint stream from random initialization.
+  The uncheckpointed work between steps `15000` and `15050` was replayed.
+
 ## 2026-05-16 E142 Final-Validation Watch; Eval Progress Instrumentation
 
 - Rechecked only the owned Runpod pod `723hbew2jrvxjx` through

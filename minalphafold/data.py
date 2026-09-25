@@ -1135,6 +1135,7 @@ def build_msa_features(
     block_delete_msa_num_blocks: int = 5,
     masked_msa_probability: float = 0.15,
     random_seed: int | None = None,
+    stochastic_msa_sampling: bool = False,
 ) -> Dict[str, Any]:
     """Build the stochastic MSA side of Table 1 for one cropped example.
 
@@ -1149,6 +1150,8 @@ def build_msa_features(
     """
     torch_generator = _make_torch_generator(random_seed)
     python_random = random.Random(random_seed) if random_seed is not None else None
+    msa_torch_generator = None if stochastic_msa_sampling and training else torch_generator
+    msa_python_random = None if stochastic_msa_sampling and training else python_random
     full_msa_profile = hhblits_profile(cropped["msa"])
 
     msa, deletions = block_delete_msa(
@@ -1167,8 +1170,8 @@ def build_msa_features(
         msa_depth=msa_depth,
         extra_msa_depth=extra_msa_depth,
         training=training,
-        torch_generator=torch_generator,
-        python_random=python_random,
+        torch_generator=msa_torch_generator,
+        python_random=msa_python_random,
     )
 
     masked_cluster_msa, masked_msa_target, masked_msa_mask = masked_msa_inputs(
@@ -1243,6 +1246,7 @@ def _build_sampled_msa_features(
     block_delete_msa_num_blocks: int,
     masked_msa_probability: float,
     random_seed: int | None,
+    stochastic_msa_sampling: bool = False,
 ) -> list[list[list[Dict[str, Any]]]]:
     """Pre-sample MSA features for recycling / ensembling.
 
@@ -1275,6 +1279,7 @@ def _build_sampled_msa_features(
                         random_seed=None
                         if random_seed is None
                         else _example_seed(random_seed + 1000 * sample_index, example_index),
+                        stochastic_msa_sampling=stochastic_msa_sampling,
                     )
                     for example_index, cropped in enumerate(cropped_examples)
                 ]
@@ -1297,6 +1302,7 @@ def build_processed_example(
     block_delete_msa_num_blocks: int = 5,
     masked_msa_probability: float = 0.15,
     random_seed: int | None = None,
+    stochastic_msa_sampling: bool = False,
 ) -> Dict[str, Any]:
     torch_generator = _make_torch_generator(random_seed)
     cropped = crop_example(example, crop_size=crop_size, training=training, torch_generator=torch_generator)
@@ -1312,6 +1318,7 @@ def build_processed_example(
         block_delete_msa_num_blocks=block_delete_msa_num_blocks,
         masked_msa_probability=masked_msa_probability,
         random_seed=random_seed,
+        stochastic_msa_sampling=stochastic_msa_sampling,
     )
 
 
@@ -1328,6 +1335,7 @@ def build_processed_example_from_cropped(
     block_delete_msa_num_blocks: int = 5,
     masked_msa_probability: float = 0.15,
     random_seed: int | None = None,
+    stochastic_msa_sampling: bool = False,
 ) -> Dict[str, Any]:
     """Convert one cropped raw example into model inputs plus supervision."""
     n_res = example["aatype"].shape[0]
@@ -1356,6 +1364,7 @@ def build_processed_example_from_cropped(
             block_delete_msa_num_blocks=block_delete_msa_num_blocks,
             masked_msa_probability=masked_msa_probability,
             random_seed=random_seed,
+            stochastic_msa_sampling=stochastic_msa_sampling,
         )
     )
     processed.update(build_supervision(example["aatype"], example["atom14_positions"], example["atom14_mask"]))
@@ -1376,6 +1385,7 @@ def collate_batch(
     block_delete_msa_num_blocks: int = 5,
     masked_msa_probability: float = 0.15,
     random_seed: int | None = None,
+    stochastic_msa_sampling: bool = False,
     num_recycling_samples: int = 1,
     num_ensemble_samples: int = 1,
 ) -> Dict[str, Any]:
@@ -1420,6 +1430,7 @@ def collate_batch(
             block_delete_msa_num_blocks=block_delete_msa_num_blocks,
             masked_msa_probability=masked_msa_probability,
             random_seed=None if random_seed is None else _example_seed(random_seed, index),
+            stochastic_msa_sampling=stochastic_msa_sampling,
         )
         for index, cropped in enumerate(cropped_examples)
     ]
@@ -1437,6 +1448,7 @@ def collate_batch(
         block_delete_msa_num_blocks=block_delete_msa_num_blocks,
         masked_msa_probability=masked_msa_probability,
         random_seed=random_seed,
+        stochastic_msa_sampling=stochastic_msa_sampling,
     )
 
     max_length = max(item["aatype"].shape[0] for item in processed)

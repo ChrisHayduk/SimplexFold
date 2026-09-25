@@ -45,6 +45,21 @@ same recipe is not justified without a new global-assembly mechanism.
 `PLAN.md`, `EXPERIMENTS.md`, `EXPERIMENTS_NOTES.md`, the result ledger, and
 the ignored plot artifacts have been refreshed around this terminal outcome.
 
+Follow-up reproducibility update: E151 now has a checkpoint-free
+fixed-architecture from-scratch launcher, `scripts/run_e151_from_scratch.py`.
+It supports three planned loss-curriculum tests with the final E151
+architecture/runtime settings held constant from step 0:
+`no_staged_losses`, `staged_losses`, and `two_stage_losses`. The staged-loss
+recipe removes historical architecture changes and keeps Adam resets only at
+retained loss-introduction boundaries that previously used weights-only
+resumes. Use this setup for future E151 reproduction attempts instead of
+depending on the preserved E53/E147/E151 checkpoint artifacts.
+
+Launch history: the three fixed-architecture recipes were launched on
+separate A40 instances on 2026-06-08. On 2026-06-13, the two-stage trainer
+was recovered after a container restart. Its latest valid checkpoint was at
+step 15000, and `--auto-resume` continued from step 15001.
+
 ## 2026-05-31 Runpod Cleanup And Figure Refresh
 
 A fresh Runpod audit found no active SimplexFold training, evaluation, or
