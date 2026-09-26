@@ -11,11 +11,12 @@ accuracy experiments on held-out structures.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import statistics
 import sys
 import time
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +25,36 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from minalphafold.model import AlphaFold2
-from minalphafold.trainer import load_model_config, resolve_device, set_seed
+from minalphafold.trainer import (
+    load_model_config,
+    require_finite_state,
+    resolve_device,
+    set_seed,
+)
+
+
+def _variant_config(base_config: Any, name: str) -> Any:
+    """Name the mechanisms actually enabled; retain all other profile controls."""
+    if name not in {"simplex", "faces_only", "msa_to_face", "no_simplex"}:
+        raise ValueError(f"Unknown benchmark variant: {name}")
+    if name == "no_simplex":
+        return replace(base_config, use_simplicial_evoformer=False)
+    return replace(
+        base_config,
+        use_simplicial_evoformer=True,
+        simplex_use_faces=True,
+        simplex_use_tetra=name == "simplex",
+        simplex_use_msa_to_face=name == "msa_to_face",
+    )
+
+
+def _input_digest(inputs: dict[str, torch.Tensor]) -> str:
+    digest = hashlib.sha256()
+    for name, value in sorted(inputs.items()):
+        tensor = value.detach().cpu().contiguous()
+        digest.update(json.dumps([name, list(tensor.shape), str(tensor.dtype)]).encode())
+        digest.update(tensor.numpy().tobytes())
+    return digest.hexdigest()
 
 
 def _sync(device: torch.device) -> None:
@@ -79,6 +109,8 @@ def benchmark_variant(
     warmup_steps: int,
     timed_steps: int,
 ) -> dict[str, Any]:
+    if n_cycles < 1 or warmup_steps < 0 or timed_steps < 1:
+        raise ValueError("Benchmark requires positive cycles/timed steps and nonnegative warmup")
     model = AlphaFold2(model_config).to(device)
     model.eval()
     param_count = sum(p.numel() for p in model.parameters())
@@ -86,17 +118,20 @@ def benchmark_variant(
 
     with torch.no_grad():
         for _ in range(warmup_steps):
-            model(**inputs, n_cycles=n_cycles, n_ensemble=1)
+            model(**inputs, n_cycles=n_cycles, n_ensemble=1, sample_recycles=False)
         _sync(device)
         if device.type == "cuda":
             torch.cuda.reset_peak_memory_stats(device)
 
         times_ms: list[float] = []
+        outputs = None
         for _ in range(timed_steps):
             start = time.perf_counter()
-            model(**inputs, n_cycles=n_cycles, n_ensemble=1)
+            outputs = model(**inputs, n_cycles=n_cycles, n_ensemble=1, sample_recycles=False)
             _sync(device)
             times_ms.append((time.perf_counter() - start) * 1000.0)
+        assert outputs is not None
+        require_finite_state(outputs)
 
     use_simplicial = bool(getattr(model_config, "use_simplicial_evoformer", False))
     use_tetra = use_simplicial and bool(getattr(model_config, "simplex_use_tetra", False))
@@ -112,6 +147,7 @@ def benchmark_variant(
         counts = {"neighbor_k_effective": 0, "faces_per_example": 0, "tetras_per_example": 0}
     return {
         "variant": name,
+        "model_config": asdict(model_config),
         "profile": getattr(model_config, "model_profile", "custom"),
         "use_simplicial_evoformer": use_simplicial,
         "simplex_use_tetra": use_tetra,
@@ -122,6 +158,7 @@ def benchmark_variant(
         "median_ms": statistics.median(times_ms),
         "min_ms": min(times_ms),
         "max_ms": max(times_ms),
+        "timings_ms": times_ms,
         "peak_memory_mb": _peak_memory_mb(device),
         **counts,
     }
@@ -148,6 +185,15 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         help="Ablation variants to benchmark.",
     )
     args = parser.parse_args(argv)
+    for field in ("batch_size", "length", "msa_depth", "n_cycles", "timed_steps"):
+        if getattr(args, field) < 1:
+            raise ValueError(f"{field} must be positive")
+    if args.extra_msa_depth < 0 or args.warmup_steps < 0:
+        raise ValueError("extra_msa_depth and warmup_steps must be nonnegative")
+    if len(args.variants) != len(set(args.variants)):
+        raise ValueError("Variants must be distinct")
+    if args.json_out is not None and args.json_out.exists():
+        raise FileExistsError(f"Output already exists: {args.json_out}; choose a fresh attempt path")
 
     set_seed(args.seed)
     device = resolve_device(args.device)
@@ -160,24 +206,36 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
         device=device,
     )
 
-    variant_configs: dict[str, Any] = {
-        "simplex": base_config,
-        "faces_only": replace(base_config, simplex_use_tetra=False),
-        "msa_to_face": replace(base_config, simplex_use_msa_to_face=True),
-        "no_simplex": replace(base_config, use_simplicial_evoformer=False),
+    root = Path(__file__).resolve().parents[1]
+    source_paths = [Path(__file__).resolve(), *sorted(
+        path for path in (root / "minalphafold").iterdir()
+        if path.is_file() and path.suffix in {".py", ".txt"}
+    )]
+    provenance = {
+        "arguments": {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()},
+        "input_sha256": _input_digest(inputs),
+        "source_sha256": {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest() for path in source_paths},
+        "torch_version": torch.__version__,
+        "device": str(device),
+        "device_name": torch.cuda.get_device_name(device) if device.type == "cuda" else "cpu",
+        "cpu_threads": torch.get_num_threads(),
+        "count_semantics": "Allocated candidate slots, not unique geometric simplices",
     }
-    results = [
-        benchmark_variant(
+    results = []
+    for name in args.variants:
+        # Independent initialization streams make variant order immaterial.
+        set_seed(args.seed)
+        result = benchmark_variant(
             name=name,
-            model_config=variant_configs[name],
+            model_config=_variant_config(base_config, name),
             inputs=inputs,
             device=device,
             n_cycles=args.n_cycles,
             warmup_steps=args.warmup_steps,
             timed_steps=args.timed_steps,
         )
-        for name in args.variants
-    ]
+        result["provenance"] = provenance
+        results.append(result)
 
     header = (
         "variant,params,faces,tetras,mean_ms,median_ms,peak_memory_mb,"
@@ -195,7 +253,10 @@ def main(argv: list[str] | None = None) -> list[dict[str, Any]]:
 
     if args.json_out is not None:
         args.json_out.parent.mkdir(parents=True, exist_ok=True)
-        args.json_out.write_text(json.dumps(results, indent=2), encoding="utf-8")
+        # Exclusive creation also protects against another process claiming the
+        # path while measurements are running.
+        with args.json_out.open("x", encoding="utf-8") as handle:
+            handle.write(json.dumps(results, indent=2, allow_nan=False))
     return results
 
 

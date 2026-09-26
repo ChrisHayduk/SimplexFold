@@ -13,7 +13,7 @@ Useful quick smoke:
 
     modal run scripts/modal_nanofold_public_benchmark.py --train-limit 1 \
       --val-limit 1 --steps 1 --crop-size 256 --msa-depth 128 \
-      --extra-msa-depth 256 --n-cycles 4 --max-val-batches 1
+      --extra-msa-depth 256 --n-cycles 4
 
 Set ``SIMPLEXFOLD_MODAL_GPU`` to override the default H200 GPU class.
 """
@@ -30,9 +30,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 LOCAL_NANOFOLD_ROOT = Path(
     os.environ.get(
         "SIMPLEXFOLD_NANOFOLD_ROOT",
-        "/Users/christopherhayduk/Projects/nanoFold-Competition",
+        str(REPO_ROOT.parent / "nanoFold-Competition"),
     )
 )
+LOCAL_TRAIN_MANIFEST = Path(os.environ.get("SIMPLEXFOLD_TRAIN_MANIFEST", str(LOCAL_NANOFOLD_ROOT / "data/manifests/train.txt")))
+LOCAL_VAL_MANIFEST = Path(os.environ.get("SIMPLEXFOLD_VAL_MANIFEST", str(LOCAL_NANOFOLD_ROOT / "data/manifests/val.txt")))
 REMOTE_ROOT = Path("/root")
 REMOTE_NANOFOLD_ROOT = REMOTE_ROOT / "nanofold_public"
 REMOTE_OUTPUT_ROOT = REMOTE_ROOT / "artifacts"
@@ -63,11 +65,11 @@ image = (
         remote_path=str(REMOTE_NANOFOLD_ROOT / "nanofold"),
     )
     .add_local_file(
-        str(LOCAL_NANOFOLD_ROOT / "data" / "manifests" / "train.txt"),
+        str(LOCAL_TRAIN_MANIFEST),
         remote_path=str(REMOTE_NANOFOLD_ROOT / "data" / "manifests" / "train.txt"),
     )
     .add_local_file(
-        str(LOCAL_NANOFOLD_ROOT / "data" / "manifests" / "val.txt"),
+        str(LOCAL_VAL_MANIFEST),
         remote_path=str(REMOTE_NANOFOLD_ROOT / "data" / "manifests" / "val.txt"),
     )
 )
@@ -97,7 +99,7 @@ def _link_mount(source: Path, destination: Path) -> None:
     },
     timeout=60 * 60 * 24,
 )
-def run_benchmark(argv: list[str]) -> str:
+def run_benchmark(argv: list[str]) -> dict:
     import os
     import sys
     import threading
@@ -118,13 +120,17 @@ def run_benchmark(argv: list[str]) -> str:
         str(REMOTE_NANOFOLD_ROOT),
         "--output-dir",
         str(REMOTE_OUTPUT_ROOT / "nanofold_public_benchmarks"),
+        "--features-dir", str(FEATURES_MOUNT),
+        "--labels-dir", str(LABELS_MOUNT),
+        "--train-manifest", str(REMOTE_NANOFOLD_ROOT / "data/manifests/train.txt"),
+        "--val-manifest", str(REMOTE_NANOFOLD_ROOT / "data/manifests/val.txt"),
         *argv,
     ]
     print("[modal] argv:", " ".join(full_argv), flush=True)
     stop_commits = threading.Event()
 
     def commit_loop() -> None:
-        interval_seconds = int(os.environ.get("SIMPLEXFOLD_MODAL_COMMIT_INTERVAL_SECONDS", "600"))
+        interval_seconds = max(1, int(os.environ.get("SIMPLEXFOLD_MODAL_COMMIT_INTERVAL_SECONDS", "600")))
         while not stop_commits.wait(interval_seconds):
             try:
                 output_volume.commit()
@@ -135,13 +141,15 @@ def run_benchmark(argv: list[str]) -> str:
     commit_thread = threading.Thread(target=commit_loop, name="volume-commit-loop", daemon=True)
     commit_thread.start()
     try:
-        benchmark_main(full_argv)
+        rows = benchmark_main(full_argv)
     finally:
         stop_commits.set()
         commit_thread.join(timeout=5)
         output_volume.commit()
         print("[modal] committed final benchmark volume", flush=True)
-    return str(REMOTE_OUTPUT_ROOT / "nanofold_public_benchmarks")
+    return {"output_root": str(REMOTE_OUTPUT_ROOT / "nanofold_public_benchmarks"),
+            "status": "paused" if any(row["paused"] for row in rows) else "complete",
+            "results": rows}
 
 
 @app.local_entrypoint()
@@ -186,7 +194,7 @@ def main(
     finetune_start_step: int = 0,
     finetune_lr_scale: float = 0.5,
     violation_ramp_steps: int = 0,
-    num_workers: int = 4,
+    num_workers: int = 0,
     seed: int = 0,
     n_cycles: int = 4,
     n_ensemble: int = 1,
@@ -198,8 +206,8 @@ def main(
     checkpoint_every: int = 0,
     resume_from_checkpoint: str = "",
     auto_resume: bool = False,
-    stop_after_seconds: int = 0,
-    mixed_precision: str = "bf16",
+    stop_after_seconds: int = 23 * 60 * 60,
+    mixed_precision: str = "off",
     train_chain_ids: str = "",
     val_chain_ids: str = "",
     overfit_chain_id: str = "",
@@ -209,6 +217,14 @@ def main(
     ``train_limit=0`` and ``val_limit=0`` mean the full official public
     manifests: 10,000 train chains and 1,000 validation chains.
     """
+    if mixed_precision != "off" or num_workers != 0:
+        raise ValueError("Research v2 requires mixed_precision=off and num_workers=0")
+    if max_val_batches > 0 or eval_max_val_batches > 0 or final_max_val_batches > 0:
+        raise ValueError("Use val_limit for a complete smaller smoke cohort")
+    if overfit_chain_id:
+        raise ValueError("Use the separate overfit runner for memorization tests")
+    if not 0 < stop_after_seconds < 24 * 60 * 60:
+        raise ValueError("stop_after_seconds must leave time below the Modal 24h limit")
     argv = [
         "--model-config",
         model_config,

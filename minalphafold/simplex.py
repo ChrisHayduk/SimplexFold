@@ -152,7 +152,8 @@ def _masked_cross_entropy_from_bins(
     target_bins: torch.Tensor,
     mask: torch.Tensor,
 ) -> torch.Tensor:
-    log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
+    logits = torch.where(mask[..., None].bool(), logits, 0.0)
+    log_probs = torch.nn.functional.log_softmax(logits.float(), dim=-1)
     ce = -torch.gather(log_probs, -1, target_bins[..., None]).squeeze(-1)
     ce = ce * mask
     reduce_dims = tuple(range(1, ce.ndim))
@@ -164,8 +165,10 @@ def _masked_symmetric_kl(
     logits_b: torch.Tensor,
     mask: torch.Tensor,
 ) -> torch.Tensor:
-    log_a = torch.nn.functional.log_softmax(logits_a, dim=-1)
-    log_b = torch.nn.functional.log_softmax(logits_b, dim=-1)
+    logits_a = torch.where(mask[..., None].bool(), logits_a, 0.0)
+    logits_b = torch.where(mask[..., None].bool(), logits_b, 0.0)
+    log_a = torch.nn.functional.log_softmax(logits_a.float(), dim=-1)
+    log_b = torch.nn.functional.log_softmax(logits_b.float(), dim=-1)
     prob_a = log_a.exp()
     prob_b = log_b.exp()
     # Stop-gradient targets avoid a pure agreement collapse while still

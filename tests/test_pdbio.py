@@ -78,3 +78,21 @@ def test_write_model_output_pdb_uses_plddt_b_factors(tmp_path):
 
     assert abs(first_b_factor - 87.5) < 1.0
     assert abs(second_b_factor - 62.5) < 1.0
+
+
+def test_pdb_writer_rejects_corrupt_observed_atoms_but_ignores_absent_atoms():
+    import pytest
+    from minalphafold.pdbio import atom14_to_pdb_string
+    coords = torch.full((1, 14, 3), float("nan"))
+    coords[0, :4] = 1
+    mask = torch.zeros(1, 14)
+    mask[0, :4] = 1
+    text = atom14_to_pdb_string(torch.tensor([0]), coords, mask)
+    assert text.count("ATOM  ") == 4 and "nan" not in text
+    coords[0, 1, 0] = float("inf")
+    with pytest.raises(ValueError, match="Observed"):
+        atom14_to_pdb_string(torch.tensor([0]), coords, mask)
+    coords[0, 1, 0] = 1
+    mask[0, 1] = float("nan")
+    with pytest.raises(ValueError, match="binary"):
+        atom14_to_pdb_string(torch.tensor([0]), coords, mask)

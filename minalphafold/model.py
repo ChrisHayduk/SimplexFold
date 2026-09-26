@@ -200,15 +200,21 @@ class AlphaFold2(torch.nn.Module):
             n_cycles: int = 3,
             n_ensemble: int = 1,
             detach_rotations: bool = True,
+            sample_recycles: bool | None = None,
         ):
         """Algorithm 2 forward pass. See the class docstring for the full map."""
         # seq_mask: (batch, N_res) — 1 for valid residues, 0 for padding
         # msa_mask: (batch, N_seq, N_res) — 1 for valid, 0 for padding
         # extra_msa_mask: (batch, N_extra, N_res) — 1 for valid, 0 for padding
-        assert n_ensemble > 0
-        assert n_cycles > 0
+        for name, value in (("n_ensemble", n_ensemble), ("n_cycles", n_cycles)):
+            if type(value) is not int or value <= 0:
+                raise ValueError(f"{name} must be a positive integer.")
 
-        if self.training:
+        if sample_recycles is not None and type(sample_recycles) is not bool:
+            raise ValueError("sample_recycles must be a boolean or None.")
+        if sample_recycles is None:
+            sample_recycles = self.training
+        if sample_recycles:
             # Algorithm 31 line 1: N' ~ Uniform(1, N_cycle). Only iteration
             # N' carries gradients; earlier iterations are stop-grad'd via the
             # detach() calls at the bottom of the loop (Algorithm 31 line 4).
@@ -228,9 +234,9 @@ class AlphaFold2(torch.nn.Module):
             seq_mask = target_feat.new_ones(batch_size, N_res)
         pair_mask = seq_mask[:, :, None] * seq_mask[:, None, :]  # (batch, N_res, N_res)
         if msa_mask is None:
-            msa_mask = target_feat.new_ones(batch_size, msa_feat.shape[1], N_res)
+            msa_mask = seq_mask[:, None, :].expand(batch_size, msa_feat.shape[-3], N_res)
         if extra_msa_mask is None:
-            extra_msa_mask = target_feat.new_ones(batch_size, extra_msa_feat.shape[1], N_res)
+            extra_msa_mask = seq_mask[:, None, :].expand(batch_size, extra_msa_feat.shape[-3], N_res)
 
         # Algorithm 2 line 1: m̂_1i^prev, ẑ_ij^prev, x̄_i^{prev,Cβ} ← 0, 0, 0.
         single_rep_prev = torch.zeros(batch_size, N_res, c_m, device=msa_feat.device)

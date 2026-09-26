@@ -1,0 +1,122 @@
+[
+  {
+    "path": "minalphafold/data.py",
+    "before": "        raise ValueError(f\"Empty chain manifest: {path}\")\n",
+    "after": "        raise ValueError(f\"Empty chain manifest: {path}\")\n    if len(chain_ids) != len(set(chain_ids)):\n        raise ValueError(f\"Duplicate chain IDs in manifest: {path}\")\n"
+  },
+  {
+    "path": "minalphafold/data.py",
+    "before": "def _pair_distance_bins(distances: torch.Tensor, num_bins: int = TEMPLATE_PAIR_BINS) -> torch.Tensor:\n",
+    "after": "def _observed_atom14_positions(positions: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:\n    \"\"\"Reject invalid observed atoms and neutralize absent coordinates before geometry.\"\"\"\n    if positions.shape != (*mask.shape, 3) or mask.shape[-1] != 14:\n        raise ValueError(\"Expected atom14 positions [...,14,3] and mask [...,14].\")\n    if not torch.isfinite(mask).all() or not ((mask == 0) | (mask == 1)).all():\n        raise ValueError(\"Atom masks must contain only finite zero/one values.\")\n    if not torch.isfinite(positions[mask.bool()]).all():\n        raise ValueError(\"Observed atom coordinates must be finite.\")\n    return torch.where(mask[..., None].bool(), positions, torch.zeros_like(positions))\n\n\ndef _pair_distance_bins(distances: torch.Tensor, num_bins: int = TEMPLATE_PAIR_BINS) -> torch.Tensor:\n"
+  },
+  {
+    "path": "minalphafold/data.py",
+    "before": "    Empty-template case returns an all-zeros tensor with the right shape.\n    \"\"\"\n",
+    "after": "    Empty-template case returns an all-zeros tensor with the right shape.\n    \"\"\"\n    template_atom14_positions = _observed_atom14_positions(template_atom14_positions, template_atom14_mask)\n"
+  },
+  {
+    "path": "minalphafold/data.py",
+    "before": "    \"\"\"\n    assert template_aatype.ndim == 2, (\n",
+    "after": "    \"\"\"\n    template_atom14_positions = _observed_atom14_positions(template_atom14_positions, template_atom14_mask)\n    assert template_aatype.ndim == 2, (\n"
+  },
+  {
+    "path": "minalphafold/data.py",
+    "before": "def build_supervision(\n",
+    "after": "def loss_residue_index(\n    residue_index: torch.Tensor,\n    between_segment_residues: torch.Tensor | None = None,\n) -> torch.Tensor:\n    \"\"\"Encode peptide adjacency for losses without changing model indices.\"\"\"\n    if residue_index.ndim != 1:\n        raise ValueError(\"residue_index must be one dimensional.\")\n    connected = residue_index[1:] - residue_index[:-1] == 1\n    if between_segment_residues is not None:\n        if between_segment_residues.shape != residue_index.shape:\n            raise ValueError(\"between_segment_residues must match residue_index shape.\")\n        connected &= between_segment_residues[1:] == 0\n    increments = torch.cat((residue_index.new_zeros(1), 2 - connected.long()))\n    return increments.cumsum(dim=0)\n\n\ndef build_supervision(\n"
+  },
+  {
+    "path": "minalphafold/data.py",
+    "before": ") -> Dict[str, torch.Tensor]:\n    \"\"\"Build every ground-truth tensor the loss consumes.\n",
+    "after": "    residue_index: torch.Tensor | None = None,\n    between_segment_residues: torch.Tensor | None = None,\n) -> Dict[str, torch.Tensor]:\n    \"\"\"Build every ground-truth tensor the loss consumes.\n"
+  },
+  {
+    "path": "minalphafold/data.py",
+    "before": "    # Backbone (group 0) and group-existence mask come from Gram-Schmidt on real atoms\n",
+    "after": "    atom14_positions = _observed_atom14_positions(atom14_positions, atom14_mask)\n    # Backbone (group 0) and group-existence mask come from Gram-Schmidt on real atoms\n"
+  },
+  {
+    "path": "minalphafold/data.py",
+    "before": "    true_torsion_angles_alt = alternative_torsion_angles(true_torsion_angles, aatype)\n",
+    "after": "    # Omega and phi use the preceding residue; gaps and chain breaks must\n    # not turn nonbonded atoms into supervised peptide torsions.\n    consecutive = torch.ones_like(aatype[1:], dtype=torch.bool)\n    if residue_index is not None:\n        if residue_index.shape != aatype.shape:\n            raise ValueError(\"residue_index must match aatype shape.\")\n        consecutive &= residue_index[1:] - residue_index[:-1] == 1\n    if between_segment_residues is not None:\n        if between_segment_residues.shape != aatype.shape:\n            raise ValueError(\"between_segment_residues must match aatype shape.\")\n        consecutive &= between_segment_residues[1:] == 0\n    true_torsion_mask[1:, :2] *= consecutive[:, None]\n    true_torsion_angles_alt = alternative_torsion_angles(true_torsion_angles, aatype)\n"
+  },
+  {
+    "path": "minalphafold/data.py",
+    "before": "    processed.update(build_supervision(example[\"aatype\"], example[\"atom14_positions\"], example[\"atom14_mask\"]))\n",
+    "after": "    residue_index = processed[\"residue_index\"]\n    segment_starts = example.get(\"between_segment_residues\")\n    # Violation losses need the break information without changing relative\n    # positional inputs to the model.\n    processed[\"loss_residue_index\"] = loss_residue_index(residue_index, segment_starts)\n    processed.update(build_supervision(\n        example[\"aatype\"], example[\"atom14_positions\"], example[\"atom14_mask\"],\n        residue_index=residue_index, between_segment_residues=segment_starts,\n    ))\n"
+  },
+  {
+    "path": "minalphafold/data.py",
+    "before": "        \"seq_mask\": (max_length,),\n",
+    "after": "        \"loss_residue_index\": (max_length,),\n        \"seq_mask\": (max_length,),\n"
+  },
+  {
+    "path": "minalphafold/losses.py",
+    "before": "        torsion_normalizer = mask.sum(dim=(0, 2, 3)).clamp(min=1.0)\n",
+    "after": "        # Average across structure-module layers as well as valid torsions.\n        mask = mask.expand_as(torsion_dist_sq)\n        torsion_normalizer = mask.sum(dim=(0, 2, 3)).clamp(min=1.0)\n"
+  },
+  {
+    "path": "minalphafold/model.py",
+    "before": "            detach_rotations: bool = True,\n",
+    "after": "            detach_rotations: bool = True,\n            sample_recycles: bool | None = None,\n"
+  },
+  {
+    "path": "minalphafold/model.py",
+    "before": "        assert n_ensemble > 0\n        assert n_cycles > 0\n",
+    "after": "        for name, value in ((\"n_ensemble\", n_ensemble), (\"n_cycles\", n_cycles)):\n            if type(value) is not int or value <= 0:\n                raise ValueError(f\"{name} must be a positive integer.\")\n"
+  },
+  {
+    "path": "minalphafold/model.py",
+    "before": "        if self.training:\n            # Algorithm 31 line 1: N' ~ Uniform(1, N_cycle). Only iteration\n",
+    "after": "        if sample_recycles is not None and type(sample_recycles) is not bool:\n            raise ValueError(\"sample_recycles must be a boolean or None.\")\n        if sample_recycles is None:\n            sample_recycles = self.training\n        if sample_recycles:\n            # Algorithm 31 line 1: N' ~ Uniform(1, N_cycle). Only iteration\n"
+  },
+  {
+    "path": "minalphafold/model.py",
+    "before": "            msa_mask = target_feat.new_ones(batch_size, msa_feat.shape[1], N_res)\n",
+    "after": "            msa_mask = target_feat.new_ones(batch_size, msa_feat.shape[-3], N_res)\n"
+  },
+  {
+    "path": "minalphafold/model.py",
+    "before": "            extra_msa_mask = target_feat.new_ones(batch_size, extra_msa_feat.shape[1], N_res)\n",
+    "after": "            extra_msa_mask = target_feat.new_ones(batch_size, extra_msa_feat.shape[-3], N_res)\n"
+  },
+  {
+    "path": "minalphafold/simplex.py",
+    "before": "    log_probs = torch.nn.functional.log_softmax(logits, dim=-1)\n",
+    "after": "    logits = torch.where(mask[..., None].bool(), logits, 0.0)\n    log_probs = torch.nn.functional.log_softmax(logits.float(), dim=-1)\n"
+  },
+  {
+    "path": "minalphafold/simplex.py",
+    "before": "    log_a = torch.nn.functional.log_softmax(logits_a, dim=-1)\n    log_b = torch.nn.functional.log_softmax(logits_b, dim=-1)\n",
+    "after": "    logits_a = torch.where(mask[..., None].bool(), logits_a, 0.0)\n    logits_b = torch.where(mask[..., None].bool(), logits_b, 0.0)\n    log_a = torch.nn.functional.log_softmax(logits_a.float(), dim=-1)\n    log_b = torch.nn.functional.log_softmax(logits_b.float(), dim=-1)\n"
+  },
+  {
+    "path": "minalphafold/structure_module.py",
+    "before": "        predictions = {\n",
+    "after": "        if seq_mask is not None:\n            mask = mask * seq_mask[..., None].to(mask)\n        atom_coords = torch.where(mask[..., None].bool(), atom_coords, torch.zeros_like(atom_coords))\n        predictions = {\n"
+  },
+  {
+    "path": "minalphafold/trainer.py",
+    "before": "    latest_checkpoint_path: str | Path | None = None\n",
+    "after": "    sample_recycles: bool | None = None\n    latest_checkpoint_path: str | Path | None = None\n"
+  },
+  {
+    "path": "minalphafold/trainer.py",
+    "before": "        \"detach_rotations\": training_config.detach_rotations,\n",
+    "after": "        \"detach_rotations\": training_config.detach_rotations,\n        \"sample_recycles\": training_config.sample_recycles,\n"
+  },
+  {
+    "path": "minalphafold/trainer.py",
+    "before": "        \"residue_index\": batch[\"residue_index\"],\n        \"seq_mask\": batch[\"seq_mask\"],\n",
+    "after": "        \"residue_index\": batch.get(\"loss_residue_index\", batch[\"residue_index\"]),\n        \"seq_mask\": batch[\"seq_mask\"],\n"
+  },
+  {
+    "path": "minalphafold/model.py",
+    "before": "target_feat.new_ones(batch_size, msa_feat.shape[-3], N_res)",
+    "after": "seq_mask[:, None, :].expand(batch_size, msa_feat.shape[-3], N_res)"
+  },
+  {
+    "path": "minalphafold/model.py",
+    "before": "target_feat.new_ones(batch_size, extra_msa_feat.shape[-3], N_res)",
+    "after": "seq_mask[:, None, :].expand(batch_size, extra_msa_feat.shape[-3], N_res)"
+  }
+]

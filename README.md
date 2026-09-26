@@ -351,11 +351,12 @@ python scripts/run_nanofold_public_benchmarks.py \
   --max-templates 0
 ```
 
-The runner uses NanoFold's official public manifests, keeps templates disabled,
-and writes figure-ready JSON/CSV artifacts under
-`artifacts/nanofold_public_benchmarks/`. When the NanoFold repo is available,
-the CSV also includes official FoldScore component metrics on the evaluated
-crops.
+The runner uses the selected public manifests, keeps templates disabled by
+this recipe, and writes checkpoint-bound JSON results and per-target FoldScore
+components under `artifacts/nanofold_public_benchmarks/`. Validation always covers
+whole targets. Supply `--features-dir`, `--labels-dir`, `--train-manifest`, and
+`--val-manifest` to choose a regenerated corpus explicitly; a prefix smoke subset
+does not represent the full public evaluation.
 
 For the full model on Modal:
 
@@ -371,7 +372,7 @@ modal run --detach --timestamps scripts/modal_nanofold_public_benchmark.py \
   --extra-msa-depth 256 \
   --max-templates 0 \
   --n-cycles 4 \
-  --mixed-precision bf16 \
+  --mixed-precision off \
   --log-every 100
 ```
 
@@ -379,3 +380,17 @@ Use `configs/simplexfold_param_matched.toml` for the fair parameter-budget
 comparison: it keeps 48 SimplicialEvoformer layers but shrinks trunk/simplex
 widths so total parameters are roughly the same as a vanilla AF2-width
 pair-only model.
+
+## Audited research execution
+
+New paper and rebuttal experiments use [research protocol 2](docs/RESEARCH_PROTOCOL.md).
+The public benchmark CLI delegates to the same content-bound runner, and pinned
+exports support main/E01/E02/E03/E04/E05/E07 without changing historical refs.
+The protocol documents exact-resume semantics, whole-target scoring, corrected
+loss/mask behavior, E151 provenance limits, and CPU versus GPU validation scope.
+
+Use the [verified reporting and legacy-script migration guide](docs/verified_reporting.md)
+to record, audit, summarize, or plot v2 results. These tools require complete
+checkpoint-bound cohorts and keep each seed separate from historical ledgers.
+
+Native template preprocessing requires an explicit prespecified `--max-template-date YYYY-MM-DD`; use `--skip-templates` for template-free caches. Accepted templates must have an original release date within that cutoff, a complete deposited polymer sequence, unambiguous alignment and matching amino-acid slots. Target PDB entries are excluded across every chain. Paired cache generations and per-template provenance are saved.
